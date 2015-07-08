@@ -1,7 +1,0 @@
-#-*- mode: ruby -*-
-
-gem 'my', '1.0', :path => '../my'
-
-gem 'rake'
-
-# vim: syntax=Ruby

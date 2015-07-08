@@ -2,7 +2,6 @@ require 'socket'
 require 'fcntl'
 require 'timeout'
 require 'thread'
-require 'rbconfig'
 
 begin
   require 'securerandom'
@@ -36,11 +35,6 @@ end
 # * /etc/nsswitch.conf is not supported.
 
 class Resolv
-  
-  ##
-  # Tests whether we're running on Windows
-  
-  WINDOWS = /mswin|cygwin|mingw|bccwin/ =~ RUBY_PLATFORM || ::RbConfig::CONFIG['host_os'] =~ /mswin/
 
   ##
   # Looks up the first IP address for +name+.
@@ -171,7 +165,8 @@ class Resolv
   # DNS::Hosts is a hostname resolver that uses the system hosts file.
 
   class Hosts
-    if WINDOWS
+    require 'rbconfig'
+    if /mswin32|cygwin|mingw|bccwin/ =~ RUBY_PLATFORM || ::Config::CONFIG['host_os'] =~ /mswin/
       require 'win32/resolv'
       DefaultFileName = Win32::Resolv.get_hosts_path
     else
@@ -856,7 +851,7 @@ class Resolv
           config_hash = Config.parse_resolv_conf(filename)
         else
           require 'rbconfig'
-          if WINDOWS
+          if /mswin32|cygwin|mingw|bccwin/ =~ RUBY_PLATFORM || ::Config::CONFIG['host_os'] =~ /mswin/
             require 'win32/resolv'
             search, nameserver = Win32::Resolv.get_resolv_info
             config_hash = {}

@@ -3,9 +3,6 @@
 
 class RDoc::Markup::Rule < Struct.new :weight
 
-  ##
-  # Calls #accept_rule on +visitor+
-
   def accept visitor
     visitor.accept_rule self
   end

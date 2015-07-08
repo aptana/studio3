@@ -23,15 +23,7 @@ module WEBrick
     end
   end
 
-  ##
-  # A generic module for daemonizing a process
-
   class Daemon
-
-    ##
-    # Performs the standard operations for daemonizing a process.  Runs a
-    # block, if given.
-
     def Daemon.start
       exit!(0) if fork
       Process::setsid

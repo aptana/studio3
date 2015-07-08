@@ -29,12 +29,12 @@ module IRB
     end
 
     def thread(key)
-      th, = search(key)
+      th, irb = search(key)
       th
     end
 
     def irb(key)
-      _, irb = search(key)
+      th, irb = search(key)
       irb
     end
 
@@ -62,7 +62,7 @@ module IRB
 
     def kill(*keys)
       for key in keys
-	th, _ = search(key)
+	th, irb = search(key)
 	IRB.fail IrbAlreadyDead unless th.alive?
 	th.exit
       end

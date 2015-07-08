@@ -2,29 +2,13 @@ require 'dl'
 require 'thread'
 
 module DL
-	# The mutual exclusion (Mutex) semaphore for the DL module
-  SEM = Mutex.new # :nodoc:
+  SEM = Mutex.new
 
   if DL.fiddle?
-    # A Hash of callback Procs
-    #
-    # Uses Fiddle
-    CdeclCallbackProcs = {} # :nodoc:
-
-    # A Hash of the addresses of callback Proc
-    #
-    # Uses Fiddle
-    CdeclCallbackAddrs = {} # :nodoc:
-
-    # A Hash of Stdcall callback Procs
-    #
-    # Uses Fiddle on win32
-    StdcallCallbackProcs = {} # :nodoc:
-
-    # A Hash of the addresses of Stdcall callback Procs
-    #
-    # Uses Fiddle on win32
-    StdcallCallbackAddrs = {} # :nodoc:
+    CdeclCallbackProcs = {}
+    CdeclCallbackAddrs = {}
+    StdcallCallbackProcs = {}
+    StdcallCallbackAddrs = {}
   end
 
   def set_callback_internal(proc_entry, addr_entry, argc, ty, abi = nil, &cbp)

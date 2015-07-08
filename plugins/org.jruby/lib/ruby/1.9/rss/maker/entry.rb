@@ -99,7 +99,7 @@ module RSS
               end
             end
 
-            def _set_default_values
+            def _set_default_values(&block)
               keep = {
                 :authors => authors.to_a.dup,
                 :contributors => contributors.to_a.dup,
@@ -126,7 +126,7 @@ module RSS
                 @maker.channel.title {|t| @title = t}
               end
               self.updated ||= @maker.channel.updated
-              super
+              super(&block)
             ensure
               authors.replace(keep[:authors])
               contributors.replace(keep[:contributors])

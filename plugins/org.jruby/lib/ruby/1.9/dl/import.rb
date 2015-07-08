@@ -31,22 +31,6 @@ module DL
     end
   end
 
-  # DL::Importer includes the means to dynamically load libraries and build
-  # modules around them including calling extern functions within the C
-  # library that has been loaded.
-  #
-  # == Example
-  #
-  #   require 'dl'
-  #   require 'dl/import'
-  #
-  #   module LibSum
-  #   	extend DL::Importer
-  #   	dlload './libsum.so'
-  #   	extern 'double sum(double*, int)'
-  #   	extern 'double split(double)'
-  #   end
-	#
   module Importer
     include DL
     include CParser
@@ -112,6 +96,7 @@ module DL
 
     def parse_bind_options(opts)
       h = {}
+      prekey = nil
       while( opt = opts.shift() )
         case opt
         when :stdcall, :cdecl
@@ -209,12 +194,8 @@ module DL
       return ptr
     end
 
-    def handler
-      @handler or raise "call dlload before importing symbols and functions"
-    end
-
     def import_symbol(name)
-      addr = handler.sym(name)
+      addr = @handler.sym(name)
       if( !addr )
         raise(DLError, "cannot find the symbol: #{name}")
       end
@@ -222,7 +203,7 @@ module DL
     end
 
     def import_function(name, ctype, argtype, call_type = nil)
-      addr = handler.sym(name)
+      addr = @handler.sym(name)
       if( !addr )
         raise(DLError, "cannot find the function: #{name}()")
       end
@@ -231,13 +212,11 @@ module DL
 
     def bind_function(name, ctype, argtype, call_type = nil, &block)
       if DL.fiddle?
-        klass = Function.instance_eval { class_fiddle_closure_cfunc }
-        abi = Function.instance_eval { call_type_to_abi(call_type) }
-        closure = Class.new(klass) {
+        closure = Class.new(Fiddle::Closure) {
           define_method(:call, block)
-        }.new(ctype, argtype, abi, name)
+        }.new(ctype, argtype)
 
-        Function.new(closure, argtype, abi)
+        Function.new(closure, argtype)
       else
         f = Function.new(CFunc.new(0, ctype, name, call_type || :cdecl), argtype)
         f.bind(&block)

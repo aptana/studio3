@@ -10,5 +10,5 @@
 #
 
 while true
-  IRB::BINDING_QUEUE.push _ = binding
+  IRB::BINDING_QUEUE.push b = binding
 end

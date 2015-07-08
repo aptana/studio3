@@ -15,26 +15,16 @@ require 'webrick/httputils'
 require 'webrick/httpstatus'
 
 module WEBrick
-  ##
-  # An HTTP response.
-
   class HTTPResponse
     attr_reader :http_version, :status, :header
     attr_reader :cookies
     attr_accessor :reason_phrase
-
-    ##
-    # Body may be a String or IO subclass.
-
     attr_accessor :body
 
     attr_accessor :request_method, :request_uri, :request_http_version
     attr_accessor :filename
     attr_accessor :keep_alive
     attr_reader :config, :sent_size
-
-    ##
-    # Creates a new HTTP response object
 
     def initialize(config)
       @config = config
@@ -55,37 +45,22 @@ module WEBrick
       @sent_size = 0
     end
 
-    ##
-    # The response's HTTP status line
-
     def status_line
       "HTTP/#@http_version #@status #@reason_phrase #{CRLF}"
     end
-
-    ##
-    # Sets the response's status to the +status+ code
 
     def status=(status)
       @status = status
       @reason_phrase = HTTPStatus::reason_phrase(status)
     end
 
-    ##
-    # Retrieves the response header +field+
-
     def [](field)
       @header[field.downcase]
     end
 
-    ##
-    # Sets the response header +field+ to +value+
-
     def []=(field, value)
       @header[field.downcase] = value.to_s
     end
-
-    ##
-    # The content-length header
 
     def content_length
       if len = self['content-length']
@@ -93,57 +68,33 @@ module WEBrick
       end
     end
 
-    ##
-    # Sets the content-length header to +len+
-
     def content_length=(len)
       self['content-length'] = len.to_s
     end
-
-    ##
-    # The content-type header
 
     def content_type
       self['content-type']
     end
 
-    ##
-    # Sets the content-type header to +type+
-
     def content_type=(type)
       self['content-type'] = type
     end
 
-    ##
-    # Iterates over each header in the resopnse
-
     def each
-      @header.each{|field, value|  yield(field, value) }
+      @header.each{|k, v|  yield(k, v) }
     end
-
-    ##
-    # Will this response body be returned using chunked transfer-encoding?
 
     def chunked?
       @chunked
     end
 
-    ##
-    # Enables chunked transfer encoding.
-
     def chunked=(val)
       @chunked = val ? true : false
     end
 
-    ##
-    # Will this response's connection be kept alive?
-
     def keep_alive?
       @keep_alive
     end
-
-    ##
-    # Sends the response on +socket+
 
     def send_response(socket)
       begin
@@ -158,9 +109,6 @@ module WEBrick
         @keep_alive = false
       end
     end
-
-    ##
-    # Sets up the headers for sending
 
     def setup_header()
       @reason_phrase    ||= HTTPStatus::reason_phrase(@status)
@@ -204,11 +152,6 @@ module WEBrick
       elsif keep_alive?
         if chunked? || @header['content-length']
           @header['connection'] = "Keep-Alive"
-        else
-          msg = "Could not determine content-length of response body. Set content-length of the response or set Response#chunked = true"
-          @logger.warn(msg)
-          @header['connection'] = "close"
-          @keep_alive = false
         end
       else
         @header['connection'] = "close"
@@ -221,9 +164,6 @@ module WEBrick
         end
       end
     end
-
-    ##
-    # Sends the headers on +socket+
 
     def send_header(socket)
       if @http_version.major > 0
@@ -240,9 +180,6 @@ module WEBrick
       end
     end
 
-    ##
-    # Sends the body on +socket+
-
     def send_body(socket)
       case @body
       when IO then send_body_io(socket)
@@ -250,27 +187,17 @@ module WEBrick
       end
     end
 
-    def to_s # :nodoc:
+    def to_s
       ret = ""
       send_response(ret)
       ret
     end
-
-    ##
-    # Redirects to +url+ with a WEBrick::HTTPStatus::Redirect +status+.
-    #
-    # Example:
-    #
-    #   res.set_redirect WEBrick::HTTPStatus::TemporaryRedirect
 
     def set_redirect(status, url)
       @body = "<HTML><A HREF=\"#{url.to_s}\">#{url.to_s}</A>.</HTML>\n"
       @header['location'] = url.to_s
       raise status
     end
-
-    ##
-    # Creates an error page for exception +ex+ with an optional +backtrace+
 
     def set_error(ex, backtrace=false)
       case ex
@@ -353,7 +280,7 @@ module WEBrick
       if @request_method == "HEAD"
         # do nothing
       elsif chunked?
-        body ? @body.bytesize : 0
+        remain = body ? @body.bytesize : 0
         while buf = @body[@sent_size, @buffer_size]
           break if buf.empty?
           data = ""
