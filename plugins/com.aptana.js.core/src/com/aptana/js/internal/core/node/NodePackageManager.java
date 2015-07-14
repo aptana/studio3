@@ -491,14 +491,21 @@ public class NodePackageManager implements INodePackageManager
 		}
 
 		IStatus status = runInBackground(CollectionsUtil.toArray(processArgs));
-		if (!status.isOK())
+		IPath moduleIPath = null;
+		boolean isPathExists = false;
+		String message = status.getMessage();
+		if (!StringUtil.isEmpty(message))
+		{
+			String[] lines = message.split("\n"); //$NON-NLS-1$
+			moduleIPath = Path.fromOSString(lines[lines.length - 1]);
+			isPathExists = moduleIPath.toFile().exists();
+		}
+		if (!status.isOK() && !isPathExists) // some cases status.isNotOK even though it finds valid path
 		{
 			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
 					Messages.NodePackageManager_FailedListPackageError, packageName)));
 		}
-		String message = status.getMessage();
-		String[] lines = message.split("\n"); //$NON-NLS-1$
-		return Path.fromOSString(lines[lines.length - 1]);
+		return moduleIPath;
 	}
 
 	public String getInstalledVersion(String packageName) throws CoreException
