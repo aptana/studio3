@@ -265,4 +265,17 @@ public class VersionUtilTest
 		assertEquals("24.9", VersionUtil.parseMin(">24.9"));
 		assertEquals(null, VersionUtil.parseMin("<=24"));
 	}
+	
+	@Test
+	public void testisMinimumCompatibleVersions()
+	{
+		assertFalse(VersionUtil.isMinimumCompatibleVersions(new String[]{ "1.0", "2.0" }, new String[]{ "[5.0, 9.0]" }));
+		assertTrue(VersionUtil.isMinimumCompatibleVersions(new String[]{ "5.0", "2.0" }, new String[]{ "[5.0, 9.0]" }));
+		assertTrue(VersionUtil.isMinimumCompatibleVersions(new String[]{ "5.0", "2.0" }, new String[]{ "[5.0]" }));
+		assertTrue(VersionUtil.isMinimumCompatibleVersions(new String[]{ "9.0"}, new String[]{ "[5.0]" }));
+		assertTrue(VersionUtil.isMinimumCompatibleVersions(new String[]{ "9.0"}, new String[]{  }));
+		assertFalse(VersionUtil.isMinimumCompatibleVersions(new String[]{ "8.4"}, new String[]{ "[9.0]" }));
+		assertFalse(VersionUtil.isMinimumCompatibleVersions(new String[]{ "8.4", "9.0"}, new String[]{ "[5.0, 8.3]" }));
+		assertFalse(VersionUtil.isMinimumCompatibleVersions(new String[]{ "9.0"}, new String[]{ "[5.0, 9.0)" }));
+	}
 }
