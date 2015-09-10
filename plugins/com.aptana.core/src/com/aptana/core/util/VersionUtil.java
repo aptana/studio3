@@ -478,5 +478,88 @@ public final class VersionUtil
 		}
 		return null;
 	}
+	
+	/**
+	 * This behaves same as {@link #isCompatibleVersions(String[] installedVersions, String[] requiredVersions)} when
+	 * requiredVersions is a version range(ex: [5.0,9.0]), but behaves differently when it's not a range(ex: [5.0]). <br>
+	 * When range is not specified it will consider required version(ex: 5.0) as a minimum required version. In this
+	 * case, 5.0 is a minimum required version. <br>
+	 * <b>Examples:</b> <br>
+	 * <code>isMinimumCompatibleVersions(new String[]{ "9.0"},new String[]{ "[5.0]" }); </code> //true <br>
+	 * <code>isMinimumCompatibleVersions(new String[]{ "5.0", "2.0" },new String[]{ "[5.0, 9.0]"}); </code> //true <br>
+	 * <code>isMinimumCompatibleVersions(new String[]{ "8.4", "9.0"},new String[]{ "[5.0, 8.3]" }); </code> //false <br>
+	 * <code>isMinimumCompatibleVersions(new String[]{ "7.0"},new String[]{ "[8.0]" }); </code> //false <br>
+	 * 
+	 * @param installedVersions
+	 * @param requiredVersions
+	 * @return
+	 */
+	public static boolean isMinimumCompatibleVersions(String[] installedVersions, String[] requiredVersions)
+	{
+		if (installedVersions == null || requiredVersions == null)
+		{
+			return requiredVersions != null && requiredVersions.length > 0;
+		}
+		// Hold the installed versions as Version instances
+		Map<String, Version> installed = new HashMap<String, Version>();
+		for (String installedVer : installedVersions)
+		{
+			try
+			{
+				Version version = parseVersion(installedVer);
+				installed.put(installedVer, version);
+			}
+			catch (Exception e)
+			{
+				IdeLog.logWarning(CorePlugin.getDefault(),
+						MessageFormat.format("Error parsing the installed version {0}", installedVer)); //$NON-NLS-1$
+			}
+		}
+		// We need to match every version/version-range in the required versions array.
+		for (String required : requiredVersions)
+		{
+			// We check if the required version starts with '[' or '('. If so, we treat it as a range of versions and
+			// create a VersionRange instance for it. Otherwise, we treat it as a regex pattern.
+			// Note that the JSON content will have to pass a valid syntax for the Java Pattern class. In any other
+			// case, we log an error and ignore it.
+			if (isRange(required))
+			{
+				if (!isCompatibleVersionsRange(installed, required))
+				{
+					return false;
+				}
+			}
+			else if (!isMinimumCompatibleVersionsRegex(installed, required))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private static boolean isMinimumCompatibleVersionsRegex(Map<String, Version> installed, String required)
+	{
+		// compile the regex.
+		try
+		{
+			Pattern.compile(required);
+		}
+		catch (PatternSyntaxException e)
+		{
+			IdeLog.logError(CorePlugin.getDefault(), MessageFormat.format(
+					"The required version '{0}' should be defined as a regular-expression", required)); //$NON-NLS-1$
+			return false;
+		}
 
+		// Do a match on the installed-versions original String values
+		for (String installedVersion : installed.keySet())
+		{
+			Version minRequiredVersion = VersionUtil.parseVersion(required);
+			if (installed.get(installedVersion).compareTo(minRequiredVersion) >= 0)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }
