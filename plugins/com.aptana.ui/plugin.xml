@@ -46,7 +46,7 @@
                minimized="false"
                relationship="stack"
                relative="org.eclipse.ui.views.ContentOutline"
-               visible="true">
+               visible="false">
          </view>
          <viewShortcut
                id="com.aptana.samples.ui.SamplesView">

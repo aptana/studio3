@@ -174,7 +174,7 @@ class PP < PrettyPrint
     end
 
     def object_address_group(obj, &block)
-      id = PointerFormat % JRuby.identity_hash(obj)
+      id = PointerFormat % (obj.object_id * 2 & PointerMask)
       group(1, "\#<#{obj.class}:0x#{id}", '>', &block)
     end
 
@@ -396,7 +396,7 @@ class Range
   end
 end
 
-class File < IO
+class File
   class Stat
     def pretty_print(q)
       require 'etc.so'
@@ -503,7 +503,7 @@ class MatchData
   end
 end
 
-class Object < BasicObject
+class Object
   include PP::ObjectMixin
 end
 

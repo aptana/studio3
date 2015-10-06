@@ -1,19 +1,11 @@
 ##
-# An empty line.  This class is a singleton.
+# An empty line
 
 class RDoc::Markup::BlankLine
 
-  @instance = new
-
-  ##
-  # RDoc::Markup::BlankLine is a singleton
-
-  def self.new
-    @instance
+  def == other # :nodoc:
+    self.class == other.class
   end
-
-  ##
-  # Calls #accept_blank_line on +visitor+
 
   def accept visitor
     visitor.accept_blank_line self

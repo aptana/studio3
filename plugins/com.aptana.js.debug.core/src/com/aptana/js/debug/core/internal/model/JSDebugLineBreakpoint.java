@@ -56,9 +56,24 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	 *             if unable to create the breakpoint
 	 */
 	public JSDebugLineBreakpoint(IResource resource, int lineNumber) throws CoreException {
-		this(resource, lineNumber, new HashMap<String, Object>(), true);
+		this(resource, lineNumber, new HashMap<String, Object>(), true, true);
 	}
 
+	/**
+	 * Constructs a line breakpoint on the given resource at the given line number. The line number is 1-based (i.e. the
+	 * first line of a file is line number 1).
+	 * 
+	 * @param resource
+	 *            file on which to set the breakpoint
+	 * @param lineNumber
+	 *            1-based line number of the breakpoint
+	 * @throws CoreException
+	 *             if unable to create the breakpoint
+	 */
+	public JSDebugLineBreakpoint(IResource resource, int lineNumber, boolean isEnableBreakPoint) throws CoreException {
+		this(resource, lineNumber, new HashMap<String, Object>(), true, isEnableBreakPoint);
+	}
+	
 	/**
 	 * JSDebugLineBreakpoint
 	 * 
@@ -86,12 +101,12 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	 *             if unable to create the breakpoint
 	 */
 	public JSDebugLineBreakpoint(final IResource resource, final int lineNumber, final Map<String, Object> attributes,
-			final boolean register) throws CoreException {
+			final boolean register, final boolean isEnableBreakPoint) throws CoreException {
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				IMarker marker = resource.createMarker(IDebugCoreConstants.ID_LINE_BREAKPOINT_MARKER);
 				setMarker(marker);
-				attributes.put(IBreakpoint.ENABLED, Boolean.TRUE);
+				attributes.put(IBreakpoint.ENABLED, isEnableBreakPoint);
 				attributes.put(IMarker.LINE_NUMBER, Integer.valueOf(lineNumber));
 				attributes.put(IBreakpoint.ID, getModelIdentifier());
 				attributes.put(IMarker.MESSAGE, MessageFormat.format(Messages.JSDebugLineBreakpoint_JSBreakpoint_0_1,

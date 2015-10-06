@@ -54,12 +54,14 @@ module REXML
     def encoding=(enc)
       return unless super
       @line_break = encode( '>' )
-      if @encoding != 'UTF-8'
+      if enc != UTF_8
         @buffer = decode(@buffer)
         @to_utf = true
       else
         @to_utf = false
-        @buffer.force_encoding ::Encoding::UTF_8
+        if @buffer.respond_to? :force_encoding
+          @buffer.force_encoding Encoding::UTF_8
+        end
       end
     end
 

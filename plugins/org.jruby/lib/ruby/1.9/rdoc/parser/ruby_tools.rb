@@ -43,11 +43,13 @@ module RDoc::Parser::RubyTools
           tk = Token(TkSYMBOL).set_text(":" + tk1.text)
         end
 
-        # remove the identifier we just read to replace it with a symbol
+        # remove the identifier we just read (we're about to replace it with a
+        # symbol)
         @token_listeners.each do |obj|
           obj.pop_token
         end if @token_listeners
       else
+        warn("':' not followed by identifier or operator")
         tk = tk1
       end
     end
@@ -60,22 +62,12 @@ module RDoc::Parser::RubyTools
     tk
   end
 
-  ##
-  # Reads and returns all tokens up to one of +tokens+.  Leaves the matched
-  # token in the token list.
-
   def get_tk_until(*tokens)
     read = []
 
     loop do
       tk = get_tk
-
-      case tk
-      when *tokens then
-        unget_tk tk
-        break
-      end
-
+      case tk when *tokens then unget_tk tk; break end
       read << tk
     end
 
@@ -158,8 +150,6 @@ module RDoc::Parser::RubyTools
     @token_listeners.each do |obj|
       obj.pop_token
     end if @token_listeners
-
-    nil
   end
 
 end

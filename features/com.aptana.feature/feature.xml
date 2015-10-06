@@ -2,7 +2,7 @@
 <feature
       id="com.aptana.feature"
       label="%featureName"
-      version="4.1.0.qualifier"
+      version="4.3.0.qualifier"
       provider-name="%providerName"
       plugin="com.aptana.branding">
 
@@ -732,6 +732,13 @@
 
    <plugin
          id="com.jackson.libraries"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+	<plugin
+         id="mestevens.xcode.parser"
          download-size="0"
          install-size="0"
          version="0.0.0"

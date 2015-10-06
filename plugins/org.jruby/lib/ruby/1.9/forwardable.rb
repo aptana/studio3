@@ -1,9 +1,9 @@
 #
 #   forwardable.rb -
-#       $Release Version: 1.1$
-#       $Revision$
-#       by Keiju ISHITSUKA(keiju@ishitsuka.com)
-#       original definition by delegator.rb
+#   	$Release Version: 1.1$
+#   	$Revision$
+#   	by Keiju ISHITSUKA(keiju@ishitsuka.com)
+#	original definition by delegator.rb
 #       Revised by Daniel J. Berger with suggestions from Florian Gross.
 #
 #       Documentation by James Edward Gray II and Gavin Sinclair
@@ -84,7 +84,7 @@
 #      def_delegator :Implementation, :service
 #
 #      class Implementation
-#         def service...
+#	  def service...
 #      end
 #    end
 #
@@ -149,7 +149,7 @@ module Forwardable
   #
   def instance_delegate(hash)
     hash.each{ |methods, accessor|
-      methods = [methods] unless methods.respond_to?(:each)
+      methods = methods.to_s unless methods.respond_to?(:each)
       methods.each{ |method|
         def_instance_delegator(accessor, method)
       }
@@ -175,34 +175,15 @@ module Forwardable
     end
   end
 
-  # Define +method+ as delegator instance method with an optional
-  # alias name +ali+. Method calls to +ali+ will be delegated to
-  # +accessor.method+. 
-  #
-  #   class MyQueue
-  #     extend Forwardable
-  #     attr_reader :queue
-  #     def initialize
-  #       @queue = []
-  #     end
-  #     
-  #     def_delegator :@queue, :push, :mypush
-  #   end
-  #
-  #   q = MyQueue.new
-  #   q.mypush 42
-  #   q.queue    #=> [42]
-  #   q.push 23  #=> NoMethodError
-  #
   def def_instance_delegator(accessor, method, ali = method)
     line_no = __LINE__; str = %{
       def #{ali}(*args, &block)
-        begin
-          #{accessor}.__send__(:#{method}, *args, &block)
-        rescue Exception
-          $@.delete_if{|s| %r"#{Regexp.quote(__FILE__)}"o =~ s} unless Forwardable::debug
-          ::Kernel::raise
-        end
+	begin
+	  #{accessor}.__send__(:#{method}, *args, &block)
+	rescue Exception
+	  $@.delete_if{|s| %r"#{Regexp.quote(__FILE__)}"o =~ s} unless Forwardable::debug
+	  ::Kernel::raise
+	end
       end
     }
     # If it's not a class or module, it's an instance
@@ -233,7 +214,7 @@ module SingleForwardable
   #
   def single_delegate(hash)
     hash.each{ |methods, accessor|
-      methods = [methods] unless methods.respond_to?(:each)
+      methods = methods.to_s unless methods.respond_to?(:each)
       methods.each{ |method|
         def_single_delegator(accessor, method)
       }
@@ -265,14 +246,14 @@ module SingleForwardable
   # provided, it is used as the name for the delegate method.
   #
   def def_single_delegator(accessor, method, ali = method)
-    str = %{
+    line_no = __LINE__; str = %{
       def #{ali}(*args, &block)
-        begin
-          #{accessor}.__send__(:#{method}, *args, &block)
-        rescue Exception
-          $@.delete_if{|s| %r"#{Regexp.quote(__FILE__)}"o =~ s} unless Forwardable::debug
-          ::Kernel::raise
-        end
+	begin
+	  #{accessor}.__send__(:#{method}, *args, &block)
+	rescue Exception
+	  $@.delete_if{|s| %r"#{Regexp.quote(__FILE__)}"o =~ s} unless Forwardable::debug
+	  ::Kernel::raise
+	end
       end
     }
 
@@ -283,3 +264,7 @@ module SingleForwardable
   alias def_delegators def_single_delegators
   alias def_delegator def_single_delegator
 end
+
+
+
+

@@ -38,7 +38,6 @@ module WEBrick
       end
       return orig_parse_uri(str)
     end
-    private :parse_uri
 
     alias orig_meta_vars meta_vars
 

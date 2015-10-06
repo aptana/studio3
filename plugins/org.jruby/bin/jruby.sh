@@ -52,14 +52,14 @@ fi
 
 JRUBY_OPTS_SPECIAL="--ng" # space-separated list of special flags
 unset JRUBY_OPTS_TEMP
-process_special_opts() {
+function process_special_opts {
     case $1 in
         --ng) nailgun_client=true;;
         *) break;;
     esac
 }
-for opt in ${JRUBY_OPTS}; do
-    for special in ${JRUBY_OPTS_SPECIAL}; do
+for opt in ${JRUBY_OPTS[@]}; do
+    for special in ${JRUBY_OPTS_SPECIAL[@]}; do
         if [ $opt != $special ]; then
             JRUBY_OPTS_TEMP="${JRUBY_OPTS_TEMP} $opt"
         else
@@ -139,20 +139,16 @@ if [ -z "$JAVA_MEM" ] ; then
 fi
 
 if [ -z "$JAVA_STACK" ] ; then
-  JAVA_STACK=-Xss2048k
+  JAVA_STACK=-Xss1024k
 fi
 
-if [ -z "$JAVA_VM" ]; then
-  JAVA_VM=-client
-fi
+JAVA_VM=-client
 JAVA_ENCODING=""
 
 #declare -a java_args
 #declare -a ruby_args
 
-JAVA_CLASS_JRUBY_MAIN=org.jruby.Main
-java_class=$JAVA_CLASS_JRUBY_MAIN
-JAVA_CLASS_NGSERVER=com.martiansoftware.nailgun.NGServer
+java_class=org.jruby.Main
 
 # Split out any -J argument for passing to the JVM.
 # Scanning for args is aborted by '--'.
@@ -230,7 +226,7 @@ do
         java_args="${java_args} -Xprof" ;;
      --ng-server)
         # Start up as Nailgun server
-        java_class=$JAVA_CLASS_NGSERVER
+        java_class=com.martiansoftware.nailgun.NGServer
         VERIFY_JRUBY=true ;;
      --ng)
         # Use native Nailgun client to toss commands to server
@@ -250,15 +246,28 @@ if [[ -z "$JAVA_ENCODING" ]]; then
   java_args="${java_args} -Dfile.encoding=UTF-8"
 fi
 
+# Add a property to report memory max
+JAVA_OPTS="$JAVA_OPTS $JAVA_VM -Djruby.memory.max=${JAVA_MEM} -Djruby.stack.max=${JAVA_STACK}"
+
 # Append the rest of the arguments
 ruby_args="${ruby_args} $@"
 
 # Put the ruby_args back into the position arguments $1, $2 etc
 set -- "${ruby_args}"
 
-JAVA_OPTS="$JAVA_OPTS $JAVA_VM $JAVA_MEM $JAVA_STACK"
+JAVA_OPTS="$JAVA_OPTS $JAVA_MEM $JAVA_STACK"
 
-JFFI_OPTS="-Djffi.boot.library.path=$JRUBY_HOME/lib/jni"
+JFFI_BOOT=""
+if [ -d $JRUBY_HOME/lib/native/ ]; then
+  for d in $JRUBY_HOME/lib/native/*`uname -s`; do
+    if [ -z "$JFFI_BOOT" ]; then
+      JFFI_BOOT="$d"
+    else
+      JFFI_BOOT="$JFFI_BOOT:$d"
+    fi
+  done
+fi
+JFFI_OPTS="-Djffi.boot.library.path=$JFFI_BOOT"
 
 
 if [ "$nailgun_client" != "" ]; then
@@ -274,17 +283,11 @@ if [ "$VERIFY_JRUBY" != "" ]; then
       echo "Running with instrumented profiler"
   fi
 
-  if [ $java_class = $JAVA_CLASS_NGSERVER -a -n ${JRUBY_OPTS} ]; then
-    echo "warning: starting a nailgun server; discarding JRUBY_OPTS: ${JRUBY_OPTS}"
-    JRUBY_OPTS=''
-  fi
-
-
-  "$JAVACMD" $PROFILE_ARGS $JAVA_OPTS "$JFFI_OPTS" ${java_args} -classpath "$JRUBY_CP$CP_DELIMITER$CP$CP_DELIMITER$CLASSPATH" \
+  "$JAVACMD" $PROFILE_ARGS $JAVA_OPTS "$JFFI_OPTS" "${java_args[@]}" -classpath "$JRUBY_CP$CP_DELIMITER$CP$CP_DELIMITER$CLASSPATH" \
     "-Djruby.home=$JRUBY_HOME" \
     "-Djruby.lib=$JRUBY_HOME/lib" -Djruby.script=jruby \
     "-Djruby.shell=$JRUBY_SHELL" \
-    $java_class $JRUBY_OPTS $@
+    $java_class $JRUBY_OPTS "$@"
 
   # Record the exit status immediately, or it will be overridden.
   JRUBY_STATUS=$?

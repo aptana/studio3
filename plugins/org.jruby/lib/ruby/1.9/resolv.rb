@@ -35,11 +35,6 @@ end
 # * /etc/nsswitch.conf is not supported.
 
 class Resolv
-  
-  ##
-  # Tests whether we're running on Windows
-  
-  WINDOWS = /mswin|cygwin|mingw|bccwin/ =~ RUBY_PLATFORM || ::RbConfig::CONFIG['host_os'] =~ /mswin/
 
   ##
   # Looks up the first IP address for +name+.
@@ -170,7 +165,7 @@ class Resolv
   # Resolv::Hosts is a hostname resolver that uses the system hosts file.
 
   class Hosts
-    if WINDOWS
+    if /mswin|mingw|bccwin/ =~ RUBY_PLATFORM
       require 'win32/resolv'
       DefaultFileName = Win32::Resolv.get_hosts_path
     else
@@ -399,7 +394,7 @@ class Resolv
       end
     end
 
-    def use_ipv6? # :nodoc:
+    def use_ipv6?
       begin
         list = Socket.ip_address_list
       rescue NotImplementedError
@@ -497,7 +492,7 @@ class Resolv
 
     def each_resource(name, typeclass, &proc)
       lazy_initialize
-      requester = make_udp_requester
+      requester = make_requester
       senders = {}
       begin
         @config.resolv(name) {|candidate, tout, nameserver, port|
@@ -511,19 +506,7 @@ class Resolv
           reply, reply_name = requester.request(sender, tout)
           case reply.rcode
           when RCode::NoError
-            if reply.tc == 1 and not Requester::TCP === requester
-              requester.close
-              # Retry via TCP:
-              requester = make_tcp_requester(nameserver, port)
-              senders = {}
-              # This will use TCP for all remaining candidates (assuming the
-              # current candidate does not already respond successfully via
-              # TCP).  This makes sense because we already know the full
-              # response will not fit in an untruncated UDP packet.
-              redo
-            else
-              extract_resources(reply, reply_name, typeclass, &proc)
-            end
+            extract_resources(reply, reply_name, typeclass, &proc)
             return
           when RCode::NXDomain
             raise Config::NXDomain.new(reply_name.to_s)
@@ -536,17 +519,13 @@ class Resolv
       end
     end
 
-    def make_udp_requester # :nodoc:
+    def make_requester # :nodoc:
       nameserver_port = @config.nameserver_port
       if nameserver_port.length == 1
         Requester::ConnectedUDP.new(*nameserver_port[0])
       else
         Requester::UnconnectedUDP.new(*nameserver_port)
       end
-    end
-
-    def make_tcp_requester(host, port) # :nodoc:
-      return Requester::TCP.new(host, port)
     end
 
     def extract_resources(msg, name, typeclass) # :nodoc:
@@ -604,8 +583,8 @@ class Resolv
       base + random(len)
     end
 
-    RequestID = {} # :nodoc:
-    RequestIDMutex = Mutex.new # :nodoc:
+    RequestID = {}
+    RequestIDMutex = Mutex.new
 
     def self.allocate_request_id(host, port) # :nodoc:
       id = nil
@@ -659,14 +638,7 @@ class Resolv
           if !select_result
             raise ResolvTimeout
           end
-          begin
-            reply, from = recv_reply(select_result[0])
-          rescue Errno::ECONNREFUSED, # GNU/Linux, FreeBSD
-                 Errno::ECONNRESET # Windows
-            # No name server running on the server?
-            # Don't wait anymore.
-            raise ResolvTimeout
-          end
+          reply, from = recv_reply(select_result[0])
           begin
             msg = Message.decode(reply)
           rescue DecodeError
@@ -896,7 +868,7 @@ class Resolv
         if File.exist? filename
           config_hash = Config.parse_resolv_conf(filename)
         else
-          if WINDOWS
+          if /mswin|cygwin|mingw|bccwin/ =~ RUBY_PLATFORM
             require 'win32/resolv'
             search, nameserver = Win32::Resolv.get_resolv_info
             config_hash = {}

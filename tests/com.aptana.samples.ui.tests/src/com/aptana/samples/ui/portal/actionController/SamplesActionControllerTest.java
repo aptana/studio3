@@ -147,7 +147,7 @@ public class SamplesActionControllerTest
 		assertEquals("This is a test sample", sample.getDescription());
 		assertTrue(sample.isRemote());
 		// Check that default nature is added
-		assertArrayEquals(new String[] { "com.aptana.projects.webnature" }, sample.getNatures());
+		assertArrayEquals(new String[] { SamplesActionController.WEB_NATURE, SamplesActionController.MOBILE_NATURE }, sample.getNatures());
 	}
 
 	@After

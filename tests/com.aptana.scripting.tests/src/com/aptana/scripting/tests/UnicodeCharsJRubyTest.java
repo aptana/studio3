@@ -7,17 +7,17 @@
  */
 package com.aptana.scripting.tests;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import org.junit.Test;
+import static org.junit.Assert.*;
 import java.io.File;
+
+import junit.framework.TestCase;
 
 import org.jruby.Ruby;
 import org.jruby.RubyFile;
 import org.jruby.RubyInstanceConfig;
 import org.jruby.RubyString;
-import org.jruby.util.FileResource;
-import org.junit.Test;
+import org.jruby.util.JRubyFile;
 
 /**
  * @author Fabio
@@ -42,17 +42,17 @@ public class UnicodeCharsJRubyTest
 			{
 				fail("Unable to create directory: " + file);
 			}
-			RubyInstanceConfig config = new RubyInstanceConfig();
-			config.setNativeEnabled(false);
-			Ruby runtime = Ruby.newInstance(config);
+			Ruby runtime;
+			RubyInstanceConfig.nativeEnabled = false;
+			runtime = Ruby.newInstance();
 
-			FileResource rubyFile = RubyFile.fileResource(RubyString.newString(runtime, file.getAbsolutePath()));
+			JRubyFile rubyFile = RubyFile.file(RubyString.newString(runtime, file.getAbsolutePath()));
 			assertTrue(rubyFile.exists());
 			assertTrue(file.exists());
 			assertTrue(file.isDirectory());
 			try
 			{
-				assertTrue(runtime.getPosix().stat(rubyFile.absolutePath()).isDirectory());
+				assertTrue(runtime.getPosix().stat(rubyFile.getAbsolutePath()).isDirectory());
 			}
 			catch (Exception e)
 			{

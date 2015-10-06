@@ -98,6 +98,7 @@ module DL
           align = ALIGN_MAP[t]
         end
         offset = PackInfo.align(orig_offset, align)
+        size = offset - orig_offset
         @offset[i] = offset
         if( t.is_a?(Array) )
           offset += (SIZE_MAP[t[0]] * t[1])

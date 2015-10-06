@@ -12,7 +12,12 @@ package com.aptana.formatter;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -30,12 +35,15 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchWindow;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.debug.core.IDebugCoreConstants;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.FormatterSyntaxProblemException;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
+import com.aptana.js.debug.core.model.JSDebugModel;
 import com.aptana.ui.util.StatusLineMessageTimerManager;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * Formatting strategy for a source code.
@@ -112,16 +120,45 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 		{
 			public void run()
 			{
-				doFormat(job);
+				TextEdit edit = doFormat(job);
+				postEditProcessing(edit);
 			}
 		});
 	}
 
+	protected void postEditProcessing(TextEdit edit)
+	{
+		if (edit != null && edit.getLength() > 0)
+		{
+			IResource selectedResource = UIUtils.getSelectedResource();
+			if (selectedResource != null && selectedResource instanceof IFile)
+			{
+				try
+				{
+					IMarker[] findMarkers = selectedResource.findMarkers(IDebugCoreConstants.ID_LINE_BREAKPOINT_MARKER,
+							true, IResource.DEPTH_INFINITE);
+					for (IMarker iMarker : findMarkers)
+					{
+						Integer lineNumber = (Integer) iMarker.getAttribute(IMarker.LINE_NUMBER);
+						boolean isEnabled = (Boolean) iMarker.getAttribute(IBreakpoint.ENABLED);
+						JSDebugModel.createLineBreakpoint(selectedResource, lineNumber, isEnabled);
+					}
+				}
+				catch (CoreException e)
+				{
+					IdeLog.logWarning(FormatterPlugin.getDefault(),
+							FormatterMessages.ScriptFormattingStrategy_breakpointsRestoreError, e, IDebugScopes.DEBUG);
+				}
+			}
+		}
+	}
+
 	/**
+	 * @return
 	 * @since 2.0
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected void doFormat(final FormatJob job)
+	protected TextEdit doFormat(final FormatJob job)
 	{
 		final IDocument document = job.document;
 		final TypedPosition partition = job.partition;
@@ -201,6 +238,7 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 							}
 						}
 					}
+					return edit;
 				}
 			}
 			catch (FormatterSyntaxProblemException e)
@@ -244,6 +282,7 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 					TextUtilities.addDocumentPartitioners(document, partitioners);
 			}
 		}
+		return null;
 	}
 
 	protected IScriptFormatterFactory selectFormatterFactory(FormatJob job)

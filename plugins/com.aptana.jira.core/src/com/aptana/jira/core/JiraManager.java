@@ -89,7 +89,7 @@ public class JiraManager
 	 * Project Keys for Aptana and Titanium
 	 */
 	static final String APTANA_STUDIO = "APSTUD"; //$NON-NLS-1$
-	static final String TITANIUM_COMMUNITY = "TC"; //$NON-NLS-1$
+	static final String TITANIUM_COMMUNITY = "AC"; //$NON-NLS-1$
 
 	/**
 	 * Ticket field names.
@@ -141,7 +141,7 @@ public class JiraManager
 
 	/**
 	 * Logs into JIRA with a username and password.
-	 * 
+	 *
 	 * @param username
 	 *            the username
 	 * @param password
@@ -169,8 +169,8 @@ public class JiraManager
 						Messages.JiraManager_BadCredentialsErrMsg, null);
 			}
 			String msg = IOUtil.read(connection.getInputStream());
-			return new Status(IStatus.ERROR, JiraCorePlugin.PLUGIN_ID, code, Messages.JiraManager_UnknownErrMsg + ": "
-					+ msg, null);
+			return new Status(IStatus.ERROR, JiraCorePlugin.PLUGIN_ID, code,
+					Messages.JiraManager_UnknownErrMsg + ": " + msg, null);
 		}
 		catch (Exception e)
 		{
@@ -187,7 +187,7 @@ public class JiraManager
 
 	/**
 	 * The URL to get details on a user.
-	 * 
+	 *
 	 * @param username
 	 * @return
 	 */
@@ -235,7 +235,7 @@ public class JiraManager
 
 	/**
 	 * Creates a JIRA ticket.
-	 * 
+	 *
 	 * @param type
 	 *            the issue type (bug, feature, or improvement)
 	 * @param priority
@@ -356,7 +356,7 @@ public class JiraManager
 
 	/**
 	 * Adds an attachment to a JIRA ticket.
-	 * 
+	 *
 	 * @param path
 	 *            the path of the file to be attached
 	 * @param issue
@@ -458,7 +458,7 @@ public class JiraManager
 
 	/**
 	 * Specifies the JIRA project to log the ticket against. By default Aptana Studio will be used.
-	 * 
+	 *
 	 * @param projectName
 	 *            the name of the JIRA project (e.g. Aptana Studio)
 	 * @param projectKey

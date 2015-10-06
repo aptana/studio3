@@ -15,17 +15,9 @@ class RDoc::Markup::AttributeManager
   # optimistic
   #++
 
-  A_PROTECT = 004 # :nodoc:
+  A_PROTECT  = 004 # :nodoc:
 
-  ##
-  # Special mask character to prevent inline markup handling
-
-  PROTECT_ATTR = A_PROTECT.chr # :nodoc:
-
-  ##
-  # The attributes enabled for this markup object.
-
-  attr_reader :attributes
+  PROTECT_ATTR  = A_PROTECT.chr # :nodoc:
 
   ##
   # This maps delimiters that occur around words (such as *bold* or +tt+)
@@ -64,10 +56,9 @@ class RDoc::Markup::AttributeManager
   def initialize
     @html_tags = {}
     @matching_word_pairs = {}
-    @protectable = %w[<]
-    @special = []
+    @protectable = %w[<\\]
+    @special = {}
     @word_pair_map = {}
-    @attributes = RDoc::Markup::Attributes.new
 
     add_word_pair "*", "*", :BOLD
     add_word_pair "_", "_", :EM
@@ -80,6 +71,7 @@ class RDoc::Markup::AttributeManager
     add_html "code", :TT
   end
 
+
   ##
   # Return an attribute object with the given turn_on and turn_off bits set
 
@@ -87,33 +79,23 @@ class RDoc::Markup::AttributeManager
     RDoc::Markup::AttrChanger.new turn_on, turn_off
   end
 
-  ##
-  # Changes the current attribute from +current+ to +new+
-
-  def change_attribute current, new
+  def change_attribute(current, new)
     diff = current ^ new
     attribute(new & diff, current & diff)
   end
 
-  ##
-  # Used by the tests to change attributes by name from +current_set+ to
-  # +new_set+
-
-  def changed_attribute_by_name current_set, new_set
+  def changed_attribute_by_name(current_set, new_set)
     current = new = 0
     current_set.each do |name|
-      current |= @attributes.bitmap_for(name)
+      current |= RDoc::Markup::Attribute.bitmap_for(name)
     end
 
     new_set.each do |name|
-      new |= @attributes.bitmap_for(name)
+      new |= RDoc::Markup::Attribute.bitmap_for(name)
     end
 
     change_attribute(current, new)
   end
-
-  ##
-  # Copies +start_pos+ to +end_pos+ from the current string
 
   def copy_string(start_pos, end_pos)
     res = @str[start_pos...end_pos]
@@ -167,14 +149,13 @@ class RDoc::Markup::AttributeManager
   ##
   # Converts special sequences to RDoc attributes
 
-  def convert_specials str, attrs
-    @special.each do |regexp, attribute|
-      str.scan(regexp) do
-        capture = $~.size == 1 ? 0 : 1
-
-        s, e = $~.offset capture
-
-        attrs.set_attrs s, e - s, attribute | @attributes.special
+  def convert_specials(str, attrs)
+    unless @special.empty?
+      @special.each do |regexp, attr|
+        str.scan(regexp) do
+          attrs.set_attrs($`.length, $&.length,
+                          attr | RDoc::Markup::Attribute::SPECIAL)
+        end
       end
     end
   end
@@ -183,9 +164,6 @@ class RDoc::Markup::AttributeManager
   # Escapes special sequences of text to prevent conversion to RDoc
 
   def mask_protected_sequences
-    # protect __send__, __FILE__, etc.
-    @str.gsub!(/__([a-z]+)__/i,
-      "_#{PROTECT_ATTR}_#{PROTECT_ATTR}\\1_#{PROTECT_ATTR}_#{PROTECT_ATTR}")
     @str.gsub!(/\\([#{Regexp.escape @protectable.join('')}])/,
                "\\1#{PROTECT_ATTR}")
   end
@@ -207,7 +185,7 @@ class RDoc::Markup::AttributeManager
     raise ArgumentError, "Word flags may not start with '<'" if
       start[0,1] == '<'
 
-    bitmap = @attributes.bitmap_for name
+    bitmap = RDoc::Markup::Attribute.bitmap_for name
 
     if start == stop then
       @matching_word_pairs[start] = bitmap
@@ -227,7 +205,7 @@ class RDoc::Markup::AttributeManager
   #   am.add_html 'em', :EM
 
   def add_html(tag, name)
-    @html_tags[tag.downcase] = @attributes.bitmap_for name
+    @html_tags[tag.downcase] = RDoc::Markup::Attribute.bitmap_for name
   end
 
   ##
@@ -236,14 +214,14 @@ class RDoc::Markup::AttributeManager
   #
   #   @am.add_special(/((https?:)\S+\w)/, :HYPERLINK)
 
-  def add_special pattern, name
-    @special << [pattern, @attributes.bitmap_for(name)]
+  def add_special(pattern, name)
+    @special[pattern] = RDoc::Markup::Attribute.bitmap_for name
   end
 
   ##
   # Processes +str+ converting attributes, HTML and specials
 
-  def flow str
+  def flow(str)
     @str = str
 
     mask_protected_sequences
@@ -284,12 +262,10 @@ class RDoc::Markup::AttributeManager
     end
   end
 
-  ##
-  # Splits the string into chunks by attribute change
-
   def split_into_flow
     res = []
     current_attr = 0
+    str = ""
 
     str_len = @str.length
 
@@ -310,9 +286,9 @@ class RDoc::Markup::AttributeManager
         res << change_attribute(current_attr, new_attr)
         current_attr = new_attr
 
-        if (current_attr & @attributes.special) != 0 then
+        if (current_attr & RDoc::Markup::Attribute::SPECIAL) != 0 then
           i += 1 while
-            i < str_len and (@attrs[i] & @attributes.special) != 0
+            i < str_len and (@attrs[i] & RDoc::Markup::Attribute::SPECIAL) != 0
 
           res << RDoc::Markup::Special.new(current_attr,
                                            copy_string(start_pos, i))

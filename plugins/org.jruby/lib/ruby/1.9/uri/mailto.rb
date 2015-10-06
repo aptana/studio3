@@ -1,10 +1,9 @@
+#
 # = uri/mailto.rb
 #
 # Author:: Akira Yamada <akira@ruby-lang.org>
 # License:: You can redistribute it and/or modify it under the same term as Ruby.
 # Revision:: $Id$
-#
-# See URI for general documentation
 #
 
 require 'uri/generic'
@@ -17,10 +16,8 @@ module URI
   class MailTo < Generic
     include REGEXP
 
-    # A Default port of nil for URI::MailTo
     DEFAULT_PORT = nil
 
-    # An Array of the available components for URI::MailTo
     COMPONENT = [ :scheme, :to, :headers ].freeze
 
     # :stopdoc:
@@ -158,9 +155,6 @@ module URI
     # E-mail headers set by the URL, as an Array of Arrays
     attr_reader :headers
 
-    # check the to +v+ component against either
-    # * URI::Parser Regexp for :OPAQUE
-    # * MAILBOX_PATTERN
     def check_to(v)
       return true unless v
       return true if v.size == 0
@@ -174,22 +168,17 @@ module URI
     end
     private :check_to
 
-    # private setter for to +v+
     def set_to(v)
       @to = v
     end
     protected :set_to
 
-    # setter for to +v+
     def to=(v)
       check_to(v)
       set_to(v)
       v
     end
 
-    # check the headers +v+ component against either
-    # * URI::Parser Regexp for :OPAQUE
-    # * HEADER_PATTERN
     def check_headers(v)
       return true unless v
       return true if v.size == 0
@@ -204,7 +193,6 @@ module URI
     end
     private :check_headers
 
-    # private setter for headers +v+
     def set_headers(v)
       @headers = []
       if v
@@ -215,14 +203,12 @@ module URI
     end
     protected :set_headers
 
-    # setter for headers +v+
     def headers=(v)
       check_headers(v)
       set_headers(v)
       v
     end
 
-    # Constructs String from URI
     def to_s
       @scheme + ':' +
         if @to

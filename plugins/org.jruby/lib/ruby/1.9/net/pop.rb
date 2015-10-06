@@ -196,14 +196,12 @@ module Net
   #
   class POP3 < Protocol
 
-    # svn revision of this library
     Revision = %q$Revision$.split[1]
 
     #
     # Class Parameters
     #
 
-    # returns the port for POP3
     def POP3.default_port
       default_pop3_port()
     end
@@ -335,7 +333,6 @@ module Net
       @ssl_params = create_ssl_params(*args)
     end
 
-    # Constructs proper parameters from arguments
     def POP3.create_ssl_params(verify_or_params = {}, certs = nil)
       begin
         params = verify_or_params.to_hash
@@ -358,24 +355,18 @@ module Net
       @ssl_params = nil
     end
 
-    # returns the SSL Parameters
-    #
-    # see also POP3.enable_ssl
     def POP3.ssl_params
       return @ssl_params
     end
 
-    # returns +true+ if POP3.ssl_params is set
     def POP3.use_ssl?
       return !@ssl_params.nil?
     end
 
-    # returns whether verify_mode is enable from POP3.ssl_params
     def POP3.verify
       return @ssl_params[:verify_mode]
     end
 
-    # returns the :ca_file or :ca_path from POP3.ssh_params
     def POP3.certs
       return @ssl_params[:ca_file] || @ssl_params[:ca_path]
     end
@@ -461,7 +452,6 @@ module Net
       end
     end
 
-    # Disable SSL for all new instances.
     def disable_ssl
       @ssl_params = nil
     end
@@ -540,8 +530,7 @@ module Net
       end
     end
 
-    # internal method for Net::POP3.start
-    def do_start(account, password) # :nodoc:
+    def do_start(account, password)
       s = timeout(@open_timeout) { TCPSocket.open(@address, port) }
       if use_ssl?
         raise 'openssl library not installed' unless defined?(OpenSSL)
@@ -576,8 +565,7 @@ module Net
     end
     private :do_start
 
-    # Does nothing
-    def on_connect # :nodoc:
+    def on_connect
     end
     private :on_connect
 
@@ -587,12 +575,7 @@ module Net
       do_finish
     end
 
-    # nil's out the:
-    # - mails
-    # - number counter for mails
-    # - number counter for bytes
-    # - quits the current command, if any
-    def do_finish # :nodoc:
+    def do_finish
       @mails = nil
       @n_mails = nil
       @n_bytes = nil
@@ -605,10 +588,7 @@ module Net
     end
     private :do_finish
 
-    # Returns the current command.
-    #
-    # Raises IOError if there is no active socket
-    def command # :nodoc:
+    def command
       raise IOError, 'POP session not opened yet' \
                                       if not @socket or @socket.closed?
       @command
@@ -707,7 +687,6 @@ module Net
       @mails.each {|m| m.uid = uidl[m.number] }
     end
 
-    # deguging output for +msg+
     def logging(msg)
       @debug_output << msg + "\n" if @debug_output
     end

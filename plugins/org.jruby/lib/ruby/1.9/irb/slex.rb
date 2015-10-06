@@ -35,7 +35,7 @@ module IRB
       D_DETAIL.pp token
 
       postproc = block if block_given?
-      create(token, preproc, postproc)
+      node = create(token, preproc, postproc)
     end
 
     def def_rules(*tokens, &block)
