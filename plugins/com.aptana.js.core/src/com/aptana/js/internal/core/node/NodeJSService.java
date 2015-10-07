@@ -68,7 +68,7 @@ public class NodeJSService implements INodeJSService
 	private static final String NPM_EXE = "npm.cmd"; //$NON-NLS-1$
 
 	private static final String MAC_NODE_URL = "http://go.appcelerator.com/installer_nodejs_osx"; //$NON-NLS-1$
-	private static final String WIN_NODE_URL = "http://go.appcelerator.com/installer_nodejs_windows_10_37.msi"; //$NON-NLS-1$
+	private static final String WIN_NODE_URL = "http://go.appcelerator.com/installer_nodejs_windows.msi"; //$NON-NLS-1$
 	private static final String MAC_EXTENSION = ".pkg"; //$NON-NLS-1$
 	private static final String WIN_EXTENSION = ".msi"; //$NON-NLS-1$
 
