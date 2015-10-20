@@ -72,7 +72,7 @@ public class SudoProcessRunnable extends ProcessRunnable
 					}
 				}
 				// Now ensure there's more to read. If not, then let's assume we're blocked on more input and fail
-				if (!isReady(br, 3, 50))
+				if (!isReady(br, 3, 500))
 				{
 					exitCode = 1;
 					break;
