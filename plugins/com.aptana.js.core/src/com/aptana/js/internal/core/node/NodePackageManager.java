@@ -9,6 +9,7 @@ package com.aptana.js.internal.core.node;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -58,6 +59,8 @@ import com.aptana.js.core.node.INodePackageManager;
  */
 public class NodePackageManager implements INodePackageManager
 {
+
+	private static final String VERSION = "version"; //$NON-NLS-1$
 
 	/**
 	 * The error string that appears in the npm command output.
@@ -516,30 +519,61 @@ public class NodePackageManager implements INodePackageManager
 	public String getInstalledVersion(String packageName, boolean global, IPath workingDir) throws CoreException
 	{
 		IPath npmPath = checkedNPMPath();
-		List<String> args = CollectionsUtil.newList(npmPath.toOSString(),
-				"ls", packageName, SILENT, COLOR, FALSE, JSON, TRUE); //$NON-NLS-1$
+		List<String> args = CollectionsUtil.newList(npmPath.toOSString(), "ls", packageName, SILENT, COLOR, FALSE, JSON, //$NON-NLS-1$
+				TRUE);
 		if (global)
 		{
 			args.add(GLOBAL_ARG);
 		}
 		IStatus status = nodeJS.runInBackground(workingDir, ShellExecutable.getEnvironment(), args);
-		if (!status.isOK())
+		String version = getVersion(packageName, status.getMessage());
+
+		if (StringUtil.isEmpty(version))
 		{
 			// Sometimes due to unrelated un-met dependencies the status is not OK but the
 			// version information is still present so try first to read it. Log the issue
 			// so that user knows he has a problem with NPM
-			String version = getVersion(packageName, status.getMessage());
-			if (StringUtil.isEmpty(version))
-			{
-				throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
-						MessageFormat.format(Messages.NodePackageManager_FailedToDetermineInstalledVersion,
-								packageName, status.getMessage())));
-			}
-			IdeLog.logError(JSCorePlugin.getDefault(), status.getMessage());
-			return version;
+			return readPackageVersion(packageName, workingDir);
 		}
 
-		return getVersion(packageName, status.getMessage());
+		return version;
+	}
+
+	/**
+	 * It reads the package.json file for the specified package either in the global node_modules directory, or in the
+	 * specified local directory.
+	 *
+	 * @param packageName
+	 * @param workingDir
+	 * @return
+	 */
+	@SuppressWarnings("resource")
+	private String readPackageVersion(String packageName, IPath workingDir) throws CoreException
+	{
+		if (workingDir == null)
+		{
+			workingDir = getModulesPath();
+		}
+		IPath packageDir = workingDir.append(packageName);
+		if (!packageDir.toFile().exists())
+		{
+			packageDir = workingDir.append(NODE_MODULES).append(packageName);
+		}
+		if (packageDir.toFile().exists())
+		{
+			try
+			{
+				FileReader reader = new FileReader(packageDir.append(PACKAGE_JSON).toFile());
+				JSONObject json = (JSONObject) new JSONParser().parse(reader);
+				return (String) json.get(VERSION);
+			}
+			catch (Exception e)
+			{
+				IdeLog.logError(JSCorePlugin.getDefault(), e);
+			}
+		}
+
+		return null;
 	}
 
 	private String getVersion(String packageName, String output) throws CoreException
@@ -557,13 +591,14 @@ public class NodePackageManager implements INodePackageManager
 				return null;
 			}
 			JSONObject pkg = (JSONObject) dependencies.get(packageName);
-			return (String) pkg.get("version");
+			return (String) pkg.get(VERSION);
 		}
 		catch (ParseException e)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.NodePackageManager_FailedToDetermineInstalledVersion, packageName, e.getMessage())));
+			IdeLog.logError(JSCorePlugin.getDefault(), MessageFormat.format(
+					Messages.NodePackageManager_FailedToDetermineInstalledVersion, packageName, e.getMessage()));
 		}
+		return null;
 	}
 
 	public String getLatestVersionAvailable(String packageName) throws CoreException
@@ -573,7 +608,7 @@ public class NodePackageManager implements INodePackageManager
 		IPath npmPath = checkedNPMPath();
 
 		Map<String, String> env = ShellExecutable.getEnvironment();
-		List<String> args = CollectionsUtil.newList(npmPath.toOSString(), "view", packageName, "version");//$NON-NLS-1$ //$NON-NLS-2$
+		List<String> args = CollectionsUtil.newList(npmPath.toOSString(), "view", packageName, VERSION);//$NON-NLS-1$ //$NON-NLS-2$
 		args.addAll(proxySettings(env));
 
 		IStatus status = nodeJS.runInBackground(null, env, args);
@@ -597,8 +632,8 @@ public class NodePackageManager implements INodePackageManager
 		IPath npmPath = checkedNPMPath();
 
 		Map<String, String> env = ShellExecutable.getEnvironment();
-		List<String> args = CollectionsUtil.newList(npmPath.toOSString(),
-				"view", packageName, "versions", COLOR, FALSE, JSON, TRUE);//$NON-NLS-1$ //$NON-NLS-2$
+		List<String> args = CollectionsUtil.newList(npmPath.toOSString(), "view", packageName, "versions", COLOR, FALSE, //$NON-NLS-1$ //$NON-NLS-2$
+				JSON, TRUE);
 		args.addAll(proxySettings(env));
 
 		IStatus status = nodeJS.runInBackground(null, env, args);
