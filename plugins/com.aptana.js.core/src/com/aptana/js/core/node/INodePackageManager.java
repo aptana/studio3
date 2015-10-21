@@ -31,6 +31,7 @@ public interface INodePackageManager
 	 * Folder where modules live.
 	 */
 	public static final String NODE_MODULES = "node_modules"; //$NON-NLS-1$
+	public static final String PACKAGE_JSON = "package.json"; //$NON-NLS-1$
 
 	/**
 	 * Installs a package.
