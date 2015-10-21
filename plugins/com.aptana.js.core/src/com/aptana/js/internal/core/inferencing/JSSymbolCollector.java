@@ -317,6 +317,10 @@ public class JSSymbolCollector extends JSTreeWalker
 		}
 		// Now let's split it into it's parts
 		List<String> names = StringUtil.split(fullyQualifiedName, '.');
+		if (CollectionsUtil.isEmpty(names))
+		{
+			return null;
+		}
 		names.remove(names.size() - 1); // drop the last segment, which is the property we plan to add and get the path
 										// to it's parent
 		if (CollectionsUtil.isEmpty(names))
