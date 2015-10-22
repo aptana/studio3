@@ -335,14 +335,14 @@ public class NodePackageManagerTest
 	public void testGetInstalledPrePatchVersion() throws Exception
 	{
 		URL url = FileLocator.find(JSCorePlugin.getDefault().getBundle(), Path.fromPortableString("resources"), null);
-		System.out.println(url);
+		System.err.println(url);
 		userHome = Path.fromOSString(FileLocator.resolve(url).getPath());
-		System.out.println("userHome: " + userHome);
+		System.err.println("userHome: " + userHome);
 
 		URL fileURL = FileLocator.toFileURL(url);
-		System.out.println("fileURL: " + fileURL + ": " + fileURL.getPath());
+		System.err.println("fileURL: " + fileURL + ": " + fileURL.getPath());
 		URI fileURI = ResourceUtil.toURI(fileURL);
-		System.out.println("fileURI: " + fileURI);
+		System.err.println("fileURI: " + fileURI);
 
 		// For prepatch npm versions such as 4.2.1-5, npm -g ls <appcelerator> doesn't return the version number.
 		context.checking(new Expectations()
