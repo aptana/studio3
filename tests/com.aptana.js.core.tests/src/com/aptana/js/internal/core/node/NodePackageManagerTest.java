@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Set;
 
@@ -30,6 +30,7 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.IProcessRunner;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessStatus;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.node.INodeJS;
 
@@ -331,10 +332,17 @@ public class NodePackageManagerTest
 	}
 
 	@Test
-	public void testGetInstalledPrePatchVersion() throws CoreException, IOException
+	public void testGetInstalledPrePatchVersion() throws Exception
 	{
-		URL url = FileLocator.find(JSCorePlugin.getDefault().getBundle(), new Path("resources"), null);
+		URL url = FileLocator.find(JSCorePlugin.getDefault().getBundle(), Path.fromPortableString("resources"), null);
+		System.out.println(url);
 		userHome = Path.fromOSString(FileLocator.resolve(url).getPath());
+		System.out.println("userHome: " + userHome);
+
+		URL fileURL = FileLocator.toFileURL(url);
+		System.out.println("fileURL: " + fileURL + ": " + fileURL.getPath());
+		URI fileURI = ResourceUtil.toURI(fileURL);
+		System.out.println("fileURI: " + fileURI);
 
 		// For prepatch npm versions such as 4.2.1-5, npm -g ls <appcelerator> doesn't return the version number.
 		context.checking(new Expectations()
