@@ -239,5 +239,15 @@ public interface INodePackageManager
 	 */
 	public IPath findNpmPackagePath(String executableName, boolean appendExtension, List<IPath> searchLocations,
 			FileFilter fileFilter);
+
+	/**
+	 * Rebuilds the native libraries for the provided npm package directory.
+	 *
+	 * @param packageDir
+	 * @return
+	 * @throws CoreException
+	 */
+	public IStatus rebuild(IPath packageDir) throws CoreException;
+
 	// TODO Update
 }
