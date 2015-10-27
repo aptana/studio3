@@ -120,6 +120,7 @@ public class NodePackageManager implements INodePackageManager
 	private static final String REMOVE = "remove"; //$NON-NLS-1$
 	private static final String CONFIG = "config"; //$NON-NLS-1$
 	private static final String GET = "get"; //$NON-NLS-1$
+	private static final String REBUILD = "rebuild"; //$NON-NLS-1$
 
 	/**
 	 * Cached value for NPM's "prefix" config value (where modules get installed).
@@ -165,8 +166,8 @@ public class NodePackageManager implements INodePackageManager
 			return getPath();
 		}
 
-		throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
-				Messages.NodePackageManager_ERR_NPMNotInstalled));
+		throw new CoreException(
+				new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, Messages.NodePackageManager_ERR_NPMNotInstalled));
 	}
 
 	/*
@@ -214,8 +215,8 @@ public class NodePackageManager implements INodePackageManager
 				}
 				IdeLog.logError(JSCorePlugin.getDefault(),
 						MessageFormat.format("Failed to install {0}.\n\n{1}", packageName, message)); //$NON-NLS-1$
-				return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-						Messages.NodePackageManager_FailedInstallError, packageName));
+				return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
+						MessageFormat.format(Messages.NodePackageManager_FailedInstallError, packageName));
 			}
 			else if (status instanceof ProcessStatus)
 			{
@@ -227,8 +228,8 @@ public class NodePackageManager implements INodePackageManager
 					{
 						IdeLog.logError(JSCorePlugin.getDefault(),
 								MessageFormat.format("Failed to install {0}.\n\n{1}", packageName, error)); //$NON-NLS-1$
-						return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-								Messages.NodePackageManager_FailedInstallError, packageName));
+						return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
+								MessageFormat.format(Messages.NodePackageManager_FailedInstallError, packageName));
 					}
 				}
 			}
@@ -417,8 +418,8 @@ public class NodePackageManager implements INodePackageManager
 			}
 			else
 			{
-				throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-						Messages.NodePackageManager_FailedListingError, status)));
+				throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
+						MessageFormat.format(Messages.NodePackageManager_FailedListingError, status)));
 			}
 		}
 		else
@@ -470,9 +471,10 @@ public class NodePackageManager implements INodePackageManager
 		}
 		catch (CoreException e)
 		{
-			IdeLog.logInfo(JSCorePlugin.getDefault(), MessageFormat.format(
-					"Error getting the installed version of package {0}; falling back to use ''npm list''", //$NON-NLS-1$
-					packageName));
+			IdeLog.logInfo(JSCorePlugin.getDefault(),
+					MessageFormat.format(
+							"Error getting the installed version of package {0}; falling back to use ''npm list''", //$NON-NLS-1$
+							packageName));
 		}
 		Set<String> listing = list(true);
 		return listing.contains(packageName);
@@ -505,8 +507,8 @@ public class NodePackageManager implements INodePackageManager
 		}
 		if (!status.isOK() && !isPathExists) // some cases status.isNotOK even though it finds valid path
 		{
-			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.NodePackageManager_FailedListPackageError, packageName)));
+			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
+					MessageFormat.format(Messages.NodePackageManager_FailedListPackageError, packageName)));
 		}
 		return moduleIPath;
 	}
@@ -659,15 +661,15 @@ public class NodePackageManager implements INodePackageManager
 		IStatus status = runInBackground(CONFIG, GET, key);
 		if (!status.isOK())
 		{
-			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.NodePackageManager_ConfigFailure, key, status.getMessage())));
+			throw new CoreException(new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID,
+					MessageFormat.format(Messages.NodePackageManager_ConfigFailure, key, status.getMessage())));
 		}
 		return status.getMessage().trim();
 	}
 
 	private IStatus runNpmInstaller(String packageName, String displayName, boolean global, char[] password,
-			IPath workingDirectory, String command, IProgressMonitor monitor) throws CoreException, IOException,
-			InterruptedException
+			IPath workingDirectory, String command, IProgressMonitor monitor)
+					throws CoreException, IOException, InterruptedException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor,
 				MessageFormat.format(Messages.NodePackageManager_InstallingTaskName, displayName), 100);
@@ -944,15 +946,26 @@ public class NodePackageManager implements INodePackageManager
 
 	public IStatus runInBackground(String... args) throws CoreException
 	{
+		return runInBackground(null, null, args);
+	}
+
+	private IStatus runInBackground(IPath workingDir, Map<String, String> environment, String... args)
+			throws CoreException
+	{
 		List<String> newArgs = CollectionsUtil.newList(args);
 		newArgs.add(0, checkedNPMPath().toOSString());
-		return nodeJS.runInBackground(null, null, newArgs);
+		return nodeJS.runInBackground(workingDir, environment, newArgs);
 	}
 
 	public IPath findNpmPackagePath(String executableName, boolean appendExtension, List<IPath> searchLocations,
 			FileFilter filter)
 	{
 		return ExecutableUtil.find(executableName, true, searchLocations, filter);
+	}
+
+	public IStatus rebuild(IPath packageDir) throws CoreException
+	{
+		return runInBackground(packageDir, ShellExecutable.getEnvironment(), REBUILD);
 	}
 
 }

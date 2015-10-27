@@ -47,7 +47,7 @@ public class NodeJS implements INodeJS
 
 	private final IPath path;
 	private String version;
-	private NodePackageManager fNodePackageManager;
+	private final NodePackageManager fNodePackageManager;
 
 	NodeJS(IPath path)
 	{
@@ -72,9 +72,14 @@ public class NodeJS implements INodeJS
 		{
 			return version;
 		}
-		IStatus result = createProcessRunner().runInBackground(path.toOSString(), "-v"); //$NON-NLS-1$
-		version = result.getMessage();
+		version = doGetNodeVersion();
 		return version;
+	}
+
+	private String doGetNodeVersion()
+	{
+		IStatus result = createProcessRunner().runInBackground(path.toOSString(), "-v"); //$NON-NLS-1$
+		return result.getMessage();
 	}
 
 	protected IProcessRunner createProcessRunner()
@@ -196,15 +201,15 @@ public class NodeJS implements INodeJS
 
 		if (!exists())
 		{
-			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, ERR_DOES_NOT_EXIST, MessageFormat.format(
-					Messages.NodeJSService_FileDoesntExistError, path), null);
+			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, ERR_DOES_NOT_EXIST,
+					MessageFormat.format(Messages.NodeJSService_FileDoesntExistError, path), null);
 		}
 
 		String version = getVersion();
 		if (version == null)
 		{
-			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, ERR_NOT_EXECUTABLE, MessageFormat.format(
-					Messages.NodeJSService_CouldntGetVersionError, path), null);
+			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, ERR_NOT_EXECUTABLE,
+					MessageFormat.format(Messages.NodeJSService_CouldntGetVersionError, path), null);
 		}
 
 		int index = version.indexOf('v');
@@ -218,8 +223,9 @@ public class NodeJS implements INodeJS
 			return Status.OK_STATUS;
 		}
 
-		return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, ERR_INVALID_VERSION, MessageFormat.format(
-				Messages.NodeJSService_InvalidVersionError, path, version, MIN_NODE_VERSION), null);
+		return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, ERR_INVALID_VERSION,
+				MessageFormat.format(Messages.NodeJSService_InvalidVersionError, path, version, MIN_NODE_VERSION),
+				null);
 	}
 
 	public IPath getSourcePath()
@@ -281,5 +287,10 @@ public class NodeJS implements INodeJS
 	{
 		return Platform.getPreferencesService().getString(JSCorePlugin.PLUGIN_ID,
 				IPreferenceConstants.NODEJS_SOURCE_PATH, null, null);
+	}
+
+	public synchronized void nodeJSInstalled()
+	{
+		version = doGetNodeVersion();
 	}
 }
