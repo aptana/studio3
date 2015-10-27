@@ -45,7 +45,7 @@ import com.aptana.js.core.node.INodeJSService;
 /**
  * A service for finding the path to an installed NodeJS executable, installing one, or verifying a given path as a
  * valid NodeJS executable.
- * 
+ *
  * @author cwilliams
  */
 public class NodeJSService implements INodeJSService
@@ -72,14 +72,14 @@ public class NodeJSService implements INodeJSService
 	private static final String MAC_EXTENSION = ".pkg"; //$NON-NLS-1$
 	private static final String WIN_EXTENSION = ".msi"; //$NON-NLS-1$
 
-	private Set<Listener> listeners;
-	private Map<IPath, INodeJS> nodeJsInstalls;
+	private final Set<NodeJsListener> listeners;
+	private final Map<IPath, INodeJS> nodeJsInstalls;
 
 	private INodeJS fNodeExePath;
 
 	public NodeJSService()
 	{
-		listeners = new LinkedHashSet<Listener>();
+		listeners = new LinkedHashSet<NodeJsListener>();
 		nodeJsInstalls = new HashMap<IPath, INodeJS>();
 
 		fNodeExePath = findValidExecutable();
@@ -102,8 +102,11 @@ public class NodeJSService implements INodeJSService
 			}
 
 			// Look on the PATH and in standard locations
-			path = ExecutableUtil.find(NPM_EXE, false, CollectionsUtil.newList(
-					Path.fromOSString(PlatformUtil.expandEnvironmentStrings(PROGRAM_FILES_NODEJS_NODE_PATH)),
+			path = ExecutableUtil
+					.find(NPM_EXE, false,
+							CollectionsUtil.newList(
+									Path.fromOSString(PlatformUtil.expandEnvironmentStrings(
+											PROGRAM_FILES_NODEJS_NODE_PATH)),
 					Path.fromOSString(PlatformUtil.expandEnvironmentStrings(PROGRAM_FILES_X86_NODEJS_NODE_PATH))));
 		}
 		else
@@ -141,7 +144,7 @@ public class NodeJSService implements INodeJSService
 
 			// Look on the PATH and in standard locations
 			// @formatter:off
-			path = ExecutableUtil.find(NODE_EXE, false, 
+			path = ExecutableUtil.find(NODE_EXE, false,
 					CollectionsUtil.newList(
 							Path.fromOSString(PlatformUtil.expandEnvironmentStrings(PROGRAM_FILES_NODEJS_NODE_PATH)),
 							Path.fromOSString(PlatformUtil.expandEnvironmentStrings(PROGRAM_FILES_X86_NODEJS_NODE_PATH))
@@ -168,6 +171,7 @@ public class NodeJSService implements INodeJSService
 			return nodeJsInstalls.get(path);
 		}
 		INodeJS nodeJs = new NodeJS(path);
+		addListener(nodeJs);
 		nodeJsInstalls.put(path, nodeJs);
 		return nodeJs;
 	}
@@ -253,8 +257,8 @@ public class NodeJSService implements INodeJSService
 			return new Status(IStatus.ERROR, JSCorePlugin.PLUGIN_ID, e.getMessage(), e);
 		}
 		sub.done();
-		fNodeExePath = findValidExecutable();
 		fireNodeJSInstalled();
+		fNodeExePath = findValidExecutable();
 		return Status.OK_STATUS;
 	}
 
@@ -265,7 +269,7 @@ public class NodeJSService implements INodeJSService
 
 	/**
 	 * Downloads a file from uri, return the {@link File} on disk where it was saved.
-	 * 
+	 *
 	 * @param uri
 	 * @param monitor
 	 * @return
@@ -294,8 +298,8 @@ public class NodeJSService implements INodeJSService
 	 */
 	public INodeJS getInstallFromPreferences()
 	{
-		String pref = InstanceScope.INSTANCE.getNode(JSCorePlugin.PLUGIN_ID).get(
-				com.aptana.js.core.preferences.IPreferenceConstants.NODEJS_EXECUTABLE_PATH, null);
+		String pref = InstanceScope.INSTANCE.getNode(JSCorePlugin.PLUGIN_ID)
+				.get(com.aptana.js.core.preferences.IPreferenceConstants.NODEJS_EXECUTABLE_PATH, null);
 		if (StringUtil.isEmpty(pref))
 		{
 			return null;
@@ -355,12 +359,12 @@ public class NodeJSService implements INodeJSService
 		return nodeExePath != null && nodeExePath.exists();
 	}
 
-	public void addListener(Listener listener)
+	public void addListener(NodeJsListener listener)
 	{
 		listeners.add(listener);
 	}
 
-	public void removeListener(Listener listener)
+	public void removeListener(NodeJsListener listener)
 	{
 		listeners.remove(listener);
 	}
@@ -368,7 +372,7 @@ public class NodeJSService implements INodeJSService
 	private void fireNodeJSInstalled()
 	{
 		// TODO pass along the INodeJS instance we installed!
-		for (Listener listener : listeners)
+		for (NodeJsListener listener : listeners)
 		{
 			listener.nodeJSInstalled();
 		}
@@ -383,14 +387,14 @@ public class NodeJSService implements INodeJSService
 
 		if (!path.toFile().isDirectory())
 		{
-			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, INodeJS.ERR_DOES_NOT_EXIST, MessageFormat.format(
-					Messages.NodeJSService_NoDirectory_0, path), null);
+			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, INodeJS.ERR_DOES_NOT_EXIST,
+					MessageFormat.format(Messages.NodeJSService_NoDirectory_0, path), null);
 		}
 
 		if (!path.append(LIB).toFile().isDirectory())
 		{
-			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
-					Messages.NodeJSService_InvalidLocation_0, LIB));
+			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID,
+					MessageFormat.format(Messages.NodeJSService_InvalidLocation_0, LIB));
 		}
 		// TODO Any other things we want to check for to "prove" it's a NodeJS source install?
 
