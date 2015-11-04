@@ -15,16 +15,17 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 
 import com.aptana.core.util.IProcessRunner;
+import com.aptana.js.core.node.INodeJSService.NodeJsListener;
 
 /**
  * This represents an installation of NodeJS. There may be multiple installs on the user's machine. Just because you
  * have an instance does not guarantee the path exists or that it meets our minimum required version.
- * 
+ *
  * @author cwilliams
  */
-public interface INodeJS
+public interface INodeJS extends NodeJsListener
 {
-	public static final String MIN_NODE_VERSION = "0.10.13"; //$NON-NLS-1$
+	public static final String MIN_NODE_VERSION = "0.12.7"; //$NON-NLS-1$
 
 	/**
 	 * Error codes returned by {@link #validate()}
@@ -35,35 +36,35 @@ public interface INodeJS
 
 	/**
 	 * Returns an instance of NPM running under this node install.
-	 * 
+	 *
 	 * @return
 	 */
 	public INodePackageManager getNPM();
 
 	/**
 	 * Path to the NodeJS installation.
-	 * 
+	 *
 	 * @return
 	 */
 	public IPath getPath();
 
 	/**
 	 * Returns the result of running node -v, typical output will be "v0.10.13"
-	 * 
+	 *
 	 * @return
 	 */
 	public String getVersion();
 
 	/**
 	 * Does the actual binary exist at the path we're pointing to?
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean exists();
 
 	/**
 	 * Validates this install of NodeJS. Will return OK if the install exists and meets required minimum version.
-	 * 
+	 *
 	 * @return
 	 */
 	public IStatus validate();
@@ -71,7 +72,7 @@ public interface INodeJS
 	/**
 	 * Run something under NodeJS. Under the hood calls out to
 	 * {@link IProcessRunner#runInBackground(String, IPath, Map, String...)}
-	 * 
+	 *
 	 * @param args
 	 * @return
 	 */
@@ -80,7 +81,7 @@ public interface INodeJS
 	/**
 	 * Run something under NodeJS. Under the hood calls out to
 	 * {@link IProcessRunner#runInBackground(String, IPath, Map, String...)}
-	 * 
+	 *
 	 * @param env
 	 * @param args
 	 * @return
@@ -89,7 +90,7 @@ public interface INodeJS
 
 	/**
 	 * The path to the source code for this install.
-	 * 
+	 *
 	 * @return
 	 */
 	public IPath getSourcePath();

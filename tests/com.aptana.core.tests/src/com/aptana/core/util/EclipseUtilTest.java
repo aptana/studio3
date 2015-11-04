@@ -54,7 +54,7 @@ public class EclipseUtilTest
 	}
 
 	@Test
-	@Ignore
+	@Ignore("The product version is changed after we moved the base to 4.4.2")
 	public void testGetProductVersion()
 	{
 		String productVersion = EclipseUtil.getProductVersion();

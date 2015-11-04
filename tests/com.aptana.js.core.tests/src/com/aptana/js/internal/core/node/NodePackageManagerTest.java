@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Set;
 
@@ -23,7 +22,6 @@ import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.aptana.core.ShellExecutable;
@@ -31,6 +29,7 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.IProcessRunner;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessStatus;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.node.INodeJS;
 
@@ -332,11 +331,12 @@ public class NodePackageManagerTest
 	}
 
 	@Test
-	@Ignore("Ignoring as it couldn't find package.json on build machine")
-	public void testGetInstalledPrePatchVersion() throws CoreException, IOException
+	public void testGetInstalledPrePatchVersion() throws Exception
 	{
-		URL url = FileLocator.find(JSCorePlugin.getDefault().getBundle(), new Path("resources"), null);
-		userHome = Path.fromOSString(FileLocator.resolve(url).getPath());
+		URL url = FileLocator.find(JSCorePlugin.getDefault().getBundle(), Path.fromPortableString("resources"), null);
+		File file1 = ResourceUtil.resourcePathToFile(url);
+		userHome = Path.fromOSString(file1.getPath());
+		System.err.println("userHome: " + userHome);
 
 		// For prepatch npm versions such as 4.2.1-5, npm -g ls <appcelerator> doesn't return the version number.
 		context.checking(new Expectations()

@@ -67,7 +67,19 @@ public final class JSDebugModel {
 	public static ILineBreakpoint createLineBreakpoint(IResource resource, int line) throws CoreException {
 		return new JSDebugLineBreakpoint(resource, line);
 	}
-
+	
+	/**
+	 * Create line breakpoint
+	 * 
+	 * @param resource
+	 * @param line
+	 * @return ILineBreakpoint
+	 * @throws CoreException
+	 */
+	public static ILineBreakpoint createLineBreakpoint(IResource resource, int line, boolean isEnableBreakPoint) throws CoreException {
+		return new JSDebugLineBreakpoint(resource, line, isEnableBreakPoint);
+	}
+	
 	/**
 	 * Create line breakpoint
 	 * 
@@ -80,7 +92,7 @@ public final class JSDebugModel {
 	 */
 	public static ILineBreakpoint createLineBreakpoint(IResource resource, int line, Map<String, Object> attributes,
 			boolean register) throws CoreException {
-		return new JSDebugLineBreakpoint(resource, line, attributes, register);
+		return new JSDebugLineBreakpoint(resource, line, attributes, register, true);
 	}
 
 	/**
@@ -128,7 +140,7 @@ public final class JSDebugModel {
 			return createLineBreakpoint((IUniformResource) resource, line, attributes, register);
 		} else if (resource instanceof String) {
 			attributes.put(IJSDebugConstants.BREAKPOINT_LOCATION, (String) resource);
-			return new JSDebugLineBreakpoint(ResourcesPlugin.getWorkspace().getRoot(), line, attributes, register);
+			return new JSDebugLineBreakpoint(ResourcesPlugin.getWorkspace().getRoot(), line, attributes, register, true);
 		}
 		return null;
 	}
