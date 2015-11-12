@@ -15,6 +15,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -169,8 +171,8 @@ public class JiraManager
 						Messages.JiraManager_BadCredentialsErrMsg, null);
 			}
 			String msg = IOUtil.read(connection.getInputStream());
-			return new Status(IStatus.ERROR, JiraCorePlugin.PLUGIN_ID, code,
-					Messages.JiraManager_UnknownErrMsg + ": " + msg, null);
+			return new Status(IStatus.ERROR, JiraCorePlugin.PLUGIN_ID, code, Messages.JiraManager_UnknownErrMsg + ": "
+					+ msg, null);
 		}
 		catch (Exception e)
 		{
@@ -276,15 +278,14 @@ public class JiraManager
 			{
 				severityJSON = severity.getParameterValue() + ",\n"; //$NON-NLS-1$
 			}
-
-			// If we're submitting against TC, we can't do version, we need to stuff that into the Environment
-			if (TITANIUM_COMMUNITY.equals(projectKey))
+			String projectVersion = getProjectVersion();
+			if (isProjectVersionExists(projectVersion))
 			{
-				versionString = MessageFormat.format("\"{0}\": \"{1}\"", PARAM_ENVIRONMENT, getProjectVersion()); //$NON-NLS-1$
+				versionString = "\"" + PARAM_VERSION + "\": [{\"name\": \"" + projectVersion + "\"}]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			else
 			{
-				versionString = "\"" + PARAM_VERSION + "\": [{\"name\": \"" + getProjectVersion() + "\"}]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				versionString = MessageFormat.format("\"{0}\": \"{1}\"", PARAM_ENVIRONMENT, projectVersion); //$NON-NLS-1$
 			}
 			// @formatter:off
 			String data = "{\n" + //$NON-NLS-1$
@@ -333,6 +334,83 @@ public class JiraManager
 				connection.disconnect();
 			}
 		}
+	}
+
+	/**
+	 * Check whether the current studio project version is there in the JIRA project versions.
+	 * 
+	 * @param projectVersion
+	 * @return
+	 */
+	protected boolean isProjectVersionExists(String projectVersion)
+	{
+		try
+		{
+			return getProjectVersions().contains(projectVersion);
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(JiraCorePlugin.getDefault(), e);
+		}
+		return false;
+	}
+
+	/**
+	 * Get the project versions from Appcelerator JIRA
+	 * 
+	 * @return
+	 * @throws JiraException
+	 */
+	protected List<String> getProjectVersions() throws JiraException
+	{
+		List<String> projectNames = new ArrayList<String>();
+		HttpURLConnection connection = null;
+		try
+		{
+			connection = createConnection(getProjectVersionsURL(), user.getUsername(), user.getPassword());
+			connection.setRequestMethod("GET"); //$NON-NLS-1$
+
+			int responseCode = connection.getResponseCode();
+			if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED)
+			{
+				String output = IOUtil.read(connection.getInputStream());
+				Object[] parse = (Object[]) JSON.parse(output);
+				for (Object object : parse)
+				{
+					if (object instanceof Map)
+					{
+						@SuppressWarnings("unchecked")
+						Map<String, String> projectEntry = (Map<String, String>) object;
+						projectNames.add(projectEntry.get("name"));
+					}
+				}
+				return projectNames;
+			}
+			throw new JiraException(IOUtil.read(connection.getErrorStream()));
+		}
+		catch (JiraException je)
+		{
+			throw je;
+		}
+		catch (Exception e)
+		{
+			throw new JiraException(e.getMessage(), e);
+		}
+		finally
+		{
+			if (connection != null)
+			{
+				connection.disconnect();
+			}
+		}
+	}
+
+	/**
+	 * @return url to return the project versions from JIRA
+	 */
+	protected String getProjectVersionsURL()
+	{
+		return REST_API_ENDPOINT + "project/" + projectKey + "/versions"; //$NON-NLS-1$;
 	}
 
 	/**
