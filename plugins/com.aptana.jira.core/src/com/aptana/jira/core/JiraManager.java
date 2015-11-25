@@ -98,6 +98,7 @@ public class JiraManager
 	 */
 	private static final String PARAM_ENVIRONMENT = "environment"; //$NON-NLS-1$
 	private static final String PARAM_VERSION = "versions"; //$NON-NLS-1$
+	private static final String LABELS = "labels"; //$NON-NLS-1$ 
 
 	// could override using setProjectInfo()
 	private static String projectName = "Aptana Studio"; //$NON-NLS-1$
@@ -238,21 +239,13 @@ public class JiraManager
 	/**
 	 * Creates a JIRA ticket.
 	 *
-	 * @param type
-	 *            the issue type (bug, feature, or improvement)
-	 * @param priority
-	 *            the issue's priority
-	 * @param severity
-	 *            the issue's severity (Blocker, Major, Minor, Trivial, None)
-	 * @param summary
-	 *            the summary of the ticket
-	 * @param description
-	 *            the description of the ticket
+	 * @param jiraConfig
+	 *            the issue configuration 
 	 * @return the JIRA issue created
 	 * @throws JiraException
 	 * @throws IOException
 	 */
-	public JiraIssue createIssue(JiraIssueType type, JiraIssueSeverity severity, String summary, String description)
+	public JiraIssue createIssue(JiraIssueConfig jiraConfig)
 			throws JiraException, IOException
 	{
 		if (user == null)
@@ -268,15 +261,15 @@ public class JiraManager
 			connection.setDoOutput(true);
 			String severityJSON;
 			String versionString;
-			if ((TITANIUM_COMMUNITY.equals(projectKey) && type == JiraIssueType.IMPROVEMENT)
-					|| (!TITANIUM_COMMUNITY.equals(projectKey) && type != JiraIssueType.BUG))
+			if ((TITANIUM_COMMUNITY.equals(projectKey) && jiraConfig.type == JiraIssueType.IMPROVEMENT)
+					|| (!TITANIUM_COMMUNITY.equals(projectKey) && jiraConfig.type != JiraIssueType.BUG))
 			{
 				// Improvements in TC don't get Severities, nor do Story or Improvements in Aptana Studio!
 				severityJSON = StringUtil.EMPTY;
 			}
 			else
 			{
-				severityJSON = severity.getParameterValue() + ",\n"; //$NON-NLS-1$
+				severityJSON = jiraConfig.severity.getParameterValue() + ",\n"; //$NON-NLS-1$
 			}
 			String projectVersion = getProjectVersion();
 			if (isProjectVersionExists(projectVersion))
@@ -287,6 +280,9 @@ public class JiraManager
 			{
 				versionString = MessageFormat.format("\"{0}\": \"{1}\"", PARAM_ENVIRONMENT, projectVersion); //$NON-NLS-1$
 			}
+			
+			String labels = "\"" + LABELS + "\": [" +jiraConfig.label +"]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			
 			// @formatter:off
 			String data = "{\n" + //$NON-NLS-1$
 			"    \"fields\": {\n" + //$NON-NLS-1$
@@ -294,13 +290,14 @@ public class JiraManager
 			"       { \n" + //$NON-NLS-1$
 			"          \"key\": \"" + projectKey + "\"\n" + //$NON-NLS-1$ //$NON-NLS-2$
 			"       },\n" + //$NON-NLS-1$
-			"       \"summary\": \"" + summary.replaceAll("\"", "'") + "\",\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			"       \"description\": \"" + description.replaceAll("\"", "'").replaceAll("\n", Matcher.quoteReplacement("\\n")) + "\",\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+			"       \"summary\": \"" + jiraConfig.summary.replaceAll("\"", "'") + "\",\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"       \"description\": \"" + jiraConfig.description.replaceAll("\"", "'").replaceAll("\n", Matcher.quoteReplacement("\\n")) + "\",\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 			"       \"issuetype\": {\n" + //$NON-NLS-1$
-			"          \"name\": \"" + type.getParameterValue(projectKey) + "\"\n" + //$NON-NLS-1$ //$NON-NLS-2$
+			"          \"name\": \"" + jiraConfig.type.getParameterValue(projectKey) + "\"\n" + //$NON-NLS-1$ //$NON-NLS-2$
 			"       },\n" + //$NON-NLS-1$
 			severityJSON +
-			"       " + versionString + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
+			"       " + versionString + "\n," + //$NON-NLS-1$ //$NON-NLS-2$
+			"       " + labels + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
 			"   }\n" + //$NON-NLS-1$
 			"}"; //$NON-NLS-1$
 			// @formatter:on
