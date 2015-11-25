@@ -14,8 +14,7 @@ public enum JiraIssueSeverity
 	BLOCKER(Messages.JiraIssueSeverity_Blocker, "Blocker"), //$NON-NLS-1$
 	MAJOR(Messages.JiraIssueSeverity_Major, "Major"), //$NON-NLS-1$
 	MINOR(Messages.JiraIssueSeverity_Minor, "Minor"), //$NON-NLS-1$
-	TRIVIAL(Messages.JiraIssueSeverity_Trivial, "Trivial"), //$NON-NLS-1$
-	NONE(Messages.JiraIssueSeverity_None, "None"); //$NON-NLS-1$
+	TRIVIAL(Messages.JiraIssueSeverity_Trivial, "Trivial"); //$NON-NLS-1$
 	// @formatter:on
 
 	private String displayName; // Translated name for UI
