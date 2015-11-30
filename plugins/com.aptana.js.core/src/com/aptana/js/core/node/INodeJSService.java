@@ -52,10 +52,21 @@ public interface INodeJSService
 	 * Attempts to return the {@link #getInstallFromPreferences()} if it passes validation. Otherwise, attempts to
 	 * return path from {@link #detectInstall()} if that passes validation. This is what should be used to execute node
 	 * commands.
-	 *
+	 * 
 	 * @return
 	 */
 	public INodeJS getValidExecutable();
+
+	/**
+	 * Attempts to return the {@link #getInstallFromPreferences()} if it passes validation. Otherwise, attempts to
+	 * return path from {@link #detectInstall()} if that passes validation. This is what should be used to execute node
+	 * commands.
+	 * 
+	 * @param force
+	 *            to recompute the nodejs executable.
+	 * @return
+	 */
+	public INodeJS getValidExecutable(boolean force);
 
 	/**
 	 * Downloads and then installs NodeJS for the user on Windows and Mac.
