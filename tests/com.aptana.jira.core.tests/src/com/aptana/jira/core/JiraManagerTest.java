@@ -216,9 +216,16 @@ public class JiraManagerTest {
 	public void testCreateIssueLoggedOutFails() throws Exception {
 		final String summary = "Testing creating an issue";
 		final String description = "This is a test";
+		
+		//config data
+		JiraIssueConfig jiraConfig = new JiraIssueConfig();
+		jiraConfig.type = JiraIssueType.BUG;
+		jiraConfig.severity = JiraIssueSeverity.TRIVIAL;
+		jiraConfig.summary = summary;
+		jiraConfig.description = description;
+		
 		try {
-			manager.createIssue(JiraIssueType.BUG, JiraIssueSeverity.TRIVIAL,
-					summary, description);
+			manager.createIssue(jiraConfig);
 			fail("Shouldn't allow ticket creation with no user!");
 		} catch (JiraException e) {
 			// expected
@@ -254,8 +261,15 @@ public class JiraManagerTest {
 
 		final String summary = "Testing creating an issue";
 		final String description = "This is a test";
-		JiraIssue issue = manager.createIssue(JiraIssueType.BUG,
-				JiraIssueSeverity.TRIVIAL, summary, description);
+		
+		// Config data
+		JiraIssueConfig jiraConfig = new JiraIssueConfig();
+		jiraConfig.type = JiraIssueType.BUG;
+		jiraConfig.severity = JiraIssueSeverity.TRIVIAL;
+		jiraConfig.summary = summary;
+		jiraConfig.description = description;
+			
+		JiraIssue issue = manager.createIssue(jiraConfig);
 
 		// Verify the ticket we generated
 		assertEquals("https://jira.appcelerator.org/browse/APSTUD-4030",
