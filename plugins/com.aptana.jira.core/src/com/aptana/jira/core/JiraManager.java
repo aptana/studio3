@@ -281,7 +281,7 @@ public class JiraManager
 				versionString = MessageFormat.format("\"{0}\": \"{1}\"", PARAM_ENVIRONMENT, projectVersion); //$NON-NLS-1$
 			}
 			
-			String labels = "\"" + LABELS + "\": [" +jiraConfig.label +"]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			String labels = "\"" + LABELS + "\": [\"" +jiraConfig.label +"\"]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			
 			// @formatter:off
 			String data = "{\n" + //$NON-NLS-1$
