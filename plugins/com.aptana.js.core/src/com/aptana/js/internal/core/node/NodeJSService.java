@@ -102,11 +102,8 @@ public class NodeJSService implements INodeJSService
 			}
 
 			// Look on the PATH and in standard locations
-			path = ExecutableUtil
-					.find(NPM_EXE, false,
-							CollectionsUtil.newList(
-									Path.fromOSString(PlatformUtil.expandEnvironmentStrings(
-											PROGRAM_FILES_NODEJS_NODE_PATH)),
+			path = ExecutableUtil.find(NPM_EXE, false, CollectionsUtil.newList(
+					Path.fromOSString(PlatformUtil.expandEnvironmentStrings(PROGRAM_FILES_NODEJS_NODE_PATH)),
 					Path.fromOSString(PlatformUtil.expandEnvironmentStrings(PROGRAM_FILES_X86_NODEJS_NODE_PATH))));
 		}
 		else
@@ -298,8 +295,8 @@ public class NodeJSService implements INodeJSService
 	 */
 	public INodeJS getInstallFromPreferences()
 	{
-		String pref = InstanceScope.INSTANCE.getNode(JSCorePlugin.PLUGIN_ID)
-				.get(com.aptana.js.core.preferences.IPreferenceConstants.NODEJS_EXECUTABLE_PATH, null);
+		String pref = InstanceScope.INSTANCE.getNode(JSCorePlugin.PLUGIN_ID).get(
+				com.aptana.js.core.preferences.IPreferenceConstants.NODEJS_EXECUTABLE_PATH, null);
 		if (StringUtil.isEmpty(pref))
 		{
 			return null;
@@ -315,6 +312,24 @@ public class NodeJSService implements INodeJSService
 
 	public INodeJS getValidExecutable()
 	{
+		return getValidExecutable(false);
+	}
+
+	public INodeJS getValidExecutable(boolean isforce)
+	{
+		if (isforce)
+		{
+			if (fNodeExePath != null)
+			{
+				nodeJsInstalls.remove(fNodeExePath.getPath());
+				listeners.remove(fNodeExePath);
+
+				// Let's invalidate the current nodejs
+				fNodeExePath = null;
+
+			}
+			return findValidExecutable();
+		}
 		return fNodeExePath;
 	}
 
@@ -387,14 +402,14 @@ public class NodeJSService implements INodeJSService
 
 		if (!path.toFile().isDirectory())
 		{
-			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, INodeJS.ERR_DOES_NOT_EXIST,
-					MessageFormat.format(Messages.NodeJSService_NoDirectory_0, path), null);
+			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, INodeJS.ERR_DOES_NOT_EXIST, MessageFormat.format(
+					Messages.NodeJSService_NoDirectory_0, path), null);
 		}
 
 		if (!path.append(LIB).toFile().isDirectory())
 		{
-			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID,
-					MessageFormat.format(Messages.NodeJSService_InvalidLocation_0, LIB));
+			return new Status(Status.ERROR, JSCorePlugin.PLUGIN_ID, MessageFormat.format(
+					Messages.NodeJSService_InvalidLocation_0, LIB));
 		}
 		// TODO Any other things we want to check for to "prove" it's a NodeJS source install?
 
