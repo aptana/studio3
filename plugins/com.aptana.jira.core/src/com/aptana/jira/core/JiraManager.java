@@ -11,9 +11,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -193,10 +195,11 @@ public class JiraManager
 	 *
 	 * @param username
 	 * @return
+	 * @throws UnsupportedEncodingException 
 	 */
-	protected String getUserURL(String username)
+	protected String getUserURL(String username) throws UnsupportedEncodingException
 	{
-		return REST_API_ENDPOINT + "user?username=" + username; //$NON-NLS-1$
+		return REST_API_ENDPOINT + "user?username=" + URLEncoder.encode(username, "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@SuppressWarnings("restriction")
