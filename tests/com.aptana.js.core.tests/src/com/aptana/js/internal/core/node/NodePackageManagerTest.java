@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Set;
 
@@ -331,12 +332,11 @@ public class NodePackageManagerTest
 	}
 
 	@Test
-	public void testGetInstalledPrePatchVersion() throws Exception
+	public void testGetInstalledPrePatchVersion() throws CoreException, IOException
 	{
 		URL url = FileLocator.find(JSCorePlugin.getDefault().getBundle(), Path.fromPortableString("resources"), null);
 		File file1 = ResourceUtil.resourcePathToFile(url);
 		userHome = Path.fromOSString(file1.getPath());
-		System.err.println("userHome: " + userHome);
 
 		// For prepatch npm versions such as 4.2.1-5, npm -g ls <appcelerator> doesn't return the version number.
 		context.checking(new Expectations()

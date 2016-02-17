@@ -31,6 +31,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.jira.core.JiraCorePlugin;
 import com.aptana.jira.core.JiraException;
 import com.aptana.jira.core.JiraIssue;
+import com.aptana.jira.core.JiraIssueConfig;
 import com.aptana.jira.core.JiraIssueSeverity;
 import com.aptana.jira.core.JiraIssueType;
 import com.aptana.jira.core.JiraManager;
@@ -69,8 +70,12 @@ public class SubmitTicketHandler extends AbstractHandler
 					JiraIssue issue = null;
 					try
 					{
-						// Replace any Windows new-line ending with a \n.
-						issue = manager.createIssue(type, severity, summary, description.replaceAll("(\r\n|\n)", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
+						JiraIssueConfig jiraConfig = new JiraIssueConfig();
+						jiraConfig.type = type;
+						jiraConfig.severity = severity;
+						jiraConfig.summary = summary;
+						jiraConfig.description = description.replaceAll("(\r\n|\n)", "\n"); //$NON-NLS-1$ //$NON-NLS-2$ // Replace any Windows new-line ending with a \n.
+						issue = manager.createIssue(jiraConfig); 
 					}
 					catch (final JiraException e)
 					{

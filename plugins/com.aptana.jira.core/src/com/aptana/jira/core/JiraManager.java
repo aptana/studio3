@@ -11,10 +11,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -96,6 +100,7 @@ public class JiraManager
 	 */
 	private static final String PARAM_ENVIRONMENT = "environment"; //$NON-NLS-1$
 	private static final String PARAM_VERSION = "versions"; //$NON-NLS-1$
+	private static final String LABELS = "labels"; //$NON-NLS-1$ 
 
 	// could override using setProjectInfo()
 	private static String projectName = "Aptana Studio"; //$NON-NLS-1$
@@ -169,8 +174,8 @@ public class JiraManager
 						Messages.JiraManager_BadCredentialsErrMsg, null);
 			}
 			String msg = IOUtil.read(connection.getInputStream());
-			return new Status(IStatus.ERROR, JiraCorePlugin.PLUGIN_ID, code,
-					Messages.JiraManager_UnknownErrMsg + ": " + msg, null);
+			return new Status(IStatus.ERROR, JiraCorePlugin.PLUGIN_ID, code, Messages.JiraManager_UnknownErrMsg + ": "
+					+ msg, null);
 		}
 		catch (Exception e)
 		{
@@ -190,10 +195,11 @@ public class JiraManager
 	 *
 	 * @param username
 	 * @return
+	 * @throws UnsupportedEncodingException 
 	 */
-	protected String getUserURL(String username)
+	protected String getUserURL(String username) throws UnsupportedEncodingException
 	{
-		return REST_API_ENDPOINT + "user?username=" + username; //$NON-NLS-1$
+		return REST_API_ENDPOINT + "user?username=" + URLEncoder.encode(username, "UTF-8"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@SuppressWarnings("restriction")
@@ -236,21 +242,13 @@ public class JiraManager
 	/**
 	 * Creates a JIRA ticket.
 	 *
-	 * @param type
-	 *            the issue type (bug, feature, or improvement)
-	 * @param priority
-	 *            the issue's priority
-	 * @param severity
-	 *            the issue's severity (Blocker, Major, Minor, Trivial, None)
-	 * @param summary
-	 *            the summary of the ticket
-	 * @param description
-	 *            the description of the ticket
+	 * @param jiraConfig
+	 *            the issue configuration 
 	 * @return the JIRA issue created
 	 * @throws JiraException
 	 * @throws IOException
 	 */
-	public JiraIssue createIssue(JiraIssueType type, JiraIssueSeverity severity, String summary, String description)
+	public JiraIssue createIssue(JiraIssueConfig jiraConfig)
 			throws JiraException, IOException
 	{
 		if (user == null)
@@ -266,26 +264,28 @@ public class JiraManager
 			connection.setDoOutput(true);
 			String severityJSON;
 			String versionString;
-			if ((TITANIUM_COMMUNITY.equals(projectKey) && type == JiraIssueType.IMPROVEMENT)
-					|| (!TITANIUM_COMMUNITY.equals(projectKey) && type != JiraIssueType.BUG))
+			if ((TITANIUM_COMMUNITY.equals(projectKey) && jiraConfig.type == JiraIssueType.IMPROVEMENT)
+					|| (!TITANIUM_COMMUNITY.equals(projectKey) && jiraConfig.type != JiraIssueType.BUG))
 			{
 				// Improvements in TC don't get Severities, nor do Story or Improvements in Aptana Studio!
 				severityJSON = StringUtil.EMPTY;
 			}
 			else
 			{
-				severityJSON = severity.getParameterValue() + ",\n"; //$NON-NLS-1$
+				severityJSON = jiraConfig.severity.getParameterValue() + ",\n"; //$NON-NLS-1$
 			}
-
-			// If we're submitting against TC, we can't do version, we need to stuff that into the Environment
-			if (TITANIUM_COMMUNITY.equals(projectKey))
+			String projectVersion = getProjectVersion();
+			if (isProjectVersionExists(projectVersion))
 			{
-				versionString = MessageFormat.format("\"{0}\": \"{1}\"", PARAM_ENVIRONMENT, getProjectVersion()); //$NON-NLS-1$
+				versionString = "\"" + PARAM_VERSION + "\": [{\"name\": \"" + projectVersion + "\"}]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			else
 			{
-				versionString = "\"" + PARAM_VERSION + "\": [{\"name\": \"" + getProjectVersion() + "\"}]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				versionString = MessageFormat.format("\"{0}\": \"{1}\"", PARAM_ENVIRONMENT, projectVersion); //$NON-NLS-1$
 			}
+			
+			String labels = "\"" + LABELS + "\": [\"" +jiraConfig.label +"\"]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			
 			// @formatter:off
 			String data = "{\n" + //$NON-NLS-1$
 			"    \"fields\": {\n" + //$NON-NLS-1$
@@ -293,13 +293,14 @@ public class JiraManager
 			"       { \n" + //$NON-NLS-1$
 			"          \"key\": \"" + projectKey + "\"\n" + //$NON-NLS-1$ //$NON-NLS-2$
 			"       },\n" + //$NON-NLS-1$
-			"       \"summary\": \"" + summary.replaceAll("\"", "'") + "\",\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			"       \"description\": \"" + description.replaceAll("\"", "'").replaceAll("\n", Matcher.quoteReplacement("\\n")) + "\",\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+			"       \"summary\": \"" + jiraConfig.summary.replaceAll("\"", "'") + "\",\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"       \"description\": \"" + jiraConfig.description.replaceAll("\"", "'").replaceAll("\n", Matcher.quoteReplacement("\\n")) + "\",\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 			"       \"issuetype\": {\n" + //$NON-NLS-1$
-			"          \"name\": \"" + type.getParameterValue(projectKey) + "\"\n" + //$NON-NLS-1$ //$NON-NLS-2$
+			"          \"name\": \"" + jiraConfig.type.getParameterValue(projectKey) + "\"\n" + //$NON-NLS-1$ //$NON-NLS-2$
 			"       },\n" + //$NON-NLS-1$
 			severityJSON +
-			"       " + versionString + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
+			"       " + versionString + "\n," + //$NON-NLS-1$ //$NON-NLS-2$
+			"       " + labels + "\n" + //$NON-NLS-1$ //$NON-NLS-2$
 			"   }\n" + //$NON-NLS-1$
 			"}"; //$NON-NLS-1$
 			// @formatter:on
@@ -333,6 +334,83 @@ public class JiraManager
 				connection.disconnect();
 			}
 		}
+	}
+
+	/**
+	 * Check whether the current studio project version is there in the JIRA project versions.
+	 * 
+	 * @param projectVersion
+	 * @return
+	 */
+	protected boolean isProjectVersionExists(String projectVersion)
+	{
+		try
+		{
+			return getProjectVersions().contains(projectVersion);
+		}
+		catch (Exception e)
+		{
+			IdeLog.logError(JiraCorePlugin.getDefault(), e);
+		}
+		return false;
+	}
+
+	/**
+	 * Get the project versions from Appcelerator JIRA
+	 * 
+	 * @return
+	 * @throws JiraException
+	 */
+	protected List<String> getProjectVersions() throws JiraException
+	{
+		List<String> projectNames = new ArrayList<String>();
+		HttpURLConnection connection = null;
+		try
+		{
+			connection = createConnection(getProjectVersionsURL(), user.getUsername(), user.getPassword());
+			connection.setRequestMethod("GET"); //$NON-NLS-1$
+
+			int responseCode = connection.getResponseCode();
+			if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED)
+			{
+				String output = IOUtil.read(connection.getInputStream());
+				Object[] parse = (Object[]) JSON.parse(output);
+				for (Object object : parse)
+				{
+					if (object instanceof Map)
+					{
+						@SuppressWarnings("unchecked")
+						Map<String, String> projectEntry = (Map<String, String>) object;
+						projectNames.add(projectEntry.get("name"));
+					}
+				}
+				return projectNames;
+			}
+			throw new JiraException(IOUtil.read(connection.getErrorStream()));
+		}
+		catch (JiraException je)
+		{
+			throw je;
+		}
+		catch (Exception e)
+		{
+			throw new JiraException(e.getMessage(), e);
+		}
+		finally
+		{
+			if (connection != null)
+			{
+				connection.disconnect();
+			}
+		}
+	}
+
+	/**
+	 * @return url to return the project versions from JIRA
+	 */
+	protected String getProjectVersionsURL()
+	{
+		return REST_API_ENDPOINT + "project/" + projectKey + "/versions"; //$NON-NLS-1$;
 	}
 
 	/**

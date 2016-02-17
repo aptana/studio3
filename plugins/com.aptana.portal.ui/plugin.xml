@@ -112,11 +112,6 @@
             name="Preference Actions">
       </actionController>
       <actionController
-            class="com.aptana.portal.ui.dispatch.actionControllers.BrowserActionController"
-            id="portal.browser"
-            name="Browser Actions">
-      </actionController>
-      <actionController
             class="com.aptana.portal.ui.dispatch.actionControllers.ViewActionController"
             id="portal.views"
             name="View Actions">
