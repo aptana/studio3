@@ -2,15 +2,6 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension
-         point="org.eclipse.ui.views">
-      <view
-            category="com.aptana"
-            class="com.aptana.samples.ui.views.SamplesView"
-            icon="icons/samples.gif"
-            id="com.aptana.samples.ui.SamplesView"
-            name="%View.samples.name"/>
-   </extension>
-   <extension
          point="org.eclipse.ui.commands">
       <category
             id="com.aptana.samples.ui.category"
