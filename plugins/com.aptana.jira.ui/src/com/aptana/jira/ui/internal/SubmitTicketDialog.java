@@ -92,11 +92,14 @@ public class SubmitTicketDialog extends TitleAreaDialog
 	{
 		super(parentShell);
 		setHelpAvailable(false);
-		setShellStyle(getShellStyle() | SWT.RESIZE);
 		screenshotCheckboxes = new ArrayList<Button>();
 		screenshots = new LinkedHashSet<IPath>();
 	}
-
+	
+	@Override
+	protected void setShellStyle(int newShellStyle) {           
+	     super.setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MODELESS);
+	}
 	/**
 	 * @return the issue type
 	 */
