@@ -129,6 +129,11 @@ public interface IPreferenceConstants
 	 * The preference key used to open extensionless files with the selected editor from preferences.
 	 */
 	public static final String OPEN_WITH_EDITOR = CommonEditorPlugin.PLUGIN_ID + ".openWithEditor"; //$NON-NLS-1$
+	
+	/**
+	 * The preference key used to open alloy view xml files with the selected editor from preferences.
+	 */
+	public static final String DEFAULT_ALLOY_VIEW_EDITOR = CommonEditorPlugin.PLUGIN_ID + ".alloyViewEditor"; //$NON-NLS-1$
 
 	/**
 	 * The preference key for if to show the dialog of where the untitled file should save to

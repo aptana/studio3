@@ -473,7 +473,10 @@ public class EditorUtil
 			IEditorDescriptor[] editorDescs = iFileEditorMapping.getEditors();
 			for (IEditorDescriptor iEditorDescriptor : editorDescs)
 			{
-				editorsMap.put(iEditorDescriptor.getId(), iEditorDescriptor.getLabel());
+				if (iEditorDescriptor != null)
+				{
+					editorsMap.put(iEditorDescriptor.getId(), iEditorDescriptor.getLabel());
+				}
 			}
 		}
 
