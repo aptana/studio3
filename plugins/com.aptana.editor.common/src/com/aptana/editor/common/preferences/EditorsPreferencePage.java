@@ -12,12 +12,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
+import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -25,10 +27,14 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -44,6 +50,7 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 
 	private String GENERAL_TEXT_EDITOR_PREF_ID = "org.eclipse.ui.preferencePages.GeneralTextEditor"; //$NON-NLS-1$
 	private ComboFieldEditor editorsListCombo;
+	private RadioGroupFieldEditor alloyDefaultEditor;
 
 	/**
 	 * EditorsPreferencePage
@@ -88,6 +95,14 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 				StringUtil.makeFormLabel(Messages.EditorsPreferencePage_MaxColumnsLabel), group);
 		colEditor.setValidRange(-1, Integer.MAX_VALUE);
 		addField(colEditor);
+
+		// Alloy view editor selection
+		alloyDefaultEditor = new RadioGroupFieldEditor(IPreferenceConstants.DEFAULT_ALLOY_VIEW_EDITOR,
+				Messages.EditorsPreferencePage_SelectDefaultEditor, 1, new String[][] {
+						{ Messages.EditorsPreferencePage_AlloyViewEditor, "com.aptana.editor.xml.alloy" }, //$NON-NLS-2$
+						{ Messages.EditorsPreferencePage_ScratchpadEditor, "visualui.editors.ScratchPadEditor" } }, //$NON-NLS-2$
+				appearanceComposite, true);
+		addField(alloyDefaultEditor);
 
 		// Word Wrap
 		addField(new BooleanFieldEditor(IPreferenceConstants.ENABLE_WORD_WRAP,
@@ -141,6 +156,20 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 			if (ObjectUtil.areNotEqual(newValue, oldValue))
 			{
 				CommonUtil.handleOpenWithEditorPref();
+			}
+		}
+
+		if (event.getSource() == alloyDefaultEditor)
+		{
+			Object newValue = event.getNewValue();
+			Object oldValue = event.getOldValue();
+			if (ObjectUtil.areNotEqual(newValue, oldValue))
+			{
+				IEditorRegistry registry = PlatformUI.getWorkbench().getEditorRegistry();
+				if (registry != null)
+				{
+					registry.setDefaultEditor("*.xml", newValue.toString()); //$NON-NLS-1$
+				}
 			}
 		}
 	}
