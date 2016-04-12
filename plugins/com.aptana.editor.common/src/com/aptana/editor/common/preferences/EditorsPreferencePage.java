@@ -99,8 +99,8 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		// Alloy view editor selection
 		alloyDefaultEditor = new RadioGroupFieldEditor(IPreferenceConstants.DEFAULT_ALLOY_VIEW_EDITOR,
 				Messages.EditorsPreferencePage_SelectDefaultEditor, 1, new String[][] {
-						{ Messages.EditorsPreferencePage_AlloyViewEditor, "com.aptana.editor.xml.alloy" }, //$NON-NLS-2$
-						{ Messages.EditorsPreferencePage_ScratchpadEditor, "visualui.editors.ScratchPadEditor" } }, //$NON-NLS-2$
+						{ Messages.EditorsPreferencePage_ScratchpadEditor, "visualui.editors.ScratchPadEditor" }, //$NON-NLS-1$
+						{ Messages.EditorsPreferencePage_AlloyViewEditor, "com.aptana.editor.xml.alloy" } }, //$NON-NLS-1$
 				appearanceComposite, true);
 		addField(alloyDefaultEditor);
 
