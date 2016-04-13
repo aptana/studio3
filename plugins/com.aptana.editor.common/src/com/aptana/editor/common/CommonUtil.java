@@ -8,6 +8,7 @@
 
 package com.aptana.editor.common;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Platform;
@@ -72,8 +73,8 @@ public final class CommonUtil
 							return;
 						}
 						IFile selectedFile = (IFile) selectedResource;
-						if (!selectedFile.getName().contains(".")) { ////$NON-NLS-N$
-
+						if (!selectedFile.getName().contains("."))
+						{
 							String selectedEditor = Platform.getPreferencesService().getString(
 									CommonEditorPlugin.PLUGIN_ID,
 									com.aptana.editor.common.preferences.IPreferenceConstants.OPEN_WITH_EDITOR,
@@ -81,6 +82,27 @@ public final class CommonUtil
 							if (selectedEditor != ICommonConstants.ECLIPSE_DEFAULT_EDITOR)
 							{
 								IDE.setDefaultEditor(selectedFile, selectedEditor);
+							}
+						}
+						else if (selectedFile.getFileExtension().equals("xml")) //$NON-NLS-1$
+						{
+							IContainer parent = selectedResource.getParent();
+							if (parent != null && parent.getName().equals("views")) //$NON-NLS-1$
+							{
+								String selectedEditor = Platform
+										.getPreferencesService()
+										.getString(
+												CommonEditorPlugin.PLUGIN_ID,
+												com.aptana.editor.common.preferences.IPreferenceConstants.DEFAULT_ALLOY_VIEW_EDITOR,
+												null, null);
+								if (selectedEditor != null)
+								{
+									IDE.setDefaultEditor(selectedFile, selectedEditor);
+								}
+							}
+							else
+							{
+								IDE.setDefaultEditor(selectedFile, "com.aptana.editor.xml.alloy"); //$NON-NLS-1$
 							}
 						}
 					}
