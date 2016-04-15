@@ -67,13 +67,14 @@ public final class CommonUtil
 				{
 					public void doubleClick(DoubleClickEvent event)
 					{
+						//Need to find the better way to manage this through extensions
 						IResource selectedResource = UIUtils.getSelectedResource();
 						if (!(selectedResource instanceof IFile))
 						{
 							return;
 						}
 						IFile selectedFile = (IFile) selectedResource;
-						if (!selectedFile.getName().contains("."))
+						if (selectedFile.getFileExtension() == null)
 						{
 							String selectedEditor = Platform.getPreferencesService().getString(
 									CommonEditorPlugin.PLUGIN_ID,
@@ -99,6 +100,10 @@ public final class CommonUtil
 								{
 									IDE.setDefaultEditor(selectedFile, selectedEditor);
 								}
+							}
+							else if (selectedFile.getName().equals("tiapp.xml"))
+							{
+								IDE.setDefaultEditor(selectedFile, "com.appcelerator.titanium.ui.ide.tiappEditor"); //$NON-NLS-1$
 							}
 							else
 							{
