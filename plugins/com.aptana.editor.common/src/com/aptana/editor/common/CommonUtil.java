@@ -88,7 +88,13 @@ public final class CommonUtil
 						else if (selectedFile.getFileExtension().equals("xml")) //$NON-NLS-1$
 						{
 							IContainer parent = selectedResource.getParent();
-							if (parent != null && parent.getName().equals("views")) //$NON-NLS-1$
+							boolean isView = (parent != null && parent.getName().equals("views")); //$NON-NLS-1$
+							if (!isView)
+							{
+								parent = parent.getParent(); //ex: /views/mobileweb
+								isView = (parent != null && parent.getName().equals("views")); //$NON-NLS-1$
+							}
+							if (isView) 
 							{
 								String selectedEditor = Platform
 										.getPreferencesService()
