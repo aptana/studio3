@@ -297,13 +297,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
-				String editorId = Platform.getPreferencesService().getString(CommonEditorPlugin.PLUGIN_ID,
-						com.aptana.editor.common.preferences.IPreferenceConstants.OPEN_WITH_EDITOR, StringUtil.EMPTY,
-						null);
-				if (!ICommonConstants.ECLIPSE_DEFAULT_EDITOR.equals(editorId))
-				{
-					CommonUtil.handleOpenWithEditorPref();
-				}
+				CommonUtil.handleOpenWithEditorPref();
 				return Status.OK_STATUS;
 			}
 		};

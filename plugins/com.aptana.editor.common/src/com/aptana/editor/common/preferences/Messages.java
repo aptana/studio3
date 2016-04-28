@@ -54,6 +54,8 @@ public class Messages extends NLS
 	public static String UserAgentPreferencePage_Select_None;
 	public static String UserAgentPreferencePage_Select_User_Agents;
 
+	public static String EditorsPreferencePage_AlloyViewEditor;
+
 	public static String EditorsPreferencePage_camelCaseSelection;
 
 	public static String EditorsPreferencePage_Close_Matching_Character_Pairs;
@@ -77,6 +79,10 @@ public class Messages extends NLS
 	public static String EditorsPreferencePage_Instant;
 	public static String EditorsPreferencePage_saveActionRemoveWhitespaceCharacters;
 	public static String EditorsPreferencePage_saveActionsGroup;
+	public static String EditorsPreferencePage_ScratchpadEditor;
+
+	public static String EditorsPreferencePage_SelectDefaultEditor;
+
 	public static String EditorsPreferencePage_SyntaxColoring;
 	public static String EditorsPreferencePage_Wrap_Selection;
 	public static String EditorsPreferencePage_OpenWith_Editor;

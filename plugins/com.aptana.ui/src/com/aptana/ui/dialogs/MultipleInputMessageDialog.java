@@ -162,7 +162,7 @@ public class MultipleInputMessageDialog extends InputMessageDialog
 			}
 			else if (LIST.equals(inputType))
 			{
-				Combo l = new Combo(valueComp, SWT.NONE);
+				Combo l = new Combo(valueComp, SWT.READ_ONLY);
 				ComboViewer combo = new ComboViewer(l);
 				input.add(combo);
 				combo.setContentProvider(new ArrayContentProvider()
