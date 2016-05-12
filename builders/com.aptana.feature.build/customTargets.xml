@@ -88,6 +88,14 @@
 		<!-- Now grab the max value of lastmods in bundle_timestamps.txt file and use that as qualifier! -->
 		<script language="javascript">
 			<![CDATA[
+					
+					//JDK-8025132
+					try {
+					    load("nashorn:mozilla_compat.js");
+					} catch (e) {
+					   // ignore the exception - perhaps we are running on Rhino!
+					}
+
 					importPackage(java.lang, java.util, java.io);
 
 					// The main method (called from the bottom of the file).
