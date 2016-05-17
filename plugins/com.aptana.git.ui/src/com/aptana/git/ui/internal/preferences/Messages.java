@@ -23,6 +23,8 @@ public class Messages extends NLS
 	public static String GithubAccountPageProvider_LoginFailed;
 	public static String GithubAccountPageProvider_Logout_LBL;
 	public static String GithubAccountPageProvider_Name;
+
+	public static String GithubAccountPageProvider_NoteMessageToUsePersonalToken;
 	public static String GithubAccountPageProvider_Password_LBL;
 	public static String GithubAccountPageProvider_Signup_LBL;
 	public static String GithubAccountPageProvider_User_LBL;
