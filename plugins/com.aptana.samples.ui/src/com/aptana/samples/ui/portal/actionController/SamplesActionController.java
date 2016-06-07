@@ -230,7 +230,7 @@ public class SamplesActionController extends AbstractActionController
 			iconPath = (String) sampleData.get(SAMPLE_INFO.IMAGE.toString());
 			if (StringUtil.isEmpty(iconPath))
 			{
-				IdeLog.logError(SamplesPlugin.getDefault(),
+				IdeLog.logWarning(SamplesPlugin.getDefault(),
 						MessageFormat.format("Unable to retrieve the icon at {0} for sample {1}", iconPath, name)); //$NON-NLS-1$
 
 			}
