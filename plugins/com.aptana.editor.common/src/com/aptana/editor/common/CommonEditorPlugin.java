@@ -70,6 +70,14 @@ import com.aptana.usage.preferences.IPreferenceConstants;
  */
 public class CommonEditorPlugin extends AbstractUIPlugin
 {
+	public static final String TI_APP_EDITOR_ID = "com.appcelerator.titanium.ui.ide.tiappEditor"; //$NON-NLS-1$
+	public static final String ALLOY_EDITOR_ID = "com.aptana.editor.xml.alloy"; //$NON-NLS-1$
+	public static final String WEB_PERSPECTIVE_ID = "com.aptana.ui.WebPerspective"; //$NON-NLS-1$
+	public static final String TIAPP_XML = "tiapp.xml"; //$NON-NLS-1$
+	
+	//App Designer constants
+	public static final String APP_DESIGNER_PERSPECTIVE_ID = "com.appcelerator.titanium.perspective.designer"; //$NON-NLS-N$
+	public static final String APP_DESIGNER_EDITOR_ID = "visualui.editors.ScratchPadEditor"; //$NON-NLS-1$
 
 	public static final String SNIPPET = "/icons/snippet.png"; //$NON-NLS-1$
 	public static final String COMMAND = "/icons/command.png"; //$NON-NLS-1$
@@ -292,17 +300,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			}
 		}.schedule();
 
-		Job registerDCJob = new UIJob("registering double click listener to project explorer") //$NON-NLS-1$
-		{
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor)
-			{
-				CommonUtil.handleOpenWithEditorPref();
-				return Status.OK_STATUS;
-			}
-		};
-		EclipseUtil.setSystemForJob(registerDCJob);
-		registerDCJob.schedule();
 	}
 
 	/**

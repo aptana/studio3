@@ -22,6 +22,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 
+import com.aptana.core.util.ObjectUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.util.UIUtils;
 
@@ -67,7 +68,7 @@ public final class CommonUtil
 				{
 					public void doubleClick(DoubleClickEvent event)
 					{
-						//Need to find the better way to manage this through extensions
+						// Need to find the better way to manage this through extensions
 						IResource selectedResource = UIUtils.getSelectedResource();
 						if (!(selectedResource instanceof IFile))
 						{
@@ -91,21 +92,16 @@ public final class CommonUtil
 							boolean isView = (parent != null && parent.getName().equals("views")); //$NON-NLS-1$
 							if (!isView)
 							{
-								parent = parent.getParent(); //ex: /views/mobileweb
+								parent = parent.getParent();
 								isView = (parent != null && parent.getName().equals("views")); //$NON-NLS-1$
 							}
-							if (isView) 
+							if (isView)
 							{
-								String selectedEditor = Platform
-										.getPreferencesService()
-										.getString(
-												CommonEditorPlugin.PLUGIN_ID,
-												com.aptana.editor.common.preferences.IPreferenceConstants.DEFAULT_ALLOY_VIEW_EDITOR,
-												null, null);
-								if (selectedEditor != null)
-								{
-									IDE.setDefaultEditor(selectedFile, selectedEditor);
-								}
+								IDE.setDefaultEditor(selectedFile, getSelectedEditor());
+							}
+							else if (selectedFile.getName().equals(CommonEditorPlugin.TIAPP_XML))
+							{
+								IDE.setDefaultEditor(selectedFile, CommonEditorPlugin.TI_APP_EDITOR_ID);
 							}
 							else if (selectedFile.getName().equals("tiapp.xml"))
 							{
@@ -113,7 +109,7 @@ public final class CommonUtil
 							}
 							else
 							{
-								IDE.setDefaultEditor(selectedFile, "com.aptana.editor.xml.alloy"); //$NON-NLS-1$
+								IDE.setDefaultEditor(selectedFile, CommonEditorPlugin.ALLOY_EDITOR_ID);
 							}
 						}
 					}
@@ -122,6 +118,15 @@ public final class CommonUtil
 			}
 
 		}
+	}
+
+	private static String getSelectedEditor()
+	{
+		if (ObjectUtil.areEqual(UIUtils.getActivePerspectiveId(), "com.appcelerator.titanium.perspective.designer")) //$NON-NLS-1$
+		{
+			return CommonEditorPlugin.APP_DESIGNER_EDITOR_ID;
+		}
+		return CommonEditorPlugin.ALLOY_EDITOR_ID;
 	}
 
 }
