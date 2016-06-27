@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.usage.AnalyticsEvent;
 import com.aptana.usage.IAnalyticsLogger;
 import com.aptana.usage.UsagePlugin;
@@ -136,7 +137,7 @@ public class AnalyticsLogger implements IAnalyticsLogger
 			{
 				stream = new FileInputStream(file);
 				String json = IOUtil.read(stream);
-				if (json != null)
+				if (!StringUtil.isEmpty(json))
 				{
 					events.add(AnalyticsEvent.fromJSON(json));
 				}
