@@ -12,21 +12,14 @@ import java.util.Set;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
-import org.eclipse.ui.console.IConsoleConstants;
 import org.eclipse.ui.console.IConsoleManager;
-import org.eclipse.ui.console.IConsoleView;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
-import com.aptana.jetty.util.epl.ajax.JSON;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
-import com.aptana.core.logging.IdeLog;
-import com.aptana.portal.ui.PortalUIPlugin;
+import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 
 /**
@@ -77,7 +70,6 @@ public class ConsoleController extends AbstractActionController
 	private void writeToConsole(Object arguments, boolean isError)
 	{
 		MessageConsole console = findOrCreateConsole();
-		revealConsole(console);
 
 		MessageConsoleStream out = console.newMessageStream();
 		if (isError)
@@ -89,26 +81,6 @@ public class ConsoleController extends AbstractActionController
 			out.setColor(Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
 		}
 		out.println(JSON.toString(arguments));
-	}
-
-	private void revealConsole(MessageConsole console)
-	{
-		IWorkbenchWindow workbenchWindow = PortalUIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
-		if (workbenchWindow != null)
-		{
-			IWorkbenchPage activePage = workbenchWindow.getActivePage();
-			String id = IConsoleConstants.ID_CONSOLE_VIEW;
-			IConsoleView view;
-			try
-			{
-				view = (IConsoleView) activePage.showView(id);
-				view.display(console);
-			}
-			catch (PartInitException e)
-			{
-				IdeLog.logError(PortalUIPlugin.getDefault(), e);
-			}
-		}
 	}
 
 	private MessageConsole findOrCreateConsole()
