@@ -8,6 +8,7 @@
 package com.aptana.git.ui.internal.preferences;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +36,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.StringUtil;
@@ -176,6 +180,34 @@ public class GithubAccountPageProvider extends AbstractAccountPageProvider
 			public void widgetSelected(SelectionEvent e)
 			{
 				WorkbenchBrowserUtil.launchExternalBrowser(SIGNUP_URL);
+			}
+		});
+		
+		Composite noteComp = new Composite(loginComp, SWT.NONE);
+		noteComp.setLayout(GridLayoutFactory.swtDefaults().numColumns(1).create());
+		noteComp.setLayoutData(GridDataFactory.swtDefaults().span(3, 1).create());
+
+		Link linkLabel = new Link(noteComp, SWT.NONE);
+		linkLabel.setText(Messages.GithubAccountPageProvider_NoteMessageToUsePersonalToken);
+		linkLabel.setLayoutData(GridDataFactory.swtDefaults().align(SWT.LEFT, SWT.TOP).grab(false, false).create());
+		linkLabel.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
+				try
+				{
+					IWebBrowser browser = GitUIPlugin
+							.getDefault()
+							.getWorkbench()
+							.getBrowserSupport()
+							.createBrowser(IWorkbenchBrowserSupport.AS_EXTERNAL | IWorkbenchBrowserSupport.STATUS,
+									"GitHub Personal Access Tokens", null, null); //$NON-NLS-1$ (just the browser name)
+					browser.openURL(new URL("https://github.com/settings/tokens")); //$NON-NLS-1$
+				}
+				catch (Exception ex)
+				{
+					IdeLog.logError(GitUIPlugin.getDefault(), ex);
+				}
 			}
 		});
 
