@@ -110,7 +110,7 @@ public class SudoUIManager
 						if (validPassword == null && retryAttempts >= MAX_ATTEMPTS)
 						{
 							// User has exceeded the max attempts to provide the password.
-							throw new CoreException(Status.CANCEL_STATUS);
+							throw new CoreException(new Status(Status.CANCEL,UIPlugin.PLUGIN_ID , Messages.SudoUIManager_LoginErrorMessage));
 						}
 					}
 					catch (CoreException e)
