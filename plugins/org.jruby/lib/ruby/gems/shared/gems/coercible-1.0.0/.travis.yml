@@ -1,0 +1,16 @@
+language: ruby
+before_install: gem install bundler
+bundler_args: --without guard metrics
+script: "bundle exec rake spec"
+rvm:
+  - 1.9.2
+  - 1.9.3
+  - 2.0.0
+  - jruby-19mode
+  - rbx-19mode
+  - jruby-head
+
+notifications:
+  email:
+    - piotr.solnica@gmail.com
+    - dan.kubb@gmail.com

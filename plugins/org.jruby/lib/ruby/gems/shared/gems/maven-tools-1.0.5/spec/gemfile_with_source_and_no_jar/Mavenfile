@@ -1,0 +1,5 @@
+#-*- mode: ruby -*-
+
+gemspec :jar => nil
+
+# vim: syntax=Ruby

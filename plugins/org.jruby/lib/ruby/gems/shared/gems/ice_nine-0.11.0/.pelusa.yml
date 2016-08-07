@@ -1,0 +1,9 @@
+sources: lib/**/*.rb
+lints:
+  InstanceVariables:
+    limit: 1
+  LineRestriction:
+    limit: 87
+  ElseClauses:
+    exclude:
+      - 'IceNine::Freezer'

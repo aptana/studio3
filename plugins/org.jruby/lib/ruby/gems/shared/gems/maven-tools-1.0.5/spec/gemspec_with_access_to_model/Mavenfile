@@ -1,0 +1,7 @@
+#-*- mode: ruby -*-
+
+gemspec
+
+properties( :version_from_model => model.version )
+
+# vim: syntax=Ruby

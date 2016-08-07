@@ -8,7 +8,12 @@
 # For details of Ruby License, see ruby/COPYING.
 #
 
-require 'ripper.so'
+if RUBY_ENGINE == 'jruby'
+  require 'ripper.jar'
+  org.jruby.ext.ripper.RipperLibrary.new.load(JRuby.runtime, false)
+else
+  require 'ripper.so'
+end
 
 class Ripper
 
