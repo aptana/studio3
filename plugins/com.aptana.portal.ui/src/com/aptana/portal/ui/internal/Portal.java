@@ -363,8 +363,15 @@ public class Portal
 		builder.put("fg", toHex(getThemeManager().getCurrentTheme().getForeground()));
 
 		// "chrome"
-		Color color = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-		builder.put("ch", toHex(color.getRGB()));// FIXME Grab one of the actual parent widgets and grab it's bg?
+		UIUtils.getDisplay().syncExec(new Runnable()
+		{
+			public void run()
+			{
+				Color color = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+				builder.put("ch", toHex(color.getRGB()));// FIXME Grab one of the actual parent widgets and grab it's bg?
+			}
+		});
+
 
 		// project type
 		builder.put("p", String.valueOf(getProjectType(activeProject)));
