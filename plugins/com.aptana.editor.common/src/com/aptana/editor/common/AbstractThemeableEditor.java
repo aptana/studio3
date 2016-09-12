@@ -1334,11 +1334,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return fLineNumberRulerColumn;
 	}
 
-	private boolean isWordWrapEnabled()
-	{
-		return Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
-				IPreferenceConstants.ENABLE_WORD_WRAP, false, null);
-	}
+//	private boolean isWordWrapEnabled()
+//	{
+//		return Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
+//				IPreferenceConstants.ENABLE_WORD_WRAP, false, null);
+//	}
 
 	public void refreshOutline(final IParseRootNode ast)
 	{

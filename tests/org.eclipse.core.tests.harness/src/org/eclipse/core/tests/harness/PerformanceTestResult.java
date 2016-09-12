@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,18 +11,22 @@
 package org.eclipse.core.tests.harness;
 
 import java.io.PrintWriter;
-import java.util.*;
-import junit.framework.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import junit.framework.Test;
+import junit.framework.TestFailure;
+import junit.framework.TestResult;
 
 /**
  * Test result for a performance test.  Keeps track of all timers that
- * have been created within the test. 
+ * have been created within the test.
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class PerformanceTestResult extends TestResult {
 	protected PrintWriter output;
-	protected ArrayList timerList = new ArrayList();
-	protected HashMap timers = new HashMap();
+	protected ArrayList<PerformanceTimer> timerList = new ArrayList<>();
+	protected HashMap<String, PerformanceTimer> timers = new HashMap<>();
 
 	public PerformanceTestResult() {
 		this(new PrintWriter(System.out));
@@ -35,6 +39,7 @@ public class PerformanceTestResult extends TestResult {
 	/**
 	 * Informs the result that a test was completed.
 	 */
+	@Override
 	public synchronized void endTest(Test test) {
 		print();
 	}
@@ -56,13 +61,14 @@ public class PerformanceTestResult extends TestResult {
 	protected void printErrors(PrintWriter out) {
 		int count = errorCount();
 		if (count != 0) {
-			if (count == 1)
+			if (count == 1) {
 				out.println("There was " + count + " error:");
-			else
+			} else {
 				out.println("There were " + count + " errors:");
+			}
 			int i = 1;
-			for (Enumeration e = errors(); e.hasMoreElements(); i++) {
-				TestFailure failure = (TestFailure) e.nextElement();
+			for (Enumeration<TestFailure> e = errors(); e.hasMoreElements(); i++) {
+				TestFailure failure = e.nextElement();
 				out.println(i + ") " + failure.failedTest());
 				failure.thrownException().printStackTrace(out);
 			}
@@ -75,13 +81,14 @@ public class PerformanceTestResult extends TestResult {
 	protected void printFailures(PrintWriter out) {
 		int count = failureCount();
 		if (count != 0) {
-			if (count == 1)
+			if (count == 1) {
 				out.println("There was " + count + " failure:");
-			else
+			} else {
 				out.println("There were " + count + " failures:");
+			}
 			int i = 1;
-			for (Enumeration e = failures(); e.hasMoreElements(); i++) {
-				TestFailure failure = (TestFailure) e.nextElement();
+			for (Enumeration<TestFailure> e = failures(); e.hasMoreElements(); i++) {
+				TestFailure failure = e.nextElement();
 				out.println(i + ") " + failure.failedTest());
 				failure.thrownException().printStackTrace(out);
 			}
@@ -109,8 +116,8 @@ public class PerformanceTestResult extends TestResult {
 	 */
 	protected void printTimings(PrintWriter out) {
 		// print out all timing results to the console
-		for (Iterator it = timerList.iterator(); it.hasNext();) {
-			PerformanceTimer timer = (PerformanceTimer) it.next();
+		for (Iterator<PerformanceTimer> it = timerList.iterator(); it.hasNext();) {
+			PerformanceTimer timer = it.next();
 			out.println("Timing " + timer.getName() + " : " + timer.getElapsedTime() + " ms ");
 		}
 	}
@@ -118,6 +125,7 @@ public class PerformanceTestResult extends TestResult {
 	/**
 	 * Start the test
 	 */
+	@Override
 	public synchronized void startTest(Test test) {
 		super.startTest(test);
 		System.out.print(".");
@@ -130,7 +138,7 @@ public class PerformanceTestResult extends TestResult {
 	 */
 
 	public synchronized void startTimer(String timerName) {
-		PerformanceTimer timer = (PerformanceTimer) timers.get(timerName);
+		PerformanceTimer timer = timers.get(timerName);
 		if (timer == null) {
 			timer = new PerformanceTimer(timerName);
 			timers.put(timerName, timer);
@@ -144,7 +152,7 @@ public class PerformanceTestResult extends TestResult {
 	 * message.  If the timer does not exist, report an error.
 	 */
 	public synchronized void stopTimer(String timerName) {
-		PerformanceTimer timer = (PerformanceTimer) timers.get(timerName);
+		PerformanceTimer timer = timers.get(timerName);
 		if (timer == null) {
 			throw new Error(timerName + " is not a valid timer name ");
 		}
@@ -155,8 +163,8 @@ public class PerformanceTestResult extends TestResult {
 	 * Stops all timers
 	 */
 	protected void stopTimers() {
-		for (Iterator it = timerList.iterator(); it.hasNext();) {
-			((PerformanceTimer) it.next()).stopTiming();
+		for (Iterator<PerformanceTimer> it = timerList.iterator(); it.hasNext();) {
+			it.next().stopTiming();
 		}
 	}
 }
