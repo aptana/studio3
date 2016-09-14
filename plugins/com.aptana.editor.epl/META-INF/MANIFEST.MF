@@ -5,8 +5,7 @@ Bundle-SymbolicName: com.aptana.editor.epl;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.editor.epl.EditorEplPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.ui;bundle-version="[3.10.0,4.6.0)
- ",
+Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jface.text,
  com.aptana.core,
