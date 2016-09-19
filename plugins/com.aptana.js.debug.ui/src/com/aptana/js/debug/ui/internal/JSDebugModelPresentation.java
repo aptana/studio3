@@ -13,6 +13,7 @@ import java.net.URI;
 import java.text.MessageFormat;
 
 import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -172,15 +173,16 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 	 */
 	private String getStackFrameText(IStackFrame frame) throws CoreException
 	{
-		String fileName;
+		String fileName = Messages.JSDebugModelPresentation_line;
 		if (frame instanceof IJSStackFrame)
 		{
 			URI uri = ((IJSStackFrame) frame).getSourceFileName();
-			fileName = EFS.getStore(uri).getName();
-		}
-		else
-		{
-			fileName = Messages.JSDebugModelPresentation_line;
+			if (uri != null) {
+				IFileStore file = EFS.getStore(uri);
+				if (file != null) {
+					fileName = file.getName();
+				}
+			}
 		}
 		int line = frame.getLineNumber();
 		return MessageFormat.format("{0} [{1}:{2}]", //$NON-NLS-1$
