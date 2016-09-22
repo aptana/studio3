@@ -177,17 +177,27 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 		if (frame instanceof IJSStackFrame)
 		{
 			URI uri = ((IJSStackFrame) frame).getSourceFileName();
-			if (uri != null) {
-				IFileStore file = EFS.getStore(uri);
-				if (file != null) {
-					fileName = file.getName();
+			if (uri != null)
+			{
+				try
+				{
+					IFileStore file = EFS.getStore(uri);
+					if (file != null)
+					{
+						fileName = file.getName();
+					}
+				}
+				catch (CoreException e)
+				{
+					// if we're trying to resolve a ti: scheme file. (or some other unknown scheme)
+					fileName = uri.toString();
 				}
 			}
 		}
 		int line = frame.getLineNumber();
 		return MessageFormat.format("{0} [{1}:{2}]", //$NON-NLS-1$
-				frame.getName(), fileName, (line >= 0) ? Integer.toString(line)
-						: Messages.JSDebugModelPresentation_notavailable);
+				frame.getName(), fileName,
+				(line >= 0) ? Integer.toString(line) : Messages.JSDebugModelPresentation_notavailable);
 	}
 
 	/**
@@ -256,7 +266,8 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 					else if (marker.getResource() instanceof IWorkspaceRoot)
 					{
 						URI uri = URI.create((String) marker.getAttribute(IJSDebugConstants.BREAKPOINT_LOCATION));
-						if ("file".equals(uri.getScheme())) { //$NON-NLS-1$
+						if ("file".equals(uri.getScheme())) //$NON-NLS-1$
+						{
 							fileName = DebugUtil.getPath(uri);
 							IFile file = ResourcesPlugin.getWorkspace().getRoot()
 									.getFileForLocation(Path.fromOSString(fileName));
@@ -340,8 +351,8 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 			try
 			{
 				int lineNumber = ((ILineBreakpoint) breakpoint).getLineNumber();
-				label.append(MessageFormat.format(
-						" [{0}: {1}]", Messages.JSDebugModelPresentation_line, Integer.toString(lineNumber))); //$NON-NLS-1$
+				label.append(MessageFormat.format(" [{0}: {1}]", Messages.JSDebugModelPresentation_line, //$NON-NLS-1$
+						Integer.toString(lineNumber)));
 			}
 			catch (CoreException e)
 			{
@@ -381,10 +392,8 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 			}
 			else
 			{
-				descriptor = new JSDebugImageDescriptor(
-						DebugUITools
-								.getImageDescriptor(org.eclipse.debug.ui.IDebugUIConstants.IMG_OBJS_BREAKPOINT_DISABLED),
-						flags);
+				descriptor = new JSDebugImageDescriptor(DebugUITools.getImageDescriptor(
+						org.eclipse.debug.ui.IDebugUIConstants.IMG_OBJS_BREAKPOINT_DISABLED), flags);
 			}
 			return DebugUIImages.getImageDescriptorRegistry().get(descriptor);
 		}
