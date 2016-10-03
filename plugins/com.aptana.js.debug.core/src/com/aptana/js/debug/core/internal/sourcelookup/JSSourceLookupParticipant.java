@@ -20,23 +20,56 @@ import com.aptana.js.debug.core.model.ISourceLink;
 /**
  * The source lookup participant knows how to translate a JS stack frame into a source file name
  */
-public class JSSourceLookupParticipant extends RemoteContentSourceLookupParticipant {
+public class JSSourceLookupParticipant extends RemoteContentSourceLookupParticipant
+{
 
 	/*
 	 * @see org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant#getSourceName(java.lang.Object)
 	 */
-	public String getSourceName(Object object) throws CoreException {
-		if (object instanceof IJSStackFrame) {
-			return ((IJSStackFrame) object).getSourceFileName().toString();
-		} else if (object instanceof IJSScriptElement) {
-			return ((IJSScriptElement) object).getLocation().toString();
-		} else if (object instanceof ISourceLink) {
-			return ((ISourceLink) object).getLocation().toString();
-		} else if (object instanceof IFileStore) {
-			return ((IFileStore) object).toURI().toString();
-		} else if (object instanceof URI) {
+	public String getSourceName(Object object) throws CoreException
+	{
+		if (object instanceof IJSStackFrame)
+		{
+			URI uri = ((IJSStackFrame) object).getSourceFileName();
+			if (uri == null)
+			{
+				return null;
+			}
+			return uri.toString();
+		}
+		else if (object instanceof IJSScriptElement)
+		{
+			URI uri = ((IJSScriptElement) object).getLocation();
+			if (uri == null)
+			{
+				return null;
+			}
+			return uri.toString();
+		}
+		else if (object instanceof ISourceLink)
+		{
+			URI uri = ((ISourceLink) object).getLocation();
+			if (uri == null)
+			{
+				return null;
+			}
+			return uri.toString();
+		}
+		else if (object instanceof IFileStore)
+		{
+			URI uri = ((IFileStore) object).toURI();
+			if (uri == null)
+			{
+				return null;
+			}
+			return uri.toString();
+		}
+		else if (object instanceof URI)
+		{
 			return ((URI) object).toString();
-		} else if (object instanceof String) {
+		}
+		else if (object instanceof String)
+		{
 			// assume it's a file name
 			return (String) object;
 		}
