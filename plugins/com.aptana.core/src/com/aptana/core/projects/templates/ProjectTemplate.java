@@ -109,6 +109,7 @@ public class ProjectTemplate implements IProjectTemplate
 	private boolean isReplacingParameters;
 	private int priority;
 	private List<String> tags;
+	private boolean isPrePackaged;
 
 	/**
 	 * Constructs a new ProjectTemplate
@@ -125,7 +126,7 @@ public class ProjectTemplate implements IProjectTemplate
 	public ProjectTemplate(String path, TemplateType type, String name, boolean isReplacingParameters,
 			String description, URL iconURL, String id)
 	{
-		this(path, type, name, isReplacingParameters, description, iconURL, id, 0, null);
+		this(path, type, name, isReplacingParameters, description, iconURL, id, 0, null, false);
 	}
 
 	/**
@@ -143,6 +144,24 @@ public class ProjectTemplate implements IProjectTemplate
 	public ProjectTemplate(String path, TemplateType type, String name, boolean isReplacingParameters,
 			String description, URL iconURL, String id, int priority, List<String> tags)
 	{
+		this(path, type, name, isReplacingParameters, description, iconURL, id, 0, null, false);
+	}
+
+	/**
+	 * Constructs a new ProjectTemplate
+	 * 
+	 * @param path
+	 * @param type
+	 * @param name
+	 * @param isReplacingParameters
+	 * @param description
+	 * @param iconURL
+	 * @param id
+	 * @param priority
+	 */
+	public ProjectTemplate(String path, TemplateType type, String name, boolean isReplacingParameters,
+			String description, URL iconURL, String id, int priority, List<String> tags, boolean isPrePackaged)
+	{
 		this.type = type;
 		this.path = path;
 		this.name = name;
@@ -152,6 +171,7 @@ public class ProjectTemplate implements IProjectTemplate
 		this.id = id;
 		this.priority = priority;
 		this.tags = CollectionsUtil.isEmpty(tags) ? null : new ArrayList<String>(tags);
+		this.isPrePackaged = isPrePackaged;
 	}
 
 	/*
@@ -397,5 +417,14 @@ public class ProjectTemplate implements IProjectTemplate
 				}
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#isPrePackaged()
+	 */
+	public boolean isPrePackaged()
+	{
+		return isPrePackaged;
 	}
 }
