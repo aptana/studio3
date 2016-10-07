@@ -19,7 +19,7 @@ class PerformanceTimer {
 	private long fStartTime;
 
 	/**
-	 * 
+	 *
 	 */
 	public PerformanceTimer(String name) {
 		fName = name;

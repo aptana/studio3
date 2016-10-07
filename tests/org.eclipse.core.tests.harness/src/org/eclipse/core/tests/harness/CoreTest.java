@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2009 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,15 +8,19 @@
  * Contributors:
  *	IBM Corporation - initial API and implementation
  *	Martin Oberhuber (Wind River) - [232426] createSymLink() method
+ *	Martin Oberhuber (Wind River) - [335864] ResourceAttributeTest fails on Win7
+ *	Sergey Prigogin (Google) - [440283] Modify symlink tests to run on Windows with or without administrator privileges
  *******************************************************************************/
 package org.eclipse.core.tests.harness;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import junit.framework.AssertionFailedError;
@@ -27,11 +31,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.osgi.framework.Version;
 
 /**
  * @since 3.1
  */
 public class CoreTest extends TestCase {
+	private static Boolean canCreateSymLinks;
 
 	/** counter for generating unique random file system locations */
 	protected static int nextLocationCounter = 0;
@@ -188,7 +194,7 @@ public class CoreTest extends TestCase {
 	}
 
 	/**
-	 * Create the given file in the file system. 
+	 * Create the given file in the file system.
 	 */
 	public void createFileInFileSystem(File file, InputStream contents) throws IOException {
 		file.getParentFile().mkdirs();
@@ -197,38 +203,71 @@ public class CoreTest extends TestCase {
 	}
 
 	/**
-	 * Create a symbolic link.
-	 * Should only be called on Platforms where symbolic links can actually
+	 * Creates a symbolic link.
+	 * Should only be called on platforms where symbolic links can actually
 	 * be created, i.e. an "ln" command is available.
-	 * @param basedir folder in which the symbolic link should be created. 
+	 * @param basedir folder in which the symbolic link should be created
 	 * @param linkName name of the symbolic link
-	 * @param linkTgt target to which the symbolic link should point
+	 * @param linkTarget target to which the symbolic link should point
 	 * @param isDir <code>true</code> if the link should point to a folder
+	 * @throws AssertionFailedError if creation of the symbolic link failed
 	 */
-	protected void createSymLink(File basedir, String linkName, String linkTgt, boolean isDir) {
-		//Deliberately use an empty environment to make the test reproducible
+	protected void createSymLink(File basedir, String linkName, String linkTarget, boolean isDir) {
+		// Deliberately use an empty environment to make the test reproducible.
 		String[] envp = {};
 		try {
 			Process p;
-			if (isWindowsVista()) {
+			if (isWindowsVistaOrHigher()) {
 				if (isDir) {
-					String[] cmd = {"mklink", "/d", linkName, linkTgt};
+					String[] cmd = {"cmd", "/c", "mklink", "/d", linkName, linkTarget};
 					p = Runtime.getRuntime().exec(cmd, envp, basedir);
 				} else {
-					String[] cmd = {"mklink", linkName, linkTgt};
+					String[] cmd = {"cmd", "/c", "mklink", linkName, linkTarget};
 					p = Runtime.getRuntime().exec(cmd, envp, basedir);
 				}
 			} else {
-				String[] cmd = {"ln", "-s", linkTgt, linkName};
+				String[] cmd = {"ln", "-s", linkTarget, linkName};
 				p = Runtime.getRuntime().exec(cmd, envp, basedir);
 			}
 			int exitcode = p.waitFor();
-			assertEquals(exitcode, 0);
+			if (exitcode != 0) {
+				String result = new BufferedReader(new InputStreamReader(p.getErrorStream())).readLine();
+				assertEquals("createSymLink: " + result + ", exitcode", 0, exitcode);
+			}
 		} catch (IOException e) {
 			fail("createSymLink", e);
 		} catch (InterruptedException e) {
 			fail("createSymLink", e);
 		}
+	}
+
+	/**
+	 * Checks whether it is possible for a test to create a symbolic link.
+	 *
+	 * @return <code>true</code> if symbolic links can be created by a test
+	 */
+	protected boolean canCreateSymLinks() {
+		if (canCreateSymLinks == null) {
+			if (isWindowsVistaOrHigher()) {
+				// Creation of a symbolic link on Windows requires administrator privileges,
+				// so it may or may not be possible.
+				IPath tempDir = getTempDir();
+				String linkName = FileSystemHelper.getRandomLocation(tempDir).lastSegment();
+				try {
+					// Try to create a symlink.
+					createSymLink(tempDir.toFile(), linkName, "testTarget", false);
+					// Clean up if the link was created.
+					new File(tempDir.toFile(), linkName).delete();
+					canCreateSymLinks = Boolean.TRUE;
+				} catch (AssertionFailedError e) {
+					// This exception indicates that creation of the symlink failed.
+					canCreateSymLinks = Boolean.FALSE;
+				}
+			} else {
+				canCreateSymLinks = Boolean.TRUE;
+			}
+		}
+		return canCreateSymLinks.booleanValue();
 	}
 
 	protected void ensureDoesNotExistInFileSystem(java.io.File file) {
@@ -266,9 +305,9 @@ public class CoreTest extends TestCase {
 
 	/**
 	 * Returns a unique location on disk.  It is guaranteed that no file currently
-	 * exists at that location.  The returned location will be unique with respect 
-	 * to all other locations generated by this method in the current session.  
-	 * If the caller creates a folder or file at this location, they are responsible for 
+	 * exists at that location.  The returned location will be unique with respect
+	 * to all other locations generated by this method in the current session.
+	 * If the caller creates a folder or file at this location, they are responsible for
 	 * deleting it when finished.
 	 */
 	public IPath getRandomLocation() {
@@ -314,12 +353,26 @@ public class CoreTest extends TestCase {
 		return System.currentTimeMillis() + "-" + Math.random();
 	}
 
+	protected static boolean isWindowsMinVersion(int major, int minor, int micro) {
+		if (Platform.getOS().equals(Platform.OS_WIN32)) {
+			try {
+				Version v = Version.parseVersion(System.getProperty("org.osgi.framework.os.version")); //$NON-NLS-1$
+				System.out.println("Windows version: " + Version.parseVersion(System.getProperty("org.osgi.framework.os.version")));
+				return v.compareTo(new Version(major, minor, micro)) >= 0;
+			} catch (IllegalArgumentException e) {
+				/* drop down to returning false */
+			}
+
+		}
+		return false;
+	}
+
 	/**
-	 * Test if running on Windows Vista.
-	 * @return <code>true</code> if running on Windows Vista.
+	 * Test if running on Windows Vista or higher.
+	 * @return <code>true</code> if running on Windows Vista or higher.
 	 */
-	private static boolean isWindowsVista() {
-		return Platform.getOS().equals(Platform.OS_WIN32) && "6.0".equals(System.getProperty("org.osgi.framework.os.version")); //$NON-NLS-1$ //$NON-NLS-2$
+	protected static boolean isWindowsVistaOrHigher() {
+		return isWindowsMinVersion(6, 0, 0);
 	}
 
 	/**

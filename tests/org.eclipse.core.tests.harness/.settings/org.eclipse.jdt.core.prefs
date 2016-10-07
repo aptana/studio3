@@ -1,4 +1,3 @@
-#Thu Mar 24 09:51:46 PDT 2011
 eclipse.preferences.version=1
 org.eclipse.jdt.core.builder.cleanOutputFolder=clean
 org.eclipse.jdt.core.builder.duplicateResourceTask=warning
@@ -8,9 +7,9 @@ org.eclipse.jdt.core.circularClasspath=error
 org.eclipse.jdt.core.classpath.exclusionPatterns=enabled
 org.eclipse.jdt.core.classpath.multipleOutputLocations=enabled
 org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled
-org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.5
+org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.8
 org.eclipse.jdt.core.compiler.codegen.unusedLocal=preserve
-org.eclipse.jdt.core.compiler.compliance=1.5
+org.eclipse.jdt.core.compiler.compliance=1.8
 org.eclipse.jdt.core.compiler.debug.lineNumber=generate
 org.eclipse.jdt.core.compiler.debug.localVariable=generate
 org.eclipse.jdt.core.compiler.debug.sourceFile=generate
@@ -73,6 +72,6 @@ org.eclipse.jdt.core.compiler.problem.unusedParameterWhenImplementingAbstract=en
 org.eclipse.jdt.core.compiler.problem.unusedParameterWhenOverridingConcrete=enabled
 org.eclipse.jdt.core.compiler.problem.unusedPrivateMember=warning
 org.eclipse.jdt.core.compiler.problem.varargsArgumentNeedCast=warning
-org.eclipse.jdt.core.compiler.source=1.5
+org.eclipse.jdt.core.compiler.source=1.8
 org.eclipse.jdt.core.incompatibleJDKLevel=ignore
 org.eclipse.jdt.core.incompleteClasspath=error

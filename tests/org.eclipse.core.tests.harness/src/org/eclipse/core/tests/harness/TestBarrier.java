@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2009 IBM Corporation and others.
+ * Copyright (c) 2003, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.core.tests.harness;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * This class acts as an implementation of a barrier that is appropriate for
@@ -64,7 +64,7 @@ public class TestBarrier {
 
 	/**
 	 * Blocks the calling thread until the status integer at the given index
-	 * is set to the given value. Fails if the status change does not occur in 
+	 * is set to the given value. Fails if the status change does not occur in
 	 * a reasonable amount of time.
 	 * @param statuses the array of statuses that represent the states of
 	 * an array of jobs or threads
@@ -73,6 +73,7 @@ public class TestBarrier {
 	 * @param status the status that the calling thread should wait for
 	 */
 	private static void doWaitForStatus(int[] statuses, int index, int status, int timeout) {
+		long start = System.currentTimeMillis();
 		int i = 0;
 		while (statuses[index] != status) {
 			try {
@@ -83,7 +84,8 @@ public class TestBarrier {
 				//ignore
 			}
 			//sanity test to avoid hanging tests
-			Assert.assertTrue("Timeout waiting for status to change from " + getStatus(statuses[index]) + " to " + getStatus(status), i++ < timeout);
+			long elapsed = System.currentTimeMillis()-start;
+			Assert.assertTrue("Timeout after " + elapsed + "ms waiting for status to change from " + getStatus(statuses[index]) + " to " + getStatus(status), i++ < timeout);
 		}
 	}
 
@@ -135,7 +137,7 @@ public class TestBarrier {
 	}
 
 	/**
-	 * Creates a new test barrier on the provided status array, suitable for 
+	 * Creates a new test barrier on the provided status array, suitable for
 	 * acting as a barrier for multiple threads.
 	 */
 	public TestBarrier(int[] location, int index) {

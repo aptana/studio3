@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,10 @@
  *******************************************************************************/
 package org.eclipse.core.tests.harness;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Iterator;
 import junit.framework.TestFailure;
@@ -20,7 +23,6 @@ import junit.framework.TestFailure;
  * other output file, and have test results written to that file instead
  * of the standard output.
  */
-@SuppressWarnings("rawtypes")
 public class LoggingPerformanceTestResult extends PerformanceTestResult {
 	private static PrintWriter createWriter(File logFile) {
 		try {
@@ -47,6 +49,7 @@ public class LoggingPerformanceTestResult extends PerformanceTestResult {
 	/**
 	 * Prints the test result
 	 */
+	@Override
 	public synchronized void print() {
 		try {
 			super.print();
@@ -60,17 +63,19 @@ public class LoggingPerformanceTestResult extends PerformanceTestResult {
 	/**
 	 * Prints the errors to the standard output
 	 */
+	@Override
 	protected void printErrors(PrintWriter out) {
 		out.println("<h3>Error summary</h3>");
 		int count = errorCount();
 		if (count != 0) {
-			if (count == 1)
+			if (count == 1) {
 				out.println("There was " + count + " error:<p>");
-			else
+			} else {
 				out.println("There were " + count + " errors:<p>");
+			}
 			int i = 1;
-			for (Enumeration e = errors(); e.hasMoreElements(); i++) {
-				TestFailure failure = (TestFailure) e.nextElement();
+			for (Enumeration<TestFailure> e = errors(); e.hasMoreElements(); i++) {
+				TestFailure failure = e.nextElement();
 				out.println(i + ") " + failure.failedTest() + "<p>");
 				failure.thrownException().printStackTrace(out);
 				out.println("<p>");
@@ -83,17 +88,19 @@ public class LoggingPerformanceTestResult extends PerformanceTestResult {
 	/**
 	 * Prints the failures to the output
 	 */
+	@Override
 	protected void printFailures(PrintWriter out) {
 		out.println("<h3>Failure summary</h3>");
 		int count = failureCount();
 		if (count != 0) {
-			if (count == 1)
+			if (count == 1) {
 				out.println("There was " + count + " failure:<p>");
-			else
+			} else {
 				out.println("There were " + count + " failures:<p>");
+			}
 			int i = 1;
-			for (Enumeration e = failures(); e.hasMoreElements(); i++) {
-				TestFailure failure = (TestFailure) e.nextElement();
+			for (Enumeration<TestFailure> e = failures(); e.hasMoreElements(); i++) {
+				TestFailure failure = e.nextElement();
 				out.println(i + ") " + failure.failedTest() + "<p>");
 				failure.thrownException().printStackTrace(out);
 				out.println("<p>");
@@ -106,8 +113,9 @@ public class LoggingPerformanceTestResult extends PerformanceTestResult {
 	/**
 	 * Prints the header of the report
 	 */
+	@Override
 	protected void printHeader(PrintWriter out) {
-		// Nothing here right now
+		//
 	}
 
 	/**
@@ -132,13 +140,14 @@ public class LoggingPerformanceTestResult extends PerformanceTestResult {
 	 * Prints the timings of the result.
 	 */
 
+	@Override
 	protected void printTimings(PrintWriter out) {
 		out.println("<h3>Timing summary</h3>");
 		out.println("<ul>");
 
 		// print out all timing results to the console
-		for (Iterator it = timerList.iterator(); it.hasNext();) {
-			PerformanceTimer timer = (PerformanceTimer) it.next();
+		for (Iterator<PerformanceTimer> it = timerList.iterator(); it.hasNext();) {
+			PerformanceTimer timer = it.next();
 			out.println("<li>" + timer.getName() + " : " + timer.getElapsedTime() + " ms</li>");
 		}
 		out.println("</ul>");
@@ -150,6 +159,7 @@ public class LoggingPerformanceTestResult extends PerformanceTestResult {
 	 * and send the new timer the startTiming message.
 	 */
 
+	@Override
 	public synchronized void startTimer(String timerName) {
 		super.startTimer(timerName);
 		//log("Starting timer: " + timerName);
@@ -160,6 +170,7 @@ public class LoggingPerformanceTestResult extends PerformanceTestResult {
 	 * message.  If the timer does not exist, report an error.
 	 */
 
+	@Override
 	public synchronized void stopTimer(String timerName) {
 		super.stopTimer(timerName);
 		//log("Stopping timer: " + timerName);

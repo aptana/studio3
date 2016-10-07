@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2006 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.core.tests.harness;
 
-import org.eclipse.core.runtime.*;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 /**
@@ -43,16 +45,14 @@ public class TestJob extends Job {
 	}
 
 	/**
-	 * Returns the number of times this job instance has been run, possibly including 
+	 * Returns the number of times this job instance has been run, possibly including
 	 * the current invocation if the job is currently running.
 	 */
 	public synchronized int getRunCount() {
 		return runCount;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
-	 */
+	@Override
 	public IStatus run(IProgressMonitor monitor) {
 		setRunCount(getRunCount() + 1);
 		//must have positive work
@@ -60,8 +60,9 @@ public class TestJob extends Job {
 		try {
 			for (int i = 0; i < ticks; i++) {
 				monitor.subTask("Tick: " + i);
-				if (monitor.isCanceled())
+				if (monitor.isCanceled()) {
 					return Status.CANCEL_STATUS;
+				}
 				try {
 					Thread.sleep(tickLength);
 				} catch (InterruptedException e) {
@@ -69,8 +70,9 @@ public class TestJob extends Job {
 				}
 				monitor.worked(1);
 			}
-			if (ticks <= 0)
+			if (ticks <= 0) {
 				monitor.worked(1);
+			}
 		} finally {
 			monitor.done();
 		}

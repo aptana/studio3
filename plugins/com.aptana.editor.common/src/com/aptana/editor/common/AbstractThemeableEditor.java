@@ -350,7 +350,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		this.fThemeableEditorFindBarExtension.activateContexts(new String[] { ScriptingActivator.EDITOR_CONTEXT_ID,
 				ScriptingUIPlugin.SCRIPTING_CONTEXT_ID, partId + ".context" }); //$NON-NLS-1$
 
-		if (isWordWrapEnabled())
+		if (isWordWrapEnabledAptana())
 		{
 			setWordWrapEnabled(true);
 		}
@@ -1334,7 +1334,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return fLineNumberRulerColumn;
 	}
 
-	private boolean isWordWrapEnabled()
+	private boolean isWordWrapEnabledAptana()
 	{
 		return Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
 				IPreferenceConstants.ENABLE_WORD_WRAP, false, null);

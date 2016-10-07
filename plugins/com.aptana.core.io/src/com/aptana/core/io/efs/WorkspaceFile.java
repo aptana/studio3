@@ -47,6 +47,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
 
 import com.aptana.core.io.vfs.IFileTreeVisitor;
@@ -321,11 +322,11 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 			monitor.beginTask(MessageFormat.format("Creating folder {0}", path.lastSegment()), 100); //$NON-NLS-1$
 			try {
 				if ((options & EFS.SHALLOW) == 0) {
-					createParentsRecursive(resource, Policy.subMonitorFor(monitor, 80));
+					createParentsRecursive(resource, SubMonitor.convert(monitor, 80));
 				} else {
-					Policy.subMonitorFor(monitor, 80).done();
+					SubMonitor.convert(monitor, 80).done();
 				}
-				((IFolder) resource).create(IResource.FORCE, true, Policy.subMonitorFor(monitor, 20));
+				((IFolder) resource).create(IResource.FORCE, true, SubMonitor.convert(monitor, 20));
 			} catch (CoreException e) {
 				fileNotFoundError(e, path);
 			}
@@ -373,7 +374,7 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 			}
 			try {
 				if (destinationResource.exists()) {
-					destinationResource.delete(IResource.FORCE, Policy.subMonitorFor(monitor, 20));
+					destinationResource.delete(IResource.FORCE, SubMonitor.convert(monitor, 20));
 				}
 			} catch (CoreException e) {
 				Policy.error(EFS.ERROR_DELETE, NLS.bind(Messages.couldnotDelete, toString(), destination.toString()),
@@ -384,7 +385,7 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 						new FileNotFoundException(destinationFile.path.toPortableString()));
 			}
 			try {
-				resource.move(destinationResource.getFullPath(), true, Policy.subMonitorFor(monitor, 80));
+				resource.move(destinationResource.getFullPath(), true, SubMonitor.convert(monitor, 80));
 			} catch (CoreException e) {
 				Policy.error(EFS.ERROR_WRITE, NLS.bind(Messages.failedMove, toString(), destination.toString()), e);
 			}
@@ -437,14 +438,14 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		monitor.beginTask(StringUtil.EMPTY, 100);
 		if (localFileStore == null) {
 			try {
-				((IFile) resource).create(new ByteArrayInputStream(EMPTY_ARRAY), IResource.FORCE, Policy.subMonitorFor(monitor, 50));
+				((IFile) resource).create(new ByteArrayInputStream(EMPTY_ARRAY), IResource.FORCE, SubMonitor.convert(monitor, 50));
 			} catch (CoreException e) {
 				fileNotFoundError(e, path);
 			}
 			ensureLocalFileStore();
 		}
 		if (localFileStore != null) {
-			return localFileStore.openOutputStream(options, Policy.subMonitorFor(monitor, 50));
+			return localFileStore.openOutputStream(options, SubMonitor.convert(monitor, 50));
 		}
 		return null;
 	}
@@ -518,9 +519,9 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 			return;
 		}
 		monitor.beginTask(StringUtil.EMPTY, 100);
-		createParentsRecursive(parent, Policy.subMonitorFor(monitor, 80));
+		createParentsRecursive(parent, SubMonitor.convert(monitor, 80));
 		if (parent instanceof IFolder) {
-			((IFolder) parent).create(IResource.FORCE, true, Policy.subMonitorFor(monitor, 20));
+			((IFolder) parent).create(IResource.FORCE, true, SubMonitor.convert(monitor, 20));
 		}
 	}
 

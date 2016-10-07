@@ -9,7 +9,7 @@ Require-Bundle: org.jruby,
  com.aptana.core;bundle-version="3.0.4",
  com.aptana.buildpath.core;visibility:=reexport,
  com.aptana.scripting,
- org.eclipse.ui.editors;visibility:=reexport,
+ org.eclipse.ui.editors;bundle-version="3.6.0";visibility:=reexport,
  org.eclipse.ui.console,
  org.eclipse.ui.views,
  org.eclipse.compare,
@@ -25,7 +25,7 @@ Require-Bundle: org.jruby,
  com.aptana.editor.epl;visibility:=reexport,
  com.aptana.build.ui,
  org.eclipse.ui.navigator
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common,
