@@ -148,6 +148,9 @@ public class DefaultAnalyticsEventHandlerTest
 
 				allowing(logger).getEvents();
 				will(returnValue(Collections.emptyList()));
+				
+				allowing(logger).clearEvents();
+				
 			}
 		});
 		handler.sendEventSync(event);

@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.usage.AnalyticsEvent;
@@ -261,6 +262,11 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 				synchronized (lock)
 				{
 					List<AnalyticsEvent> events = logger.getEvents();
+					if (events.isEmpty()) //no events found - we can clean the directory - It will delete the empty or unwanted files.
+					{
+						logger.clearEvents();
+					}
+					
 					// Sort the events. We want all project.create events to be first, and all project.delete events
 					// to be last
 					Collections.sort(events, new AnalyticsEventComparator());

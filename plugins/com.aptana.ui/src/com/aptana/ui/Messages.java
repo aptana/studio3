@@ -47,6 +47,8 @@ public class Messages extends NLS
 
 	public static String SudoManager_MessagePrompt;
 
+	public static String SudoUIManager_LoginErrorMessage;
+
 	static
 	{
 		// initialize resource bundle

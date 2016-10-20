@@ -25,7 +25,7 @@ import com.aptana.js.core.node.INodeJSService.NodeJsListener;
  */
 public interface INodeJS extends NodeJsListener
 {
-	public static final String MIN_NODE_VERSION = "0.12.7"; //$NON-NLS-1$
+	public static final String MIN_NODE_VERSION = "4.0.0"; //$NON-NLS-1$
 
 	/**
 	 * Error codes returned by {@link #validate()}
