@@ -61,7 +61,7 @@ public class NodeJSService implements INodeJSService
 	private static final String PROGRAM_FILES_X86_NODEJS_NODE_PATH = "%ProgramFiles(x86)%\\nodejs"; //$NON-NLS-1$
 	private static final String PROGRAM_FILES_NODEJS_NODE_PATH = "%PROGRAMFILES%\\nodejs"; //$NON-NLS-1$
 	private static final String USR_LOCAL_BIN_NODE = "/usr/local/bin"; //$NON-NLS-1$
-	private static final String REGISTRY_PATH_NODE_JS = "HKEY_CURRENT_USER\\Software\\Node.js"; //$NON-NLS-1$
+	private static final String REGISTRY_PATH_NODE_JS = "HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Node.js"; //$NON-NLS-1$
 	private static final String REG_NODEJS_INSTALL_KEY = "InstallPath"; //$NON-NLS-1$
 
 	private static final String NODE_EXE = "node.exe"; //$NON-NLS-1$
