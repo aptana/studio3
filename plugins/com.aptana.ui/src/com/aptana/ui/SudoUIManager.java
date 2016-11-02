@@ -102,7 +102,7 @@ public class SudoUIManager
 							}
 							else if (open == Dialog.CANCEL)
 							{
-								throw new CoreException(Status.CANCEL_STATUS);
+								throw new CoreException(new Status(Status.CANCEL,UIPlugin.PLUGIN_ID , Messages.SudoUIManager_OperationCancelledError));
 							}
 							promptMessage = Messages.Sudo_Invalid_Password_Prompt;
 						}
