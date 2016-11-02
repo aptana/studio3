@@ -49,6 +49,8 @@ public class Messages extends NLS
 
 	public static String SudoUIManager_LoginErrorMessage;
 
+	public static String SudoUIManager_OperationCancelledError;
+
 	static
 	{
 		// initialize resource bundle
