@@ -144,7 +144,7 @@ public class ProjectTemplate implements IProjectTemplate
 	public ProjectTemplate(String path, TemplateType type, String name, boolean isReplacingParameters,
 			String description, URL iconURL, String id, int priority, List<String> tags)
 	{
-		this(path, type, name, isReplacingParameters, description, iconURL, id, 0, null, false);
+		this(path, type, name, isReplacingParameters, description, iconURL, id, 0, tags, false);
 	}
 
 	/**
