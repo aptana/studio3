@@ -696,13 +696,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.apache.commons.logging"
-         download-size="0"
-         install-size="0"
-         version="1.1.1.v201101211721"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.editor.html.core"
          download-size="0"
          install-size="0"
@@ -725,6 +718,13 @@
 
    <plugin
          id="mestevens.xcode.parser"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.commons.logging"
          download-size="0"
          install-size="0"
          version="0.0.0"
