@@ -92,6 +92,7 @@
 				var BufferedReader = java.io.BufferedReader;
 				var FileReader = java.io.FileReader;
 				var FileWriter = java.io.FileWriter;
+				var System = java.lang.System;
 
 				// The main method (called from the bottom of the file).
 				function main() {
