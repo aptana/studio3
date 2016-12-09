@@ -10,7 +10,7 @@
 	<!-- Steps to do before generating the build scripts. -->
 	<!-- ===================================================================== -->
 	<target name="preGenerate">
-		<!-- Need to grab version qualifier for scripting plugin, we do that by cloning and checking 
+		<!-- Need to grab version qualifier for scripting plugin, we do that by cloning and checking
 		last commit of each bundle vs last commit of plugin. This MUST be done before the generateScript target
 		or else the qualifier we insert into build.properties is ignored.  -->
 		<property name="scripting.plugin" value="com.aptana.scripting"/>
@@ -81,30 +81,25 @@
 				<param name="bundle.branch" value="${scs.branch.name}" />
 			</antcall>
 		</parallel>
-		
+
 		<!-- Delete the pre-generation of cache scripts repo clone -->
 		<delete dir="${scripting.plugin.dir}/bundles/studio3-sdk" failonerror="true" />
-		
+
 		<!-- Now grab the max value of lastmods in bundle_timestamps.txt file and use that as qualifier! -->
 		<script language="javascript">
 			<![CDATA[
-					
-					//JDK-8025132
-					try {
-					    load("nashorn:mozilla_compat.js");
-					} catch (e) {
-					   // ignore the exception - perhaps we are running on Rhino!
-					}
-
-					importPackage(java.lang, java.util, java.io);
+					var File = java.io.File;
+					var BufferedReader = java.io.BufferedReader;
+					var FileReader = java.io.FileReader;
+					var FileWriter = java.io.FileWriter;
 
 					// The main method (called from the bottom of the file).
 					function main() {
 						var basedir = project.getProperty("scripting.plugin.dir");
-						
+
 						var timestamps = new File(basedir, "bundle_timestamps.txt");
 						var reader = new BufferedReader(new FileReader(timestamps));
-					    var line = reader.readLine();
+						var line = reader.readLine();
 						System.out.println(line);
 						reader.close();
 						var max = 0;
@@ -117,8 +112,8 @@
 							}
 						}
 						System.out.println("Max timestamp of scripting plugin and bundles: " + max);
-					    // Write the max number into the qualifier!
-					    var writer = new FileWriter(new File(basedir, "build.properties"), true);
+						// Write the max number into the qualifier!
+						var writer = new FileWriter(new File(basedir, "build.properties"), true);
 						writer.write("qualifier = " + max + "\n");
 						writer.close();
 					}
@@ -149,7 +144,7 @@
 
 		<!-- Now remove the .git subdirectory -->
 		<delete dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}/.git" quiet="true" />
-		
+
 		<!-- Now pre-generate the cache files! -->
 		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles/studio3-sdk/tools/bundle_cache_generator" failonerror="true">
 			<arg value="-c" />
