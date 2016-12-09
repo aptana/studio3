@@ -88,39 +88,39 @@
 		<!-- Now grab the max value of lastmods in bundle_timestamps.txt file and use that as qualifier! -->
 		<script language="javascript">
 			<![CDATA[
-					var File = java.io.File;
-					var BufferedReader = java.io.BufferedReader;
-					var FileReader = java.io.FileReader;
-					var FileWriter = java.io.FileWriter;
+				var File = java.io.File;
+				var BufferedReader = java.io.BufferedReader;
+				var FileReader = java.io.FileReader;
+				var FileWriter = java.io.FileWriter;
 
-					// The main method (called from the bottom of the file).
-					function main() {
-						var basedir = project.getProperty("scripting.plugin.dir");
+				// The main method (called from the bottom of the file).
+				function main() {
+					var basedir = project.getProperty("scripting.plugin.dir");
 
-						var timestamps = new File(basedir, "bundle_timestamps.txt");
-						var reader = new BufferedReader(new FileReader(timestamps));
-						var line = reader.readLine();
-						System.out.println(line);
-						reader.close();
-						var max = 0;
-						var numbers = line.split(",");
-						for (var i = 0; i < numbers.length; i++) {
-							new_number = parseInt(numbers[i]);
-							if (new_number > max)
-							{
-								max = new_number;
-							}
+					var timestamps = new File(basedir, "bundle_timestamps.txt");
+					var reader = new BufferedReader(new FileReader(timestamps));
+					var line = reader.readLine();
+					System.out.println(line);
+					reader.close();
+					var max = 0;
+					var numbers = line.split(",");
+					for (var i = 0; i < numbers.length; i++) {
+						new_number = parseInt(numbers[i]);
+						if (new_number > max)
+						{
+							max = new_number;
 						}
-						System.out.println("Max timestamp of scripting plugin and bundles: " + max);
-						// Write the max number into the qualifier!
-						var writer = new FileWriter(new File(basedir, "build.properties"), true);
-						writer.write("qualifier = " + max + "\n");
-						writer.close();
 					}
+					System.out.println("Max timestamp of scripting plugin and bundles: " + max);
+					// Write the max number into the qualifier!
+					var writer = new FileWriter(new File(basedir, "build.properties"), true);
+					writer.write("qualifier = " + max + "\n");
+					writer.close();
+				}
 
-					main();
-				]]>
-				</script>
+				main();
+			]]>
+		</script>
 	</target>
 
 	<target name="clone-bundle">
