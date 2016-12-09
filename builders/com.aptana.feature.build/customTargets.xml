@@ -34,7 +34,7 @@
 		<!-- TODO Checkout the correct branch of the generator scripts... -->
 
 		<!-- Grab the pre-defined set of bundles -->
-		<parallel>
+		<parallel threadsPerProcessor="2">
 			<antcall target="clone-bundle">
 				<param name="bundle.name" value="text.ruble" />
 				<param name="bundle.dir.name" value="text.ruble" />
