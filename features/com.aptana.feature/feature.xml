@@ -710,14 +710,28 @@
          unpack="false"/>
 
    <plugin
-         id="com.jackson.libraries"
+         id="mestevens.xcode.parser"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="mestevens.xcode.parser"
+         id="com.fasterxml.jackson.core.jackson-annotations"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.fasterxml.jackson.core.jackson-core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.fasterxml.jackson.core.jackson-databind"
          download-size="0"
          install-size="0"
          version="0.0.0"
