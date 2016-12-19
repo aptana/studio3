@@ -9,6 +9,7 @@ package com.aptana.browser.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +66,8 @@ public class BrowserConfigurationManager
 
 	public BrowserSizeCategory[] getSizeCategories()
 	{
-		Collection<BrowserSizeCategory> categories = sizeCategories.values();
+		List<BrowserSizeCategory> categories = new ArrayList<BrowserSizeCategory>(sizeCategories.values());
+		Collections.sort(categories); // sort by order
 		return categories.toArray(new BrowserSizeCategory[categories.size()]);
 	}
 
