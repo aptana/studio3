@@ -284,7 +284,6 @@ public class WebBrowserViewer extends Composite
 
 		BrowserSizeCategory[] categories = BrowserPlugin.getDefault().getBrowserConfigurationManager()
 				.getSizeCategories();
-		Arrays.sort(categories);
 		MenuManager categoryMenuManager;
 		BrowserSize[] sizes;
 		for (BrowserSizeCategory category : categories)
