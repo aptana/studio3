@@ -41,8 +41,10 @@ public class BrowserConfigurationManagerTest
 	{
 		BrowserSizeCategory[] categories = manager.getSizeCategories();
 		assertEquals(5, categories.length);
+		// Should be: Computer, Mobile, Test, Ordered, Default
 
-		BrowserSizeCategory defaultCategory = categories[0];
+		// Default should be the last one
+		BrowserSizeCategory defaultCategory = categories[4];
 		assertEquals("default", defaultCategory.getId());
 		assertEquals("Default", defaultCategory.getName());
 		assertEquals(Integer.MAX_VALUE, defaultCategory.getOrder());
@@ -56,7 +58,8 @@ public class BrowserConfigurationManagerTest
 		assertEquals(1280, size.getWidth());
 		assertNull(size.getImage());
 
-		BrowserSizeCategory testCategory = categories[1];
+		// Category with no order defaults to order of 127, then sorted by name, so Test should be our third category overall
+		BrowserSizeCategory testCategory = categories[2];
 		assertEquals("com.aptana.browser.tests.sizeCategory", testCategory.getId());
 		assertEquals("Test", testCategory.getName());
 		assertEquals(Byte.MAX_VALUE, testCategory.getOrder());
@@ -78,6 +81,8 @@ public class BrowserConfigurationManagerTest
 		assertEquals(AbstractUIPlugin.imageDescriptorFromPlugin("com.aptana.browser", "images/iphone_ver.png"),
 				browserImage.getImageDescriptor());
 
+		// Ordered category. Value of 200 comes after unordered default values, before default which is defaults to MAX_INT order
+		// So it should be the 4th (second last) category
 		BrowserSizeCategory orderedCategory = categories[3];
 		assertEquals("com.aptana.browser.tests.sizeCategory.ordered", orderedCategory.getId());
 		assertEquals("Ordered", orderedCategory.getName());
