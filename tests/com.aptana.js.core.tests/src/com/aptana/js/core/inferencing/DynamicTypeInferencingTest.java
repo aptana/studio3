@@ -70,10 +70,27 @@ public class DynamicTypeInferencingTest extends InferencingTestsBase
 		assertEquals("one", type.getName());
 		List<PropertyElement> properties = type.getProperties();
 		assertEquals(2, properties.size()); // prototype gets added too
-		PropertyElement property = properties.get(0);
-		assertEquals("two", property.getName());
+
+		PropertyElement property = findByName(properties, "two"); // must search for specific property, no guarantee of ordering between 'two' and 'prototype'
+		assertNotNull("two", property);
 		List<String> typeNames = property.getTypeNames();
 		assertEquals(1, typeNames.size());
 		assertEquals("Number", typeNames.get(0));
+	}
+
+	private PropertyElement findByName(List<PropertyElement> properties, String name)
+	{
+		if (properties == null || properties.isEmpty())
+		{
+			return null;
+		}
+		for (PropertyElement prop : properties)
+		{
+			if (prop.getName().equals(name))
+			{
+				return prop;
+			}
+		}
+		return null;
 	}
 }
