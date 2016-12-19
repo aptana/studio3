@@ -154,6 +154,7 @@ public class SamplesManager implements ISamplesManager
 	{
 		List<SampleCategory> sampleCategories = new ArrayList<SampleCategory>();
 		sampleCategories.addAll(categories.values());
+		Collections.sort(sampleCategories);
 		return sampleCategories;
 	}
 
