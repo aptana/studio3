@@ -87,7 +87,8 @@ public class SamplesManagerTest
 		assertEquals("Testing remote sample", remoteSample.getDescription());
 		assertEquals("git://github.com/aptana/remote_sample.git", remoteSample.getLocation());
 
-		assertEquals(samplesManager.getCategories().get(1), remoteSample.getCategory());
+		List<SampleCategory> categories = samplesManager.getCategories();
+		assertTrue(categories.contains(remoteSample.getCategory()));
 		assertNull(remoteSample.getProjectHandler());
 
 		String[] natures = remoteSample.getNatures();

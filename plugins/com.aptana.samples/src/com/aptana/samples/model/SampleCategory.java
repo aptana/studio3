@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.samples.handlers.ISampleProjectHandler;
 
-public class SampleCategory
+public class SampleCategory implements Comparable<SampleCategory>
 {
 	private static final String ATTR_ICON = "icon"; //$NON-NLS-1$
 	private static final String ATTR_PROJECT_HANDLER = "projectHandler"; //$NON-NLS-1$
@@ -84,5 +84,10 @@ public class SampleCategory
 	public int hashCode()
 	{
 		return id.hashCode() * 31 + name.hashCode();
+	}
+
+	public int compareTo(SampleCategory o)
+	{
+		return name.compareTo(o.name);
 	}
 }
