@@ -17,6 +17,10 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.hamcrest.Description;
+import org.hamcrest.Factory;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -168,9 +172,8 @@ public class GithubRepositoryTest
 				oneOf(head).push("origin", "headBranch");
 				will(returnValue(Status.OK_STATUS));
 				// POST against the baseRepo
-				oneOf(api)
-						.post("repos/octocat/Hello-World/pulls",
-								"{\"body\":\"My body.\",\"title\":\"MyTitle\",\"base\":\"baseBranch\",\"head\":\"someuser:headBranch\"}");
+				oneOf(api).post(with("repos/octocat/Hello-World/pulls"), with(aJSONString(
+						"{\"body\":\"My body.\",\"title\":\"MyTitle\",\"base\":\"baseBranch\",\"head\":\"someuser:headBranch\"}")));
 				will(returnValue(response));
 			}
 		});
@@ -208,7 +211,8 @@ public class GithubRepositoryTest
 				will(returnValue(new ProcessStatus(0,
 						"5fe978a5381f1fbad26a80e682ddd2a401966740        refs/heads/master\n"
 								+ "c781a84b5204fb294c9ccc79f8b3baceeb32c061        refs/heads/pu\n"
-								+ "b1d096f2926c4e37c9c0b6a7bf2119bedaa277cb        refs/heads/rc\n", "")));
+								+ "b1d096f2926c4e37c9c0b6a7bf2119bedaa277cb        refs/heads/rc\n",
+						"")));
 			}
 		});
 		Set<String> branches = repo.getBranches();
@@ -249,6 +253,40 @@ public class GithubRepositoryTest
 		assertFalse(fork.isPrivate());
 		assertFalse(fork.isFork());
 		context.assertIsSatisfied();
+	}
+
+	private static class JSONStringMatcher extends TypeSafeMatcher<String>
+	{
+		private JSONObject json;
+
+		public JSONStringMatcher(String json) throws ParseException
+		{
+			this.json = (JSONObject) new JSONParser().parse(json);
+		}
+
+		public boolean matchesSafely(String s)
+		{
+			try
+			{
+				JSONObject obj = (JSONObject) new JSONParser().parse(s);
+				return obj.equals(json);
+			}
+			catch (ParseException e)
+			{
+				return false;
+			}
+		}
+
+		public void describeTo(Description description)
+		{
+			description.appendText("a JSON string equivalent to ").appendValue(json.toJSONString());
+		}
+	}
+
+	@Factory
+	public static Matcher<String> aJSONString(String json) throws ParseException
+	{
+		return new JSONStringMatcher(json);
 	}
 
 }
