@@ -7,6 +7,9 @@
  */
 package com.aptana.ui.handlers;
 
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
+
 import com.aptana.core.resources.RequestCancelledException;
 import com.aptana.core.resources.SocketMessagesHandler;
 import com.aptana.core.util.StringUtil;
@@ -105,13 +108,23 @@ public class AppcSocketMessagesHandler extends SocketMessagesHandler
 
 			}
 		});
-		
-		if (response[0] == null)
+
+		if (response[0] == null && isWorkbenchLaunched()) //To control dialog prompt cancel behaviour until we launch a studio.
 		{
 			throw new RequestCancelledException();
 		}
 
 		return response[0];
+	}
+
+	private boolean isWorkbenchLaunched()
+	{
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		if (workbench != null)
+		{
+			return workbench.getWorkbenchWindowCount() == 0;
+		}
+		return false;
 	}
 
 }
