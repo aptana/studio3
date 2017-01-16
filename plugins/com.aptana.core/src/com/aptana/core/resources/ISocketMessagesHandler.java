@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  *
  * @author pinnamuri
  */
-public interface ISocketMessagesHandler
+public interface ISocketMessagesHandler extends ISocketMessagesHandlerNotifier
 {
 
 	/**
@@ -24,7 +24,8 @@ public interface ISocketMessagesHandler
 	 *
 	 * @param request
 	 * @return
+	 * @throws RequestCancelledException
 	 */
-	public JsonNode handleRequest(JsonNode request);
+	public JsonNode handleRequest(JsonNode request) throws RequestCancelledException;
 
 }
