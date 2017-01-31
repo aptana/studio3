@@ -13,7 +13,7 @@ def ratchetCoverageThresholds() {
 	def actions = b.getActions()
 
 	// Can't use find unless I move it out to @NonCPS method
-	// def action = null
+	def action = null
 	for (int i =0; i < actions.size(); i++) {
 		if (actions[i].getUrlName() == 'jacoco') {
 			action = actions[i]
@@ -98,14 +98,11 @@ def compareCoverage(jobName) {
 
 	// Now we need to grab the last values from the target job
 	echo "Grabbing configuration of job: ${jobName}"
-	// def targetJob = manager.hudson.items.find { job -> job.name == jobName }
 	def targetJob = manager.hudson.getItemByFullName(jobName)
-	// for (int i =0; i < manager.hudson.items.size(); i++) {
-	// 	if (manager.hudson.items[i].name == jobName) {
-	// 		targetJob = manager.hudson.items[i]
-	// 		break
-	// 	}
-	// }
+	if (targetJob == null) {
+		echo "Unable to get find target job ${jobName} to compare against, bailing out"
+		return
+	}
 
 	def jacocoPublisher = null
 	for (int i =0; i < targetJob.publishersList.size(); i++) {
@@ -271,11 +268,11 @@ ftps.supports.permissions=false"""
 
 			stage('Cleanup') {
 				checkCoverageDrop()
-				if (!env.BRANCH_NAME.startsWith('PR-')) {
+				// if (!env.BRANCH_NAME.startsWith('PR-')) {
 					ratchetCoverageThresholds()
-				} else {
-					compareCoverage("Studio/studio3/${env.CHANGE_TARGET}")
-				}
+				// } else {
+					// compareCoverage("Studio/studio3/${env.CHANGE_TARGET}")
+				// }
 				// TODO Clean up after Jacoco?
 			}
 
