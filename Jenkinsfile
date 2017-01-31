@@ -66,10 +66,14 @@ node('linux && ant && eclipse && jdk && vncserver') {
 
 			// Copy over dependencies
 			stage('Dependencies') {
+				def targetBranch = 'development'
+				if (!env.BRANCH_NAME.startsWith('PR-')) {
+					targetBranch = env.BRANCH_NAME
+				}
 				step([$class: 'CopyArtifact',
 					filter: 'dist/',
 					fingerprintArtifacts: true,
-					projectName: "Studio/libraries_com/${env.BRANCH_NAME}",
+					projectName: "Studio/libraries_com/${targetBranch}",
 					target: 'libraries-com'])
 			}
 
