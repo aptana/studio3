@@ -9,12 +9,21 @@ def checkCoverageDrop() {
 
 def ratchetCoverageThresholds() {
 	// Grab the API for Jacoco
-	def b = manager.build;
+	def b = manager.build
+	def actions = b.getActions()
 
-	def action = b.getActions().find { it.getUrlName() == 'jacoco' }
+	// Can't use find unless I move it out to @NonCPS method
+	// def action = null
+	for (int i =0; i < actions.size(); i++) {
+		if (actions[i].getUrlName() == 'jacoco') {
+			action = actions[i]
+			break
+		}
+	}
+	// def action = actions.find { it.getUrlName() == 'jacoco' }
 	if (action == null) {
 		// no Jacoco coverage, so nothing to do!
-		manager.listener.logger.println 'Unable to get Jacoco Build Action on build, so bailing out'
+		echo 'Unable to get Jacoco Build Action on build, so bailing out'
 		return
 	}
 
@@ -24,11 +33,12 @@ def ratchetCoverageThresholds() {
 	def thresholds = action.getThresholds();
 
 	def metrics = ['Line', 'Class', 'Method', 'Instruction', 'Branch'] // TODO Add 'Complexity'?
-	metrics.each { m ->
+	for (int i = 0; i < metrics.size(); i++) {
+		def m = metrics[i]
 		int percent = action."get${m}Coverage"().getPercentage();
-		manager.listener.logger.println "Observed ${m} coverage: ${percent}%"
+		echo "Observed ${m} coverage: ${percent}%"
 		if (percent > thresholds."getMin${m}"()) {
-			manager.listener.logger.println "Increasing minimum threshold to observed value for ${m} coverage"
+			echo "Increasing minimum threshold to observed value for ${m} coverage"
 			manager.addInfoBadge("Increased ${m} coverage threshold to ${percent}%")
 			thresholds."setMin${m}"(percent);
 			changed = true;
@@ -38,7 +48,15 @@ def ratchetCoverageThresholds() {
 	// Only if we have updated a value should we do anything...
 	if (changed) {
 		def publishers = b.getProject().publishersList;
-		def jacocoPublisher = publishers.find { it.getDescriptor().getId() == 'hudson.plugins.jacoco.JacocoPublisher' }
+		def jacocoPublisher = null
+		// Can't use find unless I move it out to @NonCPS method
+		for (int i = 0; i < publishers.size(); i++) {
+			if (publishers[i].getDescriptor().getId() == 'hudson.plugins.jacoco.JacocoPublisher') {
+				jacocoPublisher = publishers[i]
+				break
+			}
+		}
+		// publishers.find { it.getDescriptor().getId() == 'hudson.plugins.jacoco.JacocoPublisher' }
 
 		// We need to replace the publisher with a new instance that has updated minimums
 		// HACK to work around bug in plugin where we don't have access to plugin classes.
@@ -57,6 +75,75 @@ def ratchetCoverageThresholds() {
 	}
 }
 
+// Compare code coverage results to the target branch and ensure we didn't drop any
+def compareCoverage(jobName) {
+	// Grab the API for Jacoco
+	def b = manager.build
+	def actions = b.getActions()
+
+	// Can't use #find unless I move it out to @NonCPS method
+	// def action = null
+	for (int i =0; i < actions.size(); i++) {
+		if (actions[i].getUrlName() == 'jacoco') {
+			action = actions[i]
+			break
+		}
+	}
+	// def action = actions.find { it.getUrlName() == 'jacoco' }
+	if (action == null) {
+		// no Jacoco coverage, so nothing to do!
+		echo 'Unable to get Jacoco Build Action on build, so bailing out'
+		return
+	}
+
+	// Now we need to grab the last values from the target job
+	echo "Grabbing configuration of job: ${jobName}"
+	// def targetJob = manager.hudson.items.find { job -> job.name == jobName }
+	def targetJob = manager.hudson.getItemByFullName(jobName)
+	// for (int i =0; i < manager.hudson.items.size(); i++) {
+	// 	if (manager.hudson.items[i].name == jobName) {
+	// 		targetJob = manager.hudson.items[i]
+	// 		break
+	// 	}
+	// }
+
+	def jacocoPublisher = null
+	for (int i =0; i < targetJob.publishersList.size(); i++) {
+		if (targetJob.publishersList[i].getDescriptor().getId() == 'hudson.plugins.jacoco.JacocoPublisher') {
+			jacocoPublisher = targetJob.publishersList[i]
+			break
+		}
+	}
+	// def jacocoPublisher = targetJob.publishersList.find { it.getDescriptor().getId() == 'hudson.plugins.jacoco.JacocoPublisher' }
+	if (jacocoPublisher == null) {
+		echo 'Unable to get Jacoco Publisher on target merge build to grab thresholds, so bailing out'
+		return
+	}
+
+	def summary = manager.createSummary('error.gif')
+	boolean changed = false
+
+	def metrics = ['Line', 'Class', 'Method', 'Instruction', 'Branch'] // TODO Add 'Complexity'?
+	for (int i = 0; i < metrics.size(); i++) {
+		def m = metrics[i]
+		int percent = action."get${m}Coverage"().getPercentage();
+		echo "Observed ${m} coverage: ${percent}%"
+		int min = Integer.parseInt(jacocoPublisher."getMinimum${m}Coverage"())
+		if (percent < min) {
+			String msg = "${m} coverage (${percent}%) below target branch's threshold (${min}%)"
+			echo msg
+			summary.appendText("<p>${msg}</p>", false)
+			manager.addErrorBadge(msg)
+			manager.buildFailure()
+			changed = true;
+		}
+	}
+
+	if (!changed) {
+		manager.removeSummaries()
+	}
+}
+
 node('linux && ant && eclipse && jdk && vncserver') {
 	try {
 		def targetBranch = 'development'
@@ -65,6 +152,8 @@ node('linux && ant && eclipse && jdk && vncserver') {
 				checkout scm
 				if (!env.BRANCH_NAME.startsWith('PR-')) {
 					targetBranch = env.BRANCH_NAME
+				} else {
+					targetBranch = env.CHANGE_TARGET // should be the target branch for a PR!
 				}
 			}
 
@@ -182,7 +271,11 @@ ftps.supports.permissions=false"""
 
 			stage('Cleanup') {
 				checkCoverageDrop()
-				ratchetCoverageThresholds()
+				if (!env.BRANCH_NAME.startsWith('PR-')) {
+					ratchetCoverageThresholds()
+				} else {
+					compareCoverage("Studio/studio3/${env.CHANGE_TARGET}")
+				}
 				// TODO Clean up after Jacoco?
 			}
 
