@@ -59,17 +59,17 @@ def ratchetCoverageThresholds() {
 
 node('linux && ant && eclipse && jdk && vncserver') {
 	try {
+		def targetBranch = 'development'
 		timestamps() {
 			stage('Checkout') {
 				checkout scm
+				if (!env.BRANCH_NAME.startsWith('PR-')) {
+					targetBranch = env.BRANCH_NAME
+				}
 			}
 
 			// Copy over dependencies
 			stage('Dependencies') {
-				def targetBranch = 'development'
-				if (!env.BRANCH_NAME.startsWith('PR-')) {
-					targetBranch = env.BRANCH_NAME
-				}
 				step([$class: 'CopyArtifact',
 					filter: 'dist/',
 					fingerprintArtifacts: true,
@@ -79,7 +79,7 @@ node('linux && ant && eclipse && jdk && vncserver') {
 
 			stage('Build') {
 				env.PATH = "${tool name: 'Ant 1.9.2', type: 'ant'}/bin:${env.PATH}"
-				writeFile file: 'override.properties', text: """scs.branch.name=${env.BRANCH_NAME}
+				writeFile file: 'override.properties', text: """scs.branch.name=${targetBranch}
 workspace=${env.WORKSPACE}
 deploy.dir=${env.WORKSPACE}/dist
 buildDirectory=${env.WORKSPACE}
@@ -119,7 +119,7 @@ mkdir $WORKSPACE/plugins'''
 			stage('Test') {
 				wrap([$class: 'Xvnc', takeScreenshot: false, useXauthority: true]) {
 					wrap([$class: 'MaskPasswordsBuildWrapper']) {
-						writeFile file: 'test-override.properties', text: """scs.branch.name=${env.BRANCH_NAME}
+						writeFile file: 'test-override.properties', text: """scs.branch.name=${targetBranch}
 workspace=${env.WORKSPACE}
 deploy.dir=${env.WORKSPACE}/dist-tests
 buildDirectory=${env.WORKSPACE}
