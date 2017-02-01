@@ -21,7 +21,6 @@ def getCoverageMinimums(jobName) {
 	def action = null
 	// TODO Get the jacoco action!
 
-	def summary = manager.createSummary('error.gif')
 	boolean changed = false
 	def values = []
 	def metrics = ['Branch', 'Class', 'Instruction', 'Line', 'Method'] // TODO Add 'Complexity'?
@@ -37,9 +36,10 @@ def getCoverageMinimums(jobName) {
 
 def checkCoverageDrop() {
 	if (manager.logContains('Build step \'Record JaCoCo coverage report\' changed build result to FAILURE')) {
+	}
 		manager.addErrorBadge('Code Coverage dropped.')
 		manager.createSummary('error.gif').appendText('<h1>Code Coverage dropped</h1>', false, false, false, 'red')
-	}
+	// }
 }
 
 node('linux && ant && eclipse && jdk && vncserver') {
@@ -55,6 +55,7 @@ node('linux && ant && eclipse && jdk && vncserver') {
 					targetBranch = env.CHANGE_TARGET // should be the target branch for a PR!
 				}
 				minimums = getCoverageMinimums("Studio/studio3/${env.BRANCH_NAME}")
+				checkCoverageDrop()
 			}
 
 			// Copy over dependencies
