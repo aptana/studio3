@@ -2,7 +2,7 @@
 
 // take a target job to lookup the coverage values for
 // Then record the values and set those as minimums for our Jacoco step!
-def getCoverageMinimums(jobName) {
+def getCoverageMinimums(jobName, isPR) {
 	// Grab the target build
 	// if it doesn't exist, return all zeros as minimums
 	def targetJob = manager.hudson.getItemByFullName(jobName)
@@ -11,9 +11,23 @@ def getCoverageMinimums(jobName) {
 		return [0, 0, 0, 0, 0]
 	}
 	// Now get the latest build for that job
+	// Result.SUCCESS
 	def lastBuild = targetJob.getLastBuild()
 	if (lastBuild == null) {
 		echo "No build yet for ${jobName} to compare against, bailing out"
+		return [0, 0, 0, 0, 0]
+	}
+
+	// If we're comparing a non-PR, we need to not count the active build!
+	if (!isPR) {
+		lastBuild = lastBuild.getPreviousSuccessfulBuild()
+	} else if (lastBuild.getResult() != Result.SUCCESS) {
+		 // if it is a PR, and target job's last build wasn't successful
+		 // get the last successful one
+		 lastBuild = lastBuild.getPreviousSuccessfulBuild()
+	}
+	if (lastBuild == null) {
+		echo "No successful build yet for ${jobName} to compare against, bailing out"
 		return [0, 0, 0, 0, 0]
 	}
 	def actions = lastBuild.getActions()
@@ -45,10 +59,9 @@ def getCoverageMinimums(jobName) {
 
 def checkCoverageDrop() {
 	if (manager.logContains('Build step \'Record JaCoCo coverage report\' changed build result to FAILURE')) {
-	}
 		manager.addErrorBadge('Code Coverage dropped.')
 		manager.createSummary('error.gif').appendText('<h1>Code Coverage dropped</h1>', false, false, false, 'red')
-	// }
+	}
 }
 
 node('linux && ant && eclipse && jdk && vncserver') {
@@ -63,8 +76,7 @@ node('linux && ant && eclipse && jdk && vncserver') {
 				} else {
 					targetBranch = env.CHANGE_TARGET // should be the target branch for a PR!
 				}
-				minimums = getCoverageMinimums("Studio/studio3/${env.BRANCH_NAME}")
-				checkCoverageDrop()
+				minimums = getCoverageMinimums("Studio/studio3/${env.BRANCH_NAME}", false)
 			}
 
 			// Copy over dependencies
