@@ -1,7 +1,6 @@
 #!groovy
 
-
-// TODO take a target job to lookup the coverage values for
+// take a target job to lookup the coverage values for
 // Then record the values and set those as minimums for our Jacoco step!
 def getCoverageMinimums(jobName) {
 	// Grab the target build
@@ -19,7 +18,17 @@ def getCoverageMinimums(jobName) {
 	}
 	def actions = lastBuild.getActions()
 	def action = null
-	// TODO Get the jacoco action!
+	for (int i = 0; i < actions.size(); i++) {
+		if (actions[i].getUrlName() == 'jacoco') {
+			action = actions[i]
+			break
+		}
+	}
+	if (action == null) {
+		// no Jacoco coverage, so nothing to do!
+		echo 'Unable to get Jacoco Build Action on build, so bailing out'
+		return [0, 0, 0, 0, 0]
+	}
 
 	boolean changed = false
 	def values = []
