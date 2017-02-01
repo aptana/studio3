@@ -204,7 +204,7 @@ ftps.supports.permissions=false"""
 			// If not a PR, trigger downstream builds for same branch
 			if (!env.BRANCH_NAME.startsWith('PR-')) {
 				build job: "titanium-core-${env.BRANCH_NAME}", wait: false
-				build job: "studio3-php-${env.BRANCH_NAME}", wait: false
+				build job: "Studio/studio3-php/${env.BRANCH_NAME}", wait: false
 				build job: "Studio/studio3-ruby/${env.BRANCH_NAME}", wait: false
 				build job: "studio3-pydev-${env.BRANCH_NAME}", wait: false
 			}
