@@ -44,12 +44,11 @@ def getCoverageMinimums(jobName, isPR) {
 		return [0, 0, 0, 0, 0]
 	}
 
-	boolean changed = false
 	def values = []
 	def metrics = ['Branch', 'Class', 'Instruction', 'Line', 'Method'] // TODO Add 'Complexity'?
 	for (int i = 0; i < metrics.size(); i++) {
 		def m = metrics[i]
-		int percent = action."get${m}Coverage"().getPercentage();
+		float percent = action."get${m}Coverage"().getPercentageFloat();
 		echo "Observed ${m} coverage: ${percent}%"
 		values << percent
 	}
@@ -57,10 +56,33 @@ def getCoverageMinimums(jobName, isPR) {
 	return values
 }
 
-def checkCoverageDrop() {
-	if (manager.logContains('Build step \'Record JaCoCo coverage report\' changed build result to FAILURE')) {
-		manager.addErrorBadge('Code Coverage dropped.')
-		manager.createSummary('error.gif').appendText('<h1>Code Coverage dropped</h1>', false, false, false, 'red')
+// Manually check if
+def checkCoverageDrop(coverageFloats) {
+	def actions = manager.build.getActions()
+	def action = null
+	for (int i = 0; i < actions.size(); i++) {
+		if (actions[i].getUrlName() == 'jacoco') {
+			action = actions[i]
+			break
+		}
+	}
+	if (action == null) {
+		// no Jacoco coverage, so nothing to do!
+		echo 'Unable to get Jacoco Build Action on build, so bailing out'
+		return
+	}
+
+	def values = []
+	def metrics = ['Branch', 'Class', 'Instruction', 'Line', 'Method'] // TODO Add 'Complexity'?
+	for (int i = 0; i < metrics.size(); i++) {
+		def m = metrics[i]
+		float percent = action."get${m}Coverage"().getPercentageFloat();
+		echo "Comparing coverage for ${m} - Target: ${coverageFloats[i]}%, Recorded: ${percent}%"
+		if (Float.compare(percent, coverageFloats[i]) < 0) {
+			manager.addErrorBadge("${m} Code Coverage dropped.")
+			manager.createSummary('error.gif').appendText("<h3>${m} Code Coverage dropped - Target: ${coverageFloats[i]}%, Recorded: ${percent}%</h3>", false, false, false, 'red')
+			manager.buildUnstable()
+		}
 	}
 }
 
@@ -179,26 +201,26 @@ ftps.supports.permissions=false"""
 				// Seems like sometimes when the value is the same (as an integer) it still gets marked
 				// ass below threshold (likely due to decimal precision it doesn't expose?)
 				step([$class: 'JacocoPublisher',
-					changeBuildStatus: true,
+					changeBuildStatus: false,
 					classPattern: 'eclipse/plugins/com.aptana.parsing_*,eclipse/plugins/com.aptana.terminal_*,eclipse/plugins/com.aptana.git.core_*,eclipse/plugins',
 					exclusionPattern: 'lib.org.chromium*.jar,**/tests/**/*.class,**/*Test*.class,**/Messages.class,com.aptana.*.tests*.jar,com.aptana.commandline.launcher_*.jar,com.aptana.documentation_*.jar,com.aptana.org.eclipse.tm.terminal_*.jar,com.aptana.swt.webkitbrowser*.jar,com.aptana.testing.*.jar,com.aptana.libraries_*.jar,com.aptana.jetty.*.jar,com.aptana.portablegit.win32_*.jar,com.aptana.scripting_*.jar',
 					execPattern: 'coverage-results/*.exec',
 					inclusionPattern: 'com.aptana.*.core_*.jar, com.aptana.browser_*.jar, com.aptana.build*.jar, com.aptana.configurations_*.jar, com.aptana.console_*.jar, com.aptana.core*.jar, com.aptana.debug*.jar, com.aptana.debug.*.jar, com.aptana.deploy*.jar, com.aptana.editor.*.jar, com.aptana.explorer_*.jar com.aptana.file*.jar, com.aptana.formatter.*.jar, com.aptana.git.*.jar, com.aptana.index.*.jar, com.aptana.jira.*.jar, com.aptana.js*.jar, com.aptana.parsing*.jar, com.aptana.portal.*.jar, com.aptana.preview*.jar, com.aptana.projects*.jar, com.aptana.samples.*.jar, com.aptana.scripting*.jar, com.aptana.syncing.*.jar, com.aptana.theme*.jar, com.aptana.ui*.jar, com.aptana.usage_*.jar, com.aptana.webserver.*.jar, com.aptana.workbench_*.jar',
-					maximumBranchCoverage: Integer.toString(minimums[0]),
-					maximumClassCoverage: Integer.toString(minimums[1]),
-					maximumInstructionCoverage: Integer.toString(minimums[2]),
-					maximumLineCoverage: Integer.toString(minimums[3]),
-					maximumMethodCoverage: Integer.toString(minimums[4]),
-					minimumBranchCoverage: Integer.toString(minimums[0]),
-					minimumClassCoverage: Integer.toString(minimums[1]),
-					minimumInstructionCoverage: Integer.toString(minimums[2]),
-					minimumLineCoverage: Integer.toString(minimums[3]),
-					minimumMethodCoverage: Integer.toString(minimums[4]),
+					maximumBranchCoverage: Integer.toString(Math.round(minimums[0])),
+					maximumClassCoverage: Integer.toString(Math.round(minimums[1])),
+					maximumInstructionCoverage: Integer.toString(Math.round(minimums[2])),
+					maximumLineCoverage: Integer.toString(Math.round(minimums[3])),
+					maximumMethodCoverage: Integer.toString(Math.round(minimums[4])),
+					minimumBranchCoverage: Integer.toString(Math.round(minimums[0])),
+					minimumClassCoverage: Integer.toString(Math.round(minimums[1])),
+					minimumInstructionCoverage: Integer.toString(Math.round(minimums[2])),
+					minimumLineCoverage: Integer.toString(Math.round(minimums[3])),
+					minimumMethodCoverage: Integer.toString(Math.round(minimums[4])),
 					sourcePattern: 'src_plugins/*/src'])
 			} // end Test stage
 
 			stage('Cleanup') {
-				checkCoverageDrop()
+				checkCoverageDrop(minimums)
 			}
 
 			// If not a PR, trigger downstream builds for same branch
