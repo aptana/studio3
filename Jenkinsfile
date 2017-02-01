@@ -206,7 +206,7 @@ ftps.supports.permissions=false"""
 				build job: "titanium-core-${env.BRANCH_NAME}", wait: false
 				build job: "Studio/studio3-php/${env.BRANCH_NAME}", wait: false
 				build job: "Studio/studio3-ruby/${env.BRANCH_NAME}", wait: false
-				build job: "studio3-pydev-${env.BRANCH_NAME}", wait: false
+				build job: "Studio/Pydev/${env.BRANCH_NAME}", wait: false
 			}
 		} // end timestamps
 	} catch (e) {
