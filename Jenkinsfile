@@ -68,15 +68,17 @@ node('linux && ant && eclipse && jdk && vncserver') {
 	try {
 		def targetBranch = 'development'
 		def minimums = []
+		def isPR = false
 		timestamps() {
 			stage('Checkout') {
 				checkout scm
-				if (!env.BRANCH_NAME.startsWith('PR-')) {
+				isPR = env.BRANCH_NAME.startsWith('PR-')
+				if (!isPR) {
 					targetBranch = env.BRANCH_NAME
 				} else {
-					targetBranch = env.CHANGE_TARGET // should be the target branch for a PR!
+					targetBranch = env.CHANGE_TARGET
 				}
-				minimums = getCoverageMinimums("Studio/studio3/${env.BRANCH_NAME}", false)
+				minimums = getCoverageMinimums("Studio/studio3/${targetBranch}", isPR)
 			}
 
 			// Copy over dependencies
@@ -173,6 +175,9 @@ ftps.supports.permissions=false"""
 				junit 'test-results/*.xml'
 				archiveArtifacts artifacts: 'dist-tests/**/*,test-results/**/*,coverage-results/**/*,eclipse/junit-workspace/.metadata/.log,eclipse/npm-debug.log', excludes: 'dist-tests/*.zip'
 
+				// FIXME Don't set max/min here and do compariosn ourselves?
+				// Seems like sometimes when the value is the same (as an integer) it still gets marked
+				// ass below threshold (likely due to decimal precision it doesn't expose?)
 				step([$class: 'JacocoPublisher',
 					changeBuildStatus: true,
 					classPattern: 'eclipse/plugins/com.aptana.parsing_*,eclipse/plugins/com.aptana.terminal_*,eclipse/plugins/com.aptana.git.core_*,eclipse/plugins',
