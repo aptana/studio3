@@ -84,7 +84,7 @@ def checkCoverageDrop(coverageFloats) {
 		echo "Comparing coverage for ${m} - Target: ${coverageFloats[i]}%, Recorded: ${percent}%, with delta of: ${delta}"
 		// Bump our recorded value by a 'delta' to account for 'fuzzy' comparison
 		// (i.e. pass as long as our value isn't more than 0.03 less than the last value)
-		if (Float.compare(percent + delta, coverageFloats[i]) < 0) {
+		if (Float.compare((float) (percent + delta), coverageFloats[i]) < 0) {
 			manager.addErrorBadge("${m} Code Coverage dropped.")
 			manager.createSummary('error.gif').appendText("<h5>${m} Code Coverage dropped - Target: ${coverageFloats[i]}%, Recorded: ${percent}%</h5>", false, false, false, 'red')
 			manager.buildUnstable()
