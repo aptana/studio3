@@ -1,17 +1,20 @@
 #! groovy
 node('linux && ant && eclipse && jdk && vncserver') {
 	try {
-		buildPlugin(env) {
+		def librariesComRepo = "file://${env.WORKSPACE}/libraries-com/dist/"
+		def studio3Repo = "file://${env.WORKSPACE}/dist/"
+
+		buildPlugin {
 			dependencies = ['libraries-com': 'Studio/libraries_com']
 			builder = 'com.aptana.feature.build'
-			properties = ['libraries-com.p2.repo': "file://${env.WORKSPACE}/libraries-com/dist/"]
+			properties = ['libraries-com.p2.repo': librariesComRepo]
 		}
 
-		testPlugin(env) {
+		testPlugin {
 			builder = 'com.aptana.studio.tests.build'
 			properties = [
-				'studio3.p2.repo': "file://${env.WORKSPACE}/dist",
-				'libraries-com.p2.repo': "file://${env.WORKSPACE}/libraries-com/dist/",
+				'studio3.p2.repo': studio3Repo,
+				'libraries-com.p2.repo': librariesComRepo,
 				's3.accessKey': '${S3_ACCESS_KEY}',
 				's3.secretAccessKey': '${S3_SECRET_ACCESS_KEY}',
 				'ftp.host': '10.0.1.52',
