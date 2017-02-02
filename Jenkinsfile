@@ -56,7 +56,10 @@ def getCoverageMinimums(jobName, isPR) {
 	return values
 }
 
-// Manually check if
+// Manually check if coverage dropped
+// Using thresholds only allows setting integers, but plugin
+// compares using floats, causing inconsistencies when we try to enforce
+// using thresholds. So let's compare floats from last build to now
 def checkCoverageDrop(coverageFloats) {
 	def actions = manager.build.getActions()
 	def action = null
@@ -74,13 +77,14 @@ def checkCoverageDrop(coverageFloats) {
 
 	def values = []
 	def metrics = ['Branch', 'Class', 'Instruction', 'Line', 'Method'] // TODO Add 'Complexity'?
+  def delta = 0.03
 	for (int i = 0; i < metrics.size(); i++) {
 		def m = metrics[i]
 		float percent = action."get${m}Coverage"().getPercentageFloat();
-		echo "Comparing coverage for ${m} - Target: ${coverageFloats[i]}%, Recorded: ${percent}%"
-		if (Float.compare(percent, coverageFloats[i]) < 0) {
+		echo "Comparing coverage for ${m} - Target: ${coverageFloats[i]}%, Recorded: ${percent}%, with delta of: ${delta}"
+		if (!(Math.abs(coverageFloats[i] - percent) <= delta)) {
 			manager.addErrorBadge("${m} Code Coverage dropped.")
-			manager.createSummary('error.gif').appendText("<h3>${m} Code Coverage dropped - Target: ${coverageFloats[i]}%, Recorded: ${percent}%</h3>", false, false, false, 'red')
+			manager.createSummary('error.gif').appendText("<h5>${m} Code Coverage dropped - Target: ${coverageFloats[i]}%, Recorded: ${percent}%</h5>", false, false, false, 'red')
 			manager.buildUnstable()
 		}
 	}
