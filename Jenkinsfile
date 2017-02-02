@@ -77,7 +77,7 @@ def checkCoverageDrop(coverageFloats) {
 
 	def values = []
 	def metrics = ['Branch', 'Class', 'Instruction', 'Line', 'Method'] // TODO Add 'Complexity'?
-  def delta = 0.03
+	float delta = 0.03
 	for (int i = 0; i < metrics.size(); i++) {
 		def m = metrics[i]
 		float percent = action."get${m}Coverage"().getPercentageFloat();
