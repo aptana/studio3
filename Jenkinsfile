@@ -61,6 +61,6 @@ node('linux && ant && eclipse && jdk && vncserver') {
 		currentBuild.result = 'FAILURE'
 		throw e
 	} finally {
-		step([$class: 'WsCleanup', notFailBuild: true])
+		// step([$class: 'WsCleanup', notFailBuild: true])
 	}
 } // end node
