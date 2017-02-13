@@ -1,0 +1,2194 @@
+/* -*-java-extended-*-
+ *
+ * (c) COPYRIGHT MIT and INRIA, 1997.
+ * Please first read the full copyright statement in file COPYRIGHT.html
+ *
+ * $Id: CssParser.jj,v 1.43 2009/02/06 10:22:33 ylafon Exp $
+ *
+ */
+
+options {
+    IGNORE_CASE  = true;
+    STATIC = false;
+    /*
+          DEBUG_TOKEN_MANAGER = true; 
+	  DEBUG_PARSER = true;      
+    */
+}
+
+PARSER_BEGIN(CssParser)
+
+package org.w3c.css.parser.analyzer;
+
+import java.io.InputStream;
+import java.util.Vector;
+import java.util.Enumeration;
+import java.net.URL;
+
+import org.w3c.css.values.CssValue;
+import org.w3c.css.values.CssExpression;
+import org.w3c.css.values.CssString;
+import org.w3c.css.values.CssURL;
+import org.w3c.css.values.CssLength;
+import org.w3c.css.values.CssNumber;
+import org.w3c.css.values.CssColor;
+import org.w3c.css.values.CssIdent;
+import org.w3c.css.values.CssPercentage;
+import org.w3c.css.values.CssFrequency;
+import org.w3c.css.values.CssTime;
+import org.w3c.css.values.CssDate;
+import org.w3c.css.values.CssAngle;
+import org.w3c.css.values.CssFunction;
+import org.w3c.css.values.CssUnicodeRange;
+import org.w3c.css.values.CssResolution;
+import org.w3c.css.properties.css1.CssProperty;
+import org.w3c.css.parser.Frame;
+import org.w3c.css.util.ApplContext;
+import org.w3c.css.parser.CssError;
+import org.w3c.css.parser.CssSelectors;
+import org.w3c.css.parser.CssParseException;
+import org.w3c.css.parser.AtRule;
+import org.w3c.css.parser.AtRuleMedia;
+import org.w3c.css.parser.AtRuleFontFace;
+import org.w3c.css.parser.AtRulePage;
+import org.w3c.css.parser.AtRulePreference;
+import org.w3c.css.parser.AtRulePhoneticAlphabet;
+import org.w3c.css.properties.svg.AtRuleColorProfile;
+import org.w3c.css.util.InvalidParamException;
+import org.w3c.css.util.Util;
+import org.w3c.css.util.Messages;
+import org.w3c.css.css.StyleSheetCom;
+
+import org.w3c.css.selectors.AdjacentSelector;
+import org.w3c.css.selectors.AttributeSelector;
+import org.w3c.css.selectors.ChildSelector;
+import org.w3c.css.selectors.ClassSelector;
+import org.w3c.css.selectors.DescendantSelector;
+import org.w3c.css.selectors.IdSelector;
+import org.w3c.css.selectors.TypeSelector;
+import org.w3c.css.selectors.UniversalSelector;
+import org.w3c.css.selectors.attributes.AttributeAny;
+import org.w3c.css.selectors.attributes.AttributeBegin;
+import org.w3c.css.selectors.attributes.AttributeExact;
+import org.w3c.css.selectors.attributes.AttributeOneOf;
+import org.w3c.css.selectors.attributes.AttributeStart;
+import org.w3c.css.selectors.attributes.AttributeSubstr;
+import org.w3c.css.selectors.attributes.AttributeSuffix;
+
+/**
+ * A CSS3 parser  
+ *
+ * @author Philippe Le Hegaret and Sijtsche Smeman
+ * @version $Revision: 1.43 $
+ */
+public abstract class CssParser {
+
+    private static char hexdigits[] = { '0', '1', '2', '3',
+					'4', '5', '6', '7', 
+					'8', '9', 'a', 'b', 
+					'c', 'd', 'e', 'f' };
+    // the current atRule
+    protected AtRule atRule;
+    protected String mediaDeclaration = "off";
+
+    /**
+     * The URL of the document
+     */  
+    protected URL url;
+    
+    protected ApplContext ac;
+
+    protected boolean incompatible_error;
+    
+    /**
+     * The current context recognized by the parser (for errors).
+     */  
+    protected Vector currentContext;
+    
+    /**
+     * The current property recognized by the parser (for errors).
+     */  
+    protected String currentProperty;
+    
+    /**
+     * <code>true</code> if the parser should recognized Aural properties, 
+     * <code>false</code> otherwise.
+     */  
+    protected boolean mode;
+
+    /**
+     * <code>true</code> if the parser had recognize a rule,
+     * <code>false</code> otherwise.
+     */  
+    protected boolean markRule;
+
+    static StringBuffer SPACE = new StringBuffer(" ");
+
+    // to be able to remove a ruleset if the selector is not valid
+    protected boolean validSelector = true;
+
+    /**
+     * The ac for handling errors and warnings.
+     * 
+     * @param ac the new ac for the parser.
+     */  
+    public final void setApplContext(ApplContext ac) {
+	this.ac = ac;
+    }
+
+    /**
+     * Set the attribute atRule
+     *
+     * @param atRule the new value for the attribute
+     */
+    public void setAtRule(AtRule atRule) {
+        this.atRule = atRule;
+    }
+
+    /**
+     * Set the attribute mediaDeclaration
+     *
+     * @param mediaDeclaration indicator if in a media expression list or not
+     */
+    public void setMediaDeclaration(String mediadeclaration) {
+        this.mediaDeclaration = mediadeclaration;
+    }
+
+    /**
+     * Returns the attribute mediaDeclaration
+     *
+     * @return the value of the attribute
+     */
+    public String getMediaDeclaration() {
+    	return mediaDeclaration;
+    }
+
+    /**
+     * Returns the attribute atRule
+     *
+     * @return the value of the attribute
+     */
+    public AtRule getAtRule() {
+        return atRule;
+    }
+
+    /**
+     * Reinitialized the parser.
+     *
+     * @param stream the stream data to parse.
+     * @param ac  the new ac to use for parsing.
+     */
+    public void ReInitWithAc(InputStream stream, ApplContext ac) {
+    	ReInit(new CommentSkipperInputStream(stream));
+	markRule = false;
+	setApplContext(ac);
+    }
+  
+    /* utilities for a parser */
+ 
+    /**
+     * Call by the import statement.
+     *
+     * @param url  The style sheet where this import statement appears.
+     * @param file the file name in the import
+     */  
+    public abstract void handleImport(URL url, String file, AtRuleMedia media);
+
+    /**
+     * Call by the at-rule statement.
+     *
+     * @param ident  The ident for this at-rule (for example: 'font-face')
+     * @param string The string associate to this at-rule
+     * @see          org.w3c.css.parser.Analyzer.Couple
+     */  
+    public abstract void handleAtRule(String ident, String string);
+
+    /* added by Sijtsche Smeman */
+    public abstract void addCharSet(String charset);
+    public abstract void newAtRule(AtRule atRule);
+    public abstract void endOfAtRule();
+    public abstract void setImportant(boolean important);
+    public abstract void setSelectorList(Vector selectors);
+    public abstract void addProperty(Vector properties);
+    public abstract void endOfRule();	
+    public abstract void removeThisRule();
+    public abstract void removeThisAtRule();
+    
+    /**
+     * Assign an expression to a property.  This function create a new property
+     * with <code>property</code> and assign to it the expression with the
+     * importance. Don't forget to set informations too.
+     * <p>
+     * A subclass must provide an implementation of this method. 
+     *
+     * @param  property  the name of the property
+     * @param  values    the expression representation of values
+     * @param  important <code>true</code> if values are important
+     *
+     * @return           <code>null</code>or a property
+     * 
+     * @see              org.w3c.css.css.CssProperty
+     */
+    public abstract CssProperty handleDeclaration(String property, 
+						  CssExpression values, 
+						  boolean important) 
+	throws InvalidParamException;
+
+    /**
+     * Adds a vector of properties to a selector.
+     * <p>
+     * A subclass must provide an implementation of this method. 
+     *
+     * @param selector     the selector
+     * @param declarations Properties to associate with contexts
+     */  
+    public abstract void handleRule(CssSelectors selector, 
+				    Vector declarations);
+
+    /*Added by Sijtsche Smeman */
+
+    /**
+     * Returns the source file of the style sheet
+     */
+    public final String getSourceFile() {
+	return getURL().toString();
+    }
+
+    /**
+     * Returns the current line in the style sheet
+     */
+    public final int getLine() {
+	//return token.beginLine;
+	return 0;
+    }
+
+    /**
+     * Set the URL of the style sheet.
+     *
+     * @param URL The URL for the style sheet
+     */
+    public final void setURL(URL url) {
+	this.url = url;
+    }
+
+    public final URL getURL() {
+	return url;
+    }
+
+    /**
+     * Return the next selector from the inputstream
+     */    
+    public CssSelectors parseSelector() throws ParseException {
+	return externalSelector();
+    }
+    
+    /*
+     * Add a value to an expression
+     */
+    private void setValue(CssValue v, CssExpression expr, 
+			  char operator, Token n, int token) 
+	throws ParseException {
+	if (n != null) {
+	    if (ac.getCssVersion().equals("css1") && 
+		(n.image).equals("inherit")) {
+		incompatible_error = true;
+	    }	
+	    String val = (operator == ' ') ? n.image : operator+n.image;
+
+	    if (n.kind == CssParserConstants.IDENT) {
+		v.set(convertIdent(val), ac);
+	    } else if (n.kind == CssParserConstants.STRING) {
+		v.set(val, ac); 
+	    } else {
+		v.set(val, ac); 
+	    }
+	}
+	expr.addValue(v);
+    }
+
+    /*
+     * Error control
+     */
+    private void addError(Exception e, String skippedText) {
+	if (Util.onDebug) {
+	    System.err.println(e.getMessage());
+	    e.printStackTrace();
+	}
+	CssParseException ex = new CssParseException(e);
+	ex.setSkippedString(skippedText);
+	ex.setProperty(currentProperty);
+	ex.setContexts(currentContext);
+	CssError error = new CssError(getSourceFile(), getLine(), ex);
+	ac.getFrame().addError(error);
+    }
+    
+    /*
+     * Error control 2
+     */
+    private void addError(Exception e, CssExpression exp) {
+	if (Util.onDebug) {
+	    System.err.println(e.getMessage());
+	    e.printStackTrace();
+	}
+	
+	//	if ((exp != null) && (exp.getCount() != 0)) {
+	CssParseException ex = new CssParseException(e);
+	ex.setExp(exp);
+	ex.setProperty(currentProperty);
+	ex.setContexts(currentContext);
+	CssError error = new CssError(getSourceFile(), getLine(), ex);
+	ac.getFrame().addError(error);
+	//	}
+    }
+}
+
+PARSER_END(CssParser)
+
+/*
+ * The tokenizer 
+ */
+
+<DEFAULT>
+SPECIAL_TOKEN :
+{
+    < COMMENT : "/*" ( ~["*"] )* ( "*" )+ ( ~["/", "*"] ( ~["*"] )* ( "*" )+ )* "/" >
+} 
+
+<DEFAULT>
+    TOKEN [IGNORE_CASE] : /* basic tokens */
+{ 
+    < #H          : ["0"-"9", "a"-"f"] > 
+  | < #NONASCII   : ["\200"-"\377"] >
+  | < #UNICODE    : "\\" <H> ( <H> )? ( <H> )? ( <H> )? ( <H> )? ( <H> )? 
+	            ( "\r\n" | [ " ", "\t" , "\n" , "\r", "\f" ] )? >
+  | < #ESCAPE     : <UNICODE> | ( "\\" ~[ "\r", "\n", "\f", "0"-"9", "a"-"f" ] ) >
+  | < #NMSTART    : [ "a"-"z", "_" ] | <NONASCII> | <ESCAPE> >
+  | < #NMCHAR     : ["a"-"z", "0"-"9", "-", "_"] | <NONASCII> | <ESCAPE> >
+  | < #STRING1    : "\"" ( ~[ "\n", "\r", "\f", "\\", "\"" ] | "\\" <NL> | <ESCAPE> )* "\"" >
+  | < #STRING2	  : "\'" ( ~[ "\n", "\r", "\f", "\\", "\'" ] | "\\" <NL> | <ESCAPE> )* "\'" >
+  | < #INVALID1   : "\"" ( ~[ "\n", "\r", "\f", "\\", "\"" ] | "\\" <NL> | <ESCAPE> )* >
+  | < #INVALID2	  : "\'" ( ~[ "\n", "\r", "\f", "\\", "\'" ] | "\\" <NL> | <ESCAPE> )* >  
+  | < #_IDENT     : ( <MINUS> )? <NMSTART> ( <NMCHAR> )* >
+  | < #NAME       : ( <NMCHAR> )+ >
+  | < #NUM        : ( ["0"-"9"] )+ | ( ["0"-"9"] )* "." ( ["0"-"9"] )+ >
+  | < #_STRING    : <STRING1> | <STRING2> >
+  | < #_INVALID   : <INVALID1> | <INVALID2> >
+  | < #_URL       : ( [ "!", "#", "$", "%", "&", "*", "+", "-"-"[", "]"-"~" ] | <NONASCII> | <ESCAPE> )* >
+  | < #_S         : ( [ " ", "\t" , "\n" , "\r", "\f" ] ) ( <COMMENT> | [ " ", "\t" , "\n" , "\r", "\f" ] )*  >
+  | < #_W         : ( <_S> )? >
+  | < #NL         : ( "\n" | "\r\n" | "\r" | "\f" ) >
+}
+/*
+ * The _S definition is not  ( [ " ", "\t" , "\n" , "\r", "\f" ] ) + as we need to add support
+ * for the unput(' ') (see http://www.w3.org/TR/CSS21/grammar.html#scanner )
+ */
+
+<DEFAULT>
+TOKEN :
+{
+  < S : ( <_S> ) >
+}
+
+<DEFAULT>
+    TOKEN :
+{
+    < CDO : "<!--" >
+  | < CDC : "-->" >
+  | < INCLUDES  : "~=" >
+  | < DASHMATCH : "|=" >
+}
+
+<DEFAULT>
+TOKEN :
+{
+  < LBRACE : <_W> "{" >
+  | < PLUS      : <_W>  "+" >
+  | < GREATER   : <_W> ">" >
+  | < COMMA     : <_W> "," >
+  | < TILDE     : <_W> "~" >
+}
+
+<DEFAULT>
+TOKEN [IGNORE_CASE] :
+{
+    < AND : "and" > 
+}  
+
+<DEFAULT>
+TOKEN :
+{
+    <STRING  : <_STRING> >
+  | <INVALID : <_INVALID> >
+  | <IDENT   : <_IDENT> >
+  | <HASH    : "#" <NAME> >
+}
+
+<DEFAULT>
+TOKEN :
+{
+  < RBRACE : "}">
+  | < PREFIXMATCH : "^=" >
+  | < SUFFIXMATCH : "$=" >
+  | < SUBSTRINGMATCH : "*=" >
+  | < EQ        : "=" >
+  | < MINUS     : "-" >
+  | < SEMICOLON : ";" >
+  | < DIV       : "/" >
+  | < LBRACKET  : "[" >
+  | < RBRACKET  : "]" >
+  | < ANY       : "*" >
+  | < DOT       : "." >
+  | < LPARAN    : ")" >
+  | < RPARAN    : "(">
+}
+
+<DEFAULT>
+    TOKEN :
+{
+    < COLON     : ":" >
+}
+
+<DEFAULT>
+TOKEN [IGNORE_CASE] :
+{
+    < MEDIARESTRICTOR : "only" | "not" >
+}
+
+<DEFAULT>
+TOKEN [IGNORE_CASE] :
+{
+  < URL         : "url(" ( <S> )* ( <STRING> | <_URL>  ) ( <S> )* ")" >
+}
+
+<DEFAULT>
+TOKEN [IGNORE_CASE] :
+{
+  < LENGTH     : <NUM> "pt" 
+                   | <NUM> "mm" 
+	           | <NUM> "cm" 
+	           | <NUM> "pc" 
+	           | <NUM> "in"
+	           | <NUM> "gd" 
+	           | <NUM> "px" >
+  | < EMS        : <NUM> "em" >
+  | < EXS        : <NUM> "ex" >
+  | < ANGLE      : <NUM> ( "deg" | "grad" | "rad" ) >
+  | < TIME       : <NUM> ( "ms" | "s" ) >
+  | < FREQ       : <NUM> "Hz" | <NUM> "kHz" >
+  | < RESOLUTION : <NUM> "dpi" | <NUM> "dpcm" >
+  | < DATE       : <NUM> "/" <NUM> "/" <NUM> >
+  | < DIMEN      : <NUM> <NMSTART> ( <NMCHAR> )* >
+  | < PERCENTAGE : <NUM> "%" >
+  | < NUMBER     : <NUM> >
+}
+
+<DEFAULT>
+TOKEN [IGNORE_CASE] :
+{  
+    < IMPORTANT_SYM : "!" ( <_W> )* "important" >
+}
+
+<DEFAULT>
+TOKEN :
+{
+    <PSEUDOCLASS_SYM : "::" >
+}
+
+/* RESERVED ATRULE WORDS */
+<DEFAULT>
+TOKEN : 
+{
+   < CHARSET_SYM           : "@charset" >
+}
+
+<DEFAULT>
+TOKEN [IGNORE_CASE] :
+{ 
+    < IMPORT_SYM            : "@import">
+  | < MEDIA_SYM             : "@media" >
+  | < PAGE_SYM              : "@page"  >
+  | < FONT_FACE_SYM         : "@font-face" >
+  | < PREF_SYM              : "@preference" >
+  | < COLOR_PROFILE         : "@color-profile" >
+  | < ATTOP	            : "@top" >
+  | < ATRIGHT               : "@right" >
+  | < ATBOTTOM              : "@bottom" >
+  | < ATLEFT                : "@left" >
+  | < ATCOUNTER             : "@counter" >
+  | < PHONETIC_ALPHABET_SYM : "@phonetic-alphabet" >
+  | < ATKEYWORD             : "@" <IDENT> >
+}
+
+<DEFAULT>
+TOKEN [IGNORE_CASE] :
+{
+    < #RANGE0 : <H> <H> <H> <H> <H> <H> > 
+  | < #RANGE1 : <H> <H> <H> <H> <H> ( "?" )? >
+  | < #RANGE2 : <H> <H> <H> <H> ( "?" )? ( "?" )? >
+  | < #RANGE3 : <H> <H> <H> ( "?" )? ( "?" )? ( "?" )? >
+  | < #RANGE4 : <H> <H> ( "?" )? ( "?" )? ( "?" )? ( "?" )? >
+  | < #RANGE5 : <H> ( "?" )? ( "?" )? ( "?" )? ( "?" )? ( "?" )? >
+  | < #RANGE6 : "?" ( "?" )? ( "?" )? ( "?" )? ( "?" )? ( "?" )? >
+  | < #RANGE  : <RANGE0> | <RANGE1> | <RANGE2> 
+                | <RANGE3> | <RANGE4> | <RANGE5> | <RANGE6> >
+  | < #UNI    : <H> ( <H> )? ( <H> )? ( <H> )? ( <H> )? ( <H> )? >
+  | < UNICODERANGE : "U+" <RANGE> | "U+" <UNI> "-" <UNI> >
+}
+
+<DEFAULT>
+    TOKEN:
+{
+    < CLASS : "." <IDENT> >
+}
+
+/* FIXED, added a spacial case for lang pseudoclass */
+<DEFAULT>
+TOKEN [IGNORE_CASE] :
+{
+    < FUNCTIONLANG : "lang(" >
+}
+
+<DEFAULT>
+    TOKEN :
+{
+    < FUNCTION : <IDENT> "(" >
+}
+
+/* Quick and dirty way to catch HTML tags starting CSS documents 
+  (common mistake) */
+<DEFAULT>
+    TOKEN:
+{
+    <HTMLSTARTTAG : "<" ( <S> )* <IDENT> ( <S> )* 
+	                ( <IDENT> "=" ( <IDENT> | <STRING> ) ( <S> )* )* 
+	            ">" >
+  | <HTMLENDTAG : "</" ( <S> )* <IDENT> ( <S> )* ">" >
+}
+
+//<DEFAULT, IN_COMMENT>
+//TOKEN :
+//{ /* avoid token manager error */
+//   < UNKNOWN : ~[] >
+//}
+
+/*
+ * The grammar of CSS2
+ */
+
+/**
+ * The main entry for the parser.
+ *
+ * @exception ParseException exception during the parse
+ */
+void parserUnit() :
+{
+    Token n = null;
+}
+{
+    try {
+	// used as an error recovery for HTML tags in CSS pages
+        ( ( n=<HTMLSTARTTAG> | n=<HTMLENDTAG> ) {
+	    addError ( new ParseException(ac.getMsg().getString("generator.dontmixhtml")), n.image); } )*
+	( charset() )?
+	    ( <S> | <CDO> | <CDC> )*
+	    ( importDeclaration() ( ignoreStatement() ) )*
+	    afterImportDeclaration()
+	 } catch (TokenMgrError err) {
+	addError (new ParseException(ac.getMsg().getString("generator.unrecognize")), err.getMessage());
+    }
+    <EOF>
+}
+
+void charset() :
+{
+    Token n = null;
+    Token charsetToken = null;
+    Token space1Token = null;
+    Token space2Token = null;
+    Token semicolonToken = null;
+    int nb_S = 0;
+}
+{  
+    try {
+	charsetToken=<CHARSET_SYM> ( space1Token=<S> { nb_S++;} )* 
+	    n=<STRING> ( space2Token=<S> )* semicolonToken=<SEMICOLON>
+	    {
+		// the @charset must be at the beginning of the document
+		if(charsetToken.beginLine != 1 || charsetToken.beginColumn != 1) {                     
+		    throw new ParseException(
+					     ac.getMsg().getString("parser.charset"));                    
+		}
+	        // stricter rule for CSS21 and soon for CSS3
+		if ("css21".equals(ac.getCssVersion())) {
+		    // single space before
+		    // case sensitive
+		    // no space before ;
+		    // no comments
+		    // string must start with "
+		    if ( (nb_S != 1) ||
+			 (!"@charset".equals(charsetToken.image)) ||
+			 (!" ".equals(space1Token.image)) || 
+			 (space2Token != null && !"".equals(space2Token.image)) ||
+			 (space1Token.specialToken != null) ||
+			 (n.specialToken != null) ||
+			 (semicolonToken.specialToken != null) ||
+			 (n.image.charAt(0) != '\"')
+			) {
+			throw new ParseException(ac.getMsg().getString(
+						     "parser.charsetspecial"));
+		    }
+		}
+		addCharSet(n.image);                    
+	    }
+    } catch (Exception e) {
+	String skip = charsetToken +
+	    ((space1Token == null) ? "" : space1Token.image) +
+	    n +
+	    ((space2Token == null) ? "" : space2Token.image) +
+	    ";";
+        addError(e, skip); 
+    }
+}
+
+/* Modified by Sijtsche Smeman, preference, colorprofile and phoneticAlphabet added for CSS3 */
+void afterImportDeclaration() :
+{String ret; }
+{
+    ( ( ruleSet() | media() | page() | fontFace() | preference() | 
+	colorprofile() | phoneticAlphabet() | ret=skipStatement() 
+	{ if ((ret == null) || (ret.length() == 0)) {
+		return; 
+	    }
+	  // quite ugly but necessary to avoid probably a lot of changes in the
+	  // grammar, still having a beatiful error message
+	    else if(ret.startsWith("@charset")) {
+		ParseException e = 
+		new ParseException(ac.getMsg().getString("parser.charset"));
+		addError(e, ret);
+	    }
+	    else {
+		ParseException e = 
+		    new ParseException(ac.getMsg().getString("generator.unrecognize"));
+		addError(e, ret);
+	    }
+	}
+	) ignoreStatement() )*
+}
+
+void ignoreStatement() :
+{}
+{
+    ( ( <CDO> | <CDC> | atRuleDeclaration() ) ( <S> )* )*
+}
+
+/**
+ * The import statement
+ *
+ * @exception ParseException exception during the parse
+ */
+void importDeclaration() :
+{Token n;
+    AtRuleMedia media = new AtRuleMedia();
+    CssValue val; 
+    String importFile;
+}
+{
+    try {
+	<IMPORT_SYM> ( <S> )*
+	    ( n=<STRING> {
+		importFile = n.image.substring(1, n.image.length() -1);
+	    } 
+	      | n=<URL> {
+		val = new CssURL(); 
+		((CssURL) val).set(n.image, ac, url);
+		importFile = (String) val.get();
+		if ((importFile.charAt(0) == '"')
+		    || (importFile.charAt(0) == '\'')) {
+		    importFile = importFile.substring(1, importFile.length()-1);
+		}
+	    } 
+	    )
+	    ( <S> )*
+	    ( medium(media) 
+	      ( <COMMA> ( <S> )* medium(media) 
+		)* )? <SEMICOLON> 
+	    ( <S> )*
+	    { 
+		handleImport(getURL(), importFile, media);
+	    } 
+    } catch (ParseException e) {
+	addError(e, skipStatement()); 
+    }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+void media() :
+{
+    AtRule old = getAtRule();
+    AtRuleMedia newRule = new AtRuleMedia();
+    setAtRule(newRule);
+    Token n;
+    CssProperty p = null;
+}
+{
+    try {
+	<MEDIA_SYM> ( <S> )*
+            // <CSS3>
+	    (n=<MEDIARESTRICTOR> { newRule.addMediaRestrictor(convertIdent(n.image), ac); } ( <S> )+)? 
+	    medium(newRule) 
+            // </CSS3>
+	    ( <COMMA> ( <S> )* medium(newRule) )* 
+            // <CSS3>
+	    (<AND> ( <S> )* <RPARAN> ( <S> )* p=mediadeclaration() { newRule.addMediaFeature(p); } <LPARAN> ( <S> )* )*
+            // </CSS3>
+   
+	    {
+		String media = getAtRule().toString();
+		if (ac.getMedium() != null && 
+		    !(media.equals(ac.getMedium())) &&
+		    !(ac.getMedium().equals("all"))) {
+		 
+		    ac.getFrame().addWarning("noothermedium", 
+					     getAtRule().toString());
+		}
+		if (ac.getCssVersion().equals("css1")) {
+		    skipStatement();
+		    addError(new InvalidParamException("noatruleyet", "", ac),
+			     getAtRule().toString());
+		}
+		if (!ac.getCssVersion().equals("css1")) {
+		    newAtRule(getAtRule());	
+		}
+	    }
+	<LBRACE> ( <S> )* ( ruleSet() )* <RBRACE> ( <S> )*
+	     {
+		 if (!ac.getCssVersion().equals("css1")) {
+		     endOfAtRule();
+		 }
+	     }
+    } catch (ParseException e) {
+	if (!ac.getCssVersion().equals("css1")) {
+	    addError(e, skipStatement()); 
+	}
+    } finally {
+	setAtRule(old);
+    }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+void medium(AtRuleMedia media) : /* tv, projection, screen, ... */
+{Token n;}
+{
+    n=<IDENT> ( <S> )*
+    {
+	try {
+	    media.addMedia(convertIdent(n.image), ac); 
+	} catch (InvalidParamException e) {
+	    CssError error = new CssError(getSourceFile(), getLine(), e);
+	    ac.getFrame().addError(error);	
+	}
+    }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+void page() :
+{
+    Vector       v                              ;
+    Token        n        = null                ;
+    Vector       collectv = new Vector()        ;
+    CssSelectors s        = new CssSelectors(ac);
+    AtRule       old      = getAtRule()         ;
+    AtRulePage   newRule  = new AtRulePage()    ;
+    setAtRule(newRule);
+    s.setAtRule(getAtRule());
+}
+{
+    try {
+	<PAGE_SYM> ( <S> )*
+            // FIXME <CSS3> ?
+            ( n=<IDENT> { newRule.setIdent(convertIdent(n.image)); } 
+	      ( <S> )* )?
+            // </CSS3>
+	    ( pseudo_page(newRule) )? <LBRACE> ( <S> )* ( v=pageContent() 
+		{ 
+		    collectv = v;
+		}
+							  ) <RBRACE> ( <S> )*
+	    {
+		if (!ac.getCssVersion().equals("css1")) {
+		    newAtRule(getAtRule());
+		}
+
+		if (!ac.getCssVersion().equals("css1")) {
+		    addProperty(collectv);
+		    endOfRule();
+		    endOfAtRule();
+		}
+		if (v == null) {
+		    ac.getFrame().addWarning("no-declaration");
+		} else {
+		    handleRule(s, collectv);
+		}
+	    }
+    } catch (InvalidParamException ie) {
+	if (!ac.getCssVersion().equals("css1")) {
+	    skipStatement();
+	    removeThisAtRule();
+	    ac.getFrame().addError(new CssError(ie));
+	}
+    } catch (ParseException e) {
+	if (!ac.getCssVersion().equals("css1")) {
+	    removeThisAtRule();
+	    addError(e, skipStatement()); 
+	}
+    } finally {
+	setAtRule(old);
+    }
+}
+
+Vector pageContent() :
+{ CssProperty prop;
+    Vector v = new Vector();
+}
+{
+    // <CSS3> ?? FIXME
+    v=prefAtRule() { return v;}
+    // </CSS3>
+    |
+    v=declarations() { return v;} /* FIXME moved here as it can match empty string */
+}
+
+Vector prefAtRule() :
+{ Token n; 
+    Vector v;
+}
+{
+    try {
+        (n=<ATTOP> | n=<ATBOTTOM> | n=<ATLEFT> | n=<ATRIGHT> ) ( <S> )*
+	    <LBRACE> ( <S> )* v=declarations() <RBRACE> ( <S> )* 
+	    {
+		return v;
+	    }
+    } catch (ParseException e) {
+	addError(e, skipStatement());
+    }
+}
+
+void pseudo_page(AtRulePage page) :
+{ Token n; }
+{
+    ":" n=<IDENT> ( <S> )*
+    { 
+	try {
+	    page.setName(":" + convertIdent(n.image), ac); 
+	} catch (InvalidParamException e) {
+	    throw new InvalidParamException("pseudo", n.image, ac );
+	    /*CssError error = new CssError(getSourceFile(), getLine(), e);
+	      ac.getFrame().addError(error);	*/
+	}
+    }
+}
+
+void fontFace() :
+{
+    Vector v;
+    AtRule old = getAtRule();
+    setAtRule(new AtRuleFontFace());
+    CssSelectors s = new CssSelectors(ac);
+    s.setAtRule(getAtRule());
+}
+{
+    try {
+	<FONT_FACE_SYM> ( <S> )* 
+	    {
+		if (ac.getCssVersion().equals("css1")) {
+		    skipStatement();
+		    addError(new InvalidParamException("noatruleyet", "", ac),
+			     getAtRule().toString());
+		}
+		if (!ac.getCssVersion().equals("css1")) {
+		    newAtRule(getAtRule());	
+		}
+
+	    }
+	<LBRACE> ( <S> )* v=declarations() <RBRACE> ( <S> )*
+	     {
+		 if (!ac.getCssVersion().equals("css1")) {
+		     addProperty(v);
+		     endOfRule();
+		     endOfAtRule();
+		 }
+		 if (v == null) {
+		     ac.getFrame().addWarning("no-declaration");
+		 } else {
+		     handleRule(s, v);
+		 }
+	     }
+    } catch (ParseException e) {
+	if (!ac.getCssVersion().equals("css1")) {
+	    addError(e, skipStatement()); 
+        }
+    } finally {
+	setAtRule(old);
+    }
+}
+
+void colorprofile() :
+{
+    Vector v;
+    AtRule old = getAtRule();
+    setAtRule(new AtRuleColorProfile());
+    CssSelectors s = new CssSelectors(ac);
+    s.setAtRule(getAtRule());
+}
+{
+    try {
+	<COLOR_PROFILE> ( <S> )*
+	    {
+		if (!ac.getCssVersion().equals("svg")) {
+		    skipStatement();
+		    addError(new InvalidParamException("onlysvg", "", ac),
+			     getAtRule().toString());
+		}
+		if (ac.getCssVersion().equals("svg")) {
+		    newAtRule(getAtRule());	
+		}
+
+	    }
+	<LBRACE> ( <S> )* v=declarations() <RBRACE> ( <S> )*
+	     {
+		 if (ac.getCssVersion().equals("svg")) {
+		     addProperty(v);
+		     endOfRule();
+		     endOfAtRule();
+		 }
+
+		 if (v == null) {
+		     //ac.getFrame().addWarning("medialist");
+		 } else {
+		     handleRule(s, v);  
+		 }
+	     }
+    }
+    catch (ParseException e) {
+	if (ac.getCssVersion().equals("svg")) {
+            addError(e, skipStatement());
+	}
+    } finally {
+	setAtRule(old);
+    }
+}
+
+
+void preference() :
+{
+    Vector v;
+    AtRule old = getAtRule();
+    setAtRule(new AtRulePreference());
+    CssSelectors s = new CssSelectors(ac);
+    s.setAtRule(getAtRule());
+}
+{
+    try {
+	<PREF_SYM> ( <S> )*
+	    {
+		if (ac.getCssVersion().equals("css1")) {
+		    skipStatement();
+		    addError(new InvalidParamException("noatruleyet", "", ac),
+			     getAtRule().toString());
+		}
+		if (!ac.getCssVersion().equals("css1")) {
+		    newAtRule(getAtRule());	
+		}
+
+	    }
+	<LBRACE> ( <S> )* v=declarations() <RBRACE> ( <S> )*
+	     {
+		 if (!ac.getCssVersion().equals("css1")) {
+		     addProperty(v);
+		     endOfRule();
+		     endOfAtRule();
+		 }
+
+		 if (v == null) {
+		     ac.getFrame().addWarning("medialist");
+		 } else {
+		     handleRule(s, v);  
+		 }
+	     }
+    }
+    catch (ParseException e) {
+	if (!ac.getCssVersion().equals("css1")) {
+            addError(e, skipStatement());
+	}
+    } finally {
+	setAtRule(old);
+    }
+}
+
+void phoneticAlphabet() :
+{
+    Vector v;
+    AtRule old = getAtRule();
+    AtRulePhoneticAlphabet alphabetrule = new AtRulePhoneticAlphabet();
+    setAtRule(alphabetrule);
+    Token n;
+}
+{
+    try {
+	<PHONETIC_ALPHABET_SYM> ( <S> )* n=<STRING> ( <S> )* ";"
+	    {
+		if (!ac.getCssVersion().equals("css3")) {
+		    skipStatement();
+		    addError(new InvalidParamException("noatruleyet", "", ac),
+			     getAtRule().toString());
+		}
+
+		alphabetrule.addAlphabet(convertIdent(n.image), ac);
+
+		if (!ac.getCssVersion().equals("css1") && !ac.getCssVersion().equals("css2")) {
+		    newAtRule(getAtRule());	
+		}
+        
+	    }
+    } catch (ParseException e) {
+	if (!ac.getCssVersion().equals("css1")) {
+	    addError(e, skipStatement()); 
+        }
+    } finally {
+	setAtRule(old);
+    }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+void atRuleDeclaration() :
+{Token n;}
+{
+    n=<ATKEYWORD>
+	{
+	    //ac.getFrame().addWarning("at-rule", token.toString());
+	    ac.getFrame().addError(
+		          new CssError(new InvalidParamException("at-rule", 
+								 token, ac)));
+	    skipStatement();
+	}
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+void operator(CssExpression expr) :
+{}
+{
+  ( ( <DIV> { if (expr.getCount() > 0) expr.setOperator('/'); }
+    | <COMMA> { if (expr.getCount() > 0) expr.setOperator(','); }
+    ) ( <S> )* )?
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+char combinator() :
+{
+    char connector = ' ';
+}
+{
+    ( (   <PLUS> { connector = '+' ; }
+        | <GREATER> { connector = '>' ; }
+        | <TILDE> { connector = '~' ; }
+      ) ( <S> )* 
+    | ( <S> )+ { connector = ' ' ; }
+    )
+    {
+	return connector;
+    }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+char unaryOperator() :
+{}
+{
+    // FIXME <MINUS> | <PLUS> ? warning as <PLUS> is <_W>? "+"
+    "-" { return '-'; }
+    | <PLUS> { return '+'; }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+String property() :
+{Token n; }
+{
+    n=<IDENT> ( <S> )* { currentProperty = convertIdent(n.image); 
+			 return currentProperty; }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+void ruleSet() :
+{ CssSelectors contextual;
+    Vector<CssSelectors> context_set = new Vector<CssSelectors>();
+    Vector<CssProperty> value_set = null;
+    currentContext = context_set;
+}
+{
+    try {
+	contextual=selector()
+	    { 
+		if (contextual != null) {
+		    context_set.addElement(contextual); 
+		}
+	    }
+	
+	( <COMMA> ( <S> )*
+	  contextual=selector()
+	    { 
+		if (contextual != null) {
+		    context_set.addElement(contextual); 
+		}
+	    }  
+	  )*
+	    <LBRACE> ( <S> )*
+	    value_set=declarations()
+	    <RBRACE> ( <S> )*
+	    {
+		markRule = true;
+		
+		/*      if (value_set == null) {
+			ac.getFrame().addWarning("no-declaration");
+			} else {*/
+		if (value_set != null) {
+		    boolean first = true;
+		    CssSelectors sel = null;
+		    Enumeration<CssSelectors> e = context_set.elements();
+		    while (e.hasMoreElements()) {
+			sel = e.nextElement();
+			if (first) {
+			    handleRule(sel, value_set);
+			    first = false;
+			} else {
+			    // we need to duplicate properties in that case
+			    // as property holds reference to the selectors and it interact
+			    // badly with conflict detection
+			    int vsize = value_set.size();
+			    Vector<CssProperty> v = new Vector<CssProperty>(vsize);
+			    for (int i=0; i<vsize; i++) {
+				v.addElement(value_set.elementAt(i).duplicate());
+			    }
+			    handleRule(sel, v);
+			}
+		    }
+		    setSelectorList(context_set);
+		    endOfRule();
+		}
+		currentContext = null;
+	    }
+    } catch (ParseException e) {
+	if (ac.getProfile() != null) {
+	    if (!ac.getProfile().equals("mobile") && !context_set.isEmpty()) {
+		addError(e, skipStatement()); 
+	    }
+	}
+    } catch (TokenMgrError e) {
+	addError(new ParseException(e.getMessage()), skipStatement());
+    }
+}
+
+Vector<CssProperty> declarations() :
+{
+    if(!validSelector) {        
+        validSelector = true;
+        skip_to_matching_brace();
+        return null;
+    }
+
+    CssProperty values;
+    Vector<CssProperty> value_set   = new Vector<CssProperty>();
+    boolean wrong_value = true;
+}
+{    
+    ( values=declaration() 
+	{ if (values != null) {
+		value_set.addElement(values);
+		wrong_value = false;
+	    } /* else {
+		 wrong_value = true;
+		 } */
+	  currentProperty = null;
+	}
+      )? 
+	( ";" ( <S> )*
+	  ( values=declaration() 
+	      { if (values != null) {
+		      value_set.addElement(values);
+		      wrong_value = false;
+		  }/* else {
+		      wrong_value = true;
+		      }*/
+		currentProperty = null;
+	      }
+	      )? )* 
+	{  	
+	    if (!wrong_value) {
+		addProperty(value_set);
+		return value_set; 
+	    } else {
+		return null;
+	    }
+	}
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+CssSelectors selector() :
+{   char comb;
+    CssSelectors current; }
+{
+    try {
+	current=simple_selector(null) 
+	    (  
+	      comb=combinator() { 
+		if (ac.getProfile() != null) {
+		    if (ac.getProfile().equals("mobile") || 
+			getAtRule().toString().equals("@media atsc-tv") ||
+			ac.getCssVersion().equals("css1")) {
+			if (comb == '+')
+			    throw new InvalidParamException("nocomb", "+", ac);
+			if (comb == '>')
+			    throw new InvalidParamException("nocomb", ">", ac);
+		    } else if (ac.getProfile().equals("tv")) {
+			if (comb == '+')
+			    throw new InvalidParamException("nocomb", "+", ac);
+		   
+		    }
+		}
+		if (!ac.getCssVersion().equals("css3")) {
+		    if (comb == '~') {
+			throw new InvalidParamException("nocomb", "~", ac);
+		    }
+		}
+		switch(comb) {
+		case '+': 
+		current.addAdjacent(new AdjacentSelector());
+		break;
+		case '>':
+		current.addChild(new ChildSelector());
+		break;
+		default:
+		current.addDescendant(new DescendantSelector());
+		}                  
+		//current.setConnector(comb); 
+	    }
+	      current=simple_selector(current) 
+	      )* 
+	    { return current; }
+    }
+    catch (InvalidParamException ie) {    
+	skipStatement();
+	removeThisRule();
+	ac.getFrame().addError(new CssError(ie));
+	
+	return null;
+    }
+    catch (ParseException e) {
+        validSelector = false;
+	if (ac.getProfile() != null) {
+	    if(!(ac.getProfile().equals("mobile"))) {
+		Token t = getToken(1);
+		StringBuffer s = new StringBuffer();
+		s.append(getToken(0).image);
+		while ((t.kind != COMMA) && (t.kind != LBRACE) && (t.kind != EOF)) {
+		    s.append(t.image);
+		    getNextToken();
+		    t = getToken(1);
+		}
+
+		addError(e, s.toString());
+     
+		return null;
+	    }
+	} else {
+	    Token t = getToken(1);
+	    StringBuffer s = new StringBuffer();
+	    s.append(getToken(0).image);
+	    while ((t.kind != COMMA) && (t.kind != LBRACE) && (t.kind != EOF)) {
+		s.append(t.image);
+		getNextToken();
+		t = getToken(1);
+	    }
+
+	    addError(e, s.toString());
+     
+	    return null;    	
+	}
+    }
+}
+
+/**
+ * I made this rule to parse a selector from a document. Combinator are avoid.
+ * @exception ParseException exception during the parse
+ */
+CssSelectors externalSelector() :
+{
+    CssSelectors current; }
+{
+    current=simple_selector(null) 
+	( ( <S> )+
+	  current=simple_selector(current) 
+	  )*
+	{ return current; }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+CssSelectors simple_selector(CssSelectors next) :
+{ CssSelectors selector = new CssSelectors(ac, next);
+    selector.setAtRule(getAtRule());
+    //selector.setUserMedium(getUserMedium());
+}
+{
+    element_name(selector) ( hash(selector) | _class(selector)
+			     | attrib(selector) | pseudo(selector) )*
+	{   
+	    return selector;
+	}
+    | ( hash(selector) | _class(selector) | attrib(selector) 
+	| pseudo(selector) )+ 
+	{
+	    return selector;
+	}
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+void _class(CssSelectors s) :
+{Token n; }
+{
+    /*  "." n=<IDENT> { */
+    n=<CLASS> {
+	try {
+	    s.addClass(new ClassSelector(convertClassIdent(n.image.substring(1))));
+	    //        s.addAttribute("class", convertIdent(n.image.substring(1)),
+	    //           CssSelectors.ATTRIBUTE_CLASS_SEL);
+	} catch (InvalidParamException e) {
+	    removeThisRule();
+	    ac.getFrame().addError(new CssError(e));
+	}
+    } 
+    /* FIXME <DOT> n=deprecated_class() ... ?? (DONE-> to be tested) */ 
+    | <DOT> n=deprecated_class() {
+	if (n.image.charAt(0) == '.') {
+	    n.image = n.image.substring(1);
+          
+	    // the class with the first digit escaped
+	    String cl = "\\" + Integer.toString(n.image.charAt(0), 16);
+	    cl += n.image.substring(1);
+          
+	    String profile = ac.getProfile();
+	    if(profile == null || profile.equals("") || profile.equals("none")) {
+		profile = ac.getCssVersion(); 
+	    }     
+          
+	    if(!profile.equals("css1")) {
+		addError(new ParseException(ac.getMsg().getString(
+								  "parser.old_class")),
+			 "To make \"." + n.image + "\" a valid class, CSS2" +
+			 " requires the first digit to be escaped " +
+			 "(\"." + cl + "\")");
+		s.addClass(new ClassSelector(n.image));                            
+		removeThisRule();              
+	    }
+	    else {
+		CssLength length = new CssLength();
+		boolean isLength = false;
+		try {              
+		    length.set(n.image, ac);
+		    isLength = true;               
+		}
+		catch(Exception e) {
+		    isLength = false;              
+		}
+		if(isLength) {
+		    addError(new ParseException(ac.getMsg().getString(
+								      "parser.class_dim")), n.image);
+		    s.addClass(new ClassSelector(n.image));                            
+		    removeThisRule();
+		}        
+		else {
+		    try {
+			// for css > 1, we add the rule to have a context, 
+			// and we then remove it
+			s.addClass(new ClassSelector(n.image));                      	          	  
+        	      
+			ac.getFrame().addWarning("old_class");              
+		    } catch (InvalidParamException e) {
+			ac.getFrame().addError(new CssError(e));
+			removeThisRule();
+		    }
+		}
+	    }
+	} else {
+	    throw new ParseException("Unrecognized ");
+	}
+    }
+}
+
+Token deprecated_class() :
+{
+    Token n;
+}
+{
+    ( n=<LENGTH>
+    | n=<EMS> 
+    | n=<EXS> 
+    | n=<ANGLE>
+    | n=<TIME> 
+    | n=<FREQ> 
+    | n=<RESOLUTION>
+    | n=<DIMEN> )
+    { 
+	return n;
+    }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+void element_name(CssSelectors s) :
+{Token n; }
+{
+    n=<IDENT> { //              s.setElement(convertIdent(n.image), ac);
+	s.addType(new TypeSelector(convertIdent(n.image)));}
+    | <ANY> { 
+        if (!ac.getCssVersion().equals("css1")) {
+	    //          s.setElement(null);
+            s.addUniversal(new UniversalSelector());
+        } else {
+	    ac.getFrame().addError(new CssError(new InvalidParamException("notversion",
+									  "*", ac.getCssVersion(), ac)));
+	}
+    }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+void attrib(CssSelectors s) :
+{
+    Token att = null;
+    Token val = null;
+    int selectorType = CssSelectors.ATTRIBUTE_ANY;
+}
+{
+    <LBRACKET> ( <S> )* att=<IDENT> ( <S> )*
+	( (<EQ> { selectorType = CssSelectors.ATTRIBUTE_EXACT; }
+        | <INCLUDES> { selectorType = CssSelectors.ATTRIBUTE_ONE_OF; }
+	| <DASHMATCH> { selectorType = CssSelectors.ATTRIBUTE_BEGIN; }
+	| <PREFIXMATCH> { selectorType = CssSelectors.ATTRIBUTE_START; }
+	| <SUFFIXMATCH> { selectorType = CssSelectors.ATTRIBUTE_SUFFIX; }
+	| <SUBSTRINGMATCH> { selectorType = CssSelectors.ATTRIBUTE_SUBSTR; }
+	 ) ( <S> )* 
+	 ( val=<IDENT> 
+	     { val.image = convertIdent(val.image); }
+	   | ( val=<STRING> 
+	       { val.image = convertStringIndex(val.image, 1, val.image.length() -1, false);} 
+			   ) 
+	   ( <S> )* ) )?
+  <RBRACKET>
+      {
+	  if (selectorType == CssSelectors.ATTRIBUTE_ANY) {
+	      try {
+		  s.addAttribute(new AttributeAny(att.image.toLowerCase()));
+//                s.addAttribute(att.image.toLowerCase(), null, selectorType);
+              } catch (InvalidParamException e) {
+	          removeThisRule();
+	          ac.getFrame().addError(new CssError(e));
+              }
+	  } else {
+	      AttributeSelector attribute;
+              switch(selectorType) {
+              case CssSelectors.ATTRIBUTE_BEGIN:
+        	  attribute = new AttributeBegin(att.image.toLowerCase(),
+        		  val.image);
+        	  break;
+              case CssSelectors.ATTRIBUTE_EXACT:
+        	  attribute = new AttributeExact(att.image.toLowerCase(),
+        		  val.image);
+        	  break;
+              case CssSelectors.ATTRIBUTE_ONE_OF:
+        	  attribute = new AttributeOneOf(att.image.toLowerCase(),
+        		  val.image);
+        	  break;
+              case CssSelectors.ATTRIBUTE_START:
+        	  attribute = new AttributeStart(att.image.toLowerCase(),
+        		  val.image);
+        	  break;
+              case CssSelectors.ATTRIBUTE_SUBSTR:
+        	  attribute = new AttributeSubstr(att.image.toLowerCase(),
+        		  val.image);
+        	  break;
+              case CssSelectors.ATTRIBUTE_SUFFIX:
+        	  attribute = new AttributeSuffix(att.image.toLowerCase(),
+        		  val.image);
+        	  break;
+              default:
+        	  attribute = new AttributeExact(att.image.toLowerCase(),
+        		  val.image);
+              	  break;
+              }
+	      try {
+		  s.addAttribute(attribute);
+//	      	  s.addAttribute(att.image.toLowerCase(), val.image, 
+//			     selectorType);
+	      } catch (InvalidParamException e) {
+	     	  removeThisRule();
+	          ac.getFrame().addError(new CssError(e));
+      	      }
+	  }
+      }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+void pseudo(CssSelectors s) :
+{Token n;
+Token language = null;
+CssSelectors param = null;
+}
+{
+  <PSEUDOCLASS_SYM> ( ( n=<IDENT>
+	  { 
+		try {
+			if (ac.getCssVersion().equals("css3")) {
+				s.addPseudo(convertIdent(n.image).toLowerCase());
+			} else {
+			 	throw new InvalidParamException("pseudo-element", ":" + convertIdent(n.image).toLowerCase() ,
+			 		ac.getCssVersion() ,ac);
+			}
+		} catch(InvalidParamException e) {
+		     //e.printStackTrace();	
+		     removeThisRule();
+		     ac.getFrame().addError(new CssError(e));
+		}
+	  } ) )
+	|  
+  <COLON> ( ( n=<IDENT>
+	  { 
+		try {
+		     s.addPseudo(convertIdent(n.image).toLowerCase());
+		} catch(InvalidParamException e) {
+		     //e.printStackTrace();	
+		     removeThisRule();
+		     ac.getFrame().addError(new CssError(e));
+		}
+	  } )
+	// FXIXME rewrite to make :lang( use a special case
+	| ( ( n=<FUNCTIONLANG> ( <S> )* (language=<NUMBER> | language=<IDENT> | language=<STRING> ) ) {
+		try {
+		    s.setPseudoFun(convertStringIndex(n.image, 0,
+						      n.image.length() -1, false).toLowerCase(),
+				   convertIdent(language.image));
+		} catch(InvalidParamException e) {
+			removeThisRule();
+			ac.getFrame().addError(new CssError(e));
+		}
+	    }
+	    | ( n=<FUNCTION> ( <S> )* param=simple_selector(null) ) {
+		try {
+		    s.setPseudoFun(convertStringIndex(n.image, 0,
+						      n.image.length() -1, false).toLowerCase(),
+				   param.toString());
+		} catch(InvalidParamException e) {
+		    removeThisRule();
+		    ac.getFrame().addError(new CssError(e));
+		} 
+	    }
+	    ) ( <S> )* <LPARAN>
+	    )
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+void hash(CssSelectors s) :
+{Token n; }
+{
+  n=<HASH>  {
+      n.image = n.image.substring(1);
+      if(Character.isDigit(n.image.charAt(0))) { 
+	  String profile = ac.getProfile();
+	  if(profile == null || profile.equals("") || profile.equals("none")) {
+	      profile = ac.getCssVersion(); 
+	  }     
+	  
+	  if(!profile.equals("css1")) {
+	      // the id with the first digit escaped
+	      String cl = "\\" + Integer.toString(n.image.charAt(0), 16);
+	      cl += n.image.substring(1);
+	      
+	      addError(new ParseException(ac.getMsg().getString(
+	      	"parser.old_id")),
+	      	"To make \"." + n.image + "\" a valid id, CSS2" +
+	      	" requires the first digit to be escaped " +
+	      	"(\"#" + cl + "\")");
+	      // for css > 1, we add the rule to have a context, 
+	      // and we then remove it
+	      s.addId(new IdSelector(n.image));                            
+	      removeThisRule();              
+	  }
+	  else {
+	      CssLength length = new CssLength();
+	      boolean isLength = false;
+	      try {              
+		  length.set(n.image, ac);
+		  isLength = true;               
+	      }
+	      catch(Exception e) {
+		  isLength = false;              
+	      }
+	      if(isLength) {
+		  addError(new ParseException(ac.getMsg().getString(
+		  "parser.id_dim")), n.image);
+		  // we add the rule to have a context, and then we remove it
+		  s.addId(new IdSelector(n.image));                            
+		  removeThisRule();
+	      }        
+	      else {
+		  try {
+		      s.addId(new IdSelector(n.image));      
+		      ac.getFrame().addWarning("old_id");              
+		  } catch (InvalidParamException e) {
+		      ac.getFrame().addError(new CssError(e));
+		      removeThisRule();
+		  }
+	      }
+	  }
+      }
+      else {
+	  try {
+	      s.addId(new IdSelector(n.image));             
+	  } catch (InvalidParamException e) {
+	      ac.getFrame().addError(new CssError(e));
+	      removeThisRule();
+	  }
+      }
+  }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+CssProperty mediadeclaration() :
+{ String string_property;
+  CssExpression values = null;
+  boolean important = false;
+  setMediaDeclaration("on");
+}
+{
+try {
+      string_property=property() (":" ( <S> )* 
+      values=expr() ( important=prio() )? )?
+    {
+	
+	try {
+	
+	    setImportant(important);
+	
+	    if (incompatible_error) {
+		throw new InvalidParamException("notforcss1", "inherit", ac);
+	    }
+
+	    CssProperty p = handleDeclaration(string_property.toLowerCase(),
+						  values, important);
+	    return p;
+	    	    
+	} catch (InvalidParamException e) {
+		incompatible_error = false;
+		if (null != values) {
+			values.starts();
+		}
+		addError(e, (CssExpression) values);
+	}
+	return null;
+    }
+ } catch (NumberFormatException e) {
+     skipAfterExpression(e);
+     return null;
+ } catch (ParseException e) {
+     skipAfterExpression(e);
+     return null;
+ } finally {
+     setMediaDeclaration("off");
+ }
+}
+
+
+/**
+ * @exception ParseException exception during the parse
+ */
+CssProperty declaration() :
+{ String string_property;
+  CssExpression values;
+  boolean important = false;
+}
+{
+try {
+     string_property=property() ":" ( <S> )* 
+      values=expr() ( important=prio() )?
+    {
+	try {
+	
+	    setImportant(important);
+	
+	    if (incompatible_error) {
+		throw new InvalidParamException("notforcss1", "inherit", ac);
+	    }
+
+	    if (values.getCount() != 0) {
+		CssProperty p = handleDeclaration(string_property.toLowerCase(),
+						  values, important);
+		// Did the property recognize all values in the expression ?
+
+		if (!values.end() && ac.getMedium() == null) {
+		        addError(new InvalidParamException("unrecognize", "", ac),
+			     values);
+		} else {
+		    // ok, return the new property
+		    return p;
+		}
+	    }
+	} catch (InvalidParamException e) {
+		incompatible_error = false;
+		values.starts();
+		addError(e, (CssExpression) values);
+	}
+	return null;
+    }
+ } catch (NumberFormatException e) {
+     skipAfterExpression(e);
+     return null;
+ } catch (ParseException e) {
+     skipAfterExpression(e);
+     return null;
+ } catch (NullPointerException e) {
+	// NullPointerException happen if in handling a property
+	// something bad happen (like setting values on sub properties
+	// that had not been initialized (for an unknown reason yet).
+     skipAfterExpression(e);
+     return null;
+  }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+boolean prio() :
+{}
+{
+  <IMPORTANT_SYM> ( <S> )* { return true; }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+CssExpression expr() :
+{
+  CssExpression values = new CssExpression();
+}
+{
+  term(values) ( operator(values) term(values) )*
+  { return values; }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+void term(CssExpression exp) :
+{ Token n;
+  char operator = ' ';
+  CssValue func;
+}
+{
+  ( ( operator=unaryOperator() )?
+    ( n=<NUMBER> { setValue(new CssNumber(), exp, operator, n, NUMBER); }
+    | n=<PERCENTAGE> { setValue(new CssPercentage(), exp, operator, n, 
+				PERCENTAGE); }
+    | n=<LENGTH> { setValue(new CssLength(), exp, operator, n, LENGTH); }
+    | n=<EMS> { setValue(new CssLength(), exp, operator, n, EMS); }
+    | n=<EXS> { setValue(new CssLength(), exp, operator, n, EXS); }
+    | n=<ANGLE> { setValue(new CssAngle(), exp, operator, n, ANGLE);}
+    | n=<TIME> { setValue(new CssTime(), exp, operator, n, TIME); }
+    | n=<FREQ> { setValue(new CssFrequency(), exp, operator, n, FREQ); }
+    | n=<RESOLUTION> { setValue(new CssResolution(), exp, operator, n, RESOLUTION); }
+    | n=<DATE> { setValue(new CssDate(), exp, operator, n, DATE); }
+    | n=<DIMEN> {  
+	  addError(new ParseException(ac.getMsg().getString("parser.unknown-dimension")), n.image); }    
+    | func=function() { setValue(func, exp, operator, null, FUNCTION); }
+      ) ( <S> )* )
+  | (( n=<STRING> { setValue(new CssString(), exp, operator, n, STRING); }
+    | n=<IDENT> 
+    {
+	/*
+	 * Common error :
+	 * H1 {
+	 *   color : black
+	 *   background : white
+	 * }
+	 */
+	Token t = getToken(1);
+	Token semicolon = new Token();
+	semicolon.kind = SEMICOLON;
+	semicolon.image = ";";
+	if (t.kind == COLON) {
+	    /* @@SEEME. (generate a warning?) */
+	    /* @@SEEME if expression is a single ident, 
+	       generate an error ? */
+	    addError(new ParseException(ac.getMsg().getString("parser.semi-colon")),
+		     (CssExpression) null);
+	    rejectToken(semicolon);
+	} else {
+	    setValue(new CssIdent(), exp, operator, n, IDENT);
+	}
+    }
+    | hexcolor(exp)
+    | n=<URL> { 
+	CssURL _u = new CssURL();
+	_u.set(n.image, ac, url);
+	exp.addValue(_u);
+      }
+    | n=<UNICODERANGE> { setValue(new CssUnicodeRange(), exp, operator, n, 
+				UNICODERANGE); }
+    ) ( <S> )* )
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+CssValue function() :
+{Token n;
+ CssExpression exp;
+ org.w3c.css.values.CssColor color = new org.w3c.css.values.CssColor();
+ org.w3c.css.values.ATSCColor colorATSC = new org.w3c.css.values.ATSCColor();
+}
+{
+    n=<FUNCTION> ( <S> )* exp=expr() 
+    ")" { 
+
+	if (n.image.toLowerCase().equals("rgb(")) {
+	    if (!getAtRule().toString().equals("@media atsc-tv")) {
+	       color.setRGBColor(exp, ac);
+	       return color;
+            } else {
+	       colorATSC.setRGBColor(exp, ac);
+	       return colorATSC;
+            }
+	} else if (n.image.toLowerCase().equals("atsc-rgba(")) {
+	    if (getAtRule().toString().equals("@media atsc-tv")) {
+	        colorATSC.setATSCrgba(exp, ac);
+	        return colorATSC;
+	    } else {
+		addError(new InvalidParamException("onlyATSC", "", ac),
+						 getAtRule().toString());
+	        return null;
+	    }
+	} else {
+	    CssFunction f = new CssFunction();
+	    f.set(n.image.substring(0, n.image.length() - 1),
+		  exp);
+	    return f;
+	}
+    }
+}
+
+/**
+ * @exception ParseException exception during the parse
+ */
+void hexcolor(CssExpression exp) :
+{Token n; 
+}
+{
+ n=<HASH> { n.image = Util.strip(n.image);
+ setValue(new org.w3c.css.values.CssColor(), exp, ' ', n, HASH); }
+}
+
+/*
+ * @@SEEME EOF
+ */
+
+JAVACODE
+String skipStatement() {
+    StringBuffer s = new StringBuffer();
+    Token tok = getToken(0);
+    boolean first = true;
+
+    if (tok.image != null) {
+	s.append(tok.image);	
+    }
+    /* FIXME here, two option, we skip during an error, or outside
+       an error, currently both can fail with a TokenMgrError, should
+       we catch all, or only when filling message for errors? 
+       
+       -> taking the "always skip" approach.
+    */
+    while (true) {
+	try {
+	    tok = getToken(1);
+	    if (tok.kind == EOF) {
+		if (first) {
+		    return null;
+		} else {
+		    break;
+		}
+	    } 
+	    s.append(tok.image);
+	    if (tok.kind == LBRACE) {
+		getNextToken();
+		s.append(skip_to_matching_brace());
+		getNextToken();
+		tok = getToken(1);
+		break;
+	    } else if ((tok.kind == RBRACE) || (tok.kind == SEMICOLON)) {
+		getNextToken();
+		tok = getToken(1);
+		break;
+	    }
+	    getNextToken();
+	} catch (TokenMgrError tokenerror) {
+	    // read one char at a time, and loop
+	    try {
+	        s.append(jj_input_stream.readChar());
+	        continue;
+            } catch (java.io.IOException ioex) { 
+		return s.toString().trim();
+	    }
+	}
+	first = false;
+    }
+    
+    // skip white space
+    while (tok.kind == S) {
+	getNextToken();
+	tok = getToken(1);
+    }
+    String statement = s.toString().trim();
+    return statement;
+}
+
+JAVACODE
+String skip_to_matching_brace() {
+    StringBuffer s = new StringBuffer();
+    Token tok;
+    int nesting = 1;
+    /* FIXME
+       same as above */
+    while (true) {
+	tok = getToken(1);
+	if (tok.kind == EOF) {
+	    break;
+	}
+	s.append(tok.image);
+	if (tok.kind == LBRACE) {
+	    nesting++;
+	} else if (tok.kind == RBRACE) {
+	    nesting--;
+	    if (nesting == 0) {
+		break;
+	    }
+	}
+	getNextToken();
+    }
+    return s.toString();
+}
+
+/*
+ * @@HACK
+ * I can't insert a token into the tokens flow.
+ * It's jj_consume_token implementation dependant! :-(
+ */
+JAVACODE
+void rejectToken(Token t) {
+    Token fakeToken = new Token();
+    t.next = token;
+    fakeToken.next = t;
+    token = fakeToken;
+}
+
+/** skip after an expression
+ */
+JAVACODE
+void skipAfterExpression(Exception e) {
+    StringBuffer s = new StringBuffer();
+    s.append(getToken(0).image);
+    while (true) {
+	try {
+	    Token t = getToken(1);
+	    if (t.kind == LBRACE) {
+		s.append(t.image);
+		getNextToken();
+		s.append(skip_to_matching_brace());
+		getNextToken();
+		t = getToken(1);
+		continue;
+	    }
+	    if ((t.kind == SEMICOLON) || (t.kind == RBRACE) 
+		                      || (t.kind == EOF)) {
+		break;
+	    }
+	    s.append(t.image);
+	    getNextToken();
+	    t = getToken(1);
+	} catch (TokenMgrError tmerr) {
+	    try {
+		s.append(jj_input_stream.readChar());
+	        continue;
+	    } catch (java.io.IOException ioex) { 
+		ioex.printStackTrace();
+		break;
+	    }
+	}
+    }
+    String statement = s.toString().trim();
+    addError(e, s.toString()); 
+}
+
+JAVACODE
+String convertStringIndex(String s, int start, int len, boolean escapeFirst) {
+    int index = start;
+    int t;
+    int maxCount = 0;
+    if ((start == 0) && (len == s.length()) && (s.indexOf('\\') == -1)) {
+	return s;
+    }
+    StringBuilder buf = new StringBuilder(len);
+
+    while (index < len) {
+	char c = s.charAt(index);
+	if (c == '\\') {
+	    if (++index < len) {
+		c = s.charAt(index);
+		switch (c) {
+		case '0': case '1': case '2': case '3': case '4':
+		case '5': case '6': case '7': case '8': case '9':
+		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+		    int numValue = Character.digit(c, 16);
+		    int count = 1;
+		    if (maxCount == 0) {
+			maxCount = (ac.getCssVersion().equals("css1") ? 
+				    4 : 6);
+		    }
+		    while (index + 1 < len) {
+			c = s.charAt(index+1);
+			t = Character.digit(c, 16);
+			if (t != -1 && count++ < maxCount) {
+			    numValue = (numValue<<4) | t;
+			    index++;
+			} else {
+			    if (c == ' ' || c == '\t' || 
+				c == '\n' || c == '\f' ) {
+				// skip the latest white space
+				index++;
+			    } else if ( c == '\r' ) {
+				index++;
+				// special case for \r\n
+				if (index+1 < len) {
+				    if (s.charAt(index + 1) == '\n') {
+					index++;
+				    }
+				}
+			    }
+			    break;
+			}
+		    }
+		    if (!escapeFirst && numValue < 255 && numValue>31) { 
+			if (! ( (numValue>96 && numValue<123) // [a-z]
+				|| (numValue>64 && numValue<91) // [A-Z]
+				|| (numValue>47 && numValue<58) // [0-9]
+				|| (numValue == 95) // _
+				|| (numValue == 45) // -
+				)
+			    ) {
+			    buf.append('\\');
+			}
+			buf.append((char) numValue);
+			break;
+		    }
+		    char b[] = new char[maxCount];
+		    t = maxCount;
+		    while (t > 0) {
+			b[--t] = hexdigits[numValue & 0xF];
+			numValue >>>= 4;
+		    }
+		    buf.append('\\').append(b);
+		    break;
+		case '\n':
+		case '\f':
+		    break;
+		case '\r':
+		    if (index + 1 < len) {
+			if (s.charAt(index + 1) == '\n') {
+			    index ++;
+			}
+		    }
+		    break;
+		case '-' : case '_' : case 'g' : case 'G' :
+		case 'h' : case 'H' : case 'i' : case 'I' :
+		case 'j' : case 'J' : case 'k' : case 'K' :
+		case 'l' : case 'L' : case 'm' : case 'M' :
+		case 'n' : case 'N' : case 'o' : case 'O' :
+		case 'p' : case 'P' : case 'q' : case 'Q' :
+		case 'r' : case 'R' : case 's' : case 'S' :
+		case 't' : case 'T' : case 'u' : case 'U' :
+		case 'v' : case 'V' : case 'w' : case 'W' :
+		case 'x' : case 'X' : case 'y' : case 'Y' :
+		case 'z' : case 'Z' : 
+		    buf.append(c);
+		    break;
+		default:
+		    buf.append('\\').append(c);
+		}
+	    } else {
+		throw new ParseException("invalid string");
+	    }
+	} else {
+	    buf.append(c);
+	}
+	escapeFirst = false;
+	index++;
+    }
+    return buf.toString();
+}
+
+JAVACODE
+String convertIdent(String s) {
+    return convertStringIndex(s, 0, s.length(), false);
+}
+
+JAVACODE
+String convertClassIdent(String s) {
+    return convertStringIndex(s, 0, s.length(), true);
+}
+
+JAVACODE
+String convertString(String s) {
+    return convertStringIndex(s, 0, s.length(), false);
+}
+
+/*
+ * compile-command: javacc CssParser.jj & jc CssParser.java
+ */
