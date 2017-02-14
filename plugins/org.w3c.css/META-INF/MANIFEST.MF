@@ -1,18 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: %pluginName
+Bundle-Name: CSS Validator
 Bundle-SymbolicName: org.w3c.css
-Bundle-Version: 3.0.0.qualifier
-Bundle-Vendor: %providerName
+Bundle-Version: 1.0.0
+Bundle-Vendor: W3C
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Bundle-ClassPath: css-validator.jar,
- lib/velocity.jar,
- .
-Export-Package: org.apache.commons.lang,
- org.apache.velocity,
- org.apache.velocity.app,
- org.apache.velocity.context,
- org.w3c.css.css,
+Require-Bundle: org.apache.velocity;bundle-version="1.0.0"
+Export-Package: org.w3c.css.css,
  org.w3c.css.error,
  org.w3c.css.index,
  org.w3c.css.parser,
@@ -32,7 +26,12 @@ Export-Package: org.apache.commons.lang,
  org.w3c.css.properties.paged,
  org.w3c.css.properties.svg,
  org.w3c.css.selectors,
+ org.w3c.css.selectors.attributes,
+ org.w3c.css.selectors.pseudofunctions,
+ org.w3c.css.servlet,
  org.w3c.css.util,
+ org.w3c.css.util.xml,
  org.w3c.css.values,
  org.w3c.www.mime
 Eclipse-BuddyPolicy: registered
+ 

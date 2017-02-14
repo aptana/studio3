@@ -8,37 +8,34 @@
 package com.aptana.css.core.internal.build;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.w3c.css.css.StyleReport;
-import org.w3c.css.css.StyleReportFactory;
 import org.w3c.css.css.StyleSheet;
 import org.w3c.css.css.StyleSheetParser;
+import org.w3c.css.parser.CssError;
+import org.w3c.css.parser.CssErrorToken;
+import org.w3c.css.parser.CssParseException;
+import org.w3c.css.parser.Errors;
 import org.w3c.css.properties.PropertiesLoader;
 import org.w3c.css.util.ApplContext;
 import org.w3c.css.util.Utf8Properties;
+import org.w3c.css.util.Warning;
+import org.w3c.css.util.Warnings;
 
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.IOUtil;
-import com.aptana.core.util.URLEncoder;
 import com.aptana.css.core.CSSCorePlugin;
 import com.aptana.css.core.ICSSConstants;
 import com.aptana.index.core.build.BuildContext;
@@ -54,23 +51,6 @@ public class CSSValidator extends AbstractBuildParticipant
 	private static final String APTANA_PROFILE = "AptanaProfile"; //$NON-NLS-1$
 	private static final String CONFIG_FILE = "AptanaCSSConfig.properties"; //$NON-NLS-1$
 	private static final String PROFILES_CONFIG_FILE = "AptanaCSSProfiles.properties"; //$NON-NLS-1$
-
-	/**
-	 * error pattern
-	 */
-	private static final Pattern ERROR_PATTERN = Pattern.compile(
-			"<(error)>(.*?)</\\1>", Pattern.MULTILINE | Pattern.DOTALL); //$NON-NLS-1$
-	/**
-	 * warning pattern
-	 */
-	private static final Pattern WARNING_PATTERN = Pattern.compile(
-			"<(warning)>(.*?)</\\1>", Pattern.MULTILINE | Pattern.DOTALL); //$NON-NLS-1$
-
-	/**
-	 * properties pattern
-	 */
-	private static final Pattern PROPERTIES_PATTERN = Pattern.compile(
-			"<([-A-Za-z0-9_:]+)>(.*?)</\\1>", Pattern.MULTILINE | Pattern.DOTALL); //$NON-NLS-1$
 
 	// CSS3 properties that the validator doesn't recognize yet and need to be ignored
 	@SuppressWarnings("nls")
@@ -88,122 +68,57 @@ public class CSSValidator extends AbstractBuildParticipant
 	private static final String[] FILTERED_MESSAGES = { "unrecognized media only", "linear-gradient" };
 
 	@SuppressWarnings("nls")
-	public static final String[] DEFAULT_FILTERS = new String[] {
-			".*Unknown pseudo-element.*",
-			"Property\\s*[-_].*doesn't exist.*",
-			".*-moz-.*",
-			".*-o-*",
-			".*opacity.*",
-			".*overflow-.*",
-			".*accelerator.*",
-			".*background-position-.*",
-			".*filter.*",
-			".*ime-mode.*",
-			".*layout-.*",
-			".*line-break.*",
-			".*page.*",
-			".*ruby-.*",
-			".*scrollbar-.*",
-			".*text-align-.*",
-			".*text-justify.*",
-			".*text-overflow.*",
-			".*text-shadow.*",
-			".*text-underline-position.*",
-			".*word-spacing.*",
-			".*word-wrap.*",
-			".*writing-mode.*",
-			".*zoom.*",
-			".*Parse Error.*",
-			".*-webkit-.*",
-			".*rgba.*is not a .* value.*",
-			".*Too many values or values are not recognized.*",
-			Pattern.quote("Value Error : background (http://www.w3.org/TR/REC-CSS2/colors.html#propdef-background) , is an incorrect operator :") };
+	public static final String[] DEFAULT_FILTERS = new String[] { ".*Unknown pseudo-element.*",
+			"Property\\s*[-_].*doesn't exist.*", ".*-moz-.*", ".*-o-*", ".*opacity.*", ".*overflow-.*",
+			".*accelerator.*", ".*background-position-.*", ".*filter.*", ".*ime-mode.*", ".*layout-.*",
+			".*line-break.*", ".*page.*", ".*ruby-.*", ".*scrollbar-.*", ".*text-align-.*", ".*text-justify.*",
+			".*text-overflow.*", ".*text-shadow.*", ".*text-underline-position.*", ".*word-spacing.*", ".*word-wrap.*",
+			".*writing-mode.*", ".*zoom.*", ".*Parse Error.*", ".*-webkit-.*", ".*rgba.*is not a .* value.*",
+			".*Too many values or values are not recognized.*", Pattern.quote(
+					"Value Error : background (http://www.w3.org/TR/REC-CSS2/colors.html#propdef-background) , is an incorrect operator :") };
 
 	static
 	{
 		loadAptanaCSSProfile();
 	}
 
-	private void processErrorsInReport(String report, String sourcePath, List<IProblem> items, List<String> filters)
+	private void processErrorsInReport(Errors errors, String sourcePath, List<IProblem> items, List<String> filters)
 	{
-		int offset = 0;
-		String elementName = "errorlist"; //$NON-NLS-1$
-		String startTag = MessageFormat.format("<{0}>", elementName); //$NON-NLS-1$
-		String endTag = MessageFormat.format("</{0}>", elementName); //$NON-NLS-1$
-
-		while (offset < report.length())
+		CssError[] cssErrors = errors.getErrors();
+		for (CssError cssError : cssErrors)
 		{
-			int errorListStart = report.indexOf(startTag, offset);
-			if (errorListStart == -1)
+			Throwable t = cssError.getException();
+			String message = (t == null) ? "" : t.getMessage(); //$NON-NLS-1$
+			if (cssError instanceof CssErrorToken)
 			{
-				break;
+				CssErrorToken cet = (CssErrorToken) cssError;
+				message = cet.getErrorDescription();
 			}
-
-			// advances past the start tag
-			errorListStart += startTag.length();
-
-			// gets the URI
-			int uriStart = report.indexOf("<uri>", errorListStart) + "<uri>".length(); //$NON-NLS-1$ //$NON-NLS-2$
-			int uriEnd = report.indexOf("</uri>", uriStart); //$NON-NLS-1$
-			String uri = new String(report.substring(uriStart, uriEnd));
-
-			// finds the end of this list
-			int errorListEnd = report.indexOf(endTag, errorListStart);
-
-			// checks if the uri matches the source
-			if (uri != null && URLEncoder.encode(uri, null, null).equals(sourcePath))
+			else if (t instanceof CssParseException)
 			{
-				// extracts the error list
-				String listString = new String(report.substring(errorListStart, errorListEnd));
-				// finds the errors
-				String[] errors = getContent(ERROR_PATTERN, listString);
-				// add errors
-				addErrors(errors, sourcePath, items, filters);
+				message = "Parse Error"; // to retain backwards compat on message //$NON-NLS-1$
 			}
-
-			// advances past the current error list
-			offset = errorListEnd + endTag.length();
+			int lineNumber = cssError.getLine();
+			if (!isIgnored(message, filters) && !containsCSS3Property(message) && !containsCSS3AtRule(message)
+					&& !isFiltered(message))
+			{
+				items.add(createError(message, lineNumber, 0, 0, sourcePath));
+			}
 		}
 	}
 
-	private void processWarningsInReport(String report, String sourcePath, List<IProblem> items, List<String> filters)
+	private void processWarningsInReport(Warnings warnings, String sourcePath, List<IProblem> items,
+			List<String> filters)
 	{
-		int offset = 0;
-		String elementName = "warninglist"; //$NON-NLS-1$
-		String startTag = MessageFormat.format("<{0}>", elementName); //$NON-NLS-1$
-		String endTag = MessageFormat.format("</{0}>", elementName); //$NON-NLS-1$
-
-		while (offset < report.length())
+		Warning[] warningsArray = warnings.getWarnings();
+		for (Warning warning : warningsArray)
 		{
-			int warningListStart = report.indexOf(startTag, offset);
-			if (warningListStart == -1)
+			String message = warning.getWarningMessage();
+			if (!isIgnored(message, filters) && !containsCSS3Property(message) && !containsCSS3AtRule(message)
+					&& !isFiltered(message))
 			{
-				break;
+				items.add(createWarning(message, warning.getLine(), 0, 0, sourcePath));
 			}
-
-			// advances past the start tag
-			warningListStart += startTag.length();
-
-			// gets the URI
-			int uriStart = report.indexOf("<uri>", warningListStart) + "<uri>".length(); //$NON-NLS-1$ //$NON-NLS-2$
-			int uriEnd = report.indexOf("</uri>", uriStart); //$NON-NLS-1$
-			String uri = new String(report.substring(uriStart, uriEnd));
-
-			// finds the end of this list
-			int warningListEnd = report.indexOf(endTag, warningListStart);
-
-			if (uri != null && URLEncoder.encode(uri, null, null).equals(sourcePath))
-			{
-				// extracts the warning list
-				String listString = new String(report.substring(warningListStart, warningListEnd));
-				// finds the warnings
-				String[] warnings = getContent(WARNING_PATTERN, listString);
-				// adds errors
-				addWarnings(warnings, sourcePath, items, filters);
-			}
-
-			// advance past the current warning list
-			offset = warningListEnd + endTag.length();
 		}
 	}
 
@@ -255,104 +170,6 @@ public class CSSValidator extends AbstractBuildParticipant
 	}
 
 	/**
-	 * Adds the CSS errors.
-	 * 
-	 * @param errors
-	 *            the array of errors
-	 * @param sourcePath
-	 *            the source path
-	 * @param manager
-	 *            the validation manager
-	 * @param items
-	 *            the list that stores the added validation items
-	 */
-	private void addErrors(String[] errors, String sourcePath, List<IProblem> items, List<String> filters)
-	{
-		Map<String, String> map;
-		for (String error : errors)
-		{
-			map = getProperties(error);
-
-			int lineNumber = Integer.parseInt(map.get("line")); //$NON-NLS-1$
-			String message = map.get("message"); //$NON-NLS-1$
-			String context = map.get("context"); //$NON-NLS-1$
-			String property = map.get("property"); //$NON-NLS-1$
-			String skippedstring = map.get("skippedstring"); //$NON-NLS-1$
-			String errorsubtype = map.get("errorsubtype"); //$NON-NLS-1$
-
-			// Don't attempt to add errors if there are already errors on this line
-			if (hasErrorOrWarningOnLine(items, lineNumber))
-			{
-				continue;
-			}
-
-			if (message == null)
-			{
-				if (property == null)
-				{
-					property = context;
-				}
-				if (skippedstring.equals("[empty string]")) //$NON-NLS-1$
-				{
-					// alters the text a bit
-					skippedstring = "no properties defined"; //$NON-NLS-1$
-				}
-				message = MessageFormat.format("{0} : {1} for {2}", errorsubtype, skippedstring, property); //$NON-NLS-1$
-			}
-			message = StringEscapeUtils.unescapeHtml(message);
-			message = message.replaceAll("\\s+", " "); //$NON-NLS-1$ //$NON-NLS-2$
-
-			if (!isIgnored(message, filters) && !containsCSS3Property(message) && !containsCSS3AtRule(message)
-					&& !isFiltered(message))
-			{
-				// there is no info on the line offset or the length of the errored text
-				items.add(createError(message, lineNumber, 0, 0, sourcePath));
-			}
-		}
-	}
-
-	/**
-	 * Adds the CSS warnings.
-	 * 
-	 * @param warnings
-	 *            the array of warnings
-	 * @param sourcePath
-	 *            the source path
-	 * @param items
-	 *            the list that stores the added validation items
-	 * @param filters
-	 */
-	private void addWarnings(String[] warnings, String sourcePath, List<IProblem> items, List<String> filters)
-	{
-		Map<String, String> map;
-		String last = ""; //$NON-NLS-1$
-		for (String warning : warnings)
-		{
-			map = getProperties(warning);
-
-			int lineNumber = Integer.parseInt(map.get("line")); //$NON-NLS-1$
-			String level = map.get("level"); //$NON-NLS-1$
-			String message = MessageFormat.format("{0} (level {1})", map.get("message"), level); //$NON-NLS-1$ //$NON-NLS-2$
-			String context = map.get("context"); //$NON-NLS-1$
-
-			// Don't attempt to add warnings if there are already errors on this line
-			if (hasErrorOrWarningOnLine(items, lineNumber))
-			{
-				continue;
-			}
-
-			String hash = MessageFormat.format("{0}:{1}:{2}:{3}", lineNumber, level, message, context); //$NON-NLS-1$
-			// guards against duplicate warnings
-			if (!last.equals(hash) && !isIgnored(message, filters))
-			{
-				items.add(createWarning(message, lineNumber, 0, 0, sourcePath));
-			}
-
-			last = hash;
-		}
-	}
-
-	/**
 	 * Gets the validation report from the validator.
 	 * 
 	 * @param source
@@ -361,7 +178,7 @@ public class CSSValidator extends AbstractBuildParticipant
 	 *            the source path
 	 * @return the report
 	 */
-	private static String getReport(String source, URI path)
+	private static StyleSheet getReport(String source, URI path)
 	{
 		StyleSheetParser parser = new StyleSheetParser();
 		ApplContext ac = new ApplContext("en"); //$NON-NLS-1$
@@ -383,55 +200,7 @@ public class CSSValidator extends AbstractBuildParticipant
 
 		StyleSheet stylesheet = parser.getStyleSheet();
 		stylesheet.findConflicts(ac);
-		StyleReport report = StyleReportFactory.getStyleReport(ac, "Title", stylesheet, "soap12", 2); //$NON-NLS-1$ //$NON-NLS-2$
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		report.print(new PrintWriter(out));
-		return out.toString().replaceAll("m:", ""); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	/**
-	 * Gets the list of contents in a source text that matches the specific pattern.
-	 * 
-	 * @param pattern
-	 *            the pattern to match
-	 * @param source
-	 *            the source text
-	 * @return the matching contents in an array
-	 */
-	private static String[] getContent(Pattern pattern, String source)
-	{
-		Matcher matcher = pattern.matcher(source);
-		List<String> result = new ArrayList<String>();
-		while (matcher.find())
-		{
-			result.add(matcher.group(2));
-		}
-		return result.toArray(new String[result.size()]);
-	}
-
-	/**
-	 * Gets the properties map from a source text.
-	 * 
-	 * @param source
-	 *            the source text
-	 * @return the properties map
-	 */
-	private static Map<String, String> getProperties(String source)
-	{
-		Matcher matcher = PROPERTIES_PATTERN.matcher(source);
-		Map<String, String> result = new HashMap<String, String>();
-		String key, value;
-		while (matcher.find())
-		{
-			key = matcher.group(1);
-			value = matcher.group(2);
-			if (value != null)
-			{
-				value = value.trim();
-			}
-			result.put(key, value);
-		}
-		return result;
+		return stylesheet;
 	}
 
 	private static boolean containsCSS3Property(String message)
@@ -483,10 +252,10 @@ public class CSSValidator extends AbstractBuildParticipant
 		URI uri = context.getURI();
 		String path = uri.toString();
 
-		String report = getReport(source, uri);
+		StyleSheet sheet = getReport(source, uri);
 		List<String> filters = getFilters();
-		processErrorsInReport(report, path, problems, filters);
-		processWarningsInReport(report, path, problems, filters);
+		processErrorsInReport(sheet.getErrors(), path, problems, filters);
+		processWarningsInReport(sheet.getWarnings(), path, problems, filters);
 
 		context.putProblems(ICSSConstants.W3C_PROBLEM, problems);
 	}

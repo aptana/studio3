@@ -1,0 +1,175 @@
+//
+// $Id$
+// From Philippe Le Hegaret (Philippe.Le_Hegaret@sophia.inria.fr)
+//
+// (c) COPYRIGHT MIT and INRIA, 1997.
+// Please first read the full copyright statement in file COPYRIGHT.html
+/*
+ * $Log: StyleSheetParser.java,v $
+ * Revision 3.1  1997/08/29 13:23:27  plehegar
+ * Freeze
+ *
+ * Revision 1.1  1997/08/21 07:26:37  plehegar
+ * Initial revision
+ *
+ */
+
+package org.w3c.css.css;
+
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Vector;
+import java.net.URL;
+
+import org.w3c.css.parser.CssValidatorListener;
+import org.w3c.css.parser.CssXMLParser;
+import org.w3c.css.parser.CssFouffa;
+import org.w3c.css.parser.Errors;
+import org.w3c.css.parser.CssSelectors;
+import org.w3c.css.properties.CssProperty;
+import org.w3c.css.util.Warnings;
+import org.w3c.css.util.Warning;
+import org.w3c.css.util.Util;
+
+import w3c.xmlOnline.parser.XMLTokenizer;
+
+/**
+ * @version $Revision: 3.1 $
+ */
+public class StyleSheetXMLParser implements CssValidatorListener, CssParser {
+
+  CssXMLParser parser;
+  StyleSheet style = new StyleSheet();
+
+  public void reInit() {
+    style = new StyleSheet();
+  }
+
+  public StyleSheet getStyleSheet() {
+    return style;
+  }
+
+  public void notifyErrors(Errors errors) {
+    // not supported (bug)
+    style.addErrors(errors);
+  }
+  
+  public void notifyWarnings(Warnings warnings) {
+    style.addWarnings(warnings);
+  }
+  
+  /**
+   * Adds a vector of properties to a selector.
+   *
+   * @param selector     the selector
+   * @param declarations Properties to associate with contexts
+   */  
+  public void handleRule(CssSelectors selector, Vector declarations) {
+    Util.verbose( "StyleSheetXMLParser::handleRule(" + selector + ")" );
+
+    for (Enumeration e2 = declarations.elements();e2.hasMoreElements();) {
+      CssProperty property = (CssProperty) e2.nextElement();
+      property.setSelectors(selector);
+      style.addProperty(selector, property);
+    }
+  }
+
+  /**
+   * Handles an at-rule.
+   *
+   * <p>The parameter <code>value</code> can be :
+   * <DL>
+   * <DT>CssString
+   * <DD>The value coming from a string.
+   * <DT>CssURL
+   * <DD>The value coming from an URL.
+   * <DT>Vector
+   * <DD>The value is a vector of declarations (it contains properties).
+   *     This feature is not legal, so be careful.
+   * </DL>
+   *
+   * @param ident The ident for this at-rule (for example: 'font-face')
+   * @param string The string representation of this at-rule
+   */  
+  public void handleAtRule(String ident, String string) {
+    style.getWarnings().addWarning(new Warning(parser.getSourceFile(),
+					       parser.getLine(),
+					       "at-rule",
+					       2,
+					       ident,
+					       string));
+  }
+
+  /**
+   * @param url the URL containing the style sheet
+   * @param origin the origin of the style sheet
+   * @exception IOException an IO error
+   */
+  public void parseURL(URL url, int origin) {
+    Util.verbose( "StyleSheetXMLParser.parseURL(" + url + "," + origin + ")");
+    try {
+      XMLTokenizer scanner = new XMLTokenizer(url.openStream());
+      parser = new CssXMLParser(url, scanner, this);
+      parser.parseStyle();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * @param input the inputStream containing the style data
+   * @param url the name of the file the style element was read in.
+   * @exception IOException an IO error
+   */
+  public void parseStyleElement(InputStream input, URL url, int lineno) {
+    Util.verbose( "StyleSheetXMLParser.parseStyleElement(" + url + "," + 
+		  lineno + ")");
+    
+    try {
+      XMLTokenizer scanner = new XMLTokenizer(input);
+      parser = new CssXMLParser(url, scanner, this);
+      parser.parseStyle();
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * @param input the inputStream containing the style data
+   * @param url the name of the file the style element was read in.
+   * @exception IOException an IO error
+   * @deprecated Replaced by parseStyleElement
+   * @see #parseStyleElement(InputStream, URL, int)
+   */
+  public void parseStyleElement(String input, URL url, int lineno) {
+    parseStyleElement(new ByteArrayInputStream(input.getBytes()), url, lineno);
+  }
+
+  /**
+   * Parse some declarations
+   * @param input the inputStream containing the style data
+   * @param filename the name of the file the style element was read in.
+   * @exception IOException an IO error
+   */
+  public void parseStyleAttribute(InputStream input, String id, 
+				  URL url, int lineno) {
+    System.err.println( "Sorry, not implemented" );
+  }
+
+  /**
+   * @param input the inputStream containing the style data
+   * @param id the uniq id
+   * @param url the name of the file the style element was read in.
+   * @exception IOException an IO error
+   * @deprecated Replaced by parseStyleAttribute
+   * @see #parseStyleAttribute(InputStream, URL, int)
+   */
+  public void parseStyleAttribute(String input, String id, 
+				  URL url, int lineno) {
+    parseStyleAttribute(new ByteArrayInputStream(input.getBytes()), 
+			id, url, lineno);
+  }
+}

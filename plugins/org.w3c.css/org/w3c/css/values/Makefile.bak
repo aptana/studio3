@@ -1,0 +1,67 @@
+SRCS = CssFrequency.java CssPercentage.java\
+CssAngle.java CssIdent.java CssString.java\
+CssColor.java CssLength.java CssTime.java\
+CssColorConstants.java CssNumber.java CssURL.java\
+CssExpression.java CssOperator.java CssValue.java \
+CssFunction.java
+
+OBJS = $(SRCS:.java=.class)
+
+PACKAGE = org.w3c.css.values
+JAVAC = /usr/local/java11/bin/javac
+JAVADOC = javadoc
+JAVADOCFLAGS = -version -d docs -protected
+JAVACFLAGS =
+MAKEDEPEND = jmakedepend
+
+.SUFFIXES: .class .java
+.java.class:; $(JAVAC) $(JAVACFLAGS) $<
+
+all: $(OBJS)
+
+javadoc:; $(JAVADOC) $(JAVADOCFLAGS) $(PACKAGE)
+
+clean:; -rm -f $(OBJS) *~ core
+
+depend:; $(MAKEDEPEND) $(SRCS)
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+CssURL.class:: CssURL.java\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/InvalidParamException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Frame.class
+CssColor.class:: CssColor.java\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/InvalidParamException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Frame.class
+CssNumber.class:: CssNumber.java\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/InvalidParamException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Frame.class
+CssColorConstants.class:: CssColorConstants.java
+CssValue.class:: CssValue.java\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/InvalidParamException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Frame.class
+CssTime.class:: CssTime.java\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/InvalidParamException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Frame.class
+CssString.class:: CssString.java\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/InvalidParamException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Frame.class
+CssOperator.class:: CssOperator.java
+CssIdent.class:: CssIdent.java\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Frame.class
+CssPercentage.class:: CssPercentage.java\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/InvalidParamException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Frame.class
+CssFrequency.class:: CssFrequency.java\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/InvalidParamException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Frame.class
+CssAngle.class:: CssAngle.java\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/InvalidParamException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Frame.class
+CssExpression.class:: CssExpression.java\
+	/usr/local/java11/lib/classes.zip
+CssLength.class:: CssLength.java\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/InvalidParamException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Frame.class
+CssFunction.class:: CssFunction.java\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/InvalidParamException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Frame.class
