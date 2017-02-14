@@ -12,12 +12,13 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.aptana.core.epl.downloader.FileReaderTest;
+import com.aptana.core.epl.downloader.ProgressStatisticsTest;
 import com.aptana.core.epl.util.LRUCacheTest;
 import com.aptana.core.epl.util.LRUCacheWithSoftPrunedValuesTest;
 import com.aptana.core.epl.util.SoftHashMapTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({ LRUCacheTest.class, LRUCacheWithSoftPrunedValuesTest.class, SoftHashMapTest.class, FileReaderTest.class })
+@SuiteClasses({ LRUCacheTest.class, LRUCacheWithSoftPrunedValuesTest.class, SoftHashMapTest.class, FileReaderTest.class, ProgressStatisticsTest.class })
 public class AllTests
 {
 

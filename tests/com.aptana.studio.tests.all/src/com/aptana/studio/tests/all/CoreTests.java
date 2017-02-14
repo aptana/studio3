@@ -16,24 +16,26 @@ import com.aptana.core.tests.StdErrLoggingSuite;
 //@formatter:off
 @Suite.SuiteClasses({
 	com.aptana.buildpath.core.tests.BuildPathCoreTests.class,
-	com.aptana.core.tests.AllTests.class,
+	com.aptana.core.epl.tests.AllTests.class,
 	com.aptana.core.io.tests.AllTests.class,
+	com.aptana.core.tests.AllTests.class,
+	com.aptana.css.core.tests.AllTests.class,
+	com.aptana.dtd.core.tests.AllTests.class,
 	// com.aptana.filesystem.ftp.tests.AllTests.class, // TODO Re-enable when FTP server is set back up?
-	// com.aptana.filesystem.secureftp.tests.AllTests.class, // TODO Re-enable when FTP server is set back up?
 	com.aptana.filesystem.http.tests.AllTests.class,
+	// com.aptana.filesystem.secureftp.tests.AllTests.class, // TODO Re-enable when FTP server is set back up?
 	com.aptana.git.core.tests.AllGitCoreTests.class,
 	com.aptana.index.core.tests.AllIndexCoreTests.class,
-	com.aptana.parsing.tests.AllTests.class,
-	com.aptana.dtd.core.tests.AllTests.class,
-	com.aptana.css.core.tests.AllTests.class,
+	com.aptana.jira.core.tests.AllJiraCoreTests.class,
 	com.aptana.js.core.tests.AllJSCoreTests.class,
-	com.aptana.xml.core.tests.AllTests.class,
+	com.aptana.js.debug.core.tests.AllTests.class,
+	com.aptana.parsing.tests.AllTests.class,
 	com.aptana.samples.tests.AllTests.class,
 	com.aptana.scripting.tests.AllTests.class,
-	com.aptana.jira.core.tests.AllJiraCoreTests.class,
-	// com.aptana.syncing.core.tests.AllTests.class // TODO Re-enable when FTP server is set back up?
+	// com.aptana.syncing.core.tests.AllTests.class, // TODO Re-enable when FTP server is set back up?
 	com.aptana.usage.tests.AllTests.class,
-	com.aptana.js.debug.core.tests.AllTests.class,
+	com.aptana.webserver.core.AllTests.class,
+	com.aptana.xml.core.tests.AllTests.class
 })
 // @formatter:on
 public class CoreTests
