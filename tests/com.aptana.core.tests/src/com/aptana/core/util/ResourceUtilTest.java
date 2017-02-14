@@ -9,6 +9,7 @@ package com.aptana.core.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -25,6 +26,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.junit.After;
@@ -246,6 +248,38 @@ public class ResourceUtilTest
 		assertEquals(numIds, desc.getNatureIds().length);
 		natures = ResourceUtil.getAptanaNatures(desc);
 		assertEquals(0, natures.length);
+	}
+	
+	@Test
+	public void testGetProjectDescriptionWithNullProjectPath()
+	{
+		assertNull(ResourceUtil.getProjectDescription(null, null, null));
+	}
+	
+	@Test
+	public void testGetProjectDescriptionWithUncreatedProjectInWorkspace()
+	{
+		IPath path = Platform.getLocation().append("myprojectPath");
+		String[] natureIds = new String[] { WEBNATUREID };
+		IProjectDescription desc = ResourceUtil.getProjectDescription(path, natureIds, null);
+		assertNotNull(desc);
+		assertNull(desc.getLocationURI());
+		assertEquals(1, desc.getNatureIds().length);
+		assertEquals(WEBNATUREID, desc.getNatureIds()[0]);
+		assertEquals(0, desc.getBuildSpec().length);
+	}
+	
+	@Test
+	public void testGetProjectDescriptionWithUncreatedProjectOutsideWorkspace()
+	{
+		IPath path = FileUtil.getTempDirectory().append("tmpProjectPath");
+		String[] builderIds = new String[] { UnifiedBuilder_ID };
+		IProjectDescription desc = ResourceUtil.getProjectDescription(path, null, builderIds);
+		assertNotNull(desc);
+		assertEquals(path.toFile().toURI(), desc.getLocationURI());
+		assertEquals(0, desc.getNatureIds().length);
+		assertEquals(1, desc.getBuildSpec().length);
+		assertEquals(UnifiedBuilder_ID, desc.getBuildSpec()[0].getBuilderName());
 	}
 
 	/**

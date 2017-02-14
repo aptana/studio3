@@ -1,0 +1,530 @@
+//
+// $Id$
+// From Philippe Le Hegaret (Philippe.Le_Hegaret@sophia.inria.fr)
+//
+// (c) COPYRIGHT MIT and INRIA, 1997.
+// Please first read the full copyright statement in file COPYRIGHT.html
+/*
+ * $Log$
+ */
+
+package org.w3c.css.parser;
+
+import java.io.ByteArrayInputStream;
+import java.net.URL;
+import java.util.Vector;
+import java.util.Properties;
+
+import org.w3c.css.css.StyleSheetOrigin;
+import org.w3c.css.properties.CssProperty;
+import org.w3c.css.values.CssExpression;
+import org.w3c.css.util.InvalidParamException;
+import w3c.xmlOnline.parser.XMLListener;
+
+/**
+ * This is a XML listener for cascading style sheet.
+ *
+ *  <p>Example:<BR>
+ *  <pre>
+ *  &lt;xml&gt;
+ *  &lt;rule&gt;
+ *    &lt;selector type="A" pseudo-class="link"/&gt;
+ *    &lt;declaration property="color" value="rgb(0,68,17)"/&gt;
+ *  &lt;/rule&gt;
+ *
+ *  &lt;rule&gt;
+ *    &lt;context-sensitive&gt;
+ *    &lt;selector type="DIV" class="main"/&gt;
+ *    &lt;selector type="H3"/&gt;
+ *    &lt;/context-sensitive&gt;
+ *    &lt;declaration property="margin-left" value="-9.0%"/&gt;
+ *    &lt;declaration property="font-size" value="12pt" important/&gt;
+ *  &lt;/rule&gt;
+ *  &lt;/xml&gt;
+ *  </pre>
+ *
+ * @version $Revision$
+ */
+public class CssXMLListener implements XMLListener {
+    
+    // the URL of the source file
+    private URL          url;
+    // current parsed rule
+    private Rules        currentRule;
+    // the listener
+    private CssValidatorListener parserListener;
+    // true if I'm in a rule
+    private boolean inRule;
+    // true if I'm in a contextual selector
+    private boolean inContextSensitive;
+    // true if I'm in a selector
+    private boolean inSelector;
+    // true if I'm in a declaration
+    private boolean inDeclaration;
+    
+    /*
+     * tag constant
+     */
+    private static final String RULE           = "rule";
+    private static final String CONTEXTSENSITIVE = "context-sensitive";
+    private static final String SELECTOR       = "selector";
+    private static final String DECLARATION    = "declaration";
+    
+    /*
+     * attribute constant
+     */
+    // selector attribut
+    private static final String TYPE          = "type";
+    private static final String ID            = "id";
+    private static final String CLASS         = "class";
+    private static final String PSEUDOCLASS   = "pseudo-class";
+    private static final String PSEUDOELEMENT = "pseudo-element";
+    
+    // declaration attribute
+    private static final String PROPERTY  = "property";
+    private static final String VALUE     = "value";
+    private static final String IMPORTANT = "important";
+    
+    /**
+     * Create a new PipeListener.
+     * 
+     * @param url            The URL to parse
+     * @param parserListener The listener
+     */
+    public CssXMLListener(URL url, CssValidatorListener parserListener) {
+	this.url = url;
+	this.parserListener = parserListener;
+    }
+    
+    /**
+     * Encode \" as "
+     *
+     * @param s the string to encode
+     * @return  the encoded string
+     */
+    private String protect(String s) {
+	int i = 0;
+	
+	while ((i = s.indexOf("&quot;")) >= 0) {
+	    s = s.substring(0, i) + '"' + s.substring(i+2);
+	}
+	return s.trim();
+    }
+    
+    /**
+     * This function is called by the parser when it has
+     * recognized a comment.
+     *
+     * @param comment the comment string (without &lt;!-- --&gt;)
+     */
+    public void handleComment(String comment) {
+	// nothing to do
+    }
+    
+    /**
+     * This function is called by the parser when it has
+     * recognized a start tag.
+     *
+     * @param tag the tag name in lowercase
+     */
+    public void handleStartTag(String tag) {
+	
+	if (tag.equals(RULE)) {
+	    inRule = true;
+	    currentRule = new Rules(url);
+	    
+	} else if (tag.equals(CONTEXTSENSITIVE)) {
+	    if (inRule) {
+		inContextSensitive = true;
+	    } else {
+		// FIXME error
+	    }
+	    
+	} else if (tag.equals(SELECTOR)) {
+	    if (inRule) {
+		inSelector = true;
+		currentRule.initializedContext(this);
+	    } else {
+		// FIXME error
+	    }
+	    
+	} else if (tag.equals(DECLARATION)) {
+	    if (inRule) {
+		inDeclaration = true;
+	    } else {
+		// FIXME error
+	    }
+	    
+	} else {
+	    // FIXME unknown tag
+	}
+    }
+    
+    /**
+     * This function is called by the parser when it has
+     * recognized an attribute/value pair. The attribute
+     * belongs to the tag that was handled by the most recent
+     * call to handleStartTag().
+     * <p>Note that there is no indication of whether this
+     * attribute was actually on the tag, or whether it
+     * is the declared default value for the attribute on
+     * this tag (&lt;?XML DEFAULT...?&gt;)
+     * <p>The attribute value can be any value, but the expected
+     * values are String, Double, or Boolean.TRUE.
+     *
+     * @param attribute the name of the attribute in lowercase
+     * @param value the value of the attribute
+     */
+    public void handleAttribute(String attribute, Object value) {
+	
+	if (value == Boolean.TRUE) {
+	    if (attribute.equals(IMPORTANT)) {
+		if (inDeclaration) {
+		    currentRule.setImportant();
+		} else {
+		    // FIXME error
+		}
+	    } else {
+		// FIXME unknown attribute
+	    }
+	    
+	} else if (value instanceof Double) {
+	    // FIXME unknown attribute
+	    
+	} else {
+	    if (inSelector) {
+		if (attribute.equals(TYPE)) {
+		    currentRule.getSelector().setElement((String) value);
+		} else if (attribute.equals(ID)) {
+		    currentRule.getSelector().setId("#" + (String) value);
+		} else if (attribute.equals(CLASS)) {
+		    currentRule.getSelector().addClasse("." + (String) value);
+		} else if (attribute.equals(PSEUDOELEMENT)) {
+		    currentRule.getSelector().setPseudoElement("." + (String) value);
+		} else if (attribute.equals(PSEUDOCLASS)) {
+		    currentRule.getSelector().setPseudoClass("." + (String) value);
+		} else {
+		    // FIXME unknown attribute in selector
+		}
+	    } else if (inDeclaration) {
+		if (attribute.equals(PROPERTY)) {
+		    currentRule.setProperty((String) value);
+		} else if (attribute.equals(VALUE)) {
+		    currentRule.setExpression(protect((String)value));
+		} else {
+		    // FIXME unknown attribute in declaration
+		}
+	    } else {
+		// FIXME unknown attribute in tag
+	    }
+	}
+    }
+    
+    /**
+     * This function is called by the parser when it has
+     * recognized an end tag or the end of an empty tag.
+     *
+     * @param tag the name of the tag in lowercase
+     */
+    public void handleEndTag(String tag) {
+	if (tag.equals(RULE)) {
+	    if (inRule) {
+		inRule = false;
+		if (currentRule.getSelector() != null &&
+		    currentRule.getDeclaration() != null) {
+		    parserListener.handleRule(currentRule.getSelector(), 
+					      currentRule.getDeclaration());
+		}
+		currentRule = null; // protection against bug :-)
+	    }
+	} else if (tag.equals(CONTEXTSENSITIVE)) {
+	    inContextSensitive = false;
+	} else if (tag.equals(SELECTOR)) {
+	    inSelector = false;
+	} else if (tag.equals(DECLARATION)) {
+	    inDeclaration = false;
+	    if (inRule) {
+		currentRule.processProperty();
+	    }
+	} else {
+	    // error
+	}
+    }
+    
+    /**
+     * This function is called by the parser when it has
+     * recognized character data. The function may be called
+     * several times without intervening calls to handleStartTag()
+     * or handleEndTag(). The content of an element is thus the
+     * concatenation of all consecutive calls to handleData().
+     *
+     * @param data the character data
+     */
+    public void handleData(String data) {
+	// nothing to do
+    }
+    
+    /**
+     * This function is called by the parser when it has
+     * recognized a processing instruction.
+     *
+     * @param pi the processing instruction (without &lt;? ?&gt;)
+     */
+    public void handlePI(String pi) {
+	// nothing to do
+    }
+    
+    /**
+     * This function is called by the parser when it has
+     * recognized a doctype declaration.
+     *
+     * @param root the name of the start tag
+     * @param doctype the URL defining the document type (may be null)
+     */
+    public void handleStartDoc(String root, String doctype) {
+	// nothing to do
+    }
+    
+    /**
+     * This function is called by the parser when it has
+     * recognized the end of a document or sub-document.
+     *
+     * @param root the name of the start tag
+     */
+    public void handleEndDoc(String root) {
+	// nothing to do
+    }
+    
+    /**
+     * Returns <code>true</code> if the parser is in a rule.
+     */  
+    public final boolean isRule() {
+	return inRule;
+    }
+    
+    /**
+     * Returns <code>true</code> if the parser is in a contextual selector.
+     */  
+    public final boolean isContextSensitive() {
+	return inContextSensitive;
+    }
+    
+    /**
+     * Returns <code>true</code> if the parser is in a selector.
+     */  
+    public final boolean isSelector() {
+	return inSelector;
+    }
+    
+    /**
+     * Returns <code>true</code> if the parser is in a declaration.
+     */  
+    public final boolean isDeclaration() {
+	return inDeclaration;
+    }  
+}
+
+final class Rules {
+    
+    // the source file
+    private URL url;
+    // the current context
+    private CssSelectors selectors;
+    // all declarations
+    private Vector declarations = new Vector();
+    
+    // the current property
+    private String currentProperty;
+    // the current expression
+    private CssExpression currentExpression;
+    // Is this an important property.
+    private boolean isPropertyImportant;
+    
+    // all properties
+    static CssPropertyFactory properties;
+    
+    public Rules(URL url) {
+	this.url = url;
+    }
+    
+    /**
+     * Initializes the context.
+     *
+     * @param listen the 
+     */  
+    public final void initializedContext(CssXMLListener listen) {
+	if (selectors == null) {
+	    selectors = new CssSelectors();
+	} else {
+	    if (listen.isContextSensitive()) {
+		selectors = new CssSelectors(selectors);
+	    } else {
+		// FIXME error, you are not in a context sensitive
+	    }
+	}
+}
+
+/**
+ * Set the name of the current property.
+ *
+ * @param propertyName The name of the property
+ */  
+public final void setProperty(String propertyName) {
+    currentProperty = propertyName;
+}
+    
+    /**
+     * Set the expression of the current property.
+     *
+     * @param expression the string representation of the expression
+     */  
+    public final void setExpression(String expression) {
+	try {
+	    CssFouffa parser = 
+		new CssFouffa(new ByteArrayInputStream(expression.getBytes()), url, 0);
+	    currentExpression = parser.expr();
+	} catch (Exception e) {
+	    System.out.println( "Rules::setExpression " + e );
+	    e.printStackTrace();
+	}
+}
+
+/**
+ * Set the importance of the current property.
+ */  
+public final void setImportant() {
+    isPropertyImportant = true;
+}
+    
+    /**
+     * Compute the current property.
+     */  
+    public final void processProperty() {
+	if (currentProperty != null && currentExpression != null) {
+	    CssProperty property = null;
+	    
+	    try {
+		property = handleDeclaration(currentProperty, 
+					     currentExpression, 
+					     isPropertyImportant);
+	    } catch (InvalidParamException e) {
+		e.printStackTrace();
+	    }
+	    currentProperty = null;
+	    currentExpression = null;
+	    isPropertyImportant = false;
+	    if (property != null) {
+		property.setSelectors(getSelector());
+		declarations.addElement(property);
+	    }
+	} else {
+	    if (currentProperty != null) {
+		System.out.println( "Can't add property " + 
+				    currentProperty + " (no expression available)" );
+	    } else if (currentExpression != null) {
+		System.out.println( "No property name foor this expression " + 
+				    currentExpression );
+	    } else {
+		System.out.println( "No property or expression available" );
+	    }
+	}
+}
+
+/**
+ * Assign a value to a property.
+ *
+ * @param property  The name of the property
+ * @param values    The expression representation of values
+ * @param important <code>true</code> if values are important
+ * @return          <code>null</code> or a property
+ */
+private final CssProperty handleDeclaration(String property, 
+					    CssExpression expression, 
+					    boolean important) 
+    throws InvalidParamException {
+    CssProperty prop = null;
+    
+    try {
+	prop = properties.createProperty(new AtRuleMedia(),
+					 property, 
+					 expression);
+    } catch (InvalidParamException e) {
+	throw e;
+    } catch (Exception e) {
+	throw new InvalidParamException(e.getMessage());
+    }
+    // set the importance
+    if (important) {
+	prop.setImportant();
+    }
+    prop.setOrigin(StyleSheetOrigin.AUTHOR);
+    
+    if (!expression.end()) {
+	throw new InvalidParamException("unrecognize " + expression);
+    } else {
+	return prop;
+    }
+}
+    
+/**
+ * Get the current selector.
+ */  
+public final CssSelectors getSelector() {
+    return selectors;
+}
+    
+/**
+ * Get the current vector of properties.
+ */  
+public final Vector getDeclaration() {
+    return declarations;
+}
+
+/**
+ * Set the real name of a property
+ *
+ * @param prop Name of the property
+ * @see CCC.Parser.CssFouffa#getProperty
+ */  
+public static String getProperty(String property) {
+    return CssFouffa.getProperty(property);
+}
+
+/**
+ * Set properties
+ *
+ * @param properties All CSS properties
+ */  
+public static void loadConfig(Properties properties) {
+    CssFouffa.loadConfig(properties);
+}
+
+/**
+ * Set the parser in Aural mode
+ *
+ * @see CCC.Parser.CssFouffa#setAuralMode
+ */  
+public static void setAuralMode() {
+    CssFouffa.message();
+}
+
+/**
+ * Unset the parser in Aural mode
+ *
+ * @see CCC.Parser.CssFouffa#unsetAuralMode
+ */  
+public static void unsetAuralMode() {
+    CssFouffa.message();
+}
+
+/**
+ * Returns <code>true</code> if the parser is in aural mode.
+ *
+ * @see CCC.Parser.CssFouffa#inAuralMode
+ */  
+public static boolean inAuralMode() {
+    return CssFouffa.inAuralMode();
+}
+
+}
+

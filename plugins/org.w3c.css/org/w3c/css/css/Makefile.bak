@@ -1,0 +1,95 @@
+SRCS = CssCascadingOrder.java StyleSheetCom.java \
+CssParser.java StyleSheetGenerator.java \
+StyleSheetParser.java StyleSheet.java\
+HTMLStyleSheetParser.java StyleSheetXMLParser.java \
+
+
+OBJS = $(SRCS:.java=.class)
+
+PACKAGE = org.w3c.css.css
+JAVAC = /usr/local/java11/bin/javac
+JAVADOC = javadoc
+JAVADOCFLAGS = -version -d docs -protected
+JAVACFLAGS =
+MAKEDEPEND = jmakedepend
+
+.SUFFIXES: .class .java
+.java.class:; $(JAVAC) $(JAVACFLAGS) $<
+
+all: $(OBJS)
+
+javadoc:; $(JAVADOC) $(JAVADOCFLAGS) $(PACKAGE)
+
+clean:; -rm -f $(OBJS) *~ core
+
+depend:; $(MAKEDEPEND) $(SRCS)
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+StyleSheetParser.class:: StyleSheetParser.java\
+	/usr/local/java11/lib/classes.zip\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssValidatorListener.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssFouffa.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Errors.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssSelectors.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.properties/CssProperty.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Warnings.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Warning.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Util.class
+StyleSheetCom.class:: StyleSheetCom.java\
+	/usr/local/java11/lib/classes.zip\
+	/u/www43/0/w3c/plehegar/Work/Java/html/tags/HtmlTree.class\
+	/u/www43/0/w3c/plehegar/Work/Java/html/tags/HtmlParser.class\
+	/u/www43/0/w3c/plehegar/Work/Java/html/tags/HtmlParserListener.class\
+	/u/www43/0/w3c/plehegar/Work/Java/html/tags/HtmlTag.class
+StyleSheetGenerator.class:: StyleSheetGenerator.java\
+	/usr/local/java11/lib/classes.zip\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Date.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser.analyzer/ParseException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssParseException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Errors.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssError.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssErrorToken.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssErrorDeclaration.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssFouffa.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssPrinterStyle.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssSelectors.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.properties/CssProperty.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/InvalidParamException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/SortedHashtable.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Warnings.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Warning.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Util.class
+StyleSheetXMLParser.class:: StyleSheetXMLParser.java\
+	/usr/local/java11/lib/classes.zip\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssValidatorListener.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssXMLParser.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssFouffa.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Errors.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssSelectors.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.properties/CssProperty.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Warnings.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Warning.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Util.class\
+	/u/www43/0/w3c/plehegar/Work/Java/w3c.zip
+CssParser.class:: CssParser.java\
+	/usr/local/java11/lib/classes.zip
+CssCascadingOrder.class:: CssCascadingOrder.java\
+	/usr/local/java11/lib/classes.zip\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssSelectors.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.properties/CssProperty.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssStyle.class
+HTMLStyleSheetParser.class:: HTMLStyleSheetParser.java\
+	/usr/local/java11/lib/classes.zip\
+	/u/www43/0/w3c/plehegar/Work/Java/html/tags/HtmlTree.class\
+	/u/www43/0/w3c/plehegar/Work/Java/html/tags/HtmlParser.class\
+	/u/www43/0/w3c/plehegar/Work/Java/html/tags/HtmlParserListener.class\
+	/u/www43/0/w3c/plehegar/Work/Java/html/tags/HtmlTag.class
+StyleSheet.class:: StyleSheet.java\
+	/usr/local/java11/lib/classes.zip\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Warnings.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Util.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/SortedHashtable.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/Errors.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.properties/CssProperty.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssSelectors.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser/CssStyle.class

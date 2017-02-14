@@ -1,0 +1,820 @@
+//
+// $Id$
+// From Philippe Le Hegaret (Philippe.Le_Hegaret@sophia.inria.fr)
+//
+// (c) COPYRIGHT MIT and INRIA, 1997.
+// Please first read the full copyright statement in file COPYRIGHT.html
+/*
+ * $Log: CssSelectors.java,v $
+ * Revision 2.5  1997/08/27 15:31:43  plehegar
+ * Desactivated warning on block and inline element ...
+ *
+ * Revision 2.4  1997/08/22 14:55:48  plehegar
+ * Added isEmpty()
+ *
+ * Revision 2.3  1997/08/21 07:25:30  plehegar
+ * Added auralMode, getNext, setNext
+ *
+ * Revision 2.2  1997/08/20 11:41:28  plehegar
+ * Freeze
+ *
+ * Revision 2.1  1997/08/08 15:52:34  plehegar
+ * Nothing
+ *
+ * Revision 1.1  1997/08/01 19:35:24  plehegar
+ * Initial revision
+ *
+ */
+package org.w3c.css.parser;
+
+import java.net.URL;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.Enumeration;
+
+import org.w3c.css.util.Warnings;
+import org.w3c.css.util.Messages;
+import org.w3c.css.util.Util;
+import org.w3c.css.util.InvalidParamException;
+import org.w3c.css.properties.CssProperty;
+
+/**
+ * This class manages all contextual selector.
+ *
+ * <p>Note:<BR>
+ * Invoke a <code>set</code> function to change the selector clears all
+ * properties !
+ *
+ * @version $Revision: 2.5 $
+ */
+public final class CssSelectors implements CssSelectorsConstant {
+    
+    /**
+     * At rule statement
+     */
+    AtRule atRule;
+
+    /**
+     * The element.
+     */  
+    String element; 
+    
+    /**
+     * All attributes (with class and id)
+     */    
+    Hashtable attributes = new Hashtable();
+
+    /**
+     * All pseudo classes
+     */    
+    boolean[] pseudoClass = new boolean[PSEUDOCLASS_CONSTANTS.length];
+
+    /**
+     * All pseudo classes
+     */    
+    boolean[] pseudoElement = new boolean[PSEUDOELEMENT_CONSTANTS.length];
+
+    /**
+     * The language pseudo-class
+     */
+    String language;
+
+    char connector = DESCENDANT;
+
+    /**
+     * The next context.
+     */
+    protected CssSelectors next;
+
+    // the specificity
+    private int specificity;
+    
+    // true if the element is a block-level element
+    private  boolean isBlock;
+    
+    CssStyle properties;
+    
+    // all hashCode (for performance)
+    private int hashElement; 
+    
+    private int hashGeneral;
+    
+    // External representation of the selector
+    // (for performance)
+    private String representation;
+    
+    // The CssStyle to use
+    private static Class style;
+    
+    // see isEmpty and addProperty
+    private boolean Init;
+    
+    // all HTML element in HTML 4.0
+    private static Properties elements = new Properties();
+    
+    // special (?) HTML tag
+    private static final int HTMLCode = "HTML".hashCode();
+    private static final int BODYCode = "BODY".hashCode();
+    
+    /**
+     * Create a new CssSelectors with no previous selector.
+     */
+    public CssSelectors() {
+	try {
+	    properties = (CssStyle) style.newInstance();
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+    }  
+    
+    /**
+     * Create a new CssSelectors with a previous selector.
+     *
+     * @param next the next selector
+     */
+    public CssSelectors(CssSelectors next) {
+	this();
+	this.next = next;
+    }  
+    
+    /**
+     * Set the style for all contexts.
+     * Don't forget to invoke this method if you want a style !
+     * 
+     * @param style0 the style
+     */  
+    public static void setStyle(Class style0) {
+	Util.verbose("Style is : " + style0);
+	style = style0;
+    }
+    
+    /**
+     * Set the attribute atRule
+     *
+     * @param atRule the new value for the attribute
+     */
+    public void setAtRule(AtRule atRule) {
+        this.atRule = atRule;
+    }
+
+    /**
+     * Returns the attribute atRule
+     *
+     * @return the value of the attribute
+     */
+    public AtRule getAtRule() {
+        return atRule;
+    }
+
+    /**
+     * Set the connector between simple selector
+     * @see CssSelectorsConstant
+     */    
+    public void setConnector(char connector) {
+	this.connector = connector;
+	Invalidate();
+    }
+
+    public char getConnector() {
+	return connector;
+    }
+
+    /**
+     * Set the element.
+     * Be careful, you should work with upper case not lower case
+     * (it's more practical)
+     *
+     * @param element the element.
+     */
+    public void setElement(String element) {
+	if (element == null) {
+	    return;
+	}
+	this.element = element;
+	hashElement = element.hashCode();
+	verifyPseudoElement(null);
+	Invalidate();
+    }
+    
+    /**
+     * Set the element with verification.
+     * Be careful, you should work with upper case not lower case
+     * (it's more practical)
+     *
+     * @param element the element.
+     * @param frame   For errors and warnings.
+     */
+    public void setElement(String element, Frame frame) {
+	if (element == null) {
+	    return;
+	}
+
+	String isHTML = elements.getProperty(element);
+
+	if (Util.fromHTMLFile) {
+	    if (isHTML == null) {
+		frame.addWarning("unknown-html", element);
+	    } else if (isHTML.equals("true")) {
+		isBlock = true;
+		if ((next != null)
+		    && (next.element != null)
+		    && !next.isBlock) {
+		    frame.addWarning("noinside", element);
+		}
+	    }
+	}
+	
+	this.element = element;
+	hashElement = element.hashCode();
+
+	if (Util.fromHTMLFile) {
+	    if (hashElement == HTMLCode && next != null) {
+		frame.addWarning("html-inside");
+	    } else if (hashElement == BODYCode && next != null && 
+		       next.hashElement != 0 && next.hashElement != HTMLCode) {
+		frame.addWarning("body-inside");
+	    }
+	}
+	
+	verifyPseudoElement(frame);
+	Invalidate();
+    }
+    
+    /**
+     * Get the element.
+     */
+    public String getElement() {
+	return element;
+    }
+
+    /**
+     * Returns <code>true</code> if the element is a block level element (HTML
+     * only) 
+     */
+    public boolean isBlockLevelElement() {
+	return isBlock;
+    }
+
+    void addAttribute(Attribute attr, Frame frame) {
+	Attribute old = (Attribute) attributes.get(attr.getName());
+	if (old != null) {
+	    try {
+		Util.verbose("OLD : " + old);
+		Util.verbose("ADD : " + attr);
+		Attribute news = old.applyAttribute(attr);
+		Util.verbose("NEW : " + news);
+		attributes.put(attr.getName(), news);
+	    } catch (AttributeException e) {
+		e.printStackTrace();
+		if (frame != null) {
+		    InvalidParamException error = 
+			new InvalidParamException("incompatible", old, attr);
+		    frame.addError(new CssError(error));
+		}
+	    }
+	} else {
+	    Util.verbose("ADD : " + attr);
+	    attributes.put(attr.getName(), attr);
+	}
+    }
+
+    /**
+     * Add an attribute to this selector.
+     * if the selector type is ATTRIBUTE_ANY, the value is ignored.
+     */    
+    public void addAttribute(String attName, String value) {
+	Attribute attr = 
+	    new AttributeExact().setValue(value).setName(attName);
+
+	attributes.put(attName, attr);
+	addAttribute(attr, null);
+	Invalidate();
+    }
+
+    /**
+     * Add an attribute to this selector.
+     * if the selector type is ATTRIBUTE_ANY, the value is ignored.
+     */    
+    public void addAttribute(String attName, String value, 
+			     int selectorType, Frame frame) {
+	Attribute attr = null;
+
+	switch (selectorType) {
+	case ATTRIBUTE_ANY:
+	    attr = new AttributeAny().setName(attName);
+	    break;
+	case ATTRIBUTE_EXACT:
+	    attr = new AttributeExact().setValue(value).setName(attName);
+	    break;
+	case ATTRIBUTE_BEGIN:
+	    attr = new AttributeBegin().setValue(value).setName(attName);
+	    break;
+	case ATTRIBUTE_ONE_OF:
+	    if (value.indexOf(' ') != -1) {
+		InvalidParamException error = 
+		    new InvalidParamException("space", value);
+		frame.addError(new CssError(error));
+		return;
+	    }
+	    attr = new AttributeOneOf().addValue(value).setName(attName);
+	    break;
+	default:
+	    throw new NullPointerException("Invalid access in CssSelectors" 
+					   + (char) selectorType);
+	}
+	addAttribute(attr, frame);
+	Invalidate();
+    }
+
+    public Enumeration getAttributes() {
+	return attributes.elements();
+    }
+
+    public void addPseudo(String pseudo, Frame frame) {
+	if (pseudo == null) {
+	    return;
+	}
+	int index = getPseudoClassIndex(pseudo);
+	if (index != -1) {
+	    addPseudoClass(index, frame);
+	} else {
+	    index = getPseudoElementIndex(pseudo);
+	    if (index != -1) {
+		addPseudoElement(index, frame);
+	    } else {
+		CssErrorToken e = new CssErrorToken(0, 
+						    Messages.getErrorString("pseudo"), 
+						    new String[0]);
+		e.skippedString = pseudo;
+		frame.addError(e);
+	    }
+	}
+    }
+
+    private int getPseudoClassIndex(String pseudo) {
+	for (int i = 0; i < PSEUDOCLASS_CONSTANTS.length; i++) {
+	    if (pseudo.equals(PSEUDOCLASS_CONSTANTS[i])) {
+		return i;
+	    }
+	}
+	return -1;
+    }
+
+    /**
+     * Set the pseudoClass with verification.
+     *
+     * Be careful, you should work with lower case not upper case
+     * (it's more practical)
+     *
+     * @param pseudoClass The pseudo class.
+     * @param frame       For errors and warnings.
+     * @deprecated
+     */
+    private void addPseudoClass(int index, Frame frame) {
+	//	hashPseudoClass = pseudoClass.hashCode();
+	this.pseudoClass[index] = true;
+	//if (element != null && !element.equals("A")) {
+	//    frame.addWarning("pseudo-classes", pseudoClass);
+	//}
+    }
+    
+    /**
+     * Get pseudo class
+     *
+     * <p> There is no semi-colon at the beginning of the string.
+     */
+    public Enumeration getPseudoClass() {
+	return new PseudoEnumeration(pseudoClass, PSEUDOCLASS_CONSTANTS);
+    }
+
+    public void setPseudoLang(String pseudo, String language, Frame frame) {
+	if (pseudo.equals("lang")) {
+	    this.language = language;
+	} else {
+	    CssErrorToken e = new CssErrorToken(0, 
+						Messages.getErrorString("pseudo"), 
+						new String[0]);
+	    e.skippedString = pseudo;
+	    frame.addError(e);
+	}
+    }
+
+    public String getPseudolanguage() {
+	return language;
+    }
+    
+    private int getPseudoElementIndex(String pseudo) {
+	for (int i = 0; i < PSEUDOELEMENT_CONSTANTS.length; i++) {
+	    if (pseudo.equals(PSEUDOELEMENT_CONSTANTS[i])) {
+		return i;
+	    }
+	}
+	return -1;
+    }
+
+    /**
+     * Set the pseudoElement.
+     * Be careful, you should work with lower case not upper case
+     * (it's more practical)
+     *
+     * @param pseudoElement the pseudo element
+     * @param frame         For errors and warnings.
+     * @deprecated
+     */
+    private void addPseudoElement(int index, Frame frame) {
+	//     if (!isBlock) {
+	//       frame.addWarning("withblock");
+	//     }
+	
+	this.pseudoElement[index] = true;
+	// hashPseudoElement = pseudoElement.hashCode();
+    }
+    
+    /**
+     * Get the pseudoElement.
+     *
+     * <p> There is no semi-colon at the beginning of the string.
+     */
+    public Enumeration getPseudoElement() {
+	return new PseudoEnumeration(pseudoElement, PSEUDOELEMENT_CONSTANTS);
+    }
+    
+    /**
+     * Adds a property to this selector.
+     *
+     * @param property The property.
+     * @param warnings For warning report.
+     */  
+    public void addProperty(CssProperty property, Warnings warnings) {
+	Init = true;
+	if (properties != null) {
+	    properties.setProperty(property, warnings);
+	} else {
+	    System.err.println("[ERROR] Invalid state in org.w3c.css.parser.CssSelectors#addProperty");
+	    System.err.println("[ERROR] Please report BUG");
+	}
+    }
+    
+    public CssStyle getStyle() {
+	return properties;
+    }
+    
+    /**
+     * Get the specificity of this selector.
+     *
+     * @see CssContextualSelector
+     */  
+    public int getSpecificity() {
+	
+	if (specificity == 0) {
+	    // compute the specificity
+	    specificity = next.getSpecificity();
+
+	    if (element != null) {
+		specificity += 1;
+	    }
+	    for (Enumeration e = attributes.elements(); e.hasMoreElements();) {
+		Attribute attr = (Attribute) e.nextElement();
+		if (attr.isId()) {
+		    specificity += 10000;
+		} else {
+		    specificity += 100;
+		}
+	    }
+	    for (Enumeration e = getPseudoClass(); e.hasMoreElements();) {
+		specificity += 100;
+	    }
+	}
+	
+	return specificity;
+    }
+    
+    /**
+     * Returns a string representation of the object.
+     */
+    public String toString() {
+	if ((atRule instanceof AtRulePage)
+	    || (atRule instanceof AtRuleFontFace)) {
+	    return atRule.toString();
+	}
+	if (representation == null) {
+	    representation = "";
+	    
+	    // I'm in reverse order, so compute the next before the current
+	    if (next != null) {
+		representation += next.toString();
+	    }
+
+	    if (element != null) {
+		representation += element;
+	    } 
+	    for (Enumeration e = attributes.elements(); e.hasMoreElements();) {
+		representation += e.nextElement().toString();
+	    }
+	    for (Enumeration e = getPseudoClass(); e.hasMoreElements();) {
+		representation += ":" + e.nextElement().toString();
+	    }
+	    if (language != null) {
+		representation += ":lang(" + language + ")";
+	    }
+	    for (Enumeration e = getPseudoElement(); e.hasMoreElements();) {
+		representation += ":" + e.nextElement().toString();
+	    }
+
+	    if (representation.length() == 0) {
+		// avoid problem with * { color : red }
+		representation = "*";
+	    }
+	    if (connector != DESCENDANT) {
+		representation += " " + new Character(connector);
+	    }
+	    representation += " ";
+	}
+
+	return representation;
+    }
+    
+    /**
+     * Get a hashCode.
+     */  
+    public int hashCode() {
+	if (hashGeneral == 0) {
+	    String s = toString();
+	    hashGeneral = s.hashCode();
+	    for (int i = 0; i < s.length(); i++) {
+		hashGeneral += (int) s.charAt(i);
+	    }
+	}
+	return hashGeneral;
+    }
+    
+    /**
+     * Returns <code>true</code> if the selector is equals to an another.
+     *
+     * @param selector The selector to compare
+     */
+    public boolean equals(Object selector) {
+	if ((selector == null) || !(selector instanceof CssSelectors)) {
+	    return false;
+	}
+	CssSelectors s = (CssSelectors) selector;
+
+	if ((atRule instanceof AtRulePage)
+	    || (atRule instanceof AtRuleFontFace)) {
+	    return atRule.equals(s.atRule);
+	}
+	if (hashCode() == s.hashCode()) {
+	    if (atRule == null) {
+		return (s.getAtRule() == null);
+	    } else {
+		return atRule.canApply(s.getAtRule());
+	    }
+	} else {
+	    return false;
+	}
+    }
+    
+    /**
+     * Set the previous selector.
+     *
+     * @param next the previous selector.
+     */  
+    public void setNext(CssSelectors next) {
+	this.next = next;
+	verifyPseudoElement(null);
+	Invalidate();
+    }
+    
+    /**
+     * Get the previous selector.
+     */  
+    public CssSelectors getNext() {
+	return next;
+    }
+    
+    final boolean canApply(Hashtable attrs, Hashtable attrs2) {
+	if (attrs.size() > 0) {
+	    for (Enumeration e = attrs.elements(); e.hasMoreElements();) {
+		Attribute attr = (Attribute) e.nextElement();
+		Attribute other = 
+		    (Attribute) attrs2.get(attr.getName());
+		if (other != null) {
+		    if (!attr.canApply(other)) {
+			return false;
+		    }
+		}
+	    }
+	    return true;
+	}
+	return true;
+    }
+
+    /**
+     * Returns <code>true</code> if the selector can matched this selector.
+     *
+     * <p>Examples:<br>
+     * <OL>
+     * <LI><code>H1.canApply(HTML BODY H1)</code> returns <code>true</code>
+     * <LI><code>H1.canApply(HTML BODY H1 EM)</code> returns <code>false</code>
+     * <LI><code>(H1 EM).canApply(HTML BODY H2 EM)</code> returns 
+     *     <code>false</code>
+     * <LI><code>(HTML EM).canApply(HTML BODY H2 EM)</code> returns 
+     *     <code>true</code>
+     * </OL>
+     *
+     * <p> Note:<BR>
+     * In principle, if you work with a HTML document, your selector should
+     * start with HTML BODY. Because you are always in this context when you
+     * parse the text in a HTML document.
+     *
+     * @param selector the selector to match
+     * @see            org.w3c.css.css.CssCascadingOrder#order
+     */  
+    public boolean canApply(CssSelectors selector) {
+	if ((atRule instanceof AtRulePage)
+	    || (atRule instanceof AtRuleFontFace)) {
+	    return atRule.canApply(selector.atRule);
+	}
+
+	// current work
+	System.err.println( attributes );
+	System.err.println( selector.attributes );
+	System.err.println( "canApply :" + canApply(attributes, 
+						    selector.attributes));
+	
+	
+
+	if (((hashElement != selector.hashElement) && hashElement != 0) ||
+	    ((hashClasse != selector.hashClasse) && hashClasse != 0) ||
+	    ((hashId != selector.hashId) && hashId != 0) ||
+	    ((hashPseudoClass != selector.hashPseudoClass) && 
+	     hashPseudoClass != 0) ||
+	    ((hashPseudoElement != selector.hashPseudoElement) && 
+	     hashPseudoElement != 0)) {
+	    // here we are in this case :
+	    // H1 and HTML BODY H1 EM
+	    // don't do anything !
+	    // the cascading order algorithm resolves this case like this :
+	    // 
+	    // if (for all contexts) !canApply(selector) 
+	    //       go and see canApply(selector.getNext())
+	    //
+	    // for further informations, see org.w3c.css.css.CssCascadingOrder#order
+	    return false;
+	} else {
+	    if (next == null || selector.next == null) {
+		return true;
+	    } else {
+		return next.canMatched(selector.next);
+	    }
+	}
+    }
+    
+    /**
+     * Returns true if the selector can matched an another selector.
+     * called by canApply
+     *
+     * @param selector The selector to compare
+     */
+    private boolean canMatched(CssSelectors selector) {
+
+	// current work
+	System.err.println( "canMatched :" );
+	System.err.println( attributes );
+	System.err.println( selector.attributes );
+	
+	if (((hashElement != selector.hashElement) && hashElement != 0) ||
+	    ((hashClasse != selector.hashClasse) && hashClasse != 0) ||
+	    ((hashId != selector.hashId) && hashId != 0) ||
+	    ((hashPseudoClass != selector.hashPseudoClass) && 
+	     hashPseudoClass != 0) ||
+	    ((hashPseudoElement != selector.hashPseudoElement) && 
+	     hashPseudoElement != 0)) {
+	    if (selector.next != null) {
+		// here we are in this case :
+		// H1 and HTML BODY H1 EM
+		// H1 can't matched EM but EM have next
+		return canMatched(selector.next);
+	    } else {
+		// here we are in this case :
+		// H1 and HTML
+		// H1 can't matched HTML and HTML don't have next
+		return false; 
+	    }
+	}
+	
+	if (next == null || selector.next == null) {
+	    // here we are in this case :
+	    // H1 and BODY HTML H1
+	    // or :
+	    // HTML BODY and BODY (this case won't appear in principle)
+	    return true;
+	} else {
+	    // here we are in this case :
+	    // BODY H1 and HTML BODY H1
+	    return next.canMatched(selector.next);
+	}
+    }
+    
+    /**
+     * Returns <code>true</code> if there is no property in this document.
+     */  
+    public boolean isEmpty() {
+	return !Init;
+    }
+    
+    void verifyPseudoElement(Frame frame) {
+	/*
+	if (next != null && next.pseudoElement != null) {
+	    // eliminate this error
+	    if (frame != null) {
+		InvalidParamException error = 
+		    new InvalidParamException("pseudo-element", 
+					      next.pseudoElement,
+					      this.toString());
+		frame.addError(new CssError(error));
+	    }
+	    next.pseudoElement = null;
+	    next.verifyPseudoElement(frame);
+	    next.Invalidate();
+	}
+	*/
+    }
+    
+    void verifyPseudoClass(Frame frame) {
+	/*
+	if (next != null && next.pseudoClass != null) {
+	    // eliminate this error
+	    if (frame != null) {
+		InvalidParamException error = 
+		    new InvalidParamException("pseudo-class", 
+					      next.pseudoClass,
+					      this.toString());
+		frame.addError(new CssError(error));
+	    }
+	    next.pseudoClass = null;
+	    next.verifyPseudoClass(frame);
+	    next.Invalidate();
+	}
+	*/
+    }
+    
+    void Invalidate() {
+	// invalidate all pre-computation in this selectors
+	representation = null;
+	specificity = 0;
+	hashGeneral = 0;
+	
+	if (Init) {
+	    // yes I invalidate all properties too !
+	    try {
+		properties = (CssStyle) style.newInstance();
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+	}
+    }
+    
+    static {
+	try {
+	    URL url = CssSelectors.class.getResource("Elements.dtd4");
+	    java.io.InputStream f = url.openStream();
+	    try {
+		elements.load(f);
+	    } finally {
+		f.close();
+	    }
+	} catch (Exception e) {
+	    System.err.println("org.w3c.css.properties.CssSelectors: couldn't load properties");
+	    System.err.println("  " + e.toString() );
+	}
+    }
+}
+
+
+
+
+class PseudoEnumeration implements Enumeration {
+    boolean[] classes;
+    String[] values;
+    int current = -1;
+
+    PseudoEnumeration(boolean[] classes, String[] values) {
+	this.classes = classes;
+	this.values = values;
+
+	while ((++current < classes.length) 
+	       && !classes[current]) /*nothing*/;
+    }
+
+    public boolean hasMoreElements() {
+	return (current != classes.length);
+    }
+
+    public Object nextElement() {
+	String v = values[current];
+	while ((++current < classes.length) 
+	       && !classes[current]) /*nothing*/;
+	return v;
+    }
+}
