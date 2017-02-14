@@ -22,3 +22,4 @@ Export-Package: com.aptana.css.core,
  com.aptana.css.core.preferences
 Eclipse-ExtensibleAPI: true
 Eclipse-RegisterBuddy: org.w3c.css
+Import-Package: org.apache.commons.lang3

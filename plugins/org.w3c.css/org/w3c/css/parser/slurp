@@ -1,0 +1,129 @@
+Style is : class org.w3c.css.font.Css2Style
+ADD : [lang=yot]
+ADD : #34
+StyleSheet.parseURL(file:/u/crash/0/koala/plehegar/titi.css, 3)
+ADD : [lang=yot]
+add property HTML[lang=yot] BODY  #ccc
+ADD : [lang~=yot]
+add property HTML[lang~=yot] BODY  #fff
+ADD : #34
+add property #34  white
+StyleSheet.getStyle(HTML[lang=yot]#34 BODY H1 )
+CASCADING ORDER color in HTML[lang=yot]#34 BODY H1 
+######## test with HTML[lang=yot]#34 BODY  and HTML[lang=yot]#34 BODY H1 
+10102 canApply this HTML[lang=yot]#34 BODY  selector: HTML[lang=yot]#34 BODY H1 
+connector  
+{}
+{}
+canApply for attributes :true
+canApply RETURNS FALSE
+######## test with HTML[lang=yot]  and HTML[lang=yot]#34 BODY H1 
+101 canApply this HTML[lang=yot]  selector: HTML[lang=yot]#34 BODY H1 
+connector  
+{lang=[lang=yot]}
+{}
+canApply for attributes :false
+canApply RETURNS FALSE
+######## test with HTML[lang=yot]#34  and HTML[lang=yot]#34 BODY H1 
+10101 canApply this HTML[lang=yot]#34  selector: HTML[lang=yot]#34 BODY H1 
+connector  
+{lang=[lang=yot], id=#34}
+{}
+canApply for attributes :false
+canApply RETURNS FALSE
+######## test with HTML[lang~=yot] BODY  and HTML[lang=yot]#34 BODY H1 
+102 canApply this HTML[lang~=yot] BODY  selector: HTML[lang=yot]#34 BODY H1 
+connector  
+{}
+{}
+canApply for attributes :true
+canApply RETURNS FALSE
+######## test with HTML[lang~=yot]  and HTML[lang=yot]#34 BODY H1 
+101 canApply this HTML[lang~=yot]  selector: HTML[lang=yot]#34 BODY H1 
+connector  
+{lang=[lang~=yot]}
+{}
+canApply for attributes :false
+canApply RETURNS FALSE
+######## test with #34  and HTML[lang=yot]#34 BODY H1 
+10000 canApply this #34  selector: HTML[lang=yot]#34 BODY H1 
+connector  
+{id=#34}
+{}
+canApply for attributes :false
+canApply RETURNS false
+######## test with HTML[lang=yot]#34 BODY H1  and HTML[lang=yot]#34 BODY H1 
+######## test with HTML[lang=yot] BODY  and HTML[lang=yot]#34 BODY H1 
+102 canApply this HTML[lang=yot] BODY  selector: HTML[lang=yot]#34 BODY H1 
+connector  
+{}
+{}
+canApply for attributes :true
+canApply RETURNS FALSE
+Found nothing ... try the next HTML[lang=yot]#34 BODY 
+StyleSheet.getStyle(HTML[lang=yot]#34 BODY )
+CASCADING ORDER color in HTML[lang=yot]#34 BODY 
+######## test with HTML[lang=yot]#34 BODY  and HTML[lang=yot]#34 BODY 
+######## test with HTML[lang=yot]  and HTML[lang=yot]#34 BODY 
+101 canApply this HTML[lang=yot]  selector: HTML[lang=yot]#34 BODY 
+connector  
+{lang=[lang=yot]}
+{}
+canApply for attributes :false
+canApply RETURNS FALSE
+######## test with HTML[lang=yot]#34  and HTML[lang=yot]#34 BODY 
+10101 canApply this HTML[lang=yot]#34  selector: HTML[lang=yot]#34 BODY 
+connector  
+{lang=[lang=yot], id=#34}
+{}
+canApply for attributes :false
+canApply RETURNS FALSE
+######## test with HTML[lang~=yot] BODY  and HTML[lang=yot]#34 BODY 
+102 canApply this HTML[lang~=yot] BODY  selector: HTML[lang=yot]#34 BODY 
+connector  
+{}
+{}
+canApply for attributes :true
+canMatched this HTML[lang~=yot]  selector: HTML[lang=yot]#34 
+connector  
+{lang=[lang~=yot]}
+{lang=[lang=yot], id=#34}
+canMatched for attributes :true
+canMatched RETURN true
+%%%%%%%%%%%%%%%%% Found HTML[lang~=yot] BODY 
+######## test with HTML[lang~=yot]  and HTML[lang=yot]#34 BODY 
+101 canApply this HTML[lang~=yot]  selector: HTML[lang=yot]#34 BODY 
+connector  
+{lang=[lang~=yot]}
+{}
+canApply for attributes :false
+canApply RETURNS FALSE
+######## test with #34  and HTML[lang=yot]#34 BODY 
+10000 canApply this #34  selector: HTML[lang=yot]#34 BODY 
+connector  
+{id=#34}
+{}
+canApply for attributes :false
+canApply RETURNS false
+######## test with HTML[lang=yot]#34 BODY H1  and HTML[lang=yot]#34 BODY 
+10103 canApply this HTML[lang=yot]#34 BODY H1  selector: HTML[lang=yot]#34 BODY 
+connector  
+{}
+{}
+canApply for attributes :true
+canApply RETURNS FALSE
+######## test with HTML[lang=yot] BODY  and HTML[lang=yot]#34 BODY 
+102 canApply this HTML[lang=yot] BODY  selector: HTML[lang=yot]#34 BODY 
+connector  
+{}
+{}
+canApply for attributes :true
+canMatched this HTML[lang=yot]  selector: HTML[lang=yot]#34 
+connector  
+{lang=[lang=yot]}
+{lang=[lang=yot], id=#34}
+canMatched for attributes :true
+canMatched RETURN true
+%%%%%%%%%%%%%%%%% Found HTML[lang=yot] BODY 
+@@@@@@@@@@@@@@ FOUND 2 properties
+color: #fff;
