@@ -80,6 +80,7 @@
       <import plugin="javax.inject" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.osgi.services"/>
       <import plugin="org.eclipse.emf.ecore"/>
+      <import plugin="org.apache.commons.lang3"/>
    </requires>
 
    <plugin
