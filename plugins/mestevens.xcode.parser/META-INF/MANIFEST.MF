@@ -6,6 +6,6 @@ Bundle-Version: 1.0.0.qualifier
 Export-Package: ca.mestevens.ios.xcode.parser.exceptions,
  ca.mestevens.ios.xcode.parser.models,
  ca.mestevens.ios.xcode.parser.utils
-Bundle-ClassPath: libs/commons-codec-1.4.jar,
- libs/commons-lang3-3.1.jar,
- .
+Bundle-ClassPath: .
+Require-Bundle: org.apache.commons.codec;bundle-version="1.4.0",
+ org.apache.commons.lang3;bundle-version="3.1.0"
