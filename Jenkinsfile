@@ -52,7 +52,7 @@ timestamps() {
 
 			// If not a PR, trigger downstream builds for same branch
 			if (!env.BRANCH_NAME.startsWith('PR-')) {
-				build job: "titanium-core-${env.BRANCH_NAME}", wait: false
+				build job: "Appcelerator Studio/titanium_studio/${env.BRANCH_NAME}", wait: false
 				build job: "Studio/studio3-php/${env.BRANCH_NAME}", wait: false
 				build job: "Studio/studio3-ruby/${env.BRANCH_NAME}", wait: false
 				build job: "Studio/Pydev/${env.BRANCH_NAME}", wait: false
