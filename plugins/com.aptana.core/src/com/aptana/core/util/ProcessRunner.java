@@ -271,7 +271,8 @@ public class ProcessRunner implements IProcessRunner
 				}
 				else
 				{
-					CollectionsUtil.addToList(arguments, ">", outFile.getAbsolutePath(), "2>", errFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+					CollectionsUtil.addToList(arguments,
+							">", outFile.getAbsolutePath(), "2>", errFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 					p = run(workingDirectory, environment, arguments.toArray(new String[arguments.size()]));
 				}
 				return processData(p, outFile, errFile);
@@ -398,9 +399,9 @@ public class ProcessRunner implements IProcessRunner
 		}
 		catch (InterruptedException e)
 		{
-			IdeLog.logError(CorePlugin.getDefault(), e);
+			//As the process request couldn't complete successfully, let's throw the error status so that callers will get to know about it.
+			return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, e.getMessage(), e);
 		}
-		return null;
 	}
 
 	private void logProcessOutput(String stdout, String stderr)
