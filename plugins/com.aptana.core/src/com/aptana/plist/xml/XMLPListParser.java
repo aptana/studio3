@@ -85,7 +85,7 @@ public class XMLPListParser implements IPListParser
 				}
 				catch (Exception e1)
 				{
-					IdeLog.logError(CorePlugin.getDefault(), e1);
+					IdeLog.logWarning(CorePlugin.getDefault(), e1);
 				}
 			}
 			if (d != null)

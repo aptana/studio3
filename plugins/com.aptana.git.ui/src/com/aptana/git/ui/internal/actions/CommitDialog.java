@@ -804,7 +804,7 @@ class CommitDialog extends StatusDialog
 			}
 			catch (Throwable t)
 			{
-				IdeLog.logError(GitUIPlugin.getDefault(), "Failed to turn diff into HTML", t, IDebugScopes.DEBUG); //$NON-NLS-1$
+				IdeLog.logWarning(GitUIPlugin.getDefault(), "Failed to turn diff into HTML", t, IDebugScopes.DEBUG); //$NON-NLS-1$
 			}
 		}
 		updateDiff(file, diff);

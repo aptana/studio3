@@ -50,13 +50,13 @@ public class TarUtil
 			}
 			catch (IOException e)
 			{
-				IdeLog.logError(CorePlugin.getDefault(), "Error unpacking .tgz - " + source.toOSString(), e); //$NON-NLS-1$
+				IdeLog.logWarning(CorePlugin.getDefault(), "Error unpacking .tgz - " + source.toOSString(), e); //$NON-NLS-1$
 				return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, "Error unpacking .tgz - " + source.toOSString(), //$NON-NLS-1$
 						e);
 			}
 			catch (InterruptedException e)
 			{
-				IdeLog.logError(CorePlugin.getDefault(), e);
+				IdeLog.logWarning(CorePlugin.getDefault(), e);
 				return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, "Error unpacking .tgz. Process interrupted."); //$NON-NLS-1$
 			}
 		}

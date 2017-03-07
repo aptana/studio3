@@ -123,7 +123,7 @@ public class CommandlineArgumentsHandler
 			}
 			catch (CoreException e)
 			{
-				IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e);
+				IdeLog.logWarning(CommandlineLauncherPlugin.getDefault(), e); //that's the best try!
 			}
 		}
 
@@ -171,7 +171,7 @@ public class CommandlineArgumentsHandler
 		}
 		catch (CoreException e)
 		{
-			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e);
+			IdeLog.logWarning(CommandlineLauncherPlugin.getDefault(), e);
 		}
 	}
 
@@ -230,7 +230,7 @@ public class CommandlineArgumentsHandler
 		}
 		catch (PartInitException e)
 		{
-			IdeLog.logError(CommandlineLauncherPlugin.getDefault(), e);
+			IdeLog.logWarning(CommandlineLauncherPlugin.getDefault(), e);
 		}
 	}
 }

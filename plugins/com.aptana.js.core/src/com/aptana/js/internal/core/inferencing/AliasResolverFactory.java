@@ -105,12 +105,12 @@ public class AliasResolverFactory implements IAliasResolver
 			}
 			catch (CoreException e)
 			{
-				IdeLog.logError(JSCorePlugin.getDefault(), e);
+				IdeLog.logWarning(JSCorePlugin.getDefault(), e);
 				continue;
 			}
 			catch (Exception e)
 			{
-				IdeLog.logError(JSCorePlugin.getDefault(), e);
+				IdeLog.logWarning(JSCorePlugin.getDefault(), e);
 			}
 
 		}

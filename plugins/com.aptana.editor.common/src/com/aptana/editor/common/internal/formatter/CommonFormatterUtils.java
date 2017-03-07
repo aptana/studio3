@@ -93,7 +93,7 @@ public class CommonFormatterUtils
 					}
 					catch (Exception e)
 					{
-						IdeLog.logError(CommonEditorPlugin.getDefault(),
+						IdeLog.logWarning(CommonEditorPlugin.getDefault(),
 								"Error while formatting the file template code", e); //$NON-NLS-1$
 					}
 				}

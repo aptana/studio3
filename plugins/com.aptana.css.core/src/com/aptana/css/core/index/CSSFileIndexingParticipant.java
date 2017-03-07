@@ -47,7 +47,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (Throwable e)
 		{
-			IdeLog.logError(CSSCorePlugin.getDefault(), e);
+			IdeLog.logWarning(CSSCorePlugin.getDefault(), e);
 		}
 		finally
 		{

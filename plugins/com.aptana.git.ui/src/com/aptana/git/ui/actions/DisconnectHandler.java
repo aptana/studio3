@@ -87,7 +87,7 @@ public class DisconnectHandler extends AbstractGitHandler
 				}
 				catch (CoreException e)
 				{
-					IdeLog.logError(GitUIPlugin.getDefault(), e);
+					IdeLog.logWarning(GitUIPlugin.getDefault(), e);
 				}
 				sub.worked(20);
 
@@ -97,7 +97,7 @@ public class DisconnectHandler extends AbstractGitHandler
 				}
 				catch (Exception e)
 				{
-					IdeLog.logError(GitUIPlugin.getDefault(), e);
+					IdeLog.logWarning(GitUIPlugin.getDefault(), e);
 				}
 				sub.worked(10);
 
