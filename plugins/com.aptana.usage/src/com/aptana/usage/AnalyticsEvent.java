@@ -15,6 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.Platform;
 
@@ -175,16 +180,7 @@ public class AnalyticsEvent
 		results = (results / 1000) / 60;
 		addPostEntry(event, "tz", Integer.toString(results)); //$NON-NLS-1$
 
-		InetAddress ip;
-		try
-		{
-			ip = InetAddress.getLocalHost();
-			addPostEntry(event, "ip", ip.getHostAddress()); //$NON-NLS-1$
-		}
-		catch (UnknownHostException e)
-		{
-			addPostEntry(event, "ip", StringUtil.EMPTY); //$NON-NLS-1$
-		}
+		addIPAddress(event);
 
 		if (!EMPTY_JSON_PAYLOAD.equals(getJSONPayloadString()))
 		{
@@ -203,6 +199,43 @@ public class AnalyticsEvent
 		event.deleteCharAt(event.lastIndexOf("&")); //$NON-NLS-1$
 
 		eventString = event.toString();
+	}
+	
+	private void addIPAddress(final StringBuilder event)
+	{
+
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		Future<String> future = executor.submit(new Callable()
+		{
+			public String call() throws Exception
+			{
+				InetAddress ip;
+				try
+				{
+					ip = InetAddress.getLocalHost();
+					addPostEntry(event, "ip", ip.getHostAddress()); //$NON-NLS-1$
+				}
+				catch (UnknownHostException e)
+				{
+					addPostEntry(event, "ip", StringUtil.EMPTY); //$NON-NLS-1$
+				}
+
+				return "OK";
+			}
+		});
+
+		try
+		{
+			future.get(1, TimeUnit.SECONDS);
+		}
+		catch (Exception e) // timeout exception
+		{
+			// add empty ip for timeout exception
+			addPostEntry(event, "ip", StringUtil.EMPTY); //$NON-NLS-1$
+		}
+		executor.shutdownNow();
+
 	}
 
 	private void addPostEntry(StringBuilder event, String key, String value)
