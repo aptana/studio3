@@ -85,7 +85,7 @@ public class ProcessUtilTest
 	public void testProcessResultReturnsStatusWrappingExceptionIfInterruptedExceptionIsThrown() throws Exception
 	{
 		final String stdOutText = "stdout";
-		final String stdErrText = "stdout";
+		final String stdErrText = "stderr";
 
 		final Process process = context.mock(Process.class);
 		context.checking(new Expectations()
@@ -108,7 +108,6 @@ public class ProcessUtilTest
 		assertNotNull(status);
 		assertTrue(status instanceof ProcessStatus);
 		ProcessStatus pStatus = (ProcessStatus) status;
-		assertEquals(0, pStatus.getCode());
 		assertEquals(stdOutText, pStatus.getStdOut());
 		assertEquals(stdErrText, pStatus.getStdErr());
 		assertTrue(pStatus.getException() instanceof InterruptedException);
