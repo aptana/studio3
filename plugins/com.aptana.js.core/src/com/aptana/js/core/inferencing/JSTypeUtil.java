@@ -151,7 +151,7 @@ public class JSTypeUtil
 					);
 					// @formatter:on
 
-					IdeLog.logError(JSCorePlugin.getDefault(), message);
+					IdeLog.logWarning(JSCorePlugin.getDefault(), message);
 				}
 			}
 
@@ -462,7 +462,7 @@ public class JSTypeUtil
 	{
 		if (StringUtil.isEmpty(type))
 		{
-			IdeLog.logError(JSCorePlugin.getDefault(), new IllegalArgumentException(
+			IdeLog.logWarning(JSCorePlugin.getDefault(), new IllegalArgumentException(
 					"Null or Empty type name attempting to be recorded for a return type.")); //$NON-NLS-1$
 			return StringUtil.EMPTY;
 		}
@@ -476,7 +476,7 @@ public class JSTypeUtil
 			if (type.charAt(type.length() - 1) != '>')
 			{
 				String baseType = type.substring(0, genericOpenIndex);
-				IdeLog.logError(JSCorePlugin.getDefault(),
+				IdeLog.logWarning(JSCorePlugin.getDefault(),
 						new IllegalArgumentException(MessageFormat.format("{0} type missing end '>'", baseType))); //$NON-NLS-1$
 				return baseType;
 			}
