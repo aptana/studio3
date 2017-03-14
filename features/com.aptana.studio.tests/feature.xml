@@ -18,23 +18,20 @@
    </license>
 
    <requires>
-      <import plugin="org.junit"/>
-      <import plugin="com.aptana.editor.common" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jface.text" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.filesystem" version="1.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.ide" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.css" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.html" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.ui.epl" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.js" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.resources" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="com.aptana.scripting" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jface" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.xml" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.git.core" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.git.ui" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.findbar" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.text" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="com.aptana.ui.epl" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.filewatcher" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.parsing" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.scripting.ui" version="1.0.0" match="greaterOrEqual"/>
@@ -43,7 +40,6 @@
       <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.ui.workbench" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.commands" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.jface" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.filesystem.ftp" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.filesystem.secureftp" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.syncing.core"/>
@@ -51,23 +47,46 @@
       <import plugin="com.aptana.theme"/>
       <import plugin="com.aptana.org.eclipse.tm.terminal" version="3.0.100" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.dtd"/>
-      <import plugin="com.aptana.editor.css.formatter"/>
       <import plugin="com.aptana.editor.json"/>
-      <import plugin="com.aptana.editor.xml.formatter"/>
-      <import plugin="com.aptana.editor.html.formatter"/>
-      <import plugin="com.aptana.editor.js.formatter"/>
-      <import plugin="org.eclipse.osgi" version="3.1.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.deploy.ftp"/>
-      <import plugin="com.aptana.samples"/>
-      <import plugin="com.aptana.console"/>
-      <import plugin="com.aptana.browser"/>
       <import plugin="com.aptana.index.core"/>
-      <import plugin="com.aptana.portal.ui"/>
-      <import plugin="com.aptana.buildpath.core"/>
+      <import plugin="com.aptana.samples"/>
       <import plugin="com.aptana.jira.core"/>
-      <import plugin="com.aptana.js.core"/>
-      <import plugin="com.aptana.dtd.core"/>
+      <import plugin="org.eclipse.osgi" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.browser"/>
       <import plugin="com.aptana.css.core"/>
+      <import plugin="com.aptana.console" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.testing.mocks" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.scripting" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.projects" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.junit" version="4.7.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.testing.utils" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.core.io"/>
+      <import plugin="com.aptana.filesystem.http" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.js.core" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.usage" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.js.debug.core" version="3.0.3" match="greaterOrEqual"/>
+      <import plugin="com.aptana.ui" version="3.1.4" match="greaterOrEqual"/>
+      <import plugin="com.aptana.webserver.core"/>
+      <import plugin="org.kohsuke.junit" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.hamcrest.core"/>
+      <import plugin="com.aptana.core.epl"/>
+      <import plugin="org.eclipse.swt"/>
+      <import plugin="org.eclipse.test.performance" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime.compatibility"/>
+      <import plugin="org.eclipse.pde.junit.runtime"/>
+      <import plugin="com.aptana.editor.css.formatter" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.formatter.epl"/>
+      <import plugin="com.aptana.editor.xml.formatter" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.html.formatter" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.js.formatter" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.common" version="3.0.3" match="greaterOrEqual"/>
+      <import plugin="com.aptana.portal.ui" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.buildpath.core" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.dtd.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.xml.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.samples.ui"/>
    </requires>
 
    <plugin

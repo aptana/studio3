@@ -9,7 +9,10 @@ timestamps() {
 			checkout([
 				$class: 'GitSCM',
 				branches: scm.branches,
-				extensions: scm.extensions + [[$class: 'CleanBeforeCheckout']],
+				extensions: scm.extensions + [
+					[$class: 'CleanBeforeCheckout'],
+					[$class: 'CloneOption', depth: 30, honorRefspec: true, noTags: true, reference: '', shallow: true, timeout: 30]
+				],
 				userRemoteConfigs: scm.userRemoteConfigs
 			])
 		}
