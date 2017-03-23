@@ -92,7 +92,7 @@ public class ProcessRunnable implements Runnable
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CorePlugin.getDefault(), e);
+			IdeLog.logWarning(CorePlugin.getDefault(), e);
 			this.status = new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, e.getMessage(), e);
 		}
 		finally

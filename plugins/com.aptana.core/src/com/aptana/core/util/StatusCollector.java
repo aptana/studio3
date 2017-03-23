@@ -173,7 +173,7 @@ public class StatusCollector
 
 				public void handleException(Throwable exception)
 				{
-					IdeLog.logError(CorePlugin.getDefault(),
+					IdeLog.logWarning(CorePlugin.getDefault(),
 							"StatusCollector: Error while notifying a staus change event.", exception); //$NON-NLS-1$
 				}
 			});

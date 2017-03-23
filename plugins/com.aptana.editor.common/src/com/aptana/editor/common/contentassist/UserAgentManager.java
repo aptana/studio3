@@ -492,7 +492,7 @@ public class UserAgentManager implements IUserAgentManager
 			}
 			catch (BackingStoreException e)
 			{
-				IdeLog.logError(CommonEditorPlugin.getDefault(), "Error saving the user-agent preferences.", e); //$NON-NLS-1$
+				IdeLog.logWarning(CommonEditorPlugin.getDefault(), "Error saving the user-agent preferences.", e); //$NON-NLS-1$
 			}
 		}
 		else

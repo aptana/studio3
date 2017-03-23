@@ -78,7 +78,7 @@ public class ProjectTemplate implements IProjectTemplate
 			}
 			catch (Exception e)
 			{
-				IdeLog.logError(CorePlugin.getDefault(),
+				IdeLog.logWarning(CorePlugin.getDefault(),
 						"Error applying a template. Trying to write the file as is, without template evaluation.", e); //$NON-NLS-1$
 			}
 

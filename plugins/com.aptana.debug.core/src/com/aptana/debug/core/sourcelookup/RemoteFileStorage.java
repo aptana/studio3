@@ -82,7 +82,7 @@ public class RemoteFileStorage extends UniformResourceStorage {
 					fIn.reset();
 				}
 			} catch (IOException e) {
-				IdeLog.logError(DebugCorePlugin.getDefault(), e);
+				IdeLog.logWarning(DebugCorePlugin.getDefault(), e);
 			}
 			return fIn;
 		}

@@ -360,7 +360,7 @@ public class SamplesManager implements ISamplesManager
 				}
 				catch (Exception e)
 				{
-					IdeLog.logError(SamplesPlugin.getDefault(),
+					IdeLog.logWarning(SamplesPlugin.getDefault(),
 							MessageFormat.format("Unable to retrieve the icon at {0} for sample {1}", iconPath, name), //$NON-NLS-1$
 							e);
 				}
