@@ -21,7 +21,7 @@ timestamps() {
 		def studio3Repo = "file://${env.WORKSPACE}/dist/"
 
 		buildPlugin {
-			dependencies = ['libraries-com': 'Studio/libraries_com']
+			dependencies = ['libraries-com': 'aptana-studio/libraries_com']
 			builder = 'com.aptana.feature.build'
 			properties = ['libraries-com.p2.repo': librariesComRepo]
 		}
