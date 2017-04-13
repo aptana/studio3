@@ -14,6 +14,9 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -322,7 +325,7 @@ public class Portal
 			{
 				return true;
 			}
-			connection = (HttpURLConnection) url.openConnection();
+			connection = getConnection(url);
 			// Give it a 4 seconds delay before deciding that it's a dead connection
 			connection.setConnectTimeout(4000);
 			connection.setRequestMethod("HEAD"); // Don't ask for content //$NON-NLS-1$
@@ -335,7 +338,7 @@ public class Portal
 		{
 			connected = false;
 			IdeLog.logWarning(PortalUIPlugin.getDefault(),
-					"Could not establish a connection to the remote portal. Using the local content."); //$NON-NLS-1$
+					"Could not establish a connection to the remote portal. Using the local content.", e); //$NON-NLS-1$
 		}
 		finally
 		{
@@ -345,6 +348,15 @@ public class Portal
 			}
 		}
 		return connected;
+	}
+
+	protected HttpsURLConnection getConnection(URL httpsURL) throws Exception
+	{
+		SSLContext sc = SSLContext.getInstance("TLSv1.2"); //$NON-NLS-1$
+		sc.init(null, null, new java.security.SecureRandom());
+		HttpsURLConnection con = (HttpsURLConnection) httpsURL.openConnection();
+		con.setSSLSocketFactory(sc.getSocketFactory());
+		return con;
 	}
 
 	/**
@@ -368,10 +380,10 @@ public class Portal
 			public void run()
 			{
 				Color color = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-				builder.put("ch", toHex(color.getRGB()));// FIXME Grab one of the actual parent widgets and grab it's bg?
+				builder.put("ch", toHex(color.getRGB()));// FIXME Grab one of the actual parent widgets and grab it's
+															// bg?
 			}
 		});
-
 
 		// project type
 		builder.put("p", String.valueOf(getProjectType(activeProject)));
