@@ -32,17 +32,6 @@ public class PortalTest
 	 * testGetDefaultURLEmpty
 	 */
 	@Test
-	public void testGetDefaultURLEmpty() throws Exception
-	{
-		Portal fixture = Portal.getInstance();
-		URL result = fixture.getDefaultURL();
-		assertEquals(Portal.BASE_REMOTE_URL, result.toString());
-	}
-
-	/**
-	 * testGetDefaultURLEmpty
-	 */
-	@Test
 	public void testGetDefaultURLNull() throws Exception
 	{
 		Portal fixture = Portal.getInstance();
@@ -63,9 +52,9 @@ public class PortalTest
 	public void testGetDefaultURLOffline() throws Exception
 	{
 		URL localFileURL = new File("").toURI().toURL(); //$NON-NLS-1$
-		URL googleServer = new URL("http://www.google.com"); //$NON-NLS-1$
-		URL offlineServer = new URL("http://fff.appceler.abc"); //$NON-NLS-1$
-		URL baseServer = new URL("http://www.msn.com"); //$NON-NLS-1$
+		URL googleServer = new URL("https://www.google.com"); //$NON-NLS-1$
+		URL offlineServer = new URL("https://fff.appceler.abc"); //$NON-NLS-1$
+		URL baseServer = new URL("https://www.msn.com"); //$NON-NLS-1$
 
 		Portal fixture = Portal.getInstance();
 
