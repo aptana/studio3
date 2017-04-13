@@ -61,10 +61,10 @@ timestamps() {
 
 		// If not a PR, trigger downstream builds for same branch
 		if (!env.BRANCH_NAME.startsWith('PR-')) {
-			build job: "Appcelerator Studio/titanium_studio/${env.BRANCH_NAME}", wait: false
-			build job: "Studio/studio3-php/${env.BRANCH_NAME}", wait: false
-			build job: "Studio/studio3-ruby/${env.BRANCH_NAME}", wait: false
-			build job: "Studio/Pydev/${env.BRANCH_NAME}", wait: false
+			build job: "appcelerator-studio/titanium_studio/${env.BRANCH_NAME}", wait: false
+			build job: "aptana-studio/studio3-php/${env.BRANCH_NAME}", wait: false
+			build job: "aptana-studio/studio3-ruby/${env.BRANCH_NAME}", wait: false
+			build job: "aptana-studio/Pydev/${env.BRANCH_NAME}", wait: false
 		}
 	} // end node
 } //end timestamps
