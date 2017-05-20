@@ -110,4 +110,9 @@ public interface IProjectTemplate
 	 * @return An {@link IPath} array of index files to open (can be <code>null</code>).
 	 */
 	public IPath[] getIndexFiles();
+
+	/**
+	 * @return True, if the template is pre-packaged as part of appc installation.
+	 */
+	public boolean isPrePackaged();
 }

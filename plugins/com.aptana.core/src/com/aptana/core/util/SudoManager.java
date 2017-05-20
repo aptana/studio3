@@ -84,7 +84,7 @@ public class SudoManager
 			{
 				return true;
 			}
-			IdeLog.log(CorePlugin.getDefault(), status);
+			IdeLog.logInfo(CorePlugin.getDefault(), status.getMessage());
 		}
 		catch (IOException e)
 		{
@@ -92,7 +92,7 @@ public class SudoManager
 		}
 		catch (InterruptedException e)
 		{
-			IdeLog.logError(CorePlugin.getDefault(), e.getMessage());
+			IdeLog.logWarning(CorePlugin.getDefault(), e.getMessage());
 		}
 		return false;
 	}

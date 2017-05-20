@@ -145,7 +145,7 @@ public class AnalyticsLogger implements IAnalyticsLogger
 			catch (FileNotFoundException e)
 			{
 				// Should never happen...
-				IdeLog.logError(UsagePlugin.getDefault(), e);
+				IdeLog.logWarning(UsagePlugin.getDefault(), e);
 			}
 			finally
 			{

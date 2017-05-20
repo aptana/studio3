@@ -271,7 +271,8 @@ public class ProcessRunner implements IProcessRunner
 				}
 				else
 				{
-					CollectionsUtil.addToList(arguments, ">", outFile.getAbsolutePath(), "2>", errFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+					CollectionsUtil.addToList(arguments,
+							">", outFile.getAbsolutePath(), "2>", errFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 					p = run(workingDirectory, environment, arguments.toArray(new String[arguments.size()]));
 				}
 				return processData(p, outFile, errFile);
@@ -350,6 +351,8 @@ public class ProcessRunner implements IProcessRunner
 			String input, Process process, boolean earlyWait)
 	{
 		String lineSeparator = ResourceUtil.getLineSeparatorValue(null);
+		InputStreamGobbler readerGobbler = null;
+		InputStreamGobbler errorGobbler = null;
 		try
 		{
 			int exitValue = 0;
@@ -365,8 +368,8 @@ public class ProcessRunner implements IProcessRunner
 				// Using the UTF-8 will not work for all cases.
 				writerThread = new OutputStreamThread(outputStream, input, IOUtil.UTF_8);
 			}
-			InputStreamGobbler readerGobbler = new InputStreamGobbler(inputStream, lineSeparator, IOUtil.UTF_8);
-			InputStreamGobbler errorGobbler = new InputStreamGobbler(errorStream, lineSeparator, null);
+			readerGobbler = new InputStreamGobbler(inputStream, lineSeparator, IOUtil.UTF_8);
+			errorGobbler = new InputStreamGobbler(errorStream, lineSeparator, null);
 
 			// Start the threads
 			if (writerThread != null)
@@ -398,9 +401,33 @@ public class ProcessRunner implements IProcessRunner
 		}
 		catch (InterruptedException e)
 		{
-			IdeLog.logError(CorePlugin.getDefault(), e);
+			// As the process request couldn't complete successfully, let's throw the error status so that callers will get to know about it.
+			// First, let's try and grab any output we have so we can retain that as well
+			String stdout = ""; //$NON-NLS-1$
+			String stderr = ""; //$NON-NLS-1$
+			try
+			{
+				if (readerGobbler != null) {
+					readerGobbler.interrupt();
+				}
+				if (errorGobbler != null) {
+					errorGobbler.interrupt();
+				}
+				if (readerGobbler != null) {
+					readerGobbler.join();
+					stdout = readerGobbler.getResult();
+				}
+				if (errorGobbler != null) {
+					errorGobbler.join();
+					stderr = errorGobbler.getResult();
+				}
+			}
+			catch (InterruptedException e1)
+			{
+				// ignore
+			}
+			return new ProcessStatus(stdout, stderr, e);
 		}
-		return null;
 	}
 
 	private void logProcessOutput(String stdout, String stderr)

@@ -9,7 +9,6 @@ package com.aptana.core.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -83,10 +82,10 @@ public class ProcessUtilTest
 	}
 
 	@Test
-	public void testProcessResultReturnsNullIfInterruptedExceptionIsThrown() throws Exception
+	public void testProcessResultReturnsStatusWrappingExceptionIfInterruptedExceptionIsThrown() throws Exception
 	{
 		final String stdOutText = "stdout";
-		final String stdErrText = "stdout";
+		final String stdErrText = "stderr";
 
 		final Process process = context.mock(Process.class);
 		context.checking(new Expectations()
@@ -106,7 +105,12 @@ public class ProcessUtilTest
 		});
 
 		IStatus status = ProcessUtil.processResult(process);
-		assertNull(status);
+		assertNotNull(status);
+		assertTrue(status instanceof ProcessStatus);
+		ProcessStatus pStatus = (ProcessStatus) status;
+		assertEquals(stdOutText, pStatus.getStdOut());
+		assertEquals(stdErrText, pStatus.getStdErr());
+		assertTrue(pStatus.getException() instanceof InterruptedException);
 		context.assertIsSatisfied();
 	}
 

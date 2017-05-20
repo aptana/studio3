@@ -254,11 +254,11 @@ public class CorePlugin extends Plugin implements IPreferenceChangeListener
 		}
 		catch (NoSuchAlgorithmException e)
 		{
-			IdeLog.logError(getDefault(), Messages.CorePlugin_MD5_generation_error, e);
+			IdeLog.logWarning(getDefault(), Messages.CorePlugin_MD5_generation_error, e);
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			IdeLog.logError(getDefault(), e);
+			IdeLog.logWarning(getDefault(), e);
 		}
 		finally
 		{

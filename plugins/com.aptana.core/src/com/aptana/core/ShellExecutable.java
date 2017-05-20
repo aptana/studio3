@@ -191,7 +191,7 @@ public final class ShellExecutable
 		}
 		catch (BackingStoreException e)
 		{
-			IdeLog.logError(CorePlugin.getDefault(), "Saving preferences failed.", e); //$NON-NLS-1$
+			IdeLog.logWarning(CorePlugin.getDefault(), "Saving preferences failed.", e); //$NON-NLS-1$
 		}
 		shellPath = null;
 		shellEnvironment = null;

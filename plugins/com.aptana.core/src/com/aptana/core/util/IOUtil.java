@@ -336,7 +336,7 @@ public abstract class IOUtil
 						error //
 						);
 
-				IdeLog.logError(CorePlugin.getDefault(), message);
+				IdeLog.logWarning(CorePlugin.getDefault(), message);
 
 				return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, IStatus.ERROR, message, null);
 			}

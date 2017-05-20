@@ -173,7 +173,7 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), e);
+			IdeLog.logWarning(CommonEditorPlugin.getDefault(), e);
 		}
 	}
 

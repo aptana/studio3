@@ -249,7 +249,7 @@ public class DefaultAnalyticsEventHandler implements IAnalyticsEventHandler
 			}
 			else
 			{
-				IdeLog.logError(UsagePlugin.getDefault(),
+				IdeLog.logWarning(UsagePlugin.getDefault(),
 						"No Analytics logger around to log event. Event will be dropped!"); //$NON-NLS-1$
 			}
 		}

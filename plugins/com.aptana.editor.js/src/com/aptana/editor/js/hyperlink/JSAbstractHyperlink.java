@@ -96,7 +96,7 @@ public abstract class JSAbstractHyperlink implements IJSHyperlink
 			{
 				String message = "An error occurred while trying to retrieve the current editor: " + e.getMessage(); //$NON-NLS-1$
 
-				IdeLog.logError(JSPlugin.getDefault(), message);
+				IdeLog.logWarning(JSPlugin.getDefault(), message);
 			}
 		}
 

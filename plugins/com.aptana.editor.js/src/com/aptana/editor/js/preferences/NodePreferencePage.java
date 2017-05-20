@@ -8,7 +8,6 @@
 package com.aptana.editor.js.preferences;
 
 import java.lang.reflect.InvocationTargetException;
-import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -31,7 +30,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -212,20 +210,6 @@ public class NodePreferencePage extends FieldEditorPreferencePage implements IWo
 		{
 			IdeLog.logError(JSPlugin.getDefault(), e);
 		}
-		// setStringValue(value)
-	}
-
-	private IPath getDirectory()
-	{
-		DirectoryDialog fileDialog = new DirectoryDialog(getShell(), SWT.OPEN | SWT.SHEET);
-		fileDialog.setMessage(MessageFormat.format(Messages.NodePreferencePage_nodejsDirSelectionMessage,
-				NODE_JS_ROOT_NAME));
-		String dir = fileDialog.open();
-		if (!StringUtil.isEmpty(dir))
-		{
-			return Path.fromOSString(dir);
-		}
-		return null;
 	}
 
 	@Override

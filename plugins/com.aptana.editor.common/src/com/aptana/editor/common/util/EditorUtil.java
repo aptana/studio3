@@ -303,7 +303,7 @@ public class EditorUtil
 		// NOTE: Moved from PHP's EditorUtils
 		if (file == null)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(),
+			IdeLog.logWarning(CommonEditorPlugin.getDefault(),
 					"Error open a file in the editor", new IllegalArgumentException("file is null")); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
@@ -318,7 +318,7 @@ public class EditorUtil
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(CommonEditorPlugin.getDefault(), "Error open a file in the editor", e); //$NON-NLS-1$
+			IdeLog.logWarning(CommonEditorPlugin.getDefault(), "Error open a file in the editor", e); //$NON-NLS-1$
 		}
 		return null;
 	}

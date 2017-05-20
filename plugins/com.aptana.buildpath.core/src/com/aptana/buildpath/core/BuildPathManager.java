@@ -170,9 +170,9 @@ public class BuildPathManager
 				}
 			}
 		}
-		catch (Throwable e)
+		catch (CoreException e)
 		{
-			IdeLog.logError(BuildPathCorePlugin.getDefault(), e);
+			IdeLog.logWarning(BuildPathCorePlugin.getDefault(), e);
 		}
 	}
 
@@ -294,7 +294,7 @@ public class BuildPathManager
 							);
 							// @formatter:on
 
-							IdeLog.logError(BuildPathCorePlugin.getDefault(), message, e);
+							IdeLog.logWarning(BuildPathCorePlugin.getDefault(), message, e);
 						}
 					}
 				}
@@ -310,7 +310,7 @@ public class BuildPathManager
 			);
 			// @formatter:on
 
-			IdeLog.logError(BuildPathCorePlugin.getDefault(), message, e);
+			IdeLog.logWarning(BuildPathCorePlugin.getDefault(), message, e);
 		}
 
 		// OK, now grab the build paths contributed dynamically by contributors for this project!
@@ -432,7 +432,7 @@ public class BuildPathManager
 				);
 				// @formatter:on
 
-				IdeLog.logError(BuildPathCorePlugin.getDefault(), message);
+				IdeLog.logWarning(BuildPathCorePlugin.getDefault(), message);
 			}
 		}
 
@@ -480,7 +480,7 @@ public class BuildPathManager
 					);
 					// @formatter:on
 
-					IdeLog.logError(BuildPathCorePlugin.getDefault(), message);
+					IdeLog.logWarning(BuildPathCorePlugin.getDefault(), message);
 				}
 			}
 			catch (CoreException e)
@@ -496,7 +496,7 @@ public class BuildPathManager
 				);
 				// @formatter:on
 
-				IdeLog.logError(BuildPathCorePlugin.getDefault(), message);
+				IdeLog.logWarning(BuildPathCorePlugin.getDefault(), message);
 			}
 		}
 
@@ -614,7 +614,7 @@ public class BuildPathManager
 				);
 				// @formatter:on
 
-			IdeLog.logError(BuildPathCorePlugin.getDefault(), message, e);
+			IdeLog.logWarning(BuildPathCorePlugin.getDefault(), message, e);
 			return false;
 		}
 	}

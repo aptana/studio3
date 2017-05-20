@@ -159,7 +159,7 @@ public class DeployPreferenceUtil
 		}
 		catch (CoreException e)
 		{
-			IdeLog.logError(DeployPlugin.getDefault(), e);
+			IdeLog.logWarning(DeployPlugin.getDefault(), e);
 		}
 	}
 
@@ -175,7 +175,7 @@ public class DeployPreferenceUtil
 		}
 		catch (BackingStoreException e)
 		{
-			IdeLog.logError(DeployPlugin.getDefault(), e);
+			IdeLog.logWarning(DeployPlugin.getDefault(), e);
 		}
 	}
 }

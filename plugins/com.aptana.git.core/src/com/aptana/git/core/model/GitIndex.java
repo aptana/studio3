@@ -170,7 +170,7 @@ public class GitIndex
 		}
 		if (!result.isOK())
 		{
-			IdeLog.logError(GitPlugin.getDefault(), "Unable to run update-index: " + result.getMessage()); //$NON-NLS-1$
+			IdeLog.logWarning(GitPlugin.getDefault(), "Unable to run update-index: " + result.getMessage()); //$NON-NLS-1$
 			return result;
 		}
 
@@ -268,7 +268,7 @@ public class GitIndex
 		}
 		catch (InterruptedException e)
 		{
-			IdeLog.logError(GitPlugin.getDefault(), e);
+			IdeLog.logWarning(GitPlugin.getDefault(), e);
 		}
 
 		// Copy the last full list of changed files we built up on refresh. Used to pass along the delta
@@ -359,7 +359,7 @@ public class GitIndex
 			IStatus status = refresh(false, null, new NullProgressMonitor());
 			if (!status.isOK())
 			{
-				IdeLog.logError(GitPlugin.getDefault(), status.getMessage());
+				IdeLog.logWarning(GitPlugin.getDefault(), status.getMessage());
 				return Collections.emptyList();
 			}
 		}

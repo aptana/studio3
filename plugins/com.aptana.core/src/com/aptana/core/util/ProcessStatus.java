@@ -26,10 +26,33 @@ public class ProcessStatus extends Status
 	private String stdout;
 	private String stderr;
 
+	/**
+	 * This constructor should be used to represent when a process was interrupted or failed after launching so the user
+	 * can get at the output we have received before the error. It represents an uncompleted process (no exit code) due
+	 * to error.
+	 * 
+	 * @param stdout
+	 * @param stderr
+	 * @param t
+	 */
+	ProcessStatus(String stdout, String stderr, Throwable t)
+	{
+		super(IStatus.ERROR, CorePlugin.PLUGIN_ID, t.getMessage(), t);
+		this.stdout = stdout;
+		this.stderr = stderr;
+	}
+
+	/**
+	 * Standard constructor used when a process completes normally.
+	 * 
+	 * @param exitCode
+	 * @param stdout
+	 * @param stderr
+	 */
 	public ProcessStatus(int exitCode, String stdout, String stderr)
 	{
-		super(exitCode == 0 ? IStatus.OK : IStatus.ERROR, CorePlugin.PLUGIN_ID, exitCode, generateMessage(exitCode,
-				stdout, stderr), null);
+		super(exitCode == 0 ? IStatus.OK : IStatus.ERROR, CorePlugin.PLUGIN_ID, exitCode,
+				generateMessage(exitCode, stdout, stderr), null);
 		this.stdout = stdout;
 		this.stderr = stderr;
 	}

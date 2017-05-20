@@ -252,7 +252,7 @@ public abstract class AbstractConfigurationProcessor implements IConfigurationPr
 		}
 		catch (CoreException e)
 		{
-			IdeLog.logError(ConfigurationsPlugin.getDefault(), e);
+			IdeLog.logWarning(ConfigurationsPlugin.getDefault(), e);
 		}
 
 		return null;

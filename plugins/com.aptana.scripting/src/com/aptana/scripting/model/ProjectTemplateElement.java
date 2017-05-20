@@ -305,4 +305,9 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 				getDisplayName(), isReplacingParameters(), getDescription(), getIconURL(), getId(), getPriority(),
 				getTags());
 	}
+
+	public boolean isPrePackaged()
+	{
+		return false;
+	}
 }
