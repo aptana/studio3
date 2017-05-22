@@ -2,7 +2,7 @@
 <feature
       id="com.aptana.feature"
       label="%featureName"
-      version="4.8.2.qualifier"
+      version="4.9.0.qualifier"
       provider-name="%providerName"
       plugin="com.aptana.branding">
 
@@ -676,20 +676,6 @@
          download-size="0"
          install-size="0"
          version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.httpcomponents.httpclient"
-         download-size="0"
-         install-size="0"
-         version="4.2.2"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.httpcomponents.httpcore"
-         download-size="0"
-         install-size="0"
-         version="4.2.2"
          unpack="false"/>
 
    <plugin

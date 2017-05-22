@@ -7,7 +7,11 @@
  */
 package com.aptana.ui.handlers;
 
-import com.aptana.core.resources.ISocketMessagesHandler;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
+
+import com.aptana.core.resources.RequestCancelledException;
+import com.aptana.core.resources.SocketMessagesHandler;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ui.dialogs.InputMessageDialog;
 import com.aptana.ui.dialogs.MultipleInputMessageDialog;
@@ -24,7 +28,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  * @author pinnamuri
  */
-public class AppcSocketMessagesHandler implements ISocketMessagesHandler
+public class AppcSocketMessagesHandler extends SocketMessagesHandler
 {
 
 	private static final String MESSAGE = "message"; //$NON-NLS-1$
@@ -46,7 +50,7 @@ public class AppcSocketMessagesHandler implements ISocketMessagesHandler
 
 	}
 
-	public JsonNode handleRequest(JsonNode request)
+	public JsonNode handleRequest(JsonNode request) throws RequestCancelledException
 	{
 		final JsonNode type = request.path(TYPE);
 		if (QUESTION.equals(type.asText()))
@@ -64,7 +68,7 @@ public class AppcSocketMessagesHandler implements ISocketMessagesHandler
 		return null;
 	}
 
-	private JsonNode handleQuestion(final JsonNode type)
+	private JsonNode handleQuestion(final JsonNode type) throws RequestCancelledException
 	{
 		final JsonNode questionNode = type.path(QUESTION);
 		final ObjectNode[] response = new ObjectNode[1];
@@ -101,10 +105,26 @@ public class AppcSocketMessagesHandler implements ISocketMessagesHandler
 				{
 					response[0] = null;
 				}
+
 			}
 		});
 
+		if (response[0] == null && isWorkbenchLaunched()) //To control dialog prompt cancel behaviour until we launch a studio.
+		{
+			throw new RequestCancelledException();
+		}
+
 		return response[0];
+	}
+
+	private boolean isWorkbenchLaunched()
+	{
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		if (workbench != null)
+		{
+			return workbench.getWorkbenchWindowCount() == 0;
+		}
+		return false;
 	}
 
 }

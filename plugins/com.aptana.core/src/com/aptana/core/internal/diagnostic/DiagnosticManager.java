@@ -149,7 +149,7 @@ public class DiagnosticManager implements IDiagnosticManager
 					}
 					else
 					{
-						IdeLog.logError(CorePlugin.getDefault(), MessageFormat.format(
+						IdeLog.logWarning(CorePlugin.getDefault(), MessageFormat.format(
 								"The class {0} does not implement IDiagnosticLog.", element.getAttribute(ATTR_CLASS))); //$NON-NLS-1$
 					}
 				}

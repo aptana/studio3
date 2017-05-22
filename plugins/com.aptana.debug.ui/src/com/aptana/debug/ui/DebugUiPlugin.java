@@ -105,7 +105,7 @@ public class DebugUiPlugin extends AbstractUIPlugin {
 	 * @param t
 	 */
 	public static void errorDialog(String message, Throwable t) {
-		IdeLog.logError(getDefault(), t);
+		IdeLog.logWarning(getDefault(), t);
 		Shell shell = UIUtils.getActiveShell();
 		if (shell != null) {
 			IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR,

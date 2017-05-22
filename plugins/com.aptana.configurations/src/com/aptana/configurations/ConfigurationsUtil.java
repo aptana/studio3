@@ -71,7 +71,7 @@ public class ConfigurationsUtil
 		 */
 		public void handleException(Throwable exception)
 		{
-			IdeLog.logError(ConfigurationsPlugin.getDefault(),
+			IdeLog.logWarning(ConfigurationsPlugin.getDefault(),
 					"Error while evaluating a configuration processor element.", exception); //$NON-NLS-1$
 		}
 
