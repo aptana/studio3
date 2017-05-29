@@ -390,8 +390,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		}
 		try
 		{
-			IResource resource = getWorkspaceRoot()
-					.findMember(Path.fromOSString(generatedLocation.getPath()));
+			IResource resource = getWorkspaceRoot().findMember(Path.fromOSString(generatedLocation.getPath()));
 			return sourceMap.getOriginalMapping(resource, sourceLine);
 		}
 		catch (Exception e)
@@ -1250,8 +1249,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private void handleDetailFormattersChange() throws DebugException
 	{
 		StringBuffer sb = new StringBuffer(DETAIL_FORMATTERS);
-		for (DetailFormatter detailFormatter : getDebugOptionsManager()
-				.getDetailFormatters())
+		for (DetailFormatter detailFormatter : getDebugOptionsManager().getDetailFormatters())
 		{
 			if (!detailFormatter.isEnabled())
 			{
@@ -1325,8 +1323,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			if (ILaunchManager.DEBUG_MODE.equals(mode))
 			{
 				/* restore breakpoints */
-				for (IBreakpoint breakpoint : getBreakpointManager()
-						.getBreakpoints(getModelIdentifier()))
+				for (IBreakpoint breakpoint : getBreakpointManager().getBreakpoints(getModelIdentifier()))
 				{
 					breakpointAdded(breakpoint);
 				}
@@ -1547,8 +1544,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 */
 	public void breakpointManagerEnablementChanged(boolean enabled)
 	{
-		for (IBreakpoint breakpoint : getBreakpointManager()
-				.getBreakpoints(getModelIdentifier()))
+		for (IBreakpoint breakpoint : getBreakpointManager().getBreakpoints(getModelIdentifier()))
 		{
 			if (enabled)
 			{
@@ -1867,8 +1863,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 								"Generated mapping while adding breakpoint for {0}:{1} is {2}:{3}", resource,
 								lineNumber, generatedMapping.getFile(), generatedMapping.getLineNumber()),
 								com.aptana.debug.core.IDebugScopes.DEBUG);
-						IResource mappedResource = getWorkspaceRoot()
-								.findMember(resource.getProject().getFullPath().append(generatedMapping.getFile()));
+						IResource mappedResource = getWorkspaceRoot().findMember(
+								resource.getProject().getFullPath().append(generatedMapping.getFile()));
 						if (mappedResource != null)
 						{
 							resource = mappedResource;
@@ -2089,8 +2085,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 */
 	protected IBreakpoint findBreakpointAt(URI fileName, int lineNumber)
 	{
-		IBreakpoint[] breakpoints = getBreakpointManager()
-				.getBreakpoints(getModelIdentifier());
+		IBreakpoint[] breakpoints = getBreakpointManager().getBreakpoints(getModelIdentifier());
 		IBreakpoint breakpoint = findBreakpointIn(fileName, lineNumber, breakpoints);
 		if (breakpoint != null)
 		{
@@ -2180,39 +2175,42 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		try
 		{
 			URI uri = new URI(sourceFile);
-			String scheme = uri.getScheme();
-			if (FILE.equals(scheme))
+			if (!uri.isOpaque())
 			{
-				File osFile = new File(uri.getSchemeSpecificPart());
-				resolved = EFSUtils.getLocalFileStore(osFile).toURI();
-			}
-			else if (HTTP.equals(scheme) && uriMapper != null)
-			{
-				IFileStore fileStore = uriMapper.resolve(uri);
-				if (fileStore != null)
+				String scheme = uri.getScheme();
+				if (FILE.equals(scheme))
 				{
-					resolved = fileStore.toURI();
+					File osFile = new File(uri.getSchemeSpecificPart());
+					resolved = EFSUtils.getLocalFileStore(osFile).toURI();
 				}
-			}
-			else if (APP.equals(scheme) && uriMapper != null)
-			{
-				IFileStore fileStore = uriMapper.resolve(uri);
-				if (fileStore != null)
+				else if (HTTP.equals(scheme) && uriMapper != null)
 				{
-					resolved = fileStore.toURI();
+					IFileStore fileStore = uriMapper.resolve(uri);
+					if (fileStore != null)
+					{
+						resolved = fileStore.toURI();
+					}
 				}
-			}
-			else if (JAVASCRIPT.equals(scheme))
-			{
-				if (mainFile != null)
+				else if (APP.equals(scheme) && uriMapper != null)
 				{
-					return mainFile;
+					IFileStore fileStore = uriMapper.resolve(uri);
+					if (fileStore != null)
+					{
+						resolved = fileStore.toURI();
+					}
 				}
-			}
-			if (resolved != null)
-			{
-				sourceResolveCache.put(sourceFile, resolved);
-				return resolved;
+				else if (JAVASCRIPT.equals(scheme))
+				{
+					if (mainFile != null)
+					{
+						return mainFile;
+					}
+				}
+				if (resolved != null)
+				{
+					sourceResolveCache.put(sourceFile, resolved);
+					return resolved;
+				}
 			}
 		}
 		catch (URISyntaxException e)
