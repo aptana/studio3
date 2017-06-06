@@ -1366,7 +1366,7 @@ public class GitRepository
 		}
 		catch (FileNotFoundException e)
 		{
-			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
+			IdeLog.logWarning(GitPlugin.getDefault(), e.getMessage(), e, IDebugScopes.DEBUG);
 		}
 		finally
 		{
