@@ -18,7 +18,7 @@ How to Contribute
 License
 -------
 
-    This program Copyright (c) 2005-2015 by Appcelerator, Inc. This program is distributed under the GNU General Public license. This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License, Version 3, as published by the Free Software Foundation.
+    This program Copyright (c) 2005-2016 by Appcelerator, Inc. This program is distributed under the GNU General Public license. This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License, Version 3, as published by the Free Software Foundation.
     
     Any modifications must keep this entire license intact.
     
