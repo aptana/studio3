@@ -5,7 +5,7 @@ Aptana Studio 3 Core
 
 Aptana Studio 3 Core holds the core set of plugins used to build the Aptana Studio 3 IDE/RCP. Currently it relies on consuming a pre-built [FTP/FTPS/SFTP library](https://github.com/aptana/libraries_com) as a dependency for building. This holds a commercial library, so the sources do not contain the JAR due to licensing restrictions.
 
-This set of plugins deals with providing support for web development: HTML, CSS, XML, and Javascript. It also includes our own Git plugin support. Features that deal with adding support for [PHP](https://github.com/aptana/studio3-php), [Python](https://github.com/aptana/PyDev) and [Ruby](https://github.com/aptana/studio3-ruby) are broken out to other repositories. The Portion dealing with bundling all of that together to form the IDE is in the [studio3-rcp](https://github.com/aptana/studio3-rcp) repository.
+This set of plugins deals with providing support for web development: HTML, CSS, XML, and JavaScript. It also includes our own Git plugin support. Features that deal with adding support for [PHP](https://github.com/aptana/studio3-php), [Python](https://github.com/aptana/PyDev) and [Ruby](https://github.com/aptana/studio3-ruby) are broken out to other repositories. The Portion dealing with bundling all of that together to form the IDE is in the [studio3-rcp](https://github.com/aptana/studio3-rcp) repository.
 
 How to Contribute
 ----------
