@@ -1,4 +1,4 @@
-[![Build Status](http://studio-jenkins.appcelerator.org/job/studio3-core-development/badge/icon)](http://studio-jenkins.appcelerator.org/job/studio3-core-development)
+[![Build Status](https://jenkins.appcelerator.org/buildStatus/icon?job=aptana-studio/studio3/development)](https://jenkins.appcelerator.org/job/aptana-studio/job/studio3/job/development/)
 
 Aptana Studio 3 Core
 ========================
@@ -18,7 +18,7 @@ How to Contribute
 License
 -------
 
-    This program Copyright (c) 2005-2015 by Appcelerator, Inc. This program is distributed under the GNU General Public license. This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License, Version 3, as published by the Free Software Foundation.
+    This program Copyright (c) 2005-2017 by Appcelerator, Inc. This program is distributed under the GNU General Public license. This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License, Version 3, as published by the Free Software Foundation.
     
     Any modifications must keep this entire license intact.
     
