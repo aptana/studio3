@@ -2361,7 +2361,7 @@ IterationStatement
 		{:
  			return new JSWhileNode(l, e, r, s);
  		:}
-	// FIXME [lookahead ∉ {let [}]
+// FIXME [lookahead not in {let [}]
 	|	FOR LPAREN.l Expression.e1? SEMICOLON.s1 Expression_In.e2? SEMICOLON.s2 Expression_In.e3? RPAREN.r Statement.s
 		{:
 			if (e1 == null) {
@@ -2395,7 +2395,7 @@ IterationStatement
 			}
  			return new JSForNode(l, new JSVarNode(decl, e1), s1, e2, r, s);
  		:}
-	// FIXME [lookahead ∉ {let [}]
+// FIXME [lookahead not in {let [}]
 	|	FOR LPAREN.l LeftHandSideExpression.i IN.in Expression_In.o RPAREN.r Statement.s
 		{:
  			return new JSForInNode(l, i, in, o, r, s);
@@ -2408,7 +2408,7 @@ IterationStatement
 		{:
  			return new JSForInNode(l, decl, in, o, r, s);
  		:}
-	// FIXME [lookahead ∉ {let [}]
+// FIXME [lookahead not in {let [}]
 	|	FOR LPAREN.l LeftHandSideExpression.i OF.of AssignmentExpression_In.o RPAREN.r Statement.s
 		{:
  			return new JSForOfNode(l, i, of, o, r, s);
@@ -2434,7 +2434,7 @@ IterationStatement_Yield
 		{:
  			return new JSWhileNode(l, e, r, s);
  		:}
-	// FIXME [lookahead ∉ {let [}]
+// FIXME [lookahead not in {let [}]
 	|	FOR LPAREN.l Expression_Yield.e1? SEMICOLON.s1 Expression_In_Yield.e2? SEMICOLON.s2 Expression_In_Yield.e3? RPAREN.r Statement_Yield.s
 		{:
 			if (e1 == null) {
@@ -2468,7 +2468,7 @@ IterationStatement_Yield
 			}
  			return new JSForNode(l, new JSVarNode(decl, e1), s1, e2, r, s);
  		:}
-	// FIXME [lookahead ∉ {let [}]
+// FIXME [lookahead not in {let [}]
 	|	FOR LPAREN.l LeftHandSideExpression_Yield.i IN.in Expression_In_Yield.o RPAREN.r Statement_Yield.s
 		{:
  			return new JSForInNode(l, i, in, o, r, s);
@@ -2481,7 +2481,7 @@ IterationStatement_Yield
 		{:
  			return new JSForInNode(l, decl, in, o, r, s);
  		:}
-	// FIXME [lookahead ∉ {let [}]
+// FIXME [lookahead not in {let [}]
 	|	FOR LPAREN.l LeftHandSideExpression_Yield.i OF.of AssignmentExpression_In_Yield.o RPAREN.r Statement_Yield.s
 		{:
  			return new JSForOfNode(l, i, of, o, r, s);
@@ -2507,7 +2507,7 @@ IterationStatement_Return
 		{:
  			return new JSWhileNode(l, e, r, s);
  		:}
-	// FIXME [lookahead ∉ {let [}]
+// FIXME [lookahead not in {let [}]
 	|	FOR LPAREN.l Expression.e1? SEMICOLON.s1 Expression_In.e2? SEMICOLON.s2 Expression_In.e3? RPAREN.r Statement_Return.s
 		{:
 			if (e1 == null) {
@@ -2541,7 +2541,7 @@ IterationStatement_Return
 			}
  			return new JSForNode(l, new JSVarNode(decl, e1), s1, e2, r, s);
  		:}
-	// FIXME [lookahead ∉ {let [}]
+// FIXME [lookahead not in {let [}]
 	|	FOR LPAREN.l LeftHandSideExpression.i IN.in Expression_In.o RPAREN.r Statement_Return.s
 		{:
  			return new JSForInNode(l, i, in, o, r, s);
@@ -2554,7 +2554,7 @@ IterationStatement_Return
 		{:
  			return new JSForInNode(l, decl, in, o, r, s);
  		:}
-	// FIXME [lookahead ∉ {let [}]
+// FIXME [lookahead not in {let [}]
 	|	FOR LPAREN.l LeftHandSideExpression.i OF.of AssignmentExpression_In.o RPAREN.r Statement_Return.s
 		{:
  			return new JSForOfNode(l, i, of, o, r, s);
@@ -2580,7 +2580,7 @@ IterationStatement_Yield_Return
 		{:
  			return new JSWhileNode(l, e, r, s);
  		:}
-	// FIXME [lookahead ∉ {let [}]
+// FIXME [lookahead not in {let [}]
 	|	FOR LPAREN.l Expression_Yield.e1? SEMICOLON.s1 Expression_In_Yield.e2? SEMICOLON.s2 Expression_In_Yield.e3? RPAREN.r Statement_Yield_Return.s
 		{:
 			if (e1 == null) {
@@ -2614,7 +2614,7 @@ IterationStatement_Yield_Return
 			}
  			return new JSForNode(l, new JSVarNode(decl, e1), s1, e2, r, s);
  		:}
-	// FIXME [lookahead ∉ {let [}]
+// FIXME [lookahead not in {let [}]
 	|	FOR LPAREN.l LeftHandSideExpression_Yield.i IN.in Expression_In_Yield.o RPAREN.r Statement_Yield_Return.s
 		{:
  			return new JSForInNode(l, i, in, o, r, s);
@@ -2627,7 +2627,7 @@ IterationStatement_Yield_Return
 		{:
  			return new JSForInNode(l, decl, in, o, r, s);
  		:}
-	// FIXME [lookahead ∉ {let [}]
+// FIXME [lookahead not in {let [}]
 	|	FOR LPAREN.l LeftHandSideExpression_Yield.i OF.of AssignmentExpression_In_Yield.o RPAREN.r Statement_Yield_Return.s
 		{:
  			return new JSForOfNode(l, i, of, o, r, s);
