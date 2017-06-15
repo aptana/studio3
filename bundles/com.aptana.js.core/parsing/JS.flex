@@ -255,7 +255,6 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 	"break"			{ return newToken(JSTokenType.BREAK); }
 	"case"			{ return newToken(JSTokenType.CASE); }
 	"catch"			{ return newToken(JSTokenType.CATCH); }
-	"const"			{ return newToken(JSTokenType.VAR); }
 	"continue"		{ return newToken(JSTokenType.CONTINUE); }
 	"debugger"		{ return newToken(JSTokenType.DEBUGGER); }
 	"default"		{ return newToken(JSTokenType.DEFAULT); }
@@ -285,22 +284,26 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 	"get"			{ return newToken(JSTokenType.GET); }
 	"set"			{ return newToken(JSTokenType.SET); }
 	
-	// Future Use Reserved Words
+	// ES6
 	"class"			{ return newToken(JSTokenType.CLASS); }
-	"enum"			{ return newToken(JSTokenType.ENUM); }
+	"const"			{ return newToken(JSTokenType.CONST); }
 	"export"		{ return newToken(JSTokenType.EXPORT); }
 	"extends"		{ return newToken(JSTokenType.EXTENDS); }
 	"import"		{ return newToken(JSTokenType.IMPORT); }
+	"let"			{ return newToken(JSTokenType.LET); }
+	"static"		{ return newToken(JSTokenType.STATIC); }
 	"super"			{ return newToken(JSTokenType.SUPER); }
+	"yield"			{ return newToken(JSTokenType.YIELD); }
+	
+	// Future Use Reserved Words
+	"await"			{ return newToken(JSTokenType.AWAIT); }
+	"enum"			{ return newToken(JSTokenType.ENUM); }
 	"implements"	{ return newToken(JSTokenType.IMPLEMENTS); }
 	"interface"		{ return newToken(JSTokenType.INTERFACE); }
-	"let"			{ return newToken(JSTokenType.LET); }
 	"package"		{ return newToken(JSTokenType.PACKAGE); }
 	"private"		{ return newToken(JSTokenType.PRIVATE); }
 	"protected"		{ return newToken(JSTokenType.PROTECTED); }
 	"public"		{ return newToken(JSTokenType.PUBLIC); }
-	"static"		{ return newToken(JSTokenType.STATIC); }
-	"yield"			{ return newToken(JSTokenType.YIELD); }
 
 	// identifiers
 	{Identifier}	{ return newToken(Terminals.IDENTIFIER, pool(yytext())); }
@@ -321,6 +324,7 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 
 	"==="			{ return newToken(JSTokenType.EQUAL_EQUAL_EQUAL); }
 	"=="			{ return newToken(JSTokenType.EQUAL_EQUAL); }
+	"=>"			{ return newToken(JSTokenType.ARROW); }
 	"="				{ return newToken(JSTokenType.EQUAL); }
 
 	"!=="			{ return newToken(JSTokenType.EXCLAMATION_EQUAL_EQUAL); }
@@ -375,6 +379,7 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 	"}"				{ return newToken(JSTokenType.RCURLY); }
 	","				{ return newToken(JSTokenType.COMMA); }
 	":"				{ return newToken(JSTokenType.COLON); }
+	"..."			{ return newToken(JSTokenType.DOT_DOT_DOT); }
 	"."				{ return newToken(JSTokenType.DOT); }
 }
 

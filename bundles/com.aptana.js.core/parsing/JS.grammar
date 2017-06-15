@@ -440,68 +440,94 @@
 		// @formatter:on
 :};
 
-%terminals FUNCTION, IDENTIFIER, STRING, NUMBER, NULL, TRUE, FALSE, REGEX, GET, SET;
+%terminals FUNCTION, IDENTIFIER, STRING, NUMBER, NULL, TRUE, FALSE, REGEX, GET, SET, AS, FROM, DOT_DOT_DOT, ARROW;
 %terminals LCURLY, RCURLY, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA, COLON, SEMICOLON, EQUAL, DOT, QUESTION;
 %terminals IF, ELSE, DO, WHILE, FOR, IN, CONTINUE, BREAK, RETURN, WITH, SWITCH, CASE, DEFAULT, THROW, TRY, CATCH, FINALLY;
-%terminals VAR, THIS, NEW, DELETE, PLUS_PLUS, MINUS_MINUS, PLUS, MINUS, EXCLAMATION, TILDE, TYPEOF, VOID, AMPERSAND, CARET, PIPE, AMPERSAND_AMPERSAND, PIPE_PIPE;
+%terminals LET, CONST, VAR, THIS, NEW, DELETE, PLUS_PLUS, MINUS_MINUS, PLUS, MINUS, EXCLAMATION, TILDE, TYPEOF, VOID, AMPERSAND, CARET, PIPE, AMPERSAND_AMPERSAND, PIPE_PIPE;
 %terminals STAR, FORWARD_SLASH, PERCENT, LESS_LESS, GREATER_GREATER, GREATER_GREATER_GREATER;
 %terminals LESS, GREATER, LESS_EQUAL, GREATER_EQUAL, INSTANCEOF, IN, EQUAL_EQUAL, EXCLAMATION_EQUAL, EQUAL_EQUAL_EQUAL, EXCLAMATION_EQUAL_EQUAL;
 %terminals EQUAL, STAR_EQUAL, FORWARD_SLASH_EQUAL, PERCENT_EQUAL, PLUS_EQUAL, MINUS_EQUAL, LESS_LESS_EQUAL, GREATER_GREATER_EQUAL, GREATER_GREATER_GREATER_EQUAL, AMPERSAND_EQUAL, CARET_EQUAL, PIPE_EQUAL;
-%terminals DEBUGGER, CLASS, ENUM, EXPORT, EXTENDS, IMPORT, SUPER, IMPLEMENTS, INTERFACE, LET, PACKAGE, PRIVATE, PROTECTED, PUBLIC, STATIC, YIELD;
+%terminals DEBUGGER, CLASS, ENUM, EXPORT, EXTENDS, IMPORT, SUPER, IMPLEMENTS, INTERFACE, PACKAGE, PRIVATE, PROTECTED, PUBLIC, STATIC, YIELD;
 
-%typeof AssignmentExpression, AssignmentExpression_NoIn, LeftHandSideExpression, LeftHandSideExpression_NoLBF, UnaryExpression = "JSNode";
-%typeof AdditiveExpression, AdditiveExpression_NoLBF, MultiplicativeExpression, MultiplicativeExpression_NoLBF, RelationalExpression, RelationalExpression_NoIn, RelationalExpression_NoLBF = "JSNode";
-%typeof ShiftExpression, ShiftExpression_NoLBF, EqualityExpression, EqualityExpression_NoIn, EqualityExpression_NoLBF = "JSNode";
-%typeof LogicalAndExpression, LogicalAndExpression_NoIn, LogicalAndExpression_NoLBF, LogicalOrExpression, LogicalOrExpression_NoIn, LogicalOrExpression_NoLBF = "JSNode";
-%typeof BitwiseOrExpression, BitwiseOrExpression_NoIn, BitwiseOrExpression_NoLBF, BitwiseXorExpression, BitwiseXorExpression_NoIn, BitwiseXorExpression_NoLBF, BitwiseAndExpression, BitwiseAndExpression_NoIn, BitwiseAndExpression_NoLBF = "JSNode";
-%typeof MemberExpression, MemberExpression_NoLBF, NewExpression, CallExpression, CallExpression_NoLBF, Expression, Expression_NoIn, Expression_NoLBF, Statement, Statement_NoIf, Block, Catch, Finally = "JSNode";
-%typeof VariableDeclaration, VariableDeclaration_NoIn, PropertyName, PropertyAssignment, Elision, ElementList, FormalParameterList, FunctionParameters, FunctionBody, SourceElement = "JSNode";
-%typeof CaseClause, DefaultClause = "JSNode";
-%typeof Arguments = "JSArgumentsNode";
+%typeof ArrayLiteral, ArrayLiteral_Yield = "JSArrayNode";
+%typeof ObjectLiteral, ObjectLiteral_Yield = "JSObjectNode";
+%typeof ObjectBindingPattern, ObjectBindingPattern_Yield = "JSObjectNode";
+%typeof ArrayBindingPattern, ArrayBindingPattern_Yield = "JSArrayNode";
+%typeof WithStatement, WithStatement_Yield, WithStatement_Return, WithStatement_Yield_Return = "JSWithNode";
+%typeof CaseClause, CaseClause_Yield, CaseClause_Return, CaseClause_Yield_Return = "JSCaseNode";
+%typeof DefaultClause, DefaultClause_Yield, DefaultClause_Return, DefaultClause_Yield_Return = "JSDefaultNode";
+%typeof LabelledStatement, LabelledStatement_Yield, LabelledStatement_Return, LabelledStatement_Yield_Return = "JSLabelledNode";
+%typeof TryStatement, TryStatement_Yield, TryStatement_Return, TryStatement_Yield_Return = "JSTryNode";
+%typeof Catch, Catch_Yield, Catch_Return, Catch_Yield_Return = "JSCatchNode";
+%typeof Finally, Finally_Yield, Finally_Return, Finally_Yield_Return = "JSFinallyNode";
+%typeof NullLiteral = "JSNullNode";
+%typeof BooleanLiteral = "JSPrimitiveNode";
+%typeof NumericLiteral = "JSNumberNode";
+%typeof StringLiteral = "JSStringNode";
+%typeof RegularExpressionLiteral = "JSRegexNode";
+%typeof BitwiseANDExpression, BitwiseANDExpression_In, BitwiseANDExpression_Yield, BitwiseANDExpression_In_Yield = "JSBinaryArithmeticOperatorNode";
+%typeof BitwiseXORExpression, BitwiseXORExpression_In, BitwiseXORExpression_Yield, BitwiseXORExpression_In_Yield = "JSBinaryArithmeticOperatorNode";
+%typeof BitwiseORExpression, BitwiseORExpression_In, BitwiseORExpression_Yield, BitwiseORExpression_In_Yield = "JSBinaryArithmeticOperatorNode";
+%typeof LogicalANDExpression, LogicalANDExpression_In, LogicalANDExpression_Yield, LogicalANDExpression_In_Yield = "JSBinaryBooleanOperatorNode";	
+%typeof LogicalORExpression, LogicalORExpression_In, LogicalORExpression_Yield, LogicalORExpression_In_Yield = "JSBinaryBooleanOperatorNode";
+%typeof Elision = "JSElisionNode";
 
 %goal Program;
 
 Program
-	=	SourceElements.p
+	=	Script.s
 		{:
-			return new JSParseRootNode(p);
+			return new JSParseRootNode(s);
 		:}
-	|	{:
-			return new JSParseRootNode();
-		:}
-	;
-
-SourceElements
-	=	SourceElements SourceElement
-	|	SourceElement
-	;
-
-SourceElement
-	=	Statement
-	;
-
-FunctionDeclaration
-	=	FUNCTION Identifier.ident FunctionParameters.params FunctionBody.body
+	|	Module.m
 		{:
-			return new JSFunctionNode(
-				new JSIdentifierNode(ident),
-				params,
-				body
-			);
+			return new JSParseRootNode(m);
 		:}
+	;
+
+////////////////////////////////////
+// A.2 Expressions
+////////////////////////////////////
+
+IdentifierReference
+	=	Identifier
+	|	YIELD
+	;
+
+IdentifierReference_Yield
+	=	Identifier
+	;
+
+BindingIdentifier
+	=	Identifier
+	|	YIELD
+	;
+
+BindingIdentifier_Yield
+	=	Identifier
+	;
+
+LabelIdentifier
+	=	Identifier
+	|	YIELD
+	;
+
+LabelIdentifier_Yield
+	=	Identifier
 	;
 
 Identifier
-	=	IDENTIFIER
-	|	GET
-	|	SET
+	=	IdentifierName
 	;
 
 IdentifierName
-	=	Identifier	
+	=	IDENTIFIER
+	|	GET
+	|	SET
 	|	BREAK
 	|	CASE
 	|	CATCH
+	|	CONST
 	|	CONTINUE
 	|	DEBUGGER
 	|	DEFAULT
@@ -515,6 +541,7 @@ IdentifierName
 	|	IF
 	|	INSTANCEOF
 	|	IN
+	|	LET
 	|	NEW
 	|	NULL
 	|	RETURN
@@ -545,142 +572,1524 @@ IdentifierName
 	|	YIELD
 	;
 
-FunctionExpression
-	=	FUNCTION.f FunctionParameters.params FunctionBody.body
+PrimaryExpression
+	=	THIS.t
 		{:
-			return new JSFunctionNode(
-				new JSEmptyNode(f),
-				params,
-				body
-			);
+			return new JSThisNode(t);
 		:}
-	|	FunctionDeclaration
+	|	IdentifierReference
+	|	Literal
+	|	ArrayLiteral
+	|	ObjectLiteral
+	|	FunctionExpression
+	|	ClassExpression
+	|	GeneratorExpression
+	|	RegularExpressionLiteral
+	|	TemplateLiteral
+	|	CoverParenthesizedExpressionAndArrowParameterList
 	;
 
-FunctionParameters
-	=	LPAREN RPAREN
+PrimaryExpression_Yield
+	=	THIS.t
 		{:
-			return new JSParametersNode();
+			return new JSThisNode(t);
 		:}
-	|	LPAREN FormalParameterList.params RPAREN
+	|	IdentifierReference_Yield
+	|	Literal
+	|	ArrayLiteral_Yield
+	|	ObjectLiteral_Yield
+	|	FunctionExpression
+	|	ClassExpression_Yield
+	|	GeneratorExpression
+	|	RegularExpressionLiteral
+	|	TemplateLiteral_Yield
+	|	CoverParenthesizedExpressionAndArrowParameterList_Yield
+	;
+
+CoverParenthesizedExpressionAndArrowParameterList
+	=	LPAREN Expression_In RPAREN
+	|	LPAREN RPAREN
+	|	LPAREN DOT_DOT_DOT BindingIdentifier RPAREN
+	|	LPAREN Expression_In COMMA DOT_DOT_DOT BindingIdentifier RPAREN
+	;
+
+CoverParenthesizedExpressionAndArrowParameterList_Yield
+	=	LPAREN Expression_In_Yield RPAREN
+	|	LPAREN RPAREN
+	|	LPAREN DOT_DOT_DOT BindingIdentifier_Yield RPAREN
+	|	LPAREN Expression_In_Yield COMMA DOT_DOT_DOT BindingIdentifier_Yield RPAREN
+	;
+
+ParenthesizedExpression
+	=	LPAREN.l Expression_In.e RPAREN.r
 		{:
-			return params;
+			return new JSGroupNode(l, e, r);
 		:}
 	;
 
-FormalParameterList
-	=	FormalParameterList.list COMMA Identifier.ident
+ParenthesizedExpression_Yield
+	=	LPAREN.l Expression_In_Yield.e RPAREN.r
 		{:
-			JSNode identifier = new JSIdentifierNode(ident);
-
-			// add identifier to existing list
-			list.addChild(identifier);
-
-			return list;
-		:}
-	|	Identifier.ident
-		{:
-			JSNode identifier = new JSIdentifierNode(ident);
-
-			return new JSParametersNode(identifier);
+			return new JSGroupNode(l, e, r);
 		:}
 	;
 
-FunctionBody
-	=	LCURLY RCURLY
+Literal
+	=	NullLiteral
+	|	BooleanLiteral
+	|	NumericLiteral
+	|	StringLiteral
+	;
+
+NullLiteral
+	=	NULL.n
 		{:
-			return new JSStatementsNode();
-		:}
-	|	LCURLY SourceElements.s RCURLY
-		{:
-			return new JSStatementsNode(s);
+			return new JSNullNode(n);
 		:}
 	;
 
-Statement
-	=	Block
-	|	FunctionDeclaration
-	|	VAR.v VariableDeclarationList.l SEMICOLON.s
+BooleanLiteral
+	=	TRUE.t
 		{:
-			JSNode node = new JSVarNode(v, l);
-			node.setSemicolonIncluded(s.getEnd() >= s.getStart());
-			return node;
+			return new JSTrueNode(t);
 		:}
-	|	Expression_NoLBF.e SEMICOLON
+	|	FALSE.f
 		{:
-			e.setSemicolonIncluded(true);
+			return new JSFalseNode(f);
+		:}
+	;
+
+NumericLiteral
+	=	NUMBER.n
+		{:
+			return new JSNumberNode(n);
+		:}
+	;
+
+StringLiteral
+	=	STRING.s
+		{:
+			return new JSStringNode(s);
+		:}
+	;
+	
+RegularExpressionLiteral
+	=	REGEX.r
+		{:
+			return new JSRegexNode(r);
+		:}
+	;
+
+ArrayLiteral
+	=	LBRACKET.l Elision.e? RBRACKET.r
+		{:
+			if (e == null) {
+				return new JSArrayNode(l, r);
+			}
+			e.addChild(new JSNullNode());
+			return new JSArrayNode(l, r, e);
+		:}
+	|	LBRACKET.l ElementList.e RBRACKET.r
+		{:
+			return new JSArrayNode(l, r, e);
+		:}
+	|	LBRACKET.l ElementList.e COMMA Elision.n? RBRACKET.r
+		{:
+			if (n == null) {
+				return new JSArrayNode(l, r, e, new JSNullNode());
+			}
+			n.addChild(new JSNullNode());
+			return new JSArrayNode(l, r, e, n);
+		:}
+	;
+	
+ArrayLiteral_Yield
+	=	LBRACKET.l Elision.e? RBRACKET.r
+		{:
+			if (e == null) {
+				return new JSArrayNode(l, r);
+			}
+			e.addChild(new JSNullNode());
+			return new JSArrayNode(l, r, e);
+		:}
+	|	LBRACKET.l ElementList_Yield.e RBRACKET.r
+		{:
+			return new JSArrayNode(l, r, e);
+		:}
+	|	LBRACKET.l ElementList_Yield.e COMMA Elision.n? RBRACKET.r
+		{:
+			if (n == null) {
+				return new JSArrayNode(l, r, e, new JSNullNode());
+			}
+			n.addChild(new JSNullNode());
+			return new JSArrayNode(l, r, e, n);
+		:}
+	;
+
+// TODO: handle SpreadElement cases!
+ElementList
+	=	Elision.n? AssignmentExpression_In.e
+		{:
+			if (n == null) {
+				return new JSElementsNode(e);
+			}
+			return new JSElementsNode(n, e);
+		:}
+	|	Elision.n? SpreadElement.e
+	|	ElementList.l COMMA Elision.n? AssignmentExpression_In.e
+		{:
+			if (n != null) {
+				l.addChild(n);
+			}
+			l.addChild(e);
+
+			return l;
+		:}
+	|	ElementList.l COMMA Elision.n? SpreadElement.e
+	;
+
+ElementList_Yield
+	=	Elision.n? AssignmentExpression_In_Yield.e
+		{:
+			if (n == null) {
+				return new JSElementsNode(e);
+			}
+			return new JSElementsNode(n, e);
+		:}
+	|	Elision.n? SpreadElement_Yield.e
+	|	ElementList_Yield.l COMMA Elision.n? AssignmentExpression_In_Yield.e
+		{:
+			if (n != null) {
+				l.addChild(n);
+			}
+			l.addChild(e);
+
+			return l;
+		:}
+	|	ElementList_Yield.l COMMA Elision.n? SpreadElement_Yield.e
+	;
+
+Elision
+	=	COMMA
+		{:
+			return new JSElisionNode(new JSNullNode());
+		:}
+	|	Elision.s COMMA
+		{:
+			e.addChild(new JSNullNode());
+
 			return e;
 		:}
+	;
+
+SpreadElement
+	=	DOT_DOT_DOT AssignmentExpression_In
+	;
+
+SpreadElement_Yield
+	=	DOT_DOT_DOT AssignmentExpression_In_Yield
+	;
+
+ObjectLiteral
+	=	LCURLY.l RCURLY.r
+		{:
+			return new JSObjectNode(l, r);
+		:}
+	|	LCURLY.l PropertyDefinitionList.p RCURLY.r
+		{:
+			return new JSObjectNode(l, r, p);
+		:}
+	|	LCURLY.l PropertyDefinitionList.p COMMA  RCURLY.r
+		{:
+			return new JSObjectNode(l, r, p);
+		:}
+	;
+
+ObjectLiteral_Yield
+	=	LCURLY.l RCURLY.r
+		{:
+			return new JSObjectNode(l, r);
+		:}
+	|	LCURLY.l PropertyDefinitionList_Yield.p RCURLY.r
+		{:
+			return new JSObjectNode(l, r, p);
+		:}
+	|	LCURLY.l PropertyDefinitionList_Yield.p COMMA  RCURLY.r
+		{:
+			return new JSObjectNode(l, r, p);
+		:}
+	;
+
+PropertyDefinitionList
+	=	PropertyDefinition
+	|	PropertyDefinitionList COMMA PropertyDefinition
+	;
+
+PropertyDefinitionList_Yield
+	=	PropertyDefinition_Yield
+	|	PropertyDefinitionList_Yield COMMA PropertyDefinition_Yield
+	;
+
+PropertyDefinition
+	=	IdentifierReference
+	|	CoverInitializedName
+	|	PropertyName COLON AssignmentExpression_In
+	|	MethodDefinition
+	;
+
+PropertyDefinition_Yield
+	=	IdentifierReference_Yield
+	|	CoverInitializedName_Yield
+	|	PropertyName_Yield COLON AssignmentExpression_In_Yield
+	|	MethodDefinition_Yield
+	;
+
+PropertyName
+	=	LiteralPropertyName
+	|	ComputedPropertyName
+	;
+
+PropertyName_Yield
+	=	LiteralPropertyName
+	|	ComputedPropertyName_Yield
+	;
+
+LiteralPropertyName
+	=	IdentifierName.i
+		{:
+			return new JSIdentifierNode(i);
+		:}
+	|	StringLiteral
+	|	NumericLiteral
+	;
+
+ComputedPropertyName
+	=	LBRACKET AssignmentExpression_In RBRACKET
+	;
+
+ComputedPropertyName_Yield
+	=	LBRACKET AssignmentExpression_In_Yield RBRACKET
+	;
+
+CoverInitializedName
+	=	IdentifierReference Initializer_In
+	;
+
+CoverInitializedName_Yield
+	=	IdentifierReference_Yield Initializer_In_Yield
+	;
+
+Initializer
+	=	EQUAL AssignmentExpression
+	;
+
+Initializer_In
+	=	EQUAL AssignmentExpression_In
+	;
+	
+Initializer_Yield
+	=	EQUAL AssignmentExpression_Yield
+	;
+
+Initializer_In_Yield
+	=	EQUAL AssignmentExpression_In_Yield
+	;
+
+TemplateLiteral
+	=	NoSubstitutionTemplate
+	|	TemplateHead Expression_In TemplateSpans
+	;
+	
+TemplateLiteral_Yield
+	=	NoSubstitutionTemplate
+	|	TemplateHead Expression_In_Yield TemplateSpans_Yield
+	;
+
+TemplateSpans
+	=	TemplateTail
+	|	TemplateMiddleList TemplateTail
+	;
+
+TemplateSpans_Yield
+	=	TemplateTail
+	|	TemplateMiddleList_Yield TemplateTail
+	;
+
+TemplateMiddleList
+	=	TemplateMiddle Expression_In
+	|	TemplateMiddleList TemplateMiddle Expression_In
+	;
+
+TemplateMiddleList_Yield
+	=	TemplateMiddle Expression_In_Yield
+	|	TemplateMiddleList_Yield TemplateMiddle Expression_In_Yield
+	;
+
+MemberExpression
+	=	PrimaryExpression
+	|	MemberExpression.l LBRACKET.lb Expression_In.r RBRACKET.rb
+		{:
+			return new JSGetElementNode(l, lb, r, rb);
+		:}
+	|	MemberExpression.l DOT.o IdentifierName.r
+		{:
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
+		:}
+	|	MemberExpression.l TemplateLiteral
+	|	SuperProperty
+	|	MetaProperty
+	|	NEW MemberExpression.e Arguments.a
+		{:
+			return new JSConstructNode(e, a);
+		:}
+	;
+	
+MemberExpression_Yield
+	=	PrimaryExpression_Yield
+	|	MemberExpression_Yield.l LBRACKET.lb Expression_In_Yield RBRACKET.rb
+		{:
+			return new JSGetElementNode(l, lb, r, rb);
+		:}
+	|	MemberExpression_Yield.l DOT.o IdentifierName.r
+		{:
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
+		:}
+	|	MemberExpression_Yield.l TemplateLiteral_Yield
+	|	SuperProperty_Yield
+	|	MetaProperty
+	|	NEW MemberExpression_Yield.e Arguments_Yield.a
+		{:
+			return new JSConstructNode(e, a);
+		:}
+	;
+
+SuperProperty
+	=	SUPER LBRACKET Expression_In RBRACKET
+	|	SUPER DOT IdentifierName
+	;
+	
+SuperProperty_Yield
+	=	SUPER LBRACKET Expression_In_Yield RBRACKET
+	|	SUPER DOT IdentifierName
+	;
+
+MetaProperty
+	=	NewTarget
+	;
+
+NewTarget
+	=	NEW DOT TARGET
+	;
+
+NewExpression
+	=	MemberExpression
+	|	NEW NewExpression.e
+		{:
+			return new JSConstructNode(e, new JSEmptyNode(e));
+		:}
+	;
+
+NewExpression_Yield
+	=	MemberExpression_Yield
+	|	NEW NewExpression_Yield.e
+		{:
+			return new JSConstructNode(e, new JSEmptyNode(e));
+		:}
+	;
+
+CallExpression
+	=	MemberExpression.l Arguments.r
+		{:
+			return new JSInvokeNode(l, r);
+		:}
+	|	SuperCall
+	|	CallExpression.l Arguments.r
+		{:
+			return new JSInvokeNode(l, r);
+		:}
+	|	CallExpression.l LBRACKET.lb Expression_In RBRACKET
+		{:
+			return new JSGetElementNode(l, lb, r, rb);
+		:}
+	|	CallExpression.l DOT.o IdentifierName.r
+		{:
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
+		:}
+	|	CallExpression.l TemplateLiteral
+	;
+	
+CallExpression_Yield
+	=	MemberExpression_Yield.l Arguments_Yield.r
+		{:
+			return new JSInvokeNode(l, r);
+		:}
+	|	SuperCall_Yield
+	|	CallExpression_Yield.l Arguments_Yield.r
+		{:
+			return new JSInvokeNode(l, r);
+		:}
+	|	CallExpression_Yield.l LBRACKET.lb Expression_In_Yield.r RBRACKET.rb
+		{:
+			return new JSGetElementNode(l, lb, r, rb);
+		:}
+	|	CallExpression_Yield.l DOT.o IdentifierName.r
+		{:
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
+		:}
+	|	CallExpression_Yield.l TemplateLiteral_Yield
+	;
+
+SuperCall
+	=	SUPER Arguments
+	;
+
+SuperCall_Yield
+	=	SUPER Arguments_Yield
+	;
+
+Arguments
+	=	LPAREN RPAREN
+		{:
+			return new JSArgumentsNode();
+		:}
+	|	LPAREN ArgumentList.a RPAREN
+		{:
+			return new JSArgumentsNode(a);
+		:}
+	;
+
+Arguments_Yield
+	=	LPAREN RPAREN
+		{:
+			return new JSArgumentsNode();
+		:}
+	|	LPAREN ArgumentList_Yield.a RPAREN
+		{:
+			return new JSArgumentsNode(a);
+		:}
+	;
+
+ArgumentList
+	=	AssignmentExpression_In
+	|	DOT_DOT_DOT AssignmentExpression_In
+	|	ArgumentList COMMA AssignmentExpression_In
+	|	ArgumentList COMMA DOT_DOT_DOT AssignmentExpression_In
+	;
+
+ArgumentList_Yield
+	=	AssignmentExpression_In_Yield
+	|	DOT_DOT_DOT AssignmentExpression_In_Yield
+	|	ArgumentList_Yield COMMA AssignmentExpression_In_Yield
+	|	ArgumentList_Yield COMMA DOT_DOT_DOT AssignmentExpression_In_Yield
+	;
+
+LeftHandSideExpression
+	=	NewExpression
+	|	CallExpression
+	;
+
+LeftHandSideExpression_Yield
+	=	NewExpression_Yield
+	|	CallExpression_Yield
+	;
+
+PostfixExpression
+	=	LeftHandSideExpression
+	|	LeftHandSideExpression.e PLUS_PLUS.o
+		{:
+			return new JSPostUnaryOperatorNode(o, e);
+		:}
+	|	LeftHandSideExpression.e MINUS_MINUS.o
+		{:
+			return new JSPostUnaryOperatorNode(o, e);
+		:}
+	;
+
+PostfixExpression_Yield
+	=	LeftHandSideExpression_Yield
+	|	LeftHandSideExpression_Yield.e PLUS_PLUS.o
+		{:
+			return new JSPostUnaryOperatorNode(o, e);
+		:}
+	|	LeftHandSideExpression_Yield.e MINUS_MINUS.o
+		{:
+			return new JSPostUnaryOperatorNode(o, e);
+		:}
+	;
+
+UnaryExpression
+	=	PostfixExpression
+	|	DELETE.o UnaryExpression.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	VOID.o UnaryExpression.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	TYPEOF.o UnaryExpression.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	PLUS_PLUS.o UnaryExpression.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	MINUS_MINUS.o UnaryExpression.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	PLUS.o UnaryExpression.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	MINUS.o UnaryExpression.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	TILDE.o UnaryExpression.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	EXCLAMATION.o UnaryExpression.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	;
+
+UnaryExpression_Yield
+	=	PostfixExpression_Yield
+	|	DELETE.o UnaryExpression_Yield.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	VOID.o UnaryExpression_Yield.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	TYPEOF.o UnaryExpression_Yield.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	PLUS_PLUS.o UnaryExpression_Yield.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	MINUS_MINUS.o UnaryExpression_Yield.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	PLUS.o UnaryExpression_Yield.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	MINUS.o UnaryExpression_Yield.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	TILDE.o UnaryExpression_Yield.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	EXCLAMATION.o UnaryExpression_Yield.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	;
+
+MultiplicativeExpression
+	=	UnaryExpression
+	|	MultiplicativeExpression.l MultiplicativeOperator.o UnaryExpression.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+
+MultiplicativeExpression_Yield
+	=	UnaryExpression_Yield
+	|	MultiplicativeExpression_Yield.l MultiplicativeOperator.o UnaryExpression_Yield.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+
+MultiplicativeOperator
+	=	STAR
+	|	FORWARD_SLASH
+	|	PERCENT
+	;
+
+AdditiveExpression
+	=	MultiplicativeExpression
+	|	AdditiveExpression.l PLUS.o MultiplicativeExpression.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	|	AdditiveExpression.l MINUS.o MultiplicativeExpression.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+
+AdditiveExpression_Yield
+	=	MultiplicativeExpression_Yield
+	|	AdditiveExpression_Yield.l PLUS.o MultiplicativeExpression_Yield.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	|	AdditiveExpression_Yield.l MINUS.o MultiplicativeExpression_Yield.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+
+ShiftExpression
+	=	AdditiveExpression
+	|	ShiftExpression.l LESS_LESS.o AdditiveExpression.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	|	ShiftExpression.l GREATER_GREATER.o AdditiveExpression.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	|	ShiftExpression.l GREATER_GREATER_GREATER.o AdditiveExpression.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+
+ShiftExpression_Yield
+	=	AdditiveExpression_Yield
+	|	ShiftExpression_Yield.l LESS_LESS.o AdditiveExpression_Yield.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	|	ShiftExpression_Yield.l GREATER_GREATER.o AdditiveExpression_Yield.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	|	ShiftExpression_Yield.l GREATER_GREATER_GREATER.o AdditiveExpression_Yield.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+
+RelationalExpression
+	=	ShiftExpression
+	|	RelationalExpression.l LESS.o ShiftExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression.l GREATER.o ShiftExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression.l LESS_EQUAL.o ShiftExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression.l GREATER_EQUAL.o ShiftExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression.l INSTANCEO.oF ShiftExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+
+RelationalExpression_In
+	=	ShiftExpression
+	|	RelationalExpression_In.l LESS.o ShiftExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression_In.l GREATER.o ShiftExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression_In.l LESS_EQUAL.o ShiftExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression_In.l GREATER_EQUAL.o ShiftExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression_In.l INSTANCEOF.o ShiftExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression_In.l IN.o ShiftExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+	
+RelationalExpression_Yield
+	=	ShiftExpression_Yield
+	|	RelationalExpression_Yield.l LESS.o ShiftExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression_Yield.l GREATER.o ShiftExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression_Yield.l LESS_EQUAL.o ShiftExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression_Yield.l GREATER_EQUAL.o ShiftExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression_Yield.l INSTANCEOF.o ShiftExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+	
+RelationalExpression_In_Yield
+	=	ShiftExpression_Yield
+	|	RelationalExpression_In_Yield.l LESS.o ShiftExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression_In_Yield.l GREATER.o ShiftExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression_In_Yield.l LESS_EQUAL.o ShiftExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression_In_Yield.l GREATER_EQUAL.o ShiftExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression_In_Yield.l INSTANCEOF.o ShiftExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	RelationalExpression_In_Yield.l IN.o ShiftExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+
+EqualityExpression
+	=	RelationalExpression
+	|	EqualityExpression.l EQUAL_EQUAL.o RelationalExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	EqualityExpression.l EXCLAMATION_EQUAL.o RelationalExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	EqualityExpression.l EQUAL_EQUAL_EQUAL.o RelationalExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	EqualityExpression.l EXCLAMATION_EQUAL_EQUAL.o RelationalExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+
+EqualityExpression_In
+	=	RelationalExpression_In
+	|	EqualityExpression_In.l EQUAL_EQUAL.o RelationalExpression_In.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	EqualityExpression_In.l EXCLAMATION_EQUAL.o RelationalExpression_In.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	EqualityExpression_In.l EQUAL_EQUAL_EQUAL.o RelationalExpression_In.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	EqualityExpression_In.l EXCLAMATION_EQUAL_EQUAL.o RelationalExpression_In.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+	
+EqualityExpression_Yield
+	=	RelationalExpression_Yield
+	|	EqualityExpression_Yield.l EQUAL_EQUAL.o RelationalExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	EqualityExpression_Yield.l EXCLAMATION_EQUAL.o RelationalExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	EqualityExpression_Yield.l EQUAL_EQUAL_EQUAL.o RelationalExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	EqualityExpression_Yield.l EXCLAMATION_EQUAL_EQUAL.o RelationalExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+	
+EqualityExpression_In_Yield
+	=	RelationalExpression_In_Yield
+	|	EqualityExpression_In_Yield.l EQUAL_EQUAL.o RelationalExpression_In_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	EqualityExpression_In_Yield.l EXCLAMATION_EQUAL.o RelationalExpression_In_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	EqualityExpression_In_Yield.l EQUAL_EQUAL_EQUAL.o RelationalExpression_In_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	EqualityExpression_In_Yield.l EXCLAMATION_EQUAL_EQUAL.o RelationalExpression_In_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+
+BitwiseANDExpression
+	=	EqualityExpression
+	|	BitwiseANDExpression.l AMPERSAND.o EqualityExpression.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+
+BitwiseANDExpression_In
+	=	EqualityExpression_In
+	|	BitwiseANDExpression_In.l AMPERSAND.o EqualityExpression_In.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+	
+BitwiseANDExpression_Yield
+	=	EqualityExpression_Yield
+	|	BitwiseANDExpression_Yield.l AMPERSAND.o EqualityExpression_Yield.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+	
+BitwiseANDExpression_In_Yield
+	=	EqualityExpression_In_Yield
+	|	BitwiseANDExpression_In_Yield.l AMPERSAND.o EqualityExpression_In_Yield.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+
+BitwiseXORExpression
+	=	BitwiseANDExpression
+	|	BitwiseXORExpression.l CARET.o BitwiseANDExpression.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+
+BitwiseXORExpression_In
+	=	BitwiseANDExpression_In
+	|	BitwiseXORExpression_In.l CARET.o BitwiseANDExpression_In.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+	
+BitwiseXORExpression_Yield
+	=	BitwiseANDExpression_Yield
+	|	BitwiseXORExpression_Yield.l CARET.o BitwiseANDExpression_Yield.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+	
+BitwiseXORExpression_In_Yield
+	=	BitwiseANDExpression_In_Yield
+	|	BitwiseXORExpression_In_Yield.l CARET.o BitwiseANDExpression_In_Yield.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+
+BitwiseORExpression
+	=	BitwiseXORExpression
+	|	BitwiseORExpression.l PIPE.o BitwiseXORExpression.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+
+BitwiseORExpression_In
+	=	BitwiseXORExpression_In
+	|	BitwiseORExpression_In.l PIPE.o BitwiseXORExpression_In.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+	
+BitwiseORExpression_Yield
+	=	BitwiseXORExpression_Yield
+	|	BitwiseORExpression_Yield.l PIPE.o BitwiseXORExpression_Yield.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+	
+BitwiseORExpression_In_Yield
+	=	BitwiseXORExpression_In_Yield
+	|	BitwiseORExpression_In_Yield.l PIPE.o BitwiseXORExpression_In_Yield.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	;
+
+LogicalANDExpression
+	=	BitwiseORExpression
+	|	LogicalANDExpression AMPERSAND_AMPERSAND BitwiseORExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+
+LogicalANDExpression_In
+	=	BitwiseORExpression_In
+	|	LogicalANDExpression_In.l AMPERSAND_AMPERSAND.o BitwiseORExpression_In.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+	
+LogicalANDExpression_Yield
+	=	BitwiseORExpression_Yield
+	|	LogicalANDExpression_Yield.l AMPERSAND_AMPERSAND.o BitwiseORExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+	
+LogicalANDExpression_In_Yield
+	=	BitwiseORExpression_In_Yield
+	|	LogicalANDExpression_In_Yield.l AMPERSAND_AMPERSAND.o BitwiseORExpression_In_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+	
+LogicalORExpression
+	=	LogicalANDExpression
+	|	LogicalORExpression.l PIPE_PIPE.o LogicalANDExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+
+LogicalORExpression_In
+	=	LogicalANDExpression_In
+	|	LogicalORExpression_In.l PIPE_PIPE.o LogicalANDExpression_In.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+	
+LogicalORExpression_Yield
+	=	LogicalANDExpression_Yield
+	|	LogicalORExpression_Yield.l PIPE_PIPE.o LogicalANDExpression_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+	
+LogicalORExpression_In_Yield
+	=	LogicalANDExpression_In_Yield
+	|	LogicalORExpression_In_Yield.l PIPE_PIPE.o LogicalANDExpression_In_Yield.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	;
+
+ConditionalExpression
+	=	LogicalORExpression
+	|	LogicalORExpression.l QUESTION.q AssignmentExpression_In.t COLON.c AssignmentExpression.f
+		{:
+			return new JSConditionalNode(l, q, t, c, f);
+		:}
+	;
+
+ConditionalExpression_In
+	=	LogicalORExpression_In
+	|	LogicalORExpression_In.l QUESTION.q AssignmentExpression_In.t COLON.c AssignmentExpression_In.f
+		{:
+			return new JSConditionalNode(l, q, t, c, f);
+		:}
+	;
+	
+ConditionalExpression_Yield
+	=	LogicalORExpression_Yield
+	|	LogicalORExpression_Yield.l QUESTION.q AssignmentExpression_In.t COLON.c AssignmentExpression_Yield.f
+		{:
+			return new JSConditionalNode(l, q, t, c, f);
+		:}
+	;
+	
+ConditionalExpression_In_Yield
+	=	LogicalORExpression_In_Yield
+	|	LogicalORExpression_In_Yield.l QUESTION.q AssignmentExpression_In_Yield.t COLON.c AssignmentExpression_In_Yield.f
+		{:
+			return new JSConditionalNode(l, q, t, c, f);
+		:}
+	;
+
+AssignmentExpression
+	=	ConditionalExpression
+	|	ArrowFunction
+	|	LeftHandSideExpression.l EQUAL.o AssignmentExpression.r
+		{:
+			return new JSAssignmentNode(l, o, r);
+		:}
+	|	LeftHandSideExpression.l AssignmentOperator.o AssignmentExpression.r
+		{:
+			return new JSAssignmentNode(l, o, r);
+		:}
+	;
+
+AssignmentExpression_In
+	=	ConditionalExpression_In
+	|	ArrowFunction_In
+	|	LeftHandSideExpression.l EQUAL.o AssignmentExpression_In.r
+		{:
+			return new JSAssignmentNode(l, o, r);
+		:}
+	|	LeftHandSideExpression.l AssignmentOperator.o AssignmentExpression_In.r
+		{:
+			return new JSAssignmentNode(l, o, r);
+		:}
+	;
+	
+AssignmentExpression_Yield
+	=	ConditionalExpression_Yield
+	|	YieldExpression
+	|	ArrowFunction_Yield
+	|	LeftHandSideExpression_Yield.l EQUAL.o AssignmentExpression_Yield.r
+		{:
+			return new JSAssignmentNode(l, o, r);
+		:}
+	|	LeftHandSideExpression_Yield.l AssignmentOperator.o AssignmentExpression_Yield.r
+		{:
+			return new JSAssignmentNode(l, o, r);
+		:}
+	;
+	
+AssignmentExpression_In_Yield
+	=	ConditionalExpression_In_Yield
+	|	YieldExpression_In
+	|	ArrowFunction_In_Yield
+	|	LeftHandSideExpression_Yield.l EQUAL.o AssignmentExpression_In_Yield.r
+		{:
+			return new JSAssignmentNode(l, o, r);
+		:}
+	|	LeftHandSideExpression_Yield.l AssignmentOperator.o AssignmentExpression_In_Yield.r
+		{:
+			return new JSAssignmentNode(l, o, r);
+		:}
+	;
+
+AssignmentOperator
+	=	STAR_EQUAL
+	|	FORWARD_SLASH_EQUAL
+	|	PERCENT_EQUAL
+	|	PLUS_EQUAL
+	|	MINUS_EQUAL
+	|	LESS_LESS_EQUAL
+	|	GREATER_GREATER_EQUAL
+	|	GREATER_GREATER_GREATER_EQUAL
+	|	AMPERSAND_EQUAL
+	|	CARET_EQUAL
+	|	PIPE_EQUAL
+	;
+
+Expression
+	=	AssignmentExpression
+	|	Expression.l COMMA AssignmentExpression.r
+		{:
+			return new JSCommaNode(l, r);
+		:}
+	;
+
+Expression_In
+	=	AssignmentExpression_In
+	|	Expression_In.l COMMA AssignmentExpression_In.r
+		{:
+			return new JSCommaNode(l, r);
+		:}
+	;
+	
+Expression_Yield
+	=	AssignmentExpression_Yield
+	|	Expression_Yield.l COMMA AssignmentExpression_Yield.r
+		{:
+			return new JSCommaNode(l, r);
+		:}
+	;
+	
+Expression_In_Yield
+	=	AssignmentExpression_In_Yield
+	|	Expression_In_Yield.l COMMA AssignmentExpression_In_Yield.r
+		{:
+			return new JSCommaNode(l, r);
+		:}
+	;
+
+////////////////////////////////////
+// A.3 Statements
+////////////////////////////////////
+Statement
+	=	BlockStatement
+	|	VariableStatement
+	|	EmptyStatement
+	|	ExpressionStatement
 	|	IfStatement
-	|	IterationStatement
+	|	BreakableStatement
+	|	ContinueStatement
+	|	BreakStatement
+	|	WithStatement
+	|	LabelledStatement
+	|	ThrowStatement
+	|	TryStatement
+	|	DebuggerStatement
+	|	error
+		{:
+			return new JSErrorNode();
+		:}
+	;
+
+Statement_Yield
+	=	BlockStatement_Yield
+	|	VariableStatement_Yield
+	|	EmptyStatement
+	|	ExpressionStatement_Yield
+	|	IfStatement_Yield
+	|	BreakableStatement_Yield
+	|	ContinueStatement_Yield
+	|	BreakStatement_Yield
+	|	WithStatement_Yield
+	|	LabelledStatement_Yield
+	|	ThrowStatement_Yield
+	|	TryStatement_Yield
+	|	DebuggerStatement
+	|	error
+		{:
+			return new JSErrorNode();
+		:}
+	;
+
+Statement_Return
+	=	BlockStatement_Return
+	|	VariableStatement
+	|	EmptyStatement
+	|	ExpressionStatement
+	|	IfStatement_Return
+	|	BreakableStatement_Return
 	|	ContinueStatement
 	|	BreakStatement
 	|	ReturnStatement
-	|	WithStatement
-	|	LabelledStatement
-	|	SwitchStatement
+	|	WithStatement_Return
+	|	LabelledStatement_Return
 	|	ThrowStatement
-	|	TryStatement
-	|	SEMICOLON.s
+	|	TryStatement_Return
+	|	DebuggerStatement
+	|	error
+		{:
+			return new JSErrorNode();
+		:}
+	;
+
+StatementYield_Return
+	=	BlockStatement_Yield_Return
+	|	VariableStatement_Yield
+	|	EmptyStatement
+	|	ExpressionStatement_Yield
+	|	IfStatement_Yield_Return
+	|	BreakableStatement_Yield_Return
+	|	ContinueStatement_Yield
+	|	BreakStatement_Yield
+	|	ReturnStatement_Yield
+	|	WithStatement_Yield_Return
+	|	LabelledStatement_Yield_Return
+	|	ThrowStatement_Yield
+	|	TryStatement_Yield_Return
+	|	DebuggerStatement
+	|	error
+		{:
+			return new JSErrorNode();
+		:}
+	;
+
+EmptyStatement
+	=	SEMICOLON.s
 		{:
 			JSNode node = new JSEmptyNode(s);
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
-	|	error
-		{:
-			return new JSErrorNode();
-		:}
 	;
 
-Statement_NoIf
-	=	Block
-	|	FunctionDeclaration
-	|	VAR.v VariableDeclarationList.l SEMICOLON
-		{:
-			JSNode node = new JSVarNode(v, l);
-			node.setSemicolonIncluded(true);
-			return node;
-		:}
-	|	Expression_NoLBF.e SEMICOLON
-		{:
-			e.setSemicolonIncluded(true);
-			return e;
-		:}
-	|	IfStatement_NoIf
-	|	IterationStatement_NoIf
-	|	ContinueStatement
-	|	BreakStatement
-	|	ReturnStatement
-	|	WithStatement_NoIf
-	|	LabelledStatement_NoIf
+Declaration
+	=	HoistableDeclaration
+	|	ClassDeclaration
+	|	LexicalDeclaration_In
+	;
+
+Declaration_Yield
+	=	HoistableDeclaration_Yield
+	|	ClassDeclaration_Yield
+	|	LexicalDeclaration_In_Yield
+	;
+
+HoistableDeclaration
+	=	FunctionDeclaration
+	|	GeneratorDeclaration
+	;
+
+HoistableDeclaration_Yield
+	=	FunctionDeclaration_Yield
+	|	GeneratorDeclaration_Yield
+	;
+	
+HoistableDeclaration_Default
+	=	FunctionDeclaration_Default
+	|	GeneratorDeclaration_Default
+	;
+
+HoistableDeclaration_Yield_Default
+	=	FunctionDeclaration_Yield_Default
+	|	GeneratorDeclaration_Yield_Default
+	;
+
+BreakableStatement
+	=	IterationStatement
 	|	SwitchStatement
-	|	ThrowStatement
-	|	TryStatement
-	|	SEMICOLON.s
-		{:
-			return new JSEmptyNode(s);
-		:}
-	|	error
-		{:
-			return new JSErrorNode();
-		:}
+	;
+	
+BreakableStatement_Yield
+	=	IterationStatement_Yield
+	|	SwitchStatement_Yield
+	;
+	
+BreakableStatement_Return
+	=	IterationStatement_Return
+	|	SwitchStatement_Return
+	;
+
+BreakableStatement_Yield_Return
+	=	IterationStatement_Yield_Return
+	|	SwitchStatement_Yield_Return
+	;
+
+BlockStatement
+	=	Block
+	;
+
+BlockStatement_Yield
+	=	Block_Yield
+	;
+	
+BlockStatement_Return
+	=	Block_Return
+	;
+
+BlockStatement_Yield_Return
+	=	Block_Yield_Return
 	;
 
 Block
-	=	LCURLY RCURLY
+	=	LCURLY StatementList.list? RCURLY
 		{:
-			return new JSStatementsNode();
+			if (a == null) {
+				return new JSStatementsNode();
+			}
+			return new JSStatementsNode(a);
 		:}
-	|	LCURLY StatementList.a RCURLY
+	;
+
+Block_Yield
+	=	LCURLY StatementList_Yield.list? RCURLY
 		{:
+			if (a == null) {
+				return new JSStatementsNode();
+			}
+			return new JSStatementsNode(a);
+		:}
+	;
+
+Block_Return
+	=	LCURLY StatementList_Return.list? RCURLY
+		{:
+			if (a == null) {
+				return new JSStatementsNode();
+			}
+			return new JSStatementsNode(a);
+		:}
+	;
+
+Block_Yield_Return
+	=	LCURLY StatementList_Yield_Return.a? RCURLY
+		{:
+			if (a == null) {
+				return new JSStatementsNode();
+			}
 			return new JSStatementsNode(a);
 		:}
 	;
 
 StatementList
-	=	StatementList Statement
-	|	Statement
+	=	StatementList StatementListItem
+	|	StatementListItem
+	;
+
+StatementList_Yield
+	=	StatementList_Yield StatementListItem_Yield
+	|	StatementListItem_Yield
+	;
+
+StatementList_Return
+	=	StatementList_Return StatementListItem_Return
+	|	StatementListItem_Return
+	;
+
+StatementList_Yield_Return
+	=	StatementList_Yield_Return StatementListItem_Yield_Return
+	|	StatementListItem_Yield_Return
+	;
+
+StatementListItem
+	=	Statement
+	|	Declaration
+	;
+
+StatementListItem_Yield
+	=	Statement_Yield
+	|	Declaration_Yield
+	;
+
+StatementListItem_Return
+	=	Statement_Return
+	|	Declaration
+	;
+
+StatementListItem_Yield_Return
+	=	Statement_Yield_Return
+	|	Declaration_Yield
+	;
+
+LexicalDeclaration
+	=	LetOrConst.v BindingList.l SEMICOLON
+		{:
+			JSNode node = new JSVarNode(v, l);
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	;
+	
+LexicalDeclaration_In
+	=	LetOrConst.v BindingList_In.l SEMICOLON
+		{:
+			JSNode node = new JSVarNode(v, l);
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	;
+	
+LexicalDeclaration_Yield
+	=	LetOrConst.v BindingList_Yield.l SEMICOLON
+		{:
+			JSNode node = new JSVarNode(v, l);
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	;
+	
+LexicalDeclaration_In_Yield
+	=	LetOrConst.v BindingList_In_Yield.l SEMICOLON
+		{:
+			JSNode node = new JSVarNode(v, l);
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	;
+
+LetOrConst
+	=	LET
+	|	CONST
+	;
+
+BindingList
+	=	BindingList COMMA LexicalBinding
+	|	LexicalBinding
+	;
+
+BindingList_In
+	=	BindingList_In COMMA LexicalBinding_In
+	|	LexicalBinding_In
+	;
+
+BindingList_Yield
+	=	BindingList_Yield COMMA LexicalBinding_Yield
+	|	LexicalBinding_Yield
+	;
+
+BindingList_In_Yield
+	=	BindingList_In_Yield COMMA LexicalBinding_In_Yield
+	|	LexicalBinding_In_Yield
+	;
+
+LexicalBinding
+	=	BindingIdentifier Initializer?
+	|	BindingPattern Initializer
+	;
+
+LexicalBinding_In
+	=	BindingIdentifier Initializer_In?
+	|	BindingPattern Initializer_In
+	;
+
+LexicalBinding_Yield
+	=	BindingIdentifier_Yield Initializer_Yield?
+	|	BindingPattern_Yield Initializer_Yield
+	;
+
+LexicalBinding_In_Yield
+	=	BindingIdentifier_Yield Initializer_In_Yield?
+	|	BindingPattern_Yield Initializer_In_Yield
+	;
+
+VariableStatement
+	=	VAR.v VariableDeclarationList.l SEMICOLON
+		{:
+			JSNode node = new JSVarNode(v, l);
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	;
+	
+VariableStatement_Yield
+	=	VAR.v VariableDeclarationList_in_Yield.l SEMICOLON
+		{:
+			JSNode node = new JSVarNode(v, l);
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
 	;
 
 VariableDeclarationList
@@ -688,189 +2097,569 @@ VariableDeclarationList
 	|	VariableDeclaration
 	;
 
-VariableDeclarationList_NoIn
-	=	VariableDeclarationList_NoIn COMMA VariableDeclaration_NoIn
-	|	VariableDeclaration_NoIn
+VariableDeclarationList_In
+	=	VariableDeclarationList_In COMMA VariableDeclaration_In
+	|	VariableDeclaration_In
+	;
+
+VariableDeclarationList_Yield
+	=	VariableDeclarationList_Yield COMMA VariableDeclaration_Yield
+	|	VariableDeclaration_Yield
+	;
+
+VariableDeclarationList_In_Yield
+	=	VariableDeclarationList_In_Yield COMMA VariableDeclaration_In_Yield
+	|	VariableDeclaration_In_Yield
 	;
 
 VariableDeclaration
-	=	Identifier.i
+	=	BindingIdentifier.i Initializer.z?
 		{:
-			return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
+			if (z == null) {
+				return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
+			} else {
+				return new JSDeclarationNode(new JSIdentifierNode(i), z);
+			}
 		:}
-	|	Identifier.i EQUAL.e AssignmentExpression.expression
+	|	BindingPattern Initializer
+	;
+
+VariableDeclaration_In
+	=	BindingIdentifier.i Initializer_In.z?
 		{:
-			return new JSDeclarationNode(new JSIdentifierNode(i), e, expression);
+			if (z == null) {
+				return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
+			} else {
+				return new JSDeclarationNode(new JSIdentifierNode(i), z);
+			}
+		:}
+	|	BindingPattern Initializer_In
+	;
+
+VariableDeclaration_Yield
+	=	BindingIdentifier_Yield.i Initializer_Yield.z?
+		{:
+			if (z == null) {
+				return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
+			} else {
+				return new JSDeclarationNode(new JSIdentifierNode(i), z);
+			}
+		:}
+	|	BindingPattern_Yield Initializer_Yield
+	;
+
+VariableDeclaration_In_Yield
+	=	BindingIdentifier_Yield.i Initializer_In_Yield.z?
+		{:
+			if (z == null) {
+				return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
+			} else {
+				return new JSDeclarationNode(new JSIdentifierNode(i), z);
+			}
+		:}
+	|	BindingPattern_Yield Initializer_In_Yield
+	;
+
+BindingPattern
+	=	ObjectBindingPattern
+	|	ArrayBindingPattern
+	;
+
+BindingPattern_Yield
+	=	ObjectBindingPattern_Yield
+	|	ArrayBindingPattern_Yield
+	;
+
+ObjectBindingPattern
+	=	LCURLY.l RCURLY.r
+		{:
+			return new JSObjectNode(l, r);
+		:}
+	|	LCURLY.l BindingPropertyList.p RCURLY.r
+		{:
+			return new JSObjectNode(l, r, p);
+		:}
+	|	LCURLY.l BindingPropertyList.p COMMA RCURLY.r
+		{:
+			return new JSObjectNode(l, r, p);
 		:}
 	;
 
-VariableDeclaration_NoIn
-	=	Identifier.i
+ObjectBindingPattern_Yield
+	=	LCURLY.l RCURLY.r
 		{:
-			return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
+			return new JSObjectNode(l, r);
 		:}
-	|	Identifier.i EQUAL.e AssignmentExpression_NoIn.expression
+	|	LCURLY.l BindingPropertyList_Yield.p RCURLY.r
 		{:
-			return new JSDeclarationNode(new JSIdentifierNode(i), e, expression);
+			return new JSObjectNode(l, r, p);
 		:}
+	|	LCURLY.l BindingPropertyList_Yield.p COMMA RCURLY.r
+		{:
+			return new JSObjectNode(l, r, p);
+		:}
+	;
+
+ArrayBindingPattern
+	=	LBRACKET.l Elision.e? BindingRestElement.n? RBRACKET.r
+		{:
+			return new JSArrayNode(l, r, e);
+		:}
+	|	LBRACKET.l BindingElementList.n RBRACKET.r
+	|	LBRACKET.l BindingElementList.n COMMA Elision.e? BindingRestElement.z? RBRACKET.r
+	;
+
+ArrayBindingPattern_Yield
+	=	LBRACKET.l Elision.e? BindingRestElement_Yield.n? RBRACKET.r
+	|	LBRACKET.l BindingElementList_Yield.n RBRACKET.r
+	|	LBRACKET.l BindingElementList_Yield.n COMMA Elision.e? BindingRestElement_Yield.z? RBRACKET.r
+	;
+
+BindingPropertyList
+	=	BindingPropertyList COMMA BindingProperty
+	|	BindingProperty
+	;
+	
+BindingPropertyList_Yield
+	=	BindingPropertyList_Yield COMMA BindingProperty_Yield
+	|	BindingProperty_Yield
+	;
+
+BindingElementList
+	=	BindingElementList COMMA BindingElisionElement
+	|	BindingElisionElement
+	;
+	
+BindingElementList_Yield
+	=	BindingElementList_Yield COMMA BindingElisionElement_Yield
+	|	BindingElisionElement_Yield
+	;
+
+BindingElisionElement
+	=	Elision? BindingElement
+	;
+	
+BindingElisionElement_Yield
+	=	Elision? BindingElement_Yield
+	;
+
+BindingProperty
+	=	SingleNameBinding
+	|	PropertyName COLON BindingElement
+	;
+
+BindingProperty_Yield
+	=	SingleNameBinding_Yield
+	|	PropertyName_Yield COLON BindingElement_Yield
+	;
+
+//PropertyAssignment
+//	=	PropertyName.n COLON.c AssignmentExpression.v
+//		{:
+//			return new JSNameValuePairNode(n, c, v);
+//		:}
+//	|	GET PropertyName.n LPAREN RPAREN FunctionBody.body
+//		{:
+//			return new JSNameValuePairNode(n, body);
+//		:}
+//	|	SET PropertyName.n LPAREN PropertySetParameterList.p RPAREN FunctionBody.body
+//		{:
+//			JSIdentifierNode ident = new JSIdentifierNode(p);
+//			JSParametersNode params = new JSParametersNode(ident);
+//			params.setLocation(ident.getStartingOffset(), ident.getEndingOffset());
+//			return new JSNameValuePairNode(n, params, body);
+//		:}
+//	;	
+
+
+BindingElement
+	=	SingleNameBinding
+	|	BindingPattern Initializer_In?
+	;
+	
+BindingElement_Yield
+	=	SingleNameBinding_Yield
+	|	BindingPattern_Yield Initializer_In_Yield?
+	;
+
+SingleNameBinding
+	=	BindingIdentifier Initializer_In?
+	;
+	
+SingleNameBinding_Yield
+	=	BindingIdentifier_Yield Initializer_In_Yield?
+	;
+
+BindingRestElement
+	=	DOT_DOT_DOT BindingIdentifier
+	;
+	
+BindingRestElement_Yield
+	=	DOT_DOT_DOT BindingIdentifier_Yield
+	;
+
+ExpressionStatement
+	=	Expression_In SEMICOLON
+	;
+
+ExpressionStatement_Yield
+	=	Expression_In_Yield SEMICOLON
 	;
 
 IfStatement
-	=	IF LPAREN.l Expression.e RPAREN.r Statement_NoIf.sn ELSE Statement.s
+	=	IF LPAREN.l Expression_In.e RPAREN.r Statement.sn ELSE Statement.s
 		{:
 			return new JSIfNode(l, e, r, sn, s);
 		:}
-	|	IF LPAREN.l Expression.e RPAREN.r Statement.s
+	|	IF LPAREN.l Expression_In.e RPAREN.r Statement.s
 		{:
 			return new JSIfNode(l, e, r, s, new JSEmptyNode(s));
 		:}
 	;
 
-IfStatement_NoIf
-	=	IF LPAREN.l Expression.e RPAREN.r Statement_NoIf.sn ELSE Statement_NoIf.s
+IfStatement_Yield
+	=	IF LPAREN.l Expression_In_Yield.e RPAREN.r Statement_Yield.sn ELSE Statement_Yield.s
 		{:
 			return new JSIfNode(l, e, r, sn, s);
+		:}
+	|	IF LPAREN.l Expression_In_Yield.e RPAREN.r Statement_Yield.s
+		{:
+			return new JSIfNode(l, e, r, s, new JSEmptyNode(s));
+		:}
+	;
+
+IfStatement_Return
+	=	IF LPAREN.l Expression_In.e RPAREN.r Statement_Return.sn ELSE Statement_Return.s
+		{:
+			return new JSIfNode(l, e, r, sn, s);
+		:}
+	|	IF LPAREN.l Expression_In.e RPAREN.r Statement_Return.s
+		{:
+			return new JSIfNode(l, e, r, s, new JSEmptyNode(s));
+		:}
+	;
+
+IfStatement_Yield_Return
+	=	IF LPAREN.l Expression_In_Yield.e RPAREN.r Statement_Yield_Return.sn ELSE Statement_Yield_Return.s
+		{:
+			return new JSIfNode(l, e, r, sn, s);
+		:}
+	|	IF LPAREN.l Expression_In_Yield.e RPAREN.r Statement_Yield_Return.s
+		{:
+			return new JSIfNode(l, e, r, s, new JSEmptyNode(s));
 		:}
 	;
 
 IterationStatement
-	=	DO Statement.s WHILE LPAREN.l Expression.e RPAREN.r SEMICOLON
+	=	DO Statement.s WHILE LPAREN.l Expression_In.e RPAREN.r SEMICOLON.s1
 		{:
-			JSNode node = new JSDoNode(s, l, e, r);
-			node.setSemicolonIncluded(true);
-			return node;
-		:}
-	|	WHILE LPAREN.l Expression.e RPAREN.r Statement.s
+ 			JSNode node = new JSDoNode(s, l, e, r);
+ 			node.setSemicolonIncluded(true);
+ 			return node;
+ 		:}
+	|	WHILE LPAREN.l Expression_In.e RPAREN.r Statement.s
 		{:
-			return new JSWhileNode(l, e, r, s);
-		:}
-	|	FOR LPAREN.l SEMICOLON.s1 SEMICOLON.s2 RPAREN.r Statement.s
+ 			return new JSWhileNode(l, e, r, s);
+ 		:}
+	// FIXME [lookahead ∉ {let [}]
+	|	FOR LPAREN.l Expression.e1? SEMICOLON.s1 Expression_In.e2? SEMICOLON.s2 Expression_In.e3? RPAREN.r Statement.s
 		{:
-			return new JSForNode(l, new JSEmptyNode(l), s1, new JSEmptyNode(s1), s2, new JSEmptyNode(s2), r, s);
-		:}
-	|	FOR LPAREN.l SEMICOLON.s1 SEMICOLON.s2 Expression.a RPAREN.r Statement.s
+			if (e1 == null) {
+				e1 = new JSEmptyNode(l);
+			}
+			if (e2 == null) {
+				e2 = new JSEmptyNode(s1);
+			}
+			if (e3 == null) {
+				e3 = new JSEmptyNode(s2);
+			}
+ 			return new JSForNode(l, e1, s1, e2, s2, e3, r, s);
+ 		:}
+	|	FOR LPAREN.l VAR.v VariableDeclarationList.i SEMICOLON.s1 Expression_In.e1? SEMICOLON.s2 Expression_In.e2? RPAREN.r Statement.s
 		{:
-			return new JSForNode(l, new JSEmptyNode(l), s1, new JSEmptyNode(s1), s2, a, r, s);
-		:}
-	|	FOR LPAREN.l SEMICOLON.s1 Expression.c SEMICOLON.s2 RPAREN.r Statement.s
+			if (e1 == null) {
+				e1 = new JSEmptyNode(s1);
+			}
+			if (e2 == null) {
+				e2 = new JSEmptyNode(s2);
+			}
+ 			return new JSForNode(l, new JSVarNode(v, i), s1, e1, s2, e2, r, s);
+ 		:}
+	|	FOR LPAREN.l LexicalDeclaration.decl Expression_In.e1? SEMICOLON.s1 Expression_In.e2? RPAREN.r Statement.s
 		{:
-			return new JSForNode(l, new JSEmptyNode(l), s1, c, s2, new JSEmptyNode(s2), r, s);
-		:}
-	|	FOR LPAREN.l SEMICOLON.s1 Expression.c SEMICOLON.s2 Expression.a RPAREN.r Statement.s
+			if (e1 == null) {
+				e1 = new JSEmptyNode(l);
+			}
+			if (e2 == null) {
+				e2 = new JSEmptyNode(s1);
+			}
+ 			return new JSForNode(l, new JSVarNode(decl, e1), s1, e2, r, s);
+ 		:}
+	// FIXME [lookahead ∉ {let [}]
+	|	FOR LPAREN.l LeftHandSideExpression.i IN.in Expression_In.o RPAREN.r Statement.s
 		{:
-			return new JSForNode(l, new JSEmptyNode(l), s1, c, s2, a, r, s);
-		:}
-	|	FOR LPAREN.l Expression_NoIn.i SEMICOLON.s1 SEMICOLON.s2 RPAREN.r Statement.s
+ 			return new JSForInNode(l, i, in, o, r, s);
+ 		:}
+	|	FOR LPAREN.l VAR.v ForBinding.i IN.in Expression_In.o RPAREN.r Statement.s
 		{:
-			return new JSForNode(l, i, s1, new JSEmptyNode(s1), s2, new JSEmptyNode(s2), r, s);
-		:}
-	|	FOR LPAREN.l Expression_NoIn.i SEMICOLON.s1 SEMICOLON.s2 Expression.a RPAREN.r Statement.s
+ 			return new JSForInNode(l, new JSVarNode(v, i), in, o, r, s);
+ 		:}
+	|	FOR LPAREN.l ForDeclaration.decl IN.in Expression_In.o RPAREN.r Statement.s
 		{:
-			return new JSForNode(l, i, s1, new JSEmptyNode(s1), s2, a, r, s);
-		:}
-	|	FOR LPAREN.l Expression_NoIn.i SEMICOLON.s1 Expression.c SEMICOLON.s2 RPAREN.r Statement.s
+ 			return new JSForInNode(l, decl, in, o, r, s);
+ 		:}
+	// FIXME [lookahead ∉ {let [}]
+	|	FOR LPAREN.l LeftHandSideExpression.i OF.of AssignmentExpression_In.o RPAREN.r Statement.s
 		{:
-			return new JSForNode(l, i, s1, c, s2, new JSEmptyNode(s2), r, s);
-		:}
-	|	FOR LPAREN.l Expression_NoIn.i SEMICOLON.s1 Expression.c SEMICOLON.s2 Expression.a RPAREN.r Statement.s
+ 			return new JSForOfNode(l, i, of, o, r, s);
+ 		:}
+	|	FOR LPAREN.l VAR.v ForBinding.i OF.of AssignmentExpression_In.o RPAREN.r Statement.s
 		{:
-			return new JSForNode(l, i, s1, c, s2, a, r, s);
-		:}
-	|	FOR LPAREN.l VAR.v VariableDeclarationList_NoIn.i SEMICOLON.s1 SEMICOLON.s2 RPAREN.r Statement.s
+ 			return new JSForOfNode(l, new JSVarNode(v, i), of, o, r, s);
+ 		:}
+	|	FOR LPAREN.l ForDeclaration.decl OF.of AssignmentExpression_In.o RPAREN.r Statement.s
 		{:
-			return new JSForNode(l, new JSVarNode(v, i), s1, new JSEmptyNode(s1), s2, new JSEmptyNode(s2), r, s);
-		:}
-	|	FOR LPAREN.l VAR.v VariableDeclarationList_NoIn.i SEMICOLON.s1 SEMICOLON.s2 Expression.a RPAREN.r Statement.s
-		{:
-			return new JSForNode(l, new JSVarNode(v, i), s1, new JSEmptyNode(s1), s2, a, r, s);
-		:}
-	|	FOR LPAREN.l VAR.v VariableDeclarationList_NoIn.i SEMICOLON.s1 Expression.c SEMICOLON.s2 RPAREN.r Statement.s
-		{:
-			return new JSForNode(l, new JSVarNode(v, i), s1, c, s2, new JSEmptyNode(s2), r, s);
-		:}
-	|	FOR LPAREN.l VAR.v VariableDeclarationList_NoIn.i SEMICOLON.s1 Expression.c SEMICOLON.s2 Expression.a RPAREN.r Statement.s
-		{:
-			return new JSForNode(l, new JSVarNode(v, i), s1, c, s2, a, r, s);
-		:}
-	|	FOR LPAREN.l LeftHandSideExpression.i IN.in Expression.o RPAREN.r Statement.s
-		{:
-			return new JSForInNode(l, i, in, o, r, s);
-		:}
-	|	FOR LPAREN.l VAR.v VariableDeclaration_NoIn.i IN.in Expression.o RPAREN.r Statement.s
-		{:
-			return new JSForInNode(l, new JSVarNode(v, i), in, o, r, s);
-		:}
+ 			return new JSForOfNode(l, decl, of, o, r, s);
+ 		:}
 	;
 
-IterationStatement_NoIf
-	=	DO Statement.s WHILE LPAREN.l Expression.e RPAREN.r SEMICOLON
+IterationStatement_Yield
+	=	DO Statement_Yield.s WHILE LPAREN.l Expression_In_Yield.e RPAREN.r SEMICOLON.s1
 		{:
-			JSNode node = new JSDoNode(s, l, e, r);
-			node.setSemicolonIncluded(true);
-			return node;
-		:}
-	|	WHILE LPAREN.l Expression.e RPAREN.r Statement_NoIf.s
+ 			JSNode node = new JSDoNode(s, l, e, r);
+ 			node.setSemicolonIncluded(true);
+ 			return node;
+ 		:}
+	|	WHILE LPAREN.l Expression_In_Yield.e RPAREN.r Statement_Yield.s
 		{:
-			return new JSWhileNode(l, e, r, s);
-		:}
-	|	FOR LPAREN.l SEMICOLON.s1 SEMICOLON.s2 RPAREN.r Statement_NoIf.s
+ 			return new JSWhileNode(l, e, r, s);
+ 		:}
+	// FIXME [lookahead ∉ {let [}]
+	|	FOR LPAREN.l Expression_Yield.e1? SEMICOLON.s1 Expression_In_Yield.e2? SEMICOLON.s2 Expression_In_Yield.e3? RPAREN.r Statement_Yield.s
 		{:
-			return new JSForNode(l, new JSEmptyNode(l), s1, new JSEmptyNode(s1), s2, new JSEmptyNode(s2), r, s);
-		:}
-	|	FOR LPAREN.l SEMICOLON.s1 SEMICOLON.s2 Expression.a RPAREN.r Statement_NoIf.s
+			if (e1 == null) {
+				e1 = new JSEmptyNode(l);
+			}
+			if (e2 == null) {
+				e2 = new JSEmptyNode(s1);
+			}
+			if (e3 == null) {
+				e3 = new JSEmptyNode(s2);
+			}
+ 			return new JSForNode(l, e1, s1, e2, s2, e3, r, s);
+ 		:}
+	|	FOR LPAREN.l VAR.v VariableDeclarationList_Yield.i SEMICOLON.s1 Expression_In_Yield.e1? SEMICOLON.s2 Expression_In_Yield.e2? RPAREN.r Statement_Yield.s
 		{:
-			return new JSForNode(l, new JSEmptyNode(l), s1, new JSEmptyNode(s1), s2, a, r, s);
-		:}
-	|	FOR LPAREN.l SEMICOLON.s1 Expression.c SEMICOLON.s2 RPAREN.r Statement_NoIf.s
+			if (e1 == null) {
+				e1 = new JSEmptyNode(s1);
+			}
+			if (e2 == null) {
+				e2 = new JSEmptyNode(s2);
+			}
+ 			return new JSForNode(l, new JSVarNode(v, i), s1, e1, s2, e2, r, s);
+ 		:}
+	|	FOR LPAREN.l LexicalDeclaration_Yield.decl Expression_In_Yield.e1? SEMICOLON.s1 Expression_In_Yield.e2? RPAREN.r Statement_Yield.s
 		{:
-			return new JSForNode(l, new JSEmptyNode(l), s1, c, s2, new JSEmptyNode(s2), r, s);
-		:}
-	|	FOR LPAREN.l SEMICOLON.s1 Expression.c SEMICOLON.s2 Expression.a RPAREN.r Statement_NoIf.s
+			if (e1 == null) {
+				e1 = new JSEmptyNode(l);
+			}
+			if (e2 == null) {
+				e2 = new JSEmptyNode(s1);
+			}
+ 			return new JSForNode(l, new JSVarNode(decl, e1), s1, e2, r, s);
+ 		:}
+	// FIXME [lookahead ∉ {let [}]
+	|	FOR LPAREN.l LeftHandSideExpression_Yield.i IN.in Expression_In_Yield.o RPAREN.r Statement_Yield.s
 		{:
-			return new JSForNode(l, new JSEmptyNode(l), s1, c, s2, a, r, s);
-		:}
-	|	FOR LPAREN.l Expression_NoIn.i SEMICOLON.s1 SEMICOLON.s2 RPAREN.r Statement_NoIf.s
+ 			return new JSForInNode(l, i, in, o, r, s);
+ 		:}
+	|	FOR LPAREN.l VAR.v ForBinding_Yield.i IN.in Expression_In_Yield.o RPAREN.r Statement_Yield.s
 		{:
-			return new JSForNode(l, i, s1, new JSEmptyNode(s1), s2, new JSEmptyNode(s2), r, s);
-		:}
-	|	FOR LPAREN.l Expression_NoIn.i SEMICOLON.s1 SEMICOLON.s2 Expression.a RPAREN.r Statement_NoIf.s
+ 			return new JSForInNode(l, new JSVarNode(v, i), in, o, r, s);
+ 		:}
+	|	FOR LPAREN.l ForDeclaration_Yield.decl IN.in Expression_In_Yield.o RPAREN.r Statement_Yield.s
 		{:
-			return new JSForNode(l, i, s1, new JSEmptyNode(s1), s2, a, r, s);
-		:}
-	|	FOR LPAREN.l Expression_NoIn.i SEMICOLON.s1 Expression.c SEMICOLON.s2 RPAREN.r Statement_NoIf.s
+ 			return new JSForInNode(l, decl, in, o, r, s);
+ 		:}
+	// FIXME [lookahead ∉ {let [}]
+	|	FOR LPAREN.l LeftHandSideExpression_Yield.i OF.of AssignmentExpression_In_Yield.o RPAREN.r Statement_Yield.s
 		{:
-			return new JSForNode(l, i, s1, c, s2, new JSEmptyNode(s2), r, s);
-		:}
-	|	FOR LPAREN.l Expression_NoIn.i SEMICOLON.s1 Expression.c SEMICOLON.s2 Expression.a RPAREN.r Statement_NoIf.s
+ 			return new JSForOfNode(l, i, of, o, r, s);
+ 		:}
+	|	FOR LPAREN.l VAR.v ForBinding_Yield.i OF.of AssignmentExpression_In_Yield.o RPAREN.r Statement_Yield.s
 		{:
-			return new JSForNode(l, i, s1, c, s2, a, r, s);
-		:}
-	|	FOR LPAREN.l VAR.v VariableDeclarationList_NoIn.i SEMICOLON.s1 SEMICOLON.s2 RPAREN.r Statement_NoIf.s
+ 			return new JSForOfNode(l, new JSVarNode(v, i), of, o, r, s);
+ 		:}
+	|	FOR LPAREN.l ForDeclaration_Yield.decl OF.of AssignmentExpression_In_Yield.o RPAREN.r Statement_Yield.s
 		{:
-			return new JSForNode(l, new JSVarNode(v, i), s1, new JSEmptyNode(s1), s2, new JSEmptyNode(s2), r, s);
-		:}
-	|	FOR LPAREN.l VAR.v VariableDeclarationList_NoIn.i SEMICOLON.s1 SEMICOLON.s2 Expression.a RPAREN.r Statement_NoIf.s
+ 			return new JSForOfNode(l, decl, of, o, r, s);
+ 		:}
+	;
+	
+IterationStatement_Return
+	=	DO Statement_Return.s WHILE LPAREN.l Expression_In.e RPAREN.r SEMICOLON.s1
 		{:
-			return new JSForNode(l, new JSVarNode(v, i), s1, new JSEmptyNode(s1), s2, a, r, s);
-		:}
-	|	FOR LPAREN.l VAR.v VariableDeclarationList_NoIn.i SEMICOLON.s1 Expression.c SEMICOLON.s2 RPAREN.r Statement_NoIf.s
+ 			JSNode node = new JSDoNode(s, l, e, r);
+ 			node.setSemicolonIncluded(true);
+ 			return node;
+ 		:}
+	|	WHILE LPAREN.l Expression_In.e RPAREN.r Statement_Return.s
 		{:
-			return new JSForNode(l, new JSVarNode(v, i), s1, c, s2, new JSEmptyNode(s2), r, s);
-		:}
-	|	FOR LPAREN.l VAR.v VariableDeclarationList_NoIn.i SEMICOLON.s1 Expression.c SEMICOLON.s2 Expression.a RPAREN.r Statement_NoIf.s
+ 			return new JSWhileNode(l, e, r, s);
+ 		:}
+	// FIXME [lookahead ∉ {let [}]
+	|	FOR LPAREN.l Expression.e1? SEMICOLON.s1 Expression_In.e2? SEMICOLON.s2 Expression_In.e3? RPAREN.r Statement_Return.s
 		{:
-			return new JSForNode(l, new JSVarNode(v, i), s1, c, s2, a, r, s);
-		:}
-	|	FOR LPAREN.l LeftHandSideExpression.i IN.in Expression.o RPAREN.r Statement_NoIf.s
+			if (e1 == null) {
+				e1 = new JSEmptyNode(l);
+			}
+			if (e2 == null) {
+				e2 = new JSEmptyNode(s1);
+			}
+			if (e3 == null) {
+				e3 = new JSEmptyNode(s2);
+			}
+ 			return new JSForNode(l, e1, s1, e2, s2, e3, r, s);
+ 		:}
+	|	FOR LPAREN.l VAR.v VariableDeclarationList.i SEMICOLON.s1 Expression_In.e1? SEMICOLON.s2 Expression_In.e2? RPAREN.r Statement_Return.s
 		{:
-			return new JSForInNode(l, i, in, o, r, s);
-		:}
-	|	FOR LPAREN.l VAR.v VariableDeclaration_NoIn.i IN.in Expression.o RPAREN.r Statement_NoIf.s
+			if (e1 == null) {
+				e1 = new JSEmptyNode(s1);
+			}
+			if (e2 == null) {
+				e2 = new JSEmptyNode(s2);
+			}
+ 			return new JSForNode(l, new JSVarNode(v, i), s1, e1, s2, e2, r, s);
+ 		:}
+	|	FOR LPAREN.l LexicalDeclaration.decl Expression_In.e1? SEMICOLON.s1 Expression_In.e2? RPAREN.r Statement_Return.s
 		{:
-			return new JSForInNode(l, new JSVarNode(v, i), in, o, r, s);
-		:}
+			if (e1 == null) {
+				e1 = new JSEmptyNode(l);
+			}
+			if (e2 == null) {
+				e2 = new JSEmptyNode(s1);
+			}
+ 			return new JSForNode(l, new JSVarNode(decl, e1), s1, e2, r, s);
+ 		:}
+	// FIXME [lookahead ∉ {let [}]
+	|	FOR LPAREN.l LeftHandSideExpression.i IN.in Expression_In.o RPAREN.r Statement_Return.s
+		{:
+ 			return new JSForInNode(l, i, in, o, r, s);
+ 		:}
+	|	FOR LPAREN.l VAR.v ForBinding.i IN.in Expression_In.o RPAREN.r Statement_Return.s
+		{:
+ 			return new JSForInNode(l, new JSVarNode(v, i), in, o, r, s);
+ 		:}
+	|	FOR LPAREN.l ForDeclaration.decl IN.in Expression_In.o RPAREN.r Statement_Return.s
+		{:
+ 			return new JSForInNode(l, decl, in, o, r, s);
+ 		:}
+	// FIXME [lookahead ∉ {let [}]
+	|	FOR LPAREN.l LeftHandSideExpression.i OF.of AssignmentExpression_In.o RPAREN.r Statement_Return.s
+		{:
+ 			return new JSForOfNode(l, i, of, o, r, s);
+ 		:}
+	|	FOR LPAREN.l VAR.v ForBinding.i OF.of AssignmentExpression_In.o RPAREN.r Statement_Return.s
+		{:
+ 			return new JSForOfNode(l, new JSVarNode(v, i), of, o, r, s);
+ 		:}
+	|	FOR LPAREN.l ForDeclaration.decl OF.of AssignmentExpression_In.o RPAREN.r Statement_Return.s
+		{:
+ 			return new JSForOfNode(l, decl, of, o, r, s);
+ 		:}
+	;
+	
+IterationStatement_Yield_Return
+	=	DO Statement_Yield_Return.s WHILE LPAREN.l Expression_In_Yield.e RPAREN.r SEMICOLON.s1
+		{:
+ 			JSNode node = new JSDoNode(s, l, e, r);
+ 			node.setSemicolonIncluded(true);
+ 			return node;
+ 		:}
+	|	WHILE LPAREN.l Expression_In_Yield.e RPAREN.r Statement_Yield_Return.s
+		{:
+ 			return new JSWhileNode(l, e, r, s);
+ 		:}
+	// FIXME [lookahead ∉ {let [}]
+	|	FOR LPAREN.l Expression_Yield.e1? SEMICOLON.s1 Expression_In_Yield.e2? SEMICOLON.s2 Expression_In_Yield.e3? RPAREN.r Statement_Yield_Return.s
+		{:
+			if (e1 == null) {
+				e1 = new JSEmptyNode(l);
+			}
+			if (e2 == null) {
+				e2 = new JSEmptyNode(s1);
+			}
+			if (e3 == null) {
+				e3 = new JSEmptyNode(s2);
+			}
+ 			return new JSForNode(l, e1, s1, e2, s2, e3, r, s);
+ 		:}
+	|	FOR LPAREN.l VAR.v VariableDeclarationList_Yield.i SEMICOLON.s1 Expression_In_Yield.e1? SEMICOLON.s2 Expression_In_Yield.e2? RPAREN.r Statement_Yield_Return.s
+		{:
+			if (e1 == null) {
+				e1 = new JSEmptyNode(s1);
+			}
+			if (e2 == null) {
+				e2 = new JSEmptyNode(s2);
+			}
+ 			return new JSForNode(l, new JSVarNode(v, i), s1, e1, s2, e2, r, s);
+ 		:}
+	|	FOR LPAREN.l LexicalDeclaration_Yield.decl Expression_In_Yield.e1? SEMICOLON.s1 Expression_In_Yield.e2? RPAREN.r Statement_Yield_Return.s
+		{:
+			if (e1 == null) {
+				e1 = new JSEmptyNode(l);
+			}
+			if (e2 == null) {
+				e2 = new JSEmptyNode(s1);
+			}
+ 			return new JSForNode(l, new JSVarNode(decl, e1), s1, e2, r, s);
+ 		:}
+	// FIXME [lookahead ∉ {let [}]
+	|	FOR LPAREN.l LeftHandSideExpression_Yield.i IN.in Expression_In_Yield.o RPAREN.r Statement_Yield_Return.s
+		{:
+ 			return new JSForInNode(l, i, in, o, r, s);
+ 		:}
+	|	FOR LPAREN.l VAR.v ForBinding_Yield.i IN.in Expression_In_Yield.o RPAREN.r Statement_Yield_Return.s
+		{:
+ 			return new JSForInNode(l, new JSVarNode(v, i), in, o, r, s);
+ 		:}
+	|	FOR LPAREN.l ForDeclaration_Yield.decl IN.in Expression_In_Yield.o RPAREN.r Statement_Yield_Return.s
+		{:
+ 			return new JSForInNode(l, decl, in, o, r, s);
+ 		:}
+	// FIXME [lookahead ∉ {let [}]
+	|	FOR LPAREN.l LeftHandSideExpression_Yield.i OF.of AssignmentExpression_In_Yield.o RPAREN.r Statement_Yield_Return.s
+		{:
+ 			return new JSForOfNode(l, i, of, o, r, s);
+ 		:}
+	|	FOR LPAREN.l VAR.v ForBinding_Yield.i OF.of AssignmentExpression_In_Yield.o RPAREN.r Statement_Yield_Return.s
+		{:
+ 			return new JSForOfNode(l, new JSVarNode(v, i), of, o, r, s);
+ 		:}
+	|	FOR LPAREN.l ForDeclaration_Yield.decl OF.of AssignmentExpression_In_Yield.o RPAREN.r Statement_Yield_Return.s
+		{:
+ 			return new JSForOfNode(l, decl, of, o, r, s);
+ 		:}
 	;
 
+ForDeclaration
+	=	LetOrConst ForBinding
+	;
+
+ForDeclaration_Yield
+	=	LetOrConst ForBinding_Yield
+	;
+
+ForBinding
+	=	BindingIdentifier
+	|	BindingPattern
+	;
+
+ForBinding_Yield
+	=	BindingIdentifier_Yield
+	|	BindingPattern_Yield
+	;
+	
 ContinueStatement
 	=	CONTINUE SEMICOLON
 		{:
@@ -878,7 +2667,22 @@ ContinueStatement
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
-	|	CONTINUE Identifier.i SEMICOLON
+	|	CONTINUE LabelIdentifier.i SEMICOLON
+		{:
+			JSNode node = new JSContinueNode(i);
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	;
+
+ContinueStatement_Yield
+	=	CONTINUE SEMICOLON
+		{:
+			JSNode node = new JSContinueNode();
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	|	CONTINUE LabelIdentifier_Yield.i SEMICOLON
 		{:
 			JSNode node = new JSContinueNode(i);
 			node.setSemicolonIncluded(true);
@@ -893,7 +2697,22 @@ BreakStatement
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
-	|	BREAK Identifier.i SEMICOLON
+	|	BREAK LabelIdentifier.i SEMICOLON
+		{:
+			JSNode node = new JSBreakNode(i);
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	;
+	
+BreakStatement_Yield
+	=	BREAK SEMICOLON
+		{:
+			JSNode node = new JSBreakNode();
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	|	BREAK LabelIdentifier_Yield.i SEMICOLON
 		{:
 			JSNode node = new JSBreakNode(i);
 			node.setSemicolonIncluded(true);
@@ -908,7 +2727,22 @@ ReturnStatement
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
-	|	RETURN Expression.e SEMICOLON
+	|	RETURN Expression_In.e SEMICOLON
+		{:
+			JSNode node = new JSReturnNode(e);
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	;
+	
+ReturnStatement_Yield
+	=	RETURN.r SEMICOLON
+		{:
+			JSNode node = new JSReturnNode(new JSEmptyNode(r));
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	|	RETURN Expression_In_Yield.e SEMICOLON
 		{:
 			JSNode node = new JSReturnNode(e);
 			node.setSemicolonIncluded(true);
@@ -917,122 +2751,286 @@ ReturnStatement
 	;
 
 WithStatement
-	=	WITH LPAREN.l Expression.e RPAREN.r Statement.s
+	=	WITH LPAREN.l Expression_In.e RPAREN.r Statement.s
 		{:
 			return new JSWithNode(l, e, r, s);
 		:}
 	;
 
-WithStatement_NoIf
-	=	WITH LPAREN.l Expression.e RPAREN.r Statement_NoIf.s
+WithStatement_Yield
+	=	WITH LPAREN.l Expression_In_Yield.e RPAREN.r Statement_Yield.s
 		{:
 			return new JSWithNode(l, e, r, s);
 		:}
 	;
 
+WithStatement_Return
+	=	WITH LPAREN.l Expression_In.e RPAREN.r Statement_Return.s
+		{:
+			return new JSWithNode(l, e, r, s);
+		:}
+	;
+
+WithStatement_Yield_Return
+	=	WITH LPAREN.l Expression_In_Yield.e RPAREN.r Statement_Yield_Return.s
+		{:
+			return new JSWithNode(l, e, r, s);
+		:}
+	;
+
+// TODO: Get the curlies out of the block to pass in as args to switch node?
 SwitchStatement
-	=	SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc RCURLY.rc
+	=	SWITCH LPAREN.lp Expression_In.e RPAREN.rp CaseBlock.children
 		{:
-			return new JSSwitchNode(lp, e, rp, lc, rc);
+			return new JSSwitchNode(lp, e, rp, null, null, children);
 		:}
-	|	SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc CaseClauses.c RCURLY.rc
+	;
+
+SwitchStatement_Yield
+	=	SWITCH LPAREN.lp Expression_In_Yield.e RPAREN.rp CaseBlock_Yield.children
+		{:
+			return new JSSwitchNode(lp, e, rp, null, null, children);
+		:}
+	;
+
+SwitchStatement_Return
+	=	SWITCH LPAREN.lp Expression_In.e RPAREN.rp CaseBlock_Return.children
+		{:
+			return new JSSwitchNode(lp, e, rp, null, null, children);
+		:}
+	;
+
+SwitchStatement_Yield_Return
+	=	SWITCH LPAREN.lp Expression_In_Yield.e RPAREN.rp CaseBlock_Yield_Return.children
+		{:
+			return new JSSwitchNode(lp, e, rp, null, null, children);
+		:}
+	;
+
+CaseBlock
+	=	LCURLY CaseClauses.c? RCURLY
+	|	LCURLY CaseClauses.c1? DefaultClause.d CaseClauses.c2? RCURLY
 		{:
 			List<JSNode> nodes = new ArrayList<JSNode>();
-
-			for (JSNode statement : c)
-			{
-				nodes.add(statement);
+			if (c1 != null) {
+				for (JSNode statement : c1)
+				{
+					nodes.add(statement);
+				}
 			}
-
-			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
-
-			return new JSSwitchNode(lp, e, rp, lc, rc, children);
-		:}
-	|	SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc DefaultClause.d RCURLY.rc
-		{:
-			return new JSSwitchNode(lp, e, rp, lc, rc, d);
-		:}
-	|	SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc DefaultClause.d CaseClauses.c RCURLY.rc
-		{:
-			List<JSNode> nodes = new ArrayList<JSNode>();
-
 			nodes.add(d);
-
-			for (JSNode statement : c)
-			{
-				nodes.add(statement);
+			if (c2 != null) {
+				for (JSNode statement : c2)
+				{
+					nodes.add(statement);
+				}
 			}
-
 			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
-
-			return new JSSwitchNode(lp, e, rp, lc, rc, children);
+			return nodes;
 		:}
-	|	SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc CaseClauses.c DefaultClause.d RCURLY.rc
+	;
+
+CaseBlock_Yield
+	=	LCURLY CaseClauses_Yield? RCURLY
+	|	LCURLY CaseClauses_Yield.c1? DefaultClause_Yield.d CaseClauses_Yield.c2? RCURLY
 		{:
 			List<JSNode> nodes = new ArrayList<JSNode>();
-
-			for (JSNode statement : c)
-			{
-				nodes.add(statement);
+			if (c1 != null) {
+				for (JSNode statement : c1)
+				{
+					nodes.add(statement);
+				}
 			}
-
 			nodes.add(d);
-
+			if (c2 != null) {
+				for (JSNode statement : c2)
+				{
+					nodes.add(statement);
+				}
+			}
 			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
-
-			return new JSSwitchNode(lp, e, rp, lc, rc, children);
+			return nodes;
 		:}
-	|	SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc CaseClauses.c1 DefaultClause.d CaseClauses.c2 RCURLY.rc
+	;
+
+CaseBlock_Return
+	=	LCURLY CaseClauses_Return? RCURLY
+	|	LCURLY CaseClauses_Return.c1? DefaultClause_Return.d CaseClauses_Return.c2? RCURLY
 		{:
 			List<JSNode> nodes = new ArrayList<JSNode>();
-
-			for (JSNode statement : c1)
-			{
-				nodes.add(statement);
+			if (c1 != null) {
+				for (JSNode statement : c1)
+				{
+					nodes.add(statement);
+				}
 			}
-
 			nodes.add(d);
-
-			for (JSNode statement : c2)
-			{
-				nodes.add(statement);
+			if (c2 != null) {
+				for (JSNode statement : c2)
+				{
+					nodes.add(statement);
+				}
 			}
-
 			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
+			return nodes;
+		:}
+	;
 
-			return new JSSwitchNode(lp, e, rp, lc, rc, children);
+CaseBlock_Yield_Return
+	=	LCURLY CaseClauses_Yield_Return? RCURLY
+	|	LCURLY CaseClauses_Yield_Return.c1? DefaultClause_Yield_Return.d CaseClauses_Yield_Return.c2? RCURLY
+		{:
+			List<JSNode> nodes = new ArrayList<JSNode>();
+			if (c1 != null) {
+				for (JSNode statement : c1)
+				{
+					nodes.add(statement);
+				}
+			}
+			nodes.add(d);
+			if (c2 != null) {
+				for (JSNode statement : c2)
+				{
+					nodes.add(statement);
+				}
+			}
+			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
+			return nodes;
 		:}
 	;
 
 CaseClauses
-	=	CaseClauses CaseClause
-	|	CaseClause
+	=	CaseClause
+	|	CaseClauses CaseClause
+	;
+
+CaseClauses_Yield
+	=	CaseClause_Yield
+	|	CaseClauses_Yield CaseClause_Yield
+	;
+
+CaseClauses_Return
+	=	CaseClause_Return
+	|	CaseClauses_Return CaseClause_Return
+	;
+	
+CaseClauses_Yield_Return
+	=	CaseClause_Yield_Return
+	|	CaseClauses_Yield_Return CaseClause_Yield_Return
 	;
 
 CaseClause
-	=	CASE Expression.e COLON.c
+	=	CASE ExpressionIn.e COLON.c StatementList.s?
 		{:
-			return new JSCaseNode(e, c);
+			if (s == null) {
+				return new JSCaseNode(e, c);
+			}
+			return new JSCaseNode(e, c, s);
 		:}
-	|	CASE Expression.e COLON.c StatementList.s
+	;
+
+CaseClause_Yield
+	=	CASE Expression_In_Yield.e COLON.c StatementList_Yield.s?
 		{:
+			if (s == null) {
+				return new JSCaseNode(e, c);
+			}
+			return new JSCaseNode(e, c, s);
+		:}
+	;
+
+CaseClause_Return
+	=	CASE Expression_In.e COLON.c StatementList_Return.s?
+		{:
+			if (s == null) {
+				return new JSCaseNode(e, c);
+			}
+			return new JSCaseNode(e, c, s);
+		:}
+	;
+
+CaseClause_Yield_Return
+	=	CASE Expression_In_Yield.e COLON.c StatementList_Yield_Return.s?
+		{:
+			if (s == null) {
+				return new JSCaseNode(e, c);
+			}
 			return new JSCaseNode(e, c, s);
 		:}
 	;
 
 DefaultClause
-	=	DEFAULT COLON.c
+	=	DEFAULT COLON.c StatementList.s?
 		{:
-			return new JSDefaultNode(c);
+			if (s == null) {
+				return new JSDefaultNode(c);
+			}
+			return new JSDefaultNode(c, s);
 		:}
-	|	DEFAULT COLON.c StatementList.s
+	;
+	
+DefaultClause_Yield
+	=	DEFAULT COLON.c StatementList_Yield.s?
 		{:
+			if (s == null) {
+				return new JSDefaultNode(c);
+			}
+			return new JSDefaultNode(c, s);
+		:}
+	;
+	
+DefaultClause_Return
+	=	DEFAULT COLON.c StatementList_Return.s?
+		{:
+			if (s == null) {
+				return new JSDefaultNode(c);
+			}
+			return new JSDefaultNode(c, s);
+		:}
+	;
+	
+DefaultClause_Yield_Return
+	=	DEFAULT COLON.c StatementList_Yield_Return.s?
+		{:
+			if (s == null) {
+				return new JSDefaultNode(c);
+			}
 			return new JSDefaultNode(c, s);
 		:}
 	;
 
 LabelledStatement
-	=	Identifier.i COLON.c Statement.s
+	=	LabelIdentifier.i COLON.c LabelledItem.s
+		{:
+			JSNode id = new JSIdentifierNode(i);
+			id.setLocation(i.getStart(), i.getEnd());
+
+			return new JSLabelledNode(id, c, s);
+		:}
+	;
+	
+LabelledStatement_Yield
+	=	LabelIdentifier_Yield.i COLON.c LabelledItem_Yield.s
+		{:
+			JSNode id = new JSIdentifierNode(i);
+			id.setLocation(i.getStart(), i.getEnd());
+
+			return new JSLabelledNode(id, c, s);
+		:}
+	;
+	
+LabelledStatement_Return
+	=	LabelIdentifier.i COLON.c LabelledItem_Return.s
+		{:
+			JSNode id = new JSIdentifierNode(i);
+			id.setLocation(i.getStart(), i.getEnd());
+
+			return new JSLabelledNode(id, c, s);
+		:}
+	;
+	
+LabelledStatement_Yield_Return
+	=	LabelIdentifier_Yield.i COLON.c LabelledItem_Yield_Return.s
 		{:
 			JSNode id = new JSIdentifierNode(i);
 			id.setLocation(i.getStart(), i.getEnd());
@@ -1041,23 +3039,40 @@ LabelledStatement
 		:}
 	;
 
-LabelledStatement_NoIf
-	=	Identifier.i COLON.c Statement_NoIf.s
-		{:
-			JSNode id = new JSIdentifierNode(i);
-			id.setLocation(i.getStart(), i.getEnd());
+LabelledItem
+	=	Statement
+	|	FunctionDeclaration
+	;
 
-			return new JSLabelledNode(id, c, s);
-		:}
+LabelledItem_Yield
+	=	Statement_Yield
+	|	FunctionDeclaration_Yield
+	;
+	
+LabelledItem_Return
+	=	Statement_Return
+	|	FunctionDeclaration
+	;
+	
+LabelledItem_Yield_Return
+	=	Statement_Yield_Return
+	|	FunctionDeclaration_Yield
 	;
 
 ThrowStatement
-	=	THROW Expression.e SEMICOLON
+	=	THROW Expression_In.e SEMICOLON
 		{:
 			JSNode node = new JSThrowNode(e);
-
 			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	;
 
+ThrowStatement_Yield
+	=	THROW ExpressionIn_Yield.e SEMICOLON
+		{:
+			JSNode node = new JSThrowNode(e);
+			node.setSemicolonIncluded(true);
 			return node;
 		:}
 	;
@@ -1076,13 +3091,77 @@ TryStatement
 			return new JSTryNode(b, c, f);
 		:}
 	;
+	
+TryStatement_Yield
+	=	TRY Block_Yield.b Catch_Yield.c
+		{:
+			return new JSTryNode(b, c, new JSEmptyNode(c));
+		:}
+	|	TRY Block_Yield.b Finally_Yield.f
+		{:
+			return new JSTryNode(b, new JSEmptyNode(b), f);
+		:}
+	|	TRY Block_Yield.b Catch_Yield.c Finally_Yield.f
+		{:
+			return new JSTryNode(b, c, f);
+		:}
+	;
+	
+TryStatement_Return
+	=	TRY Block_Return.b Catch_Return.c
+		{:
+			return new JSTryNode(b, c, new JSEmptyNode(c));
+		:}
+	|	TRY Block_Return.b Finally_Return.f
+		{:
+			return new JSTryNode(b, new JSEmptyNode(b), f);
+		:}
+	|	TRY Block_Return.b Catch_Return.c Finally_Return.f
+		{:
+			return new JSTryNode(b, c, f);
+		:}
+	;
+	
+TryStatement_Yield_Return
+	=	TRY Block_Yield_Return.b Catch_Yield_Return.c
+		{:
+			return new JSTryNode(b, c, new JSEmptyNode(c));
+		:}
+	|	TRY Block_Yield_Return.b Finally_Yield_Return.f
+		{:
+			return new JSTryNode(b, new JSEmptyNode(b), f);
+		:}
+	|	TRY Block_Yield_Return.b Catch_Yield_Return.c Finally_Yield_Return.f
+		{:
+			return new JSTryNode(b, c, f);
+		:}
+	;
 
 Catch
-	=	CATCH LPAREN Identifier.i RPAREN Block.b
+	=	CATCH LPAREN CatchParameter.p RPAREN Block.b
 		{:
-			JSNode id = new JSIdentifierNode(i);
+			return new JSCatchNode(p, b);
+		:}
+	;
 
-			return new JSCatchNode(id, b);
+Catch_Yield
+	=	CATCH LPAREN CatchParameter_Yield.p RPAREN Block_Yield.b
+		{:
+			return new JSCatchNode(p, b);
+		:}
+	;
+	
+Catch_Return
+	=	CATCH LPAREN CatchParameter.p RPAREN Block_Return.b
+		{:
+			return new JSCatchNode(p, b);
+		:}
+	;
+	
+Catch_Yield_Return
+	=	CATCH LPAREN CatchParameter_Yield.p RPAREN Block_Yield_Return.b
+		{:
+			return new JSCatchNode(p, b);
 		:}
 	;
 
@@ -1093,672 +3172,547 @@ Finally
 		:}
 	;
 
-PrimaryExpression
-	=	PrimaryExpression_NoLBF
-	|	ObjectLiteral
-	;
-
-PrimaryExpression_NoLBF
-	=	THIS.t
+Finally_Yield
+	=	FINALLY Block_Yield.b
 		{:
-			return new JSThisNode(t);
-		:}
-	|	Identifier.i
-		{:
-			return new JSIdentifierNode(i);
-		:}
-	|	Literal
-	|	ArrayLiteral
-	|	LPAREN.l Expression.e RPAREN.r
-		{:
-			return new JSGroupNode(l, e, r);
+			return new JSFinallyNode(b);
 		:}
 	;
-
-ArrayLiteral
-	=	LBRACKET.l RBRACKET.r
+	
+Finally_Return
+	=	FINALLY Block_Return.b
 		{:
-			return new JSArrayNode(l, r);
+			return new JSFinallyNode(b);
 		:}
-	|	LBRACKET.l Elision.e RBRACKET.r
+	;
+	
+Finally_Yield_Return
+	=	FINALLY Block_Yield_Return.b
 		{:
-			e.addChild(new JSNullNode());
-			return new JSArrayNode(l, r, e);
-		:}
-	|	LBRACKET.l ElementList.e RBRACKET.r
-		{:
-			return new JSArrayNode(l, r, e);
-		:}
-	|	LBRACKET.l ElementList.e COMMA RBRACKET.r
-		{:
-			return new JSArrayNode(l, r, e, new JSNullNode());
-		:}
-	|	LBRACKET.l ElementList.e COMMA Elision.n RBRACKET.r
-		{:
-			n.addChild(new JSNullNode());
-			return new JSArrayNode(l, r, e, n);
+			return new JSFinallyNode(b);
 		:}
 	;
 
-ElementList
-	=	AssignmentExpression.e
-		{:
-			return new JSElementsNode(e);
-		:}
-	|	Elision.n AssignmentExpression.e
-		{:
-			return new JSElementsNode(n, e);
-		:}
-	|	ElementList.l COMMA AssignmentExpression.e
-		{:
-			l.addChild(e);
+CatchParameter
+	=	BindingIdentifier
+	|	BindingPattern
+	;
 
-			return l;
-		:}
-	|	ElementList.l COMMA Elision.n AssignmentExpression.e
-		{:
-			l.addChild(n);
-			l.addChild(e);
+CatchParameter_Yield
+	=	BindingIdentifier_Yield
+	|	BindingPattern_Yield
+	;
 
-			return l;
+DebuggerStatement
+	=	DEBUGGER SEMICOLON
+	;
+
+////////////////////////////////////
+// A.4 Functions and Classes
+////////////////////////////////////
+FunctionDeclaration
+	= 	FUNCTION BindingIdentifier.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
+		{:
+			return new JSFunctionNode(
+				new JSIdentifierNode(ident),
+				params,
+				body
+			);
 		:}
 	;
 
-Elision
-	=	Elision.e COMMA
+FunctionDeclaration_Yield
+	= 	FUNCTION BindingIdentifier_Yield.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
 		{:
-			e.addChild(new JSNullNode());
-
-			return e;
-		:}
-	|	COMMA
-		{:
-			return new JSElisionNode(new JSNullNode());
+			return new JSFunctionNode(
+				new JSIdentifierNode(ident),
+				params,
+				body
+			);
 		:}
 	;
 
-ObjectLiteral
-	=	LCURLY.l RCURLY.r
+FunctionDeclaration_Default
+	= 	FUNCTION BindingIdentifier.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
 		{:
-			return new JSObjectNode(l, r);
+			return new JSFunctionNode(
+				new JSIdentifierNode(ident),
+				params,
+				body
+			);
 		:}
-	|	LCURLY.l PropertyNameAndValueList.p RCURLY.r
+	|	FUNCTION.f LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
 		{:
-			return new JSObjectNode(l, r, p);
-		:}
-	|	LCURLY.l PropertyNameAndValueList.p COMMA RCURLY.r
-		{:
-			return new JSObjectNode(l, r, p);
+			return new JSFunctionNode(
+				new JSEmptyNode(f),
+				params,
+				body
+			);
 		:}
 	;
 
-PropertyNameAndValueList
-	=	PropertyAssignment
-	|	PropertyNameAndValueList COMMA PropertyAssignment
+FunctionDeclaration_Yield_Default
+	=	FUNCTION BindingIdentifier_Yield.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
+		{:
+			return new JSFunctionNode(
+				new JSIdentifierNode(ident),
+				params,
+				body
+			);
+		:}
+	|	FUNCTION LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
+		{:
+			return new JSFunctionNode(
+				new JSEmptyNode(f),
+				params,
+				body
+			);
+		:}
 	;
 
-PropertyAssignment
-	=	PropertyName.n COLON.c AssignmentExpression.v
+FunctionExpression
+	=	FUNCTION.f BindingIdentifier.ident? LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
 		{:
-			return new JSNameValuePairNode(n, c, v);
+			if (ident != null) {
+				return new JSFunctionNode(
+					new JSIdentifierNode(ident),
+					params,
+					body
+				);
+			}
+			return new JSFunctionNode(
+				new JSEmptyNode(f),
+				params,
+				body
+			);
 		:}
-	|	GET PropertyName.n LPAREN RPAREN FunctionBody.body
+	;
+
+StrictFormalParameters
+	=	FormalParameters
+	;
+
+StrictFormalParameters_Yield
+	=	FormalParameters_Yield
+	;
+
+FormalParameters
+	=	FormalParameterList.params
+		{:
+			return params;
+		:}
+	|
+		{:
+			return new JSParametersNode();
+		:}
+	;
+
+
+FormalParameters_Yield
+	=	FormalParameterList_Yield.params
+		{:
+			return params;
+		:}
+	|
+		{:
+			return new JSParametersNode();
+		:}
+	;
+
+FormalParameterList
+	=	FunctionRestParameter
+	|	FormalsList
+	|	FormalsList COMMA FunctionRestParameter
+	;
+
+FormalParameterList_Yield
+	=	FunctionRestParameter_Yield
+	|	FormalsList_Yield
+	|	FormalsList_Yield COMMA FunctionRestParameter_Yield
+	;
+
+FormalsList
+	=	FormalsList COMMA FormalParameter
+	|	FormalParameter
+	;
+
+FormalsList_Yield
+	=	FormalsList_Yield COMMA FormalParameter_Yield
+	|	FormalParameter_Yield
+	;
+
+FunctionRestParameter
+	=	BindingRestElement
+	;
+
+FunctionRestParameter_Yield
+	=	BindingRestElement_Yield
+	;
+
+FormalParameter
+	=	BindingElement
+	;
+
+FormalParameter_Yield
+	=	BindingElement_Yield
+	;
+
+FunctionBody
+	=	FunctionStatementList
+	;
+
+FunctionBody_Yield
+	=	FunctionStatementList_Yield
+	;
+
+FunctionStatementList
+	=	StatementList_Return?
+	;
+
+FunctionStatementList_Yield
+	=	StatementList_Yield?
+	|	StatementList_Return?
+	;
+
+ArrowFunction
+	=	ArrowParameters ARROW ConciseBody
+	;
+
+ArrowFunction_In
+	=	ArrowParameters ARROW ConciseBody_In
+	;
+
+ArrowFunction_Yield
+	=	ArrowParameters_Yield ARROW ConciseBody
+	;
+
+ArrowFunction_In_Yield
+	=	ArrowParameters_Yield ARROW ConciseBody_In
+	;
+
+ArrowParameters
+	=	BindingIdentifier
+	|	CoverParenthesizedExpressionAndArrowParameterList
+	;
+
+ArrowParameters_Yield
+	=	BindingIdentifier_Yield
+	|	CoverParenthesizedExpressionAndArrowParameterList_Yield
+	;
+
+ConciseBody
+// FIXME Do negative lookahead for '{' in first case
+	=	AssignmentExpression
+	|	LCURLY FunctionBody.body RCURLY
+	;
+
+ConciseBody_In
+// FIXME Do negative lookahead for '{' in first case
+	=	AssignmentExpression_In
+	|	LCURLY FunctionBody.body RCURLY
+	;
+
+ArrowFormalParameters
+	=	LPAREN StrictFormalParameters RPAREN
+	;
+
+ArrowFormalParameters_Yield
+	=	LPAREN StrictFormalParameters_Yield RPAREN
+	;
+
+// TODO: Handle  propertyName function cases!
+// TODO: Handle GeneratorMethod cases!
+MethodDefinition
+	=	PropertyName LPAREN StrictFormalParameters RPAREN LCURLY FunctionBody RCURLY
+	|	GeneratorMethod
+	|	GET PropertyName.n LPAREN RPAREN LCURLY FunctionBody.body RCURLY
 		{:
 			return new JSNameValuePairNode(n, body);
 		:}
-	|	SET PropertyName.n LPAREN PropertySetParameterList.p RPAREN FunctionBody.body
+	|	SET PropertyName.n LPAREN PropertySetParameterList.p RPAREN LCURLY FunctionBody.body RCURLY
 		{:
 			JSIdentifierNode ident = new JSIdentifierNode(p);
 			JSParametersNode params = new JSParametersNode(ident);
 			params.setLocation(ident.getStartingOffset(), ident.getEndingOffset());
 			return new JSNameValuePairNode(n, params, body);
 		:}
-	;	
+	;
 
-PropertyName
-	=	IdentifierName.i
+MethodDefinition_Yield
+	=	PropertyName_Yield LPAREN StrictFormalParameters RPAREN LCURLY FunctionBody RCURLY
+	|	GeneratorMethod_Yield
+	|	GET PropertyName_Yield.n LPAREN RPAREN LCURLY FunctionBody.body RCURLY
 		{:
-			return new JSIdentifierNode(i);
+			return new JSNameValuePairNode(n, body);
 		:}
-	|	STRING.s
+	|	SET PropertyName_Yield.n LPAREN PropertySetParameterList.p RPAREN LCURLY FunctionBody.body RCURLY
 		{:
-			return new JSStringNode(s);
-		:}
-	|	NUMBER.n
-		{:
-			return new JSNumberNode(n);
+			JSIdentifierNode ident = new JSIdentifierNode(p);
+			JSParametersNode params = new JSParametersNode(ident);
+			params.setLocation(ident.getStartingOffset(), ident.getEndingOffset());
+			return new JSNameValuePairNode(n, params, body);
 		:}
 	;
 
 PropertySetParameterList
-	=	Identifier
+	=	FormalParameter
 	;
 
-MemberExpression
-	=	PrimaryExpression
-	|	FunctionExpression
-	|	MemberExpression.l LBRACKET.lb Expression.r RBRACKET.rb
-		{:
-			return new JSGetElementNode(l, lb, r, rb);
-		:}
-	|	MemberExpression.l DOT.o IdentifierName.r
-		{:
-			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
-		:}
-	|	NEW MemberExpression.e Arguments.a
-		{:
-			return new JSConstructNode(e, a);
-		:}
+GeneratorMethod
+	=	STAR PropertyName LPAREN StrictFormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
 	;
 
-MemberExpression_NoLBF
-	=	PrimaryExpression_NoLBF
-	|	MemberExpression_NoLBF.l LBRACKET.lb Expression.r RBRACKET.rb
-		{:
-			return new JSGetElementNode(l, lb, r, rb);
-		:}
-	|	MemberExpression_NoLBF.l DOT.o IdentifierName.r
-		{:
-			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
-		:}
-	|	NEW MemberExpression.e Arguments.a
-		{:
-			return new JSConstructNode(e, a);
-		:}
+GeneratorMethod_Yield
+	=	STAR PropertyName_Yield LPAREN StrictFormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
 	;
 
-NewExpression
-	=	MemberExpression
-	|	NEW NewExpression.e
-		{:
-			return new JSConstructNode(e, new JSEmptyNode(e));
-		:}
+GeneratorDeclaration
+	=	FUNCTION STAR BindingIdentifier LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
 	;
 
-NewExpression_NoLBF
-	=	MemberExpression_NoLBF
-	|	NEW NewExpression.e
-		{:
-			return new JSConstructNode(e, new JSEmptyNode(e));
-		:}
+GeneratorDeclaration_Yield
+	=	FUNCTION STAR BindingIdentifier_Yield LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
+	;
+	
+GeneratorDeclaration_Default
+	=	FUNCTION STAR BindingIdentifier_Yield LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
+	|	FUNCTION STAR LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
+	;
+	
+GeneratorDeclaration_Yield_Default
+	=	FUNCTION STAR BindingIdentifier_Yield LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
+	|	FUNCTION STAR LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
 	;
 
-CallExpression
-	=	MemberExpression.l Arguments.r
-		{:
-			return new JSInvokeNode(l, r);
-		:}
-	|	CallExpression.l Arguments.r
-		{:
-			return new JSInvokeNode(l, r);
-		:}
-	|	CallExpression.l LBRACKET.lb Expression.r RBRACKET.rb
-		{:
-			return new JSGetElementNode(l, lb, r, rb);
-		:}
-	|	CallExpression.l DOT.o IdentifierName.r
-		{:
-			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
-		:}
+GeneratorExpression
+	=	FUNCTION STAR BindingIdentifier_Yield? LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
 	;
 
-CallExpression_NoLBF
-	=	MemberExpression_NoLBF.l Arguments.r
-		{:
-			return new JSInvokeNode(l, r);
-		:}
-	|	CallExpression_NoLBF.l Arguments.r
-		{:
-			return new JSInvokeNode(l, r);
-		:}
-	|	CallExpression_NoLBF.l LBRACKET.lb Expression.r RBRACKET.rb
-		{:
-			return new JSGetElementNode(l, lb, r, rb);
-		:}
-	|	CallExpression_NoLBF.l DOT.o IdentifierName.r
-		{:
-			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
-		:}
+GeneratorBody
+	=	FunctionBody_Yield
+	;
+	
+YieldExpression
+	=	YIELD
+	|	YIELD AssignmentExpression_Yield
+	|	YIELD STAR AssignmentExpression_Yield
 	;
 
-Arguments
-	=	LPAREN RPAREN
-		{:
-			return new JSArgumentsNode();
-		:}
-	|	LPAREN ArgumentList.a RPAREN
-		{:
-			return new JSArgumentsNode(a);
-		:}
+YieldExpression_In
+	=	YIELD
+	|	YIELD AssignmentExpression_In_Yield
+	|	YIELD STAR AssignmentExpression_In_Yield
 	;
 
-ArgumentList
-	=	ArgumentList COMMA AssignmentExpression
-	|	AssignmentExpression
+ClassDeclaration
+	=	CLASS BindingIdentifier ClassTail
 	;
 
-LeftHandSideExpression
-	=	NewExpression
-	|	CallExpression
+ClassDeclaration_Yield
+	=	CLASS BindingIdentifier_Yield ClassTail_Yield
+	;
+	
+ClassDeclaration_Default
+	=	CLASS BindingIdentifier ClassTail
+	|	CLASS ClassTail
+	;
+	
+ClassDeclaration_Yield_Default
+	=	CLASS BindingIdentifier_Yield ClassTail_Yield
+	|	CLASS ClassTail_Yield
 	;
 
-LeftHandSideExpression_NoLBF
-	=	NewExpression_NoLBF
-	|	CallExpression_NoLBF
+ClassExpression
+	=	CLASS BindingIdentifier? ClassTail
 	;
 
-PostfixExpression
-	=	LeftHandSideExpression
-	|	LeftHandSideExpression.e PostfixOperator.o
-		{:
-			return new JSPostUnaryOperatorNode(o, e);
-		:}
+ClassExpression_Yield
+	=	CLASS BindingIdentifier_Yield? ClassTail_Yield
 	;
 
-PostfixExpression_NoLBF
-	=	LeftHandSideExpression_NoLBF
-	|	LeftHandSideExpression_NoLBF.e PostfixOperator.o
-		{:
-			return new JSPostUnaryOperatorNode(o, e);
-		:}
+ClassTail
+	=	ClassHeritage? LCURLY ClassBody_Yield? RCURLY
 	;
 
-PostfixOperator
-	=	PLUS_PLUS
-	|	MINUS_MINUS
+ClassTail_Yield
+	=	ClassHeritage_Yield? LCURLY ClassBody_Yield? RCURLY
 	;
 
-UnaryExpression
-	=	PostfixExpression
-	|	UnaryOperator.o UnaryExpression.e
-		{:
-			return new JSPreUnaryOperatorNode(o, e);
-		:}
+ClassHeritage
+	=	EXTENDS LeftHandSideExpression
 	;
 
-UnaryExpression_NoLBF
-	=	PostfixExpression_NoLBF
-	|	UnaryOperator.o UnaryExpression.e
-		{:
-			return new JSPreUnaryOperatorNode(o, e);
-		:}
+ClassHeritage_Yield
+	=	EXTENDS LeftHandSideExpression_Yield
 	;
 
-UnaryOperator
-	=	DELETE
-	|	EXCLAMATION
-	|	MINUS
-	|	MINUS_MINUS
-	|	PLUS
-	|	PLUS_PLUS
-	|	TILDE
-	|	TYPEOF
-	|	VOID
+ClassBody
+	=	ClassElementList
 	;
 
-MultiplicativeExpression
-	=	UnaryExpression
-	|	MultiplicativeExpression.l MultiplicativeOperator.o UnaryExpression.r
-		{:
-			return new JSBinaryArithmeticOperatorNode(l, o, r);
-		:}
+ClassBody_Yield
+	=	ClassElementList_Yield
 	;
 
-MultiplicativeExpression_NoLBF
-	=	UnaryExpression_NoLBF
-	|	MultiplicativeExpression_NoLBF.l MultiplicativeOperator.o UnaryExpression.r
-		{:
-			return new JSBinaryArithmeticOperatorNode(l, o, r);
-		:}
+ClassElementList
+	=	ClassElement
+	|	ClassElementList ClassElement
 	;
 
-MultiplicativeOperator
-	=	STAR
-	|	FORWARD_SLASH
-	|	PERCENT
+ClassElementList_Yield
+	=	ClassElement_Yield
+	|	ClassElementList_Yield ClassElement_Yield
 	;
 
-AdditiveExpression
-	=	MultiplicativeExpression
-	|	AdditiveExpression.l AdditiveOperator.o MultiplicativeExpression.r
-		{:
-			return new JSBinaryArithmeticOperatorNode(l, o, r);
-		:}
+ClassElement
+	=	MethodDefinition
+	|	STATIC MethodDefinition
+	|	SEMICOLON
 	;
 
-AdditiveExpression_NoLBF
-	=	MultiplicativeExpression_NoLBF
-	|	AdditiveExpression_NoLBF.l AdditiveOperator.o MultiplicativeExpression.r
-		{:
-			return new JSBinaryArithmeticOperatorNode(l, o, r);
-		:}
+ClassElement_Yield
+	=	MethodDefinition_Yield
+	|	STATIC MethodDefinition_Yield
+	|	SEMICOLON
 	;
 
-AdditiveOperator
-	=	PLUS
-	|	MINUS
+//FormalParameterList
+//	=	FormalParameterList.list COMMA Identifier.ident
+//		{:
+//			JSNode identifier = new JSIdentifierNode(ident);
+//			// add identifier to existing list
+//			list.addChild(identifier);
+//
+//			return list;
+//		:}
+//	|	Identifier.ident
+//		{:
+//			JSNode identifier = new JSIdentifierNode(ident);
+//
+//			return new JSParametersNode(identifier);
+//		:}
+//	;
+
+//FunctionBody
+//	=	LCURLY RCURLY
+//		{:
+//			return new JSStatementsNode();
+//		:}
+//	|	LCURLY SourceElements.s RCURLY
+//		{:
+//			return new JSStatementsNode(s);
+//		:}
+//	;
+
+
+////////////////////////////////////
+// A.5 Scripts and Modules
+////////////////////////////////////
+Script
+	=	ScriptBody?
 	;
 
-ShiftExpression
-	=	AdditiveExpression
-	|	ShiftExpression.l ShiftOperator.o AdditiveExpression.r
-		{:
-			return new JSBinaryArithmeticOperatorNode(l, o, r);
-		:}
+ScriptBody
+	=	StatementList
 	;
 
-ShiftExpression_NoLBF
-	=	AdditiveExpression_NoLBF
-	|	ShiftExpression_NoLBF.l ShiftOperator.o AdditiveExpression.r
-		{:
-			return new JSBinaryArithmeticOperatorNode(l, o, r);
-		:}
+Module
+	=	ModuleBody?
+	;
+	
+ModuleBody
+	=	ModuleItemList
 	;
 
-ShiftOperator
-	=	LESS_LESS
-	|	GREATER_GREATER
-	|	GREATER_GREATER_GREATER
+ModuleItemList
+	=	ModuleItemList ModuleItem
+	|	ModuleItem
 	;
 
-RelationalExpression
-	=	ShiftExpression
-	|	RelationalExpression.l RelationalOperator.o ShiftExpression.r
-		{:
-			return new JSBinaryBooleanOperatorNode(l, o, r);
-		:}
+ModuleItem
+	=	ImportDeclaration
+	|	ExportDeclaration
+	|	StatementListItem
 	;
 
-RelationalExpression_NoLBF
-	=	ShiftExpression_NoLBF
-	|	RelationalExpression_NoLBF.l RelationalOperator.o ShiftExpression.r
-		{:
-			return new JSBinaryBooleanOperatorNode(l, o, r);
-		:}
+ImportDeclaration
+	=	IMPORT ImportClause FromClause SEMICOLON
+	|	IMPORT ModuleSpecifier SEMICOLON
 	;
 
-RelationalExpression_NoIn
-	=	ShiftExpression
-	|	RelationalExpression_NoIn.l RelationalOperator_NoIn.o ShiftExpression.r
-		{:
-			return new JSBinaryBooleanOperatorNode(l, o, r);
-		:}
+ImportClause
+	=	ImportedDefaultBinding
+	|	NameSpaceImport
+	|	NamedImports
+	|	ImportedDefaultBinding COMMA NameSpaceImport
+	|	ImportedDefaultBinding COMMA NamedImports
 	;
 
-RelationalOperator_NoIn
-	=	LESS
-	|	GREATER
-	|	LESS_EQUAL
-	|	GREATER_EQUAL
-	|	INSTANCEOF
+ImportedDefaultBinding
+	=	ImportedBinding
 	;
 
-RelationalOperator
-	=	RelationalOperator_NoIn
-	|	IN
+NameSpaceImport
+	=	STAR AS ImportedBinding
 	;
 
-EqualityExpression
-	=	RelationalExpression
-	|	EqualityExpression.l EqualityOperator.o RelationalExpression.r
-		{:
-			return new JSBinaryBooleanOperatorNode(l, o, r);
-		:}
+NamedImports
+	=	LCURLY RCURLY
+	|	LCURLY ImportsList RCURLY
+	|	LCURLY ImportsList COMMA RCURLY
 	;
 
-EqualityExpression_NoLBF
-	=	RelationalExpression_NoLBF
-	|	EqualityExpression_NoLBF.l EqualityOperator.o RelationalExpression.r
-		{:
-			return new JSBinaryBooleanOperatorNode(l, o, r);
-		:}
+FromClause
+	=	FROM ModuleSpecifier
 	;
 
-EqualityExpression_NoIn
-	=	RelationalExpression_NoIn
-	|	EqualityExpression_NoIn.l EqualityOperator.o RelationalExpression_NoIn.r
-		{:
-			return new JSBinaryBooleanOperatorNode(l, o, r);
-		:}
+ImportsList
+	=	ImportsList COMMA ImportSpecifier
+	|	ImportSpecifier
 	;
 
-EqualityOperator
-	=	EQUAL_EQUAL
-	|	EXCLAMATION_EQUAL
-	|	EQUAL_EQUAL_EQUAL
-	|	EXCLAMATION_EQUAL_EQUAL
+ImportSpecifier
+	=	IdentifierName AS ImportedBinding
+	|	ImportedBinding
 	;
 
-BitwiseAndExpression
-	=	BitwiseAndExpression.l AMPERSAND.o EqualityExpression.r
-		{:
-			return new JSBinaryArithmeticOperatorNode(l, o, r);
-		:}
-	|	EqualityExpression
+ModuleSpecifier
+	=	STRING
 	;
 
-BitwiseAndExpression_NoLBF
-	=	BitwiseAndExpression_NoLBF.l AMPERSAND.o EqualityExpression.r
-		{:
-			return new JSBinaryArithmeticOperatorNode(l, o, r);
-		:}
-	|	EqualityExpression_NoLBF
+ImportedBinding
+	=	BindingIdentifier
 	;
 
-BitwiseAndExpression_NoIn
-	=	BitwiseAndExpression_NoIn.l AMPERSAND.o EqualityExpression_NoIn.r
-		{:
-			return new JSBinaryArithmeticOperatorNode(l, o, r);
-		:}
-	|	EqualityExpression_NoIn
+ExportDeclaration
+	=	EXPORT STAR FromClause SEMICOLON
+	|	EXPORT ExportClause FromClause SEMICOLON
+	|	EXPORT ExportClause SEMICOLON
+	|	EXPORT VariableStatement
+	|	EXPORT Declaration
+	|	EXPORT DEFAULT HoistableDeclaration_Default
+	|	EXPORT DEFAULT ClassDeclaration_Default
+	|	EXPORT DEFAULT Identifier AssignmentExpression_In SEMICOLON
 	;
 
-BitwiseXorExpression
-	=	BitwiseXorExpression.l CARET.o BitwiseAndExpression.r
-		{:
-			return new JSBinaryArithmeticOperatorNode(l, o, r);
-		:}
-	|	BitwiseAndExpression
+ExportClause
+	=	LCURLY RCURLY
+	|	LCURLY ExportsList RCURLY
+	|	LCURLY ExportsList COMMA RCURLY
+	;
+	
+ExportsList
+	=	ExportsList COMMA ExportSpecifier
+	|	ExportSpecifier
 	;
 
-BitwiseXorExpression_NoLBF
-	=	BitwiseXorExpression_NoLBF.l CARET.o BitwiseAndExpression.r
-		{:
-			return new JSBinaryArithmeticOperatorNode(l, o, r);
-		:}
-	|	BitwiseAndExpression_NoLBF
+ExportSpecifier
+	=	IdentifierName AS IdentifierName
+	|	IdentifierName
 	;
 
-BitwiseXorExpression_NoIn
-	=	BitwiseXorExpression_NoIn.l CARET.o BitwiseAndExpression_NoIn.r
-		{:
-			return new JSBinaryArithmeticOperatorNode(l, o, r);
-		:}
-	|	BitwiseAndExpression_NoIn
-	;
+////////////////////////////////////
+// TODO A.6 Number Conversions
+////////////////////////////////////
 
-BitwiseOrExpression
-	=	BitwiseOrExpression.l PIPE.o BitwiseXorExpression.r
-		{:
-			return new JSBinaryArithmeticOperatorNode(l, o, r);
-		:}
-	|	BitwiseXorExpression
-	;
 
-BitwiseOrExpression_NoLBF
-	=	BitwiseOrExpression_NoLBF.l PIPE.o BitwiseXorExpression.r
-		{:
-			return new JSBinaryArithmeticOperatorNode(l, o, r);
-		:}
-	|	BitwiseXorExpression_NoLBF
-	;
-
-BitwiseOrExpression_NoIn
-	=	BitwiseOrExpression_NoIn.l PIPE.o BitwiseXorExpression_NoIn.r
-		{:
-			return new JSBinaryArithmeticOperatorNode(l, o, r);
-		:}
-	|	BitwiseXorExpression_NoIn
-	;
-
-LogicalAndExpression
-	=	LogicalAndExpression.l AMPERSAND_AMPERSAND.o BitwiseOrExpression.r
-		{:
-			return new JSBinaryBooleanOperatorNode(l, o, r);
-		:}
-	|	BitwiseOrExpression
-	;
-
-LogicalAndExpression_NoLBF
-	=	LogicalAndExpression_NoLBF.l AMPERSAND_AMPERSAND.o BitwiseOrExpression.r
-		{:
-			return new JSBinaryBooleanOperatorNode(l, o, r);
-		:}
-	|	BitwiseOrExpression_NoLBF
-	;
-
-LogicalAndExpression_NoIn
-	=	LogicalAndExpression_NoIn.l AMPERSAND_AMPERSAND.o BitwiseOrExpression_NoIn.r
-		{:
-			return new JSBinaryBooleanOperatorNode(l, o, r);
-		:}
-	|	BitwiseOrExpression_NoIn
-	;
-
-LogicalOrExpression
-	=	LogicalOrExpression.l PIPE_PIPE.o LogicalAndExpression.r
-		{:
-			return new JSBinaryBooleanOperatorNode(l, o, r);
-		:}
-	|	LogicalAndExpression
-	;
-
-LogicalOrExpression_NoLBF
-	=	LogicalOrExpression_NoLBF.l PIPE_PIPE.o LogicalAndExpression.r
-		{:
-			return new JSBinaryBooleanOperatorNode(l, o, r);
-		:}
-	|	LogicalAndExpression_NoLBF
-	;
-
-LogicalOrExpression_NoIn
-	=	LogicalOrExpression_NoIn.l PIPE_PIPE.o LogicalAndExpression_NoIn.r
-		{:
-			return new JSBinaryBooleanOperatorNode(l, o, r);
-		:}
-	|	LogicalAndExpression_NoIn
-	;
-
-ConditionalExpression
-	=	LogicalOrExpression
-	|	LogicalOrExpression.l QUESTION.q AssignmentExpression.t COLON.c AssignmentExpression.f
-		{:
-			return new JSConditionalNode(l, q, t, c, f);
-		:}
-	;
-
-ConditionalExpression_NoLBF
-	=	LogicalOrExpression_NoLBF
-	|	LogicalOrExpression_NoLBF.l QUESTION.q AssignmentExpression.t COLON.c AssignmentExpression.f
-		{:
-			return new JSConditionalNode(l, q, t, c, f);
-		:}
-	;
-
-ConditionalExpression_NoIn
-	=	LogicalOrExpression_NoIn
-	|	LogicalOrExpression_NoIn.l QUESTION.q AssignmentExpression_NoIn.t COLON.c AssignmentExpression_NoIn.f
-		{:
-			return new JSConditionalNode(l, q, t, c, f);
-		:}
-	;
-
-AssignmentExpression
-	=	ConditionalExpression
-	|	LeftHandSideExpression.l AssignmentOperator.o AssignmentExpression.r
-		{:
-			return new JSAssignmentNode(l, o, r);
-		:}
-	;
-
-AssignmentExpression_NoLBF
-	=	ConditionalExpression_NoLBF
-	|	LeftHandSideExpression_NoLBF.l AssignmentOperator.o AssignmentExpression.r
-		{:
-			return new JSAssignmentNode(l, o, r);
-		:}
-	;
-
-AssignmentExpression_NoIn
-	=	ConditionalExpression_NoIn
-	|	LeftHandSideExpression.l AssignmentOperator.o AssignmentExpression_NoIn.r
-		{:
-			return new JSAssignmentNode(l, o, r);
-		:}
-	;
-
-AssignmentOperator
-	=	EQUAL
-	|	STAR_EQUAL
-	|	FORWARD_SLASH_EQUAL
-	|	PERCENT_EQUAL
-	|	PLUS_EQUAL
-	|	MINUS_EQUAL
-	|	LESS_LESS_EQUAL
-	|	GREATER_GREATER_EQUAL
-	|	GREATER_GREATER_GREATER_EQUAL
-	|	AMPERSAND_EQUAL
-	|	CARET_EQUAL
-	|	PIPE_EQUAL
-	;
-
-Expression
-	=	Expression.l COMMA AssignmentExpression.r
-		{:
-			return new JSCommaNode(l, r);
-		:}
-	|	AssignmentExpression
-	;
-
-Expression_NoLBF
-	=	Expression_NoLBF.l COMMA AssignmentExpression.r
-		{:
-			return new JSCommaNode(l, r);
-		:}
-	|	AssignmentExpression_NoLBF
-	;
-
-Expression_NoIn
-	=	Expression_NoIn.l COMMA AssignmentExpression_NoIn.r
-		{:
-			return new JSCommaNode(l, r);
-		:}
-	|	AssignmentExpression_NoIn
-	;
-
-Literal
-	=	NULL.n
-		{:
-			return new JSNullNode(n);
-		:}
-	|	TRUE.t
-		{:
-			return new JSTrueNode(t);
-		:}
-	|	FALSE.f
-		{:
-			return new JSFalseNode(f);
-		:}
-	|	NUMBER.n
-		{:
-			return new JSNumberNode(n);
-		:}
-	|	STRING.s
-		{:
-			return new JSStringNode(s);
-		:}
-	|	REGEX.r
-		{:
-			return new JSRegexNode(r);
-		:}
-	;

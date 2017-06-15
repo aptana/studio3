@@ -1,6 +1,6 @@
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2017 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
@@ -12,13 +12,17 @@ import java.util.Set;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
 
-import java.util.Set;
-
-import com.aptana.core.util.ArrayUtil;
-import com.aptana.core.util.CollectionsUtil;
-
 public class JSLanguageConstants
 {
+	public static final String AWAIT = "await"; //$NON-NLS-1$
+	public static final String CONST = "const"; //$NON-NLS-1$
+	public static final String LET = "let"; //$NON-NLS-1$
+	public static final String YIELD = "yield"; //$NON-NLS-1$
+	public static final String IMPORT = "import"; //$NON-NLS-1$
+	public static final String EXPORT = "export"; //$NON-NLS-1$
+	public static final String CLASS = "class"; //$NON-NLS-1$
+	public static final String EXTENDS = "extends"; //$NON-NLS-1$
+	public static final String SUPER = "super"; //$NON-NLS-1$
 	public static final String GET = "get"; //$NON-NLS-1$
 	public static final String SET = "set"; //$NON-NLS-1$
 	public static final String TRUE = "true"; //$NON-NLS-1$
@@ -49,6 +53,7 @@ public class JSLanguageConstants
 	public static final String RCURLY = "}"; //$NON-NLS-1$
 	public static final String TILDE = "~"; //$NON-NLS-1$
 	public static final String DOT = "."; //$NON-NLS-1$
+	public static final String DOT_DOT_DOT = "..."; //$NON-NLS-1$
 	public static final String LESS_EQUAL = "<="; //$NON-NLS-1$
 	public static final String FORWARD_SLASH_EQUAL = "/="; //$NON-NLS-1$
 	public static final String CASE = "case"; //$NON-NLS-1$
@@ -80,6 +85,7 @@ public class JSLanguageConstants
 	public static final String CONTINUE = "continue"; //$NON-NLS-1$
 	public static final String COMMA = "comma"; //$NON-NLS-1$
 	public static final String VOID = "void"; //$NON-NLS-1$
+	public static final String ARROW = "=>"; //$NON-NLS-1$
 	public static final String EQUAL_EQUAL_EQUAL = "==="; //$NON-NLS-1$
 	public static final String ELSE = "else"; //$NON-NLS-1$
 	public static final String STAR_EQUAL = "*="; //$NON-NLS-1$
@@ -244,7 +250,7 @@ public class JSLanguageConstants
 			"LN2", "LOG10E", "LOG2E", "bottom", "borderRightWidth", "borderBottomWidth", "borderStyle", "borderColor",
 			"borderTopWidth", "borderLeftWidth", "bufferDepth", "below", "backgroundColor", "backgroundImage", };
 
-	private static String[] GRAMMAR_KEYWORDS = { FUNCTION, VAR, VOID, TRUE, FALSE, NULL, THIS };
+	private static String[] GRAMMAR_KEYWORDS = { AWAIT, FUNCTION, VAR, LET, CONST, CLASS, EXTENDS, SUPER, VOID, TRUE, FALSE, NULL, THIS };
 
 	/**
 	 * All keywords

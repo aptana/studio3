@@ -772,4 +772,58 @@ public class JSFlexScannerTest
 
 		this.assertListCrossProducts(lists, JSTokenType.NUMBER);
 	}
+	
+	@Test
+	public void testConst()
+	{
+		assertTokenTypes("const", JSTokenType.CONST);
+	}
+	
+	@Test
+	public void testLet()
+	{
+		assertTokenTypes("let", JSTokenType.LET);
+	}
+	
+	@Test
+	public void testAwait()
+	{
+		assertTokenTypes("await", JSTokenType.AWAIT);
+	}
+	
+	@Test
+	public void testClass()
+	{
+		assertTokenTypes("class", JSTokenType.CLASS);
+	}
+	
+	@Test
+	public void testExtends()
+	{
+		assertTokenTypes("extends", JSTokenType.EXTENDS);
+	}
+	
+	@Test
+	public void testSuper()
+	{
+		assertTokenTypes("super", JSTokenType.SUPER);
+	}
+	
+	@Test
+	public void testExport()
+	{
+		assertTokenTypes("export", JSTokenType.EXPORT);
+	}
+	
+	@Test
+	public void testImport()
+	{
+		assertTokenTypes("import", JSTokenType.IMPORT);
+	}
+	
+	@Test
+	public void testYield()
+	{
+		assertTokenTypes("yield", JSTokenType.YIELD);
+	}
 }
