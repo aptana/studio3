@@ -57,6 +57,7 @@ public class JSLanguageConstants
 	public static final String LESS_EQUAL = "<="; //$NON-NLS-1$
 	public static final String FORWARD_SLASH_EQUAL = "/="; //$NON-NLS-1$
 	public static final String CASE = "case"; //$NON-NLS-1$
+	public static final String TARGET = "target"; //$NON-NLS-1$
 	public static final String EXCLAMATION = "!"; //$NON-NLS-1$
 	public static final String PLUS_PLUS = "++"; //$NON-NLS-1$
 	public static final String CARET = "^"; //$NON-NLS-1$
@@ -69,6 +70,7 @@ public class JSLanguageConstants
 	public static final String EXCLAMATION_EQUAL = "!="; //$NON-NLS-1$
 	public static final String MINUS_MINUS = "--"; //$NON-NLS-1$
 	public static final String IF = "if"; //$NON-NLS-1$
+	public static final String OF = "of"; //$NON-NLS-1$
 	public static final String DEFAULT = "default"; //$NON-NLS-1$
 	public static final String NEW = "new"; //$NON-NLS-1$
 	public static final String PERCENT_EQUAL = "%="; //$NON-NLS-1$

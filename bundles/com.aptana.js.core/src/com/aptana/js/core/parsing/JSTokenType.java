@@ -34,6 +34,10 @@ public enum JSTokenType implements ITypePredicate
 	NULL(JSLanguageConstants.NULL, Terminals.NULL),
 	TRUE(JSLanguageConstants.TRUE, Terminals.TRUE),
 	FALSE(JSLanguageConstants.FALSE, Terminals.FALSE),
+	TEMPLATE_HEAD("TEMPLATE_HEAD", Terminals.TEMPLATE_HEAD), //$NON-NLS-1$
+	NO_SUB_TEMPLATE("NO_SUB_TEMPLATE", Terminals.NO_SUB_TEMPLATE), //$NON-NLS-1$
+	TEMPLATE_MIDDLE("TEMPLATE_MIDDLE", Terminals.TEMPLATE_MIDDLE), //$NON-NLS-1$
+	TEMPLATE_TAIL("TEMPLATE_TAIL", Terminals.TEMPLATE_TAIL), //$NON-NLS-1$
 	REGEX("REGEX", Terminals.REGEX), //$NON-NLS-1$
 	DELETE(JSLanguageConstants.DELETE, Terminals.DELETE),
 	EXCLAMATION(JSLanguageConstants.EXCLAMATION, Terminals.EXCLAMATION),
@@ -48,6 +52,7 @@ public enum JSTokenType implements ITypePredicate
 	DO(JSLanguageConstants.DO, Terminals.DO),
 	SWITCH(JSLanguageConstants.SWITCH, Terminals.SWITCH),
 	IF(JSLanguageConstants.IF, Terminals.IF),
+	OF(JSLanguageConstants.OF, Terminals.OF),
 	CONTINUE(JSLanguageConstants.CONTINUE, Terminals.CONTINUE),
 	BREAK(JSLanguageConstants.BREAK, Terminals.BREAK),
 	WITH(JSLanguageConstants.WITH, Terminals.WITH),
@@ -62,6 +67,7 @@ public enum JSTokenType implements ITypePredicate
 	IN(JSLanguageConstants.IN, Terminals.IN),
 	EQUAL(JSLanguageConstants.EQUAL, Terminals.EQUAL),
 	CASE(JSLanguageConstants.CASE, Terminals.CASE),
+	TARGET(JSLanguageConstants.TARGET, Terminals.TARGET),
 	DOT_DOT_DOT(JSLanguageConstants.DOT_DOT_DOT, Terminals.DOT_DOT_DOT),
 	DOT(JSLanguageConstants.DOT, Terminals.DOT),
 	LESS_LESS(JSLanguageConstants.LESS_LESS, Terminals.LESS_LESS),

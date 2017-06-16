@@ -440,14 +440,15 @@
 		// @formatter:on
 :};
 
-%terminals FUNCTION, IDENTIFIER, STRING, NUMBER, NULL, TRUE, FALSE, REGEX, GET, SET, AS, FROM, DOT_DOT_DOT, ARROW;
+%terminals FUNCTION, IDENTIFIER, STRING, NUMBER, NULL, TRUE, FALSE, REGEX, GET, SET, AS, FROM, DOT_DOT_DOT, ARROW, TARGET, OF;
 %terminals LCURLY, RCURLY, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA, COLON, SEMICOLON, EQUAL, DOT, QUESTION;
 %terminals IF, ELSE, DO, WHILE, FOR, IN, CONTINUE, BREAK, RETURN, WITH, SWITCH, CASE, DEFAULT, THROW, TRY, CATCH, FINALLY;
 %terminals LET, CONST, VAR, THIS, NEW, DELETE, PLUS_PLUS, MINUS_MINUS, PLUS, MINUS, EXCLAMATION, TILDE, TYPEOF, VOID, AMPERSAND, CARET, PIPE, AMPERSAND_AMPERSAND, PIPE_PIPE;
 %terminals STAR, FORWARD_SLASH, PERCENT, LESS_LESS, GREATER_GREATER, GREATER_GREATER_GREATER;
 %terminals LESS, GREATER, LESS_EQUAL, GREATER_EQUAL, INSTANCEOF, IN, EQUAL_EQUAL, EXCLAMATION_EQUAL, EQUAL_EQUAL_EQUAL, EXCLAMATION_EQUAL_EQUAL;
 %terminals EQUAL, STAR_EQUAL, FORWARD_SLASH_EQUAL, PERCENT_EQUAL, PLUS_EQUAL, MINUS_EQUAL, LESS_LESS_EQUAL, GREATER_GREATER_EQUAL, GREATER_GREATER_GREATER_EQUAL, AMPERSAND_EQUAL, CARET_EQUAL, PIPE_EQUAL;
-%terminals DEBUGGER, CLASS, ENUM, EXPORT, EXTENDS, IMPORT, SUPER, IMPLEMENTS, INTERFACE, PACKAGE, PRIVATE, PROTECTED, PUBLIC, STATIC, YIELD;
+%terminals AWAIT, DEBUGGER, CLASS, ENUM, EXPORT, EXTENDS, IMPORT, SUPER, IMPLEMENTS, INTERFACE, PACKAGE, PRIVATE, PROTECTED, PUBLIC, STATIC, YIELD;
+%terminals NO_SUB_TEMPLATE, TEMPLATE_HEAD, TEMPLATE_MIDDLE, TEMPLATE_TAIL;
 
 %typeof ArrayLiteral, ArrayLiteral_Yield = "JSArrayNode";
 %typeof ObjectLiteral, ObjectLiteral_Yield = "JSObjectNode";
@@ -472,61 +473,50 @@
 %typeof LogicalORExpression, LogicalORExpression_In, LogicalORExpression_Yield, LogicalORExpression_In_Yield = "JSBinaryBooleanOperatorNode";
 %typeof Elision = "JSElisionNode";
 
-%goal Program;
-
-Program
-	=	Script.s
-		{:
-			return new JSParseRootNode(s);
-		:}
-	|	Module.m
-		{:
-			return new JSParseRootNode(m);
-		:}
-	;
+%goal Module;
+%goal Script;
 
 ////////////////////////////////////
 // A.2 Expressions
 ////////////////////////////////////
 
+// BindingIdentifier is equivalent
+// LabelIdentifier is equivalent
 IdentifierReference
 	=	Identifier
 	|	YIELD
 	;
 
+// BindingIdentifier_Yield is equivalent
+// LabelIdentifier_Yield is equivalent
 IdentifierReference_Yield
 	=	Identifier
 	;
 
-BindingIdentifier
-	=	Identifier
-	|	YIELD
-	;
-
-BindingIdentifier_Yield
-	=	Identifier
-	;
-
-LabelIdentifier
-	=	Identifier
-	|	YIELD
-	;
-
-LabelIdentifier_Yield
-	=	Identifier
-	;
-
+// IdentifierName minus ReservedWords
 Identifier
-	=	IdentifierName
+	=	IDENTIFIER
+	|	GET
+	|	IMPLEMENTS
+	|	INTERFACE
+	|	LET
+	|	OF
+	|	PACKAGE
+	|	PRIVATE
+	|	PROTECTED
+	|	PUBLIC
+	|	SET
+	|	STATIC
+	|	TARGET
 	;
 
 IdentifierName
-	=	IDENTIFIER
-	|	GET
-	|	SET
+	=	Identifier
+	|	AWAIT
 	|	BREAK
 	|	CASE
 	|	CATCH
+	|	CLASS
 	|	CONST
 	|	CONTINUE
 	|	DEBUGGER
@@ -534,17 +524,21 @@ IdentifierName
 	|	DELETE
 	|	DO
 	|	ELSE
+	|	ENUM
+	|	EXPORT
+	|	EXTENDS
 	|	FALSE
 	|	FINALLY
 	|	FOR
 	|	FUNCTION
 	|	IF
+	|	IMPORT
 	|	INSTANCEOF
 	|	IN
-	|	LET
 	|	NEW
 	|	NULL
 	|	RETURN
+	|	SUPER
 	|	SWITCH
 	|	THIS
 	|	THROW
@@ -555,21 +549,6 @@ IdentifierName
 	|	VOID
 	|	WHILE
 	|	WITH
-	|	CLASS
-	|	ENUM
-	|	EXPORT
-	|	EXTENDS
-	|	IMPORT
-	|	SUPER
-	|	IMPLEMENTS
-	|	INTERFACE
-	|	LET
-	|	PACKAGE
-	|	PRIVATE
-	|	PROTECTED
-	|	PUBLIC
-	|	STATIC
-	|	YIELD
 	;
 
 PrimaryExpression
@@ -583,6 +562,11 @@ PrimaryExpression
 	|	ObjectLiteral
 	|	FunctionExpression
 	|	ClassExpression
+// Multiplied out to avoid conflict
+//	|	CLASS ClassTail
+	|	ClassDeclaration
+// Expanded to avoid conflict
+//	|	CLASS IdentifierReference ClassTail
 	|	GeneratorExpression
 	|	RegularExpressionLiteral
 	|	TemplateLiteral
@@ -600,6 +584,11 @@ PrimaryExpression_Yield
 	|	ObjectLiteral_Yield
 	|	FunctionExpression
 	|	ClassExpression_Yield
+// Multiplied out to avoid conflict
+//	|	CLASS ClassTail_Yield
+	|	ClassDeclaration_Yield
+// Expanded to avoid conflict
+//	|	CLASS IdentifierReference_Yield ClassTail_Yield
 	|	GeneratorExpression
 	|	RegularExpressionLiteral
 	|	TemplateLiteral_Yield
@@ -609,30 +598,32 @@ PrimaryExpression_Yield
 CoverParenthesizedExpressionAndArrowParameterList
 	=	LPAREN Expression_In RPAREN
 	|	LPAREN RPAREN
-	|	LPAREN DOT_DOT_DOT BindingIdentifier RPAREN
-	|	LPAREN Expression_In COMMA DOT_DOT_DOT BindingIdentifier RPAREN
+	|	LPAREN DOT_DOT_DOT IdentifierReference RPAREN
+	|	LPAREN Expression_In COMMA DOT_DOT_DOT IdentifierReference RPAREN
 	;
 
 CoverParenthesizedExpressionAndArrowParameterList_Yield
 	=	LPAREN Expression_In_Yield RPAREN
 	|	LPAREN RPAREN
-	|	LPAREN DOT_DOT_DOT BindingIdentifier_Yield RPAREN
-	|	LPAREN Expression_In_Yield COMMA DOT_DOT_DOT BindingIdentifier_Yield RPAREN
+	|	LPAREN DOT_DOT_DOT IdentifierReference_Yield RPAREN
+	|	LPAREN Expression_In_Yield COMMA DOT_DOT_DOT IdentifierReference_Yield RPAREN
 	;
 
-ParenthesizedExpression
-	=	LPAREN.l Expression_In.e RPAREN.r
-		{:
-			return new JSGroupNode(l, e, r);
-		:}
-	;
+// Unused
+//ParenthesizedExpression
+//	=	LPAREN.l Expression_In.e RPAREN.r
+//		{:
+//			return new JSGroupNode(l, e, r);
+//		:}
+//	;
 
-ParenthesizedExpression_Yield
-	=	LPAREN.l Expression_In_Yield.e RPAREN.r
-		{:
-			return new JSGroupNode(l, e, r);
-		:}
-	;
+// Unused
+//ParenthesizedExpression_Yield
+//	=	LPAREN.l Expression_In_Yield.e RPAREN.r
+//		{:
+//			return new JSGroupNode(l, e, r);
+//		:}
+//	;
 
 Literal
 	=	NullLiteral
@@ -1293,7 +1284,7 @@ RelationalExpression
 		{:
 			return new JSBinaryBooleanOperatorNode(l, o, r);
 		:}
-	|	RelationalExpression.l INSTANCEO.oF ShiftExpression.r
+	|	RelationalExpression.l INSTANCEOF.o ShiftExpression.r
 		{:
 			return new JSBinaryBooleanOperatorNode(l, o, r);
 		:}
@@ -1815,7 +1806,7 @@ Statement_Return
 		:}
 	;
 
-StatementYield_Return
+Statement_Yield_Return
 	=	BlockStatement_Yield_Return
 	|	VariableStatement_Yield
 	|	EmptyStatement
@@ -1848,12 +1839,16 @@ EmptyStatement
 Declaration
 	=	HoistableDeclaration
 	|	ClassDeclaration
+// Expanded to avoid conflict
+//	|	CLASS IdentifierReference ClassTail
 	|	LexicalDeclaration_In
 	;
 
 Declaration_Yield
 	=	HoistableDeclaration_Yield
 	|	ClassDeclaration_Yield
+// Expanded to avoid conflict
+//	|	CLASS IdentifierReference_Yield ClassTail_Yield
 	|	LexicalDeclaration_In_Yield
 	;
 
@@ -1872,10 +1867,11 @@ HoistableDeclaration_Default
 	|	GeneratorDeclaration_Default
 	;
 
-HoistableDeclaration_Yield_Default
-	=	FunctionDeclaration_Yield_Default
-	|	GeneratorDeclaration_Yield_Default
-	;
+// Unused
+//HoistableDeclaration_Yield_Default
+//	=	FunctionDeclaration_Yield_Default
+//	|	GeneratorDeclaration_Yield_Default
+//	;
 
 BreakableStatement
 	=	IterationStatement
@@ -2055,22 +2051,22 @@ BindingList_In_Yield
 	;
 
 LexicalBinding
-	=	BindingIdentifier Initializer?
+	=	IdentifierReference Initializer?
 	|	BindingPattern Initializer
 	;
 
 LexicalBinding_In
-	=	BindingIdentifier Initializer_In?
+	=	IdentifierReference Initializer_In?
 	|	BindingPattern Initializer_In
 	;
 
 LexicalBinding_Yield
-	=	BindingIdentifier_Yield Initializer_Yield?
+	=	IdentifierReference_Yield Initializer_Yield?
 	|	BindingPattern_Yield Initializer_Yield
 	;
 
 LexicalBinding_In_Yield
-	=	BindingIdentifier_Yield Initializer_In_Yield?
+	=	IdentifierReference_Yield Initializer_In_Yield?
 	|	BindingPattern_Yield Initializer_In_Yield
 	;
 
@@ -2084,7 +2080,7 @@ VariableStatement
 	;
 	
 VariableStatement_Yield
-	=	VAR.v VariableDeclarationList_in_Yield.l SEMICOLON
+	=	VAR.v VariableDeclarationList_In_Yield.l SEMICOLON
 		{:
 			JSNode node = new JSVarNode(v, l);
 			node.setSemicolonIncluded(true);
@@ -2113,7 +2109,7 @@ VariableDeclarationList_In_Yield
 	;
 
 VariableDeclaration
-	=	BindingIdentifier.i Initializer.z?
+	=	IdentifierReference.i Initializer.z?
 		{:
 			if (z == null) {
 				return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
@@ -2125,7 +2121,7 @@ VariableDeclaration
 	;
 
 VariableDeclaration_In
-	=	BindingIdentifier.i Initializer_In.z?
+	=	IdentifierReference.i Initializer_In.z?
 		{:
 			if (z == null) {
 				return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
@@ -2137,7 +2133,7 @@ VariableDeclaration_In
 	;
 
 VariableDeclaration_Yield
-	=	BindingIdentifier_Yield.i Initializer_Yield.z?
+	=	IdentifierReference_Yield.i Initializer_Yield.z?
 		{:
 			if (z == null) {
 				return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
@@ -2149,7 +2145,7 @@ VariableDeclaration_Yield
 	;
 
 VariableDeclaration_In_Yield
-	=	BindingIdentifier_Yield.i Initializer_In_Yield.z?
+	=	IdentifierReference_Yield.i Initializer_In_Yield.z?
 		{:
 			if (z == null) {
 				return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
@@ -2283,19 +2279,19 @@ BindingElement_Yield
 	;
 
 SingleNameBinding
-	=	BindingIdentifier Initializer_In?
+	=	IdentifierReference Initializer_In?
 	;
 	
 SingleNameBinding_Yield
-	=	BindingIdentifier_Yield Initializer_In_Yield?
+	=	IdentifierReference_Yield Initializer_In_Yield?
 	;
 
 BindingRestElement
-	=	DOT_DOT_DOT BindingIdentifier
+	=	DOT_DOT_DOT IdentifierReference
 	;
 	
 BindingRestElement_Yield
-	=	DOT_DOT_DOT BindingIdentifier_Yield
+	=	DOT_DOT_DOT IdentifierReference_Yield
 	;
 
 ExpressionStatement
@@ -2651,12 +2647,12 @@ ForDeclaration_Yield
 	;
 
 ForBinding
-	=	BindingIdentifier
+	=	IdentifierReference
 	|	BindingPattern
 	;
 
 ForBinding_Yield
-	=	BindingIdentifier_Yield
+	=	IdentifierReference_Yield
 	|	BindingPattern_Yield
 	;
 	
@@ -2667,7 +2663,7 @@ ContinueStatement
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
-	|	CONTINUE LabelIdentifier.i SEMICOLON
+	|	CONTINUE IdentifierReference.i SEMICOLON
 		{:
 			JSNode node = new JSContinueNode(i);
 			node.setSemicolonIncluded(true);
@@ -2682,7 +2678,7 @@ ContinueStatement_Yield
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
-	|	CONTINUE LabelIdentifier_Yield.i SEMICOLON
+	|	CONTINUE IdentifierReference_Yield.i SEMICOLON
 		{:
 			JSNode node = new JSContinueNode(i);
 			node.setSemicolonIncluded(true);
@@ -2697,7 +2693,7 @@ BreakStatement
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
-	|	BREAK LabelIdentifier.i SEMICOLON
+	|	BREAK IdentifierReference.i SEMICOLON
 		{:
 			JSNode node = new JSBreakNode(i);
 			node.setSemicolonIncluded(true);
@@ -2712,7 +2708,7 @@ BreakStatement_Yield
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
-	|	BREAK LabelIdentifier_Yield.i SEMICOLON
+	|	BREAK IdentifierReference_Yield.i SEMICOLON
 		{:
 			JSNode node = new JSBreakNode(i);
 			node.setSemicolonIncluded(true);
@@ -2920,7 +2916,7 @@ CaseClauses_Yield_Return
 	;
 
 CaseClause
-	=	CASE ExpressionIn.e COLON.c StatementList.s?
+	=	CASE Expression_In.e COLON.c StatementList.s?
 		{:
 			if (s == null) {
 				return new JSCaseNode(e, c);
@@ -3000,7 +2996,7 @@ DefaultClause_Yield_Return
 	;
 
 LabelledStatement
-	=	LabelIdentifier.i COLON.c LabelledItem.s
+	=	IdentifierReference.i COLON.c LabelledItem.s
 		{:
 			JSNode id = new JSIdentifierNode(i);
 			id.setLocation(i.getStart(), i.getEnd());
@@ -3010,7 +3006,7 @@ LabelledStatement
 	;
 	
 LabelledStatement_Yield
-	=	LabelIdentifier_Yield.i COLON.c LabelledItem_Yield.s
+	=	IdentifierReference_Yield.i COLON.c LabelledItem_Yield.s
 		{:
 			JSNode id = new JSIdentifierNode(i);
 			id.setLocation(i.getStart(), i.getEnd());
@@ -3020,7 +3016,7 @@ LabelledStatement_Yield
 	;
 	
 LabelledStatement_Return
-	=	LabelIdentifier.i COLON.c LabelledItem_Return.s
+	=	IdentifierReference.i COLON.c LabelledItem_Return.s
 		{:
 			JSNode id = new JSIdentifierNode(i);
 			id.setLocation(i.getStart(), i.getEnd());
@@ -3030,7 +3026,7 @@ LabelledStatement_Return
 	;
 	
 LabelledStatement_Yield_Return
-	=	LabelIdentifier_Yield.i COLON.c LabelledItem_Yield_Return.s
+	=	IdentifierReference_Yield.i COLON.c LabelledItem_Yield_Return.s
 		{:
 			JSNode id = new JSIdentifierNode(i);
 			id.setLocation(i.getStart(), i.getEnd());
@@ -3069,7 +3065,7 @@ ThrowStatement
 	;
 
 ThrowStatement_Yield
-	=	THROW ExpressionIn_Yield.e SEMICOLON
+	=	THROW Expression_In_Yield.e SEMICOLON
 		{:
 			JSNode node = new JSThrowNode(e);
 			node.setSemicolonIncluded(true);
@@ -3194,12 +3190,12 @@ Finally_Yield_Return
 	;
 
 CatchParameter
-	=	BindingIdentifier
+	=	IdentifierReference
 	|	BindingPattern
 	;
 
 CatchParameter_Yield
-	=	BindingIdentifier_Yield
+	=	IdentifierReference_Yield
 	|	BindingPattern_Yield
 	;
 
@@ -3211,7 +3207,7 @@ DebuggerStatement
 // A.4 Functions and Classes
 ////////////////////////////////////
 FunctionDeclaration
-	= 	FUNCTION BindingIdentifier.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
+	= 	FUNCTION IdentifierReference.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
 		{:
 			return new JSFunctionNode(
 				new JSIdentifierNode(ident),
@@ -3222,7 +3218,7 @@ FunctionDeclaration
 	;
 
 FunctionDeclaration_Yield
-	= 	FUNCTION BindingIdentifier_Yield.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
+	= 	FUNCTION IdentifierReference_Yield.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
 		{:
 			return new JSFunctionNode(
 				new JSIdentifierNode(ident),
@@ -3233,7 +3229,7 @@ FunctionDeclaration_Yield
 	;
 
 FunctionDeclaration_Default
-	= 	FUNCTION BindingIdentifier.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
+	= 	FUNCTION IdentifierReference.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
 		{:
 			return new JSFunctionNode(
 				new JSIdentifierNode(ident),
@@ -3251,27 +3247,28 @@ FunctionDeclaration_Default
 		:}
 	;
 
-FunctionDeclaration_Yield_Default
-	=	FUNCTION BindingIdentifier_Yield.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
-		{:
-			return new JSFunctionNode(
-				new JSIdentifierNode(ident),
-				params,
-				body
-			);
-		:}
-	|	FUNCTION LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
-		{:
-			return new JSFunctionNode(
-				new JSEmptyNode(f),
-				params,
-				body
-			);
-		:}
-	;
+// Unused
+//FunctionDeclaration_Yield_Default
+//	=	FUNCTION IdentifierReference_Yield.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
+//		{:
+//			return new JSFunctionNode(
+//				new JSIdentifierNode(ident),
+//				params,
+//				body
+//			);
+//		:}
+//	|	FUNCTION LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
+//		{:
+//			return new JSFunctionNode(
+//				new JSEmptyNode(f),
+//				params,
+//				body
+//			);
+//		:}
+//	;
 
 FunctionExpression
-	=	FUNCTION.f BindingIdentifier.ident? LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
+	=	FUNCTION.f IdentifierReference.ident? LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
 		{:
 			if (ident != null) {
 				return new JSFunctionNode(
@@ -3371,7 +3368,7 @@ FunctionStatementList
 
 FunctionStatementList_Yield
 	=	StatementList_Yield?
-	|	StatementList_Return?
+	|	StatementList_Yield_Return?
 	;
 
 ArrowFunction
@@ -3391,13 +3388,17 @@ ArrowFunction_In_Yield
 	;
 
 ArrowParameters
-	=	BindingIdentifier
-	|	CoverParenthesizedExpressionAndArrowParameterList
+	=	IdentifierReference
+	|	ArrowFormalParameters
+// https://www.ecma-international.org/ecma-262/6.0/#sec-arrow-function-definitions
+//	|	CoverParenthesizedExpressionAndArrowParameterList
 	;
 
 ArrowParameters_Yield
-	=	BindingIdentifier_Yield
-	|	CoverParenthesizedExpressionAndArrowParameterList_Yield
+	=	IdentifierReference_Yield
+	|	ArrowFormalParameters_Yield
+// See https://www.ecma-international.org/ecma-262/6.0/#sec-arrow-function-definitions
+//	|	CoverParenthesizedExpressionAndArrowParameterList_Yield
 	;
 
 ConciseBody
@@ -3467,25 +3468,26 @@ GeneratorMethod_Yield
 	;
 
 GeneratorDeclaration
-	=	FUNCTION STAR BindingIdentifier LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
+	=	FUNCTION STAR IdentifierReference LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
 	;
 
 GeneratorDeclaration_Yield
-	=	FUNCTION STAR BindingIdentifier_Yield LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
+	=	FUNCTION STAR IdentifierReference_Yield LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
 	;
 	
 GeneratorDeclaration_Default
-	=	FUNCTION STAR BindingIdentifier_Yield LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
+	=	FUNCTION STAR IdentifierReference_Yield LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
 	|	FUNCTION STAR LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
 	;
 	
-GeneratorDeclaration_Yield_Default
-	=	FUNCTION STAR BindingIdentifier_Yield LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
-	|	FUNCTION STAR LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
-	;
+// Unused
+//GeneratorDeclaration_Yield_Default
+//	=	FUNCTION STAR IdentifierReference_Yield LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
+//	|	FUNCTION STAR LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
+//	;
 
 GeneratorExpression
-	=	FUNCTION STAR BindingIdentifier_Yield? LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
+	=	FUNCTION STAR IdentifierReference_Yield? LPAREN FormalParameters_Yield RPAREN LCURLY GeneratorBody RCURLY
 	;
 
 GeneratorBody
@@ -3504,38 +3506,51 @@ YieldExpression_In
 	|	YIELD STAR AssignmentExpression_In_Yield
 	;
 
+// Expanded to avoid conflict
 ClassDeclaration
-	=	CLASS BindingIdentifier ClassTail
+	=	CLASS IdentifierReference ClassTail
 	;
 
+// Expanded to avoid conflict
 ClassDeclaration_Yield
-	=	CLASS BindingIdentifier_Yield ClassTail_Yield
+	=	CLASS IdentifierReference_Yield ClassTail_Yield
 	;
 	
 ClassDeclaration_Default
-	=	CLASS BindingIdentifier ClassTail
+	=	CLASS IdentifierReference ClassTail
 	|	CLASS ClassTail
 	;
 	
-ClassDeclaration_Yield_Default
-	=	CLASS BindingIdentifier_Yield ClassTail_Yield
-	|	CLASS ClassTail_Yield
-	;
+// Unused
+//ClassDeclaration_Yield_Default
+//	=	CLASS IdentifierReference_Yield ClassTail_Yield
+//	|	CLASS ClassTail_Yield
+//	;
 
+// Expanded to avoid conflict
 ClassExpression
-	=	CLASS BindingIdentifier? ClassTail
+	=	CLASS ClassTail
+	|	ClassDeclaration
 	;
 
+// Expanded to avoid conflict
 ClassExpression_Yield
-	=	CLASS BindingIdentifier_Yield? ClassTail_Yield
+	=	CLASS ClassTail_Yield
+	|	ClassDeclaration_Yield
 	;
 
 ClassTail
-	=	ClassHeritage? LCURLY ClassBody_Yield? RCURLY
+	=	ClassHeritage LCURLY ClassBody RCURLY
+	|	LCURLY ClassBody RCURLY
+	|	ClassHeritage LCURLY RCURLY
+	|	LCURLY RCURLY
 	;
 
 ClassTail_Yield
-	=	ClassHeritage_Yield? LCURLY ClassBody_Yield? RCURLY
+	=	ClassHeritage_Yield LCURLY ClassBody_Yield RCURLY
+	|	ClassHeritage_Yield LCURLY RCURLY
+	|	LCURLY ClassBody_Yield RCURLY
+	|	LCURLY RCURLY
 	;
 
 ClassHeritage
@@ -3609,7 +3624,10 @@ ClassElement_Yield
 // A.5 Scripts and Modules
 ////////////////////////////////////
 Script
-	=	ScriptBody?
+	=	ScriptBody.s?
+		{:
+			return new JSParseRootNode(s);
+		:}
 	;
 
 ScriptBody
@@ -3617,7 +3635,10 @@ ScriptBody
 	;
 
 Module
-	=	ModuleBody?
+	=	ModuleBody.m?
+		{:
+			return new JSParseRootNode(m);
+		:}
 	;
 	
 ModuleBody
@@ -3681,7 +3702,7 @@ ModuleSpecifier
 	;
 
 ImportedBinding
-	=	BindingIdentifier
+	=	IdentifierReference
 	;
 
 ExportDeclaration
@@ -3715,4 +3736,18 @@ ExportSpecifier
 // TODO A.6 Number Conversions
 ////////////////////////////////////
 
+NoSubstitutionTemplate
+	=	 NO_SUB_TEMPLATE
+	;
 
+TemplateHead
+	=	TEMPLATE_HEAD
+	;
+	
+TemplateMiddle
+	=	TEMPLATE_MIDDLE
+	;
+
+TemplateTail
+	=	TEMPLATE_TAIL
+	;

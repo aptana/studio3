@@ -193,16 +193,25 @@ Whitespace = {LineTerminator} | [ \t\f] | {RubyBlock} | {PHPBlock} | {DjangoBloc
 //Identifier = [a-zA-Z_$][a-zA-Z0-9_$]*
 Identifier = ([:jletter:]|\$)([:jletterdigit:]|\$)*
 
+// Numbers
 Integer = [:digit:][:digit:]*
 Hex = "0" [xX] [a-fA-F0-9]+
 Float = ({Integer} \.[:digit:]*) | (\.[:digit:]+)
 Scientific = ({Integer} | {Float}) [eE][-+]?[:digit:]+
 Number = {Integer} | {Hex} | {Float} | {Scientific}
 
+// Strings
 DoubleQuotedString = \"([^\\\"\r\n]|\\[^])*\"
 SingleQuotedString = '([^\\'\r\n]|\\[^])*'
 Strings = {DoubleQuotedString} | {SingleQuotedString}
 
+// Templates
+TemplateMiddle = "}" ~"${"
+TemplateTail = "}" ~"`"
+TemplateHead = "`" ~"${"
+NoSubstitutionTemplate = "`" ~"`"
+
+// Comments
 SingleLineComment = "//" [^\r\n]*
 MultiLineComment = "/*" ~"*/"
 SDocComment = "/**" ~"*/"
@@ -291,8 +300,10 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 	"extends"		{ return newToken(JSTokenType.EXTENDS); }
 	"import"		{ return newToken(JSTokenType.IMPORT); }
 	"let"			{ return newToken(JSTokenType.LET); }
+	"of"			{ return newToken(JSTokenType.OF); }
 	"static"		{ return newToken(JSTokenType.STATIC); }
 	"super"			{ return newToken(JSTokenType.SUPER); }
+	"target"		{ return newToken(JSTokenType.TARGET); }
 	"yield"			{ return newToken(JSTokenType.YIELD); }
 	
 	// Future Use Reserved Words
@@ -304,6 +315,12 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 	"private"		{ return newToken(JSTokenType.PRIVATE); }
 	"protected"		{ return newToken(JSTokenType.PROTECTED); }
 	"public"		{ return newToken(JSTokenType.PUBLIC); }
+	
+	// ES6 Templates
+	{TemplateHead}				{ return newToken(Terminals.TEMPLATE_HEAD, pool(yytext())); }
+	{NoSubstitutionTemplate}	{ return newToken(Terminals.NO_SUB_TEMPLATE, pool(yytext())); }
+	{TemplateMiddle}			{ return newToken(Terminals.TEMPLATE_MIDDLE, pool(yytext())); }
+	{TemplateTail}				{ return newToken(Terminals.TEMPLATE_TAIL, pool(yytext())); }
 
 	// identifiers
 	{Identifier}	{ return newToken(Terminals.IDENTIFIER, pool(yytext())); }
