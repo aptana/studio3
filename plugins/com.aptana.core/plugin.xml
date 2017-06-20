@@ -64,12 +64,5 @@
                type="java.lang.Object">
          </propertyTester>
       </extension>
-      <extension
-            point="com.aptana.core.diagnostic">
-         <diagnosticLog
-               class="com.aptana.core.internal.diagnostic.ENVDiagnosticLog"
-               priority="99">
-         </diagnosticLog>
-      </extension>
 
 </plugin>
