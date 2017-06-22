@@ -454,10 +454,10 @@
 %typeof ObjectLiteral = "JSObjectNode";
 %typeof ObjectBindingPattern = "JSObjectNode";
 %typeof ArrayBindingPattern = "JSArrayNode";
-%typeof WithStatement = "JSWithNode";
+%typeof WithStatement, WithStatement_NoIf = "JSWithNode";
 %typeof CaseClause = "JSCaseNode";
 %typeof DefaultClause = "JSDefaultNode";
-%typeof LabelledStatement = "JSLabelledNode";
+%typeof LabelledStatement, LabelledStatement_NoIf = "JSLabelledNode";
 %typeof TryStatement = "JSTryNode";
 %typeof Catch = "JSCatchNode";
 %typeof Finally = "JSFinallyNode";
@@ -467,8 +467,8 @@
 %typeof StringLiteral = "JSStringNode";
 %typeof RegularExpressionLiteral = "JSRegexNode";
 %typeof Elision = "JSElisionNode";
-%typeof StatementListItem, Statement, Declaration, VariableDeclaration, BindingProperty, SingleExpression, ModuleItem, PropertyDefinition, ArgumentListItem = "JSNode";
-%typeof BindingElisionElement, LexicalBinding, ForBinding, ForDeclaration, LabelledItem, CatchParameter, FormalParameter, PropertyName = "JSNode";
+%typeof StatementListItem, Statement, Statement_NoIf, Declaration, VariableDeclaration, BindingProperty, SingleExpression, ModuleItem, PropertyDefinition, ArgumentListItem = "JSNode";
+%typeof BindingElisionElement, LexicalBinding, ForBinding, ForDeclaration, LabelledItem, LabelledItem_NoIf, CatchParameter, FormalParameter, PropertyName = "JSNode";
 %typeof LexicalDeclaration, VariableStatement = "JSVarNode";
 %typeof Expression = "JSNode";
 %typeof ElementList = "JSElementsNode";
@@ -480,6 +480,7 @@
 %typeof Block, FunctionStatementList, FunctionBody = "JSStatementsNode";
 %typeof FormalParameters = "JSParametersNode";
 %typeof BindingPattern, BindingElement = "JSNode";
+%typeof IfStatement, IfStatement_NoIf = "JSIfNode";
 
 %left LPAREN, RPAREN, LBRACKET, RBRACKET, DOT;
 %right PLUS_PLUS, MINUS_MINUS, EXCLAMATION, TILDE, DELETE, NEW, TYPEOF, VOID;
@@ -954,6 +955,27 @@ Statement
 			return new JSErrorNode();
 		:}
 	;
+	
+Statement_NoIf
+	=	BlockStatement
+	|	VariableStatement
+	|	EmptyStatement
+	|	ExpressionStatement
+	|	IfStatement_NoIf
+	|	BreakableStatement_NoIf
+	|	ContinueStatement
+	|	BreakStatement
+	|	ReturnStatement
+	|	WithStatement_NoIf
+	|	LabelledStatement_NoIf
+	|	ThrowStatement
+	|	TryStatement
+	|	DebuggerStatement
+	|	error
+		{:
+			return new JSErrorNode();
+		:}
+	;
 
 EmptyStatement
 	=	SEMICOLON.s
@@ -977,6 +999,11 @@ HoistableDeclaration
 
 BreakableStatement
 	=	IterationStatement
+	|	SwitchStatement
+	;
+	
+BreakableStatement_NoIf
+	=	IterationStatement_NoIf
 	|	SwitchStatement
 	;
 
@@ -1152,14 +1179,20 @@ ExpressionStatement
 	;
 
 IfStatement
-// FIXME: Dangling else, use Statement_NoIf like we did before here
-	=	IF LPAREN.l Expression.e RPAREN.r Statement.sn ELSE Statement.s
+	=	IF LPAREN.l Expression.e RPAREN.r Statement_NoIf.sn ELSE Statement.s
 		{:
 			return new JSIfNode(l, e, r, sn, s);
 		:}
 	|	IF LPAREN.l Expression.e RPAREN.r Statement.s
 		{:
 			return new JSIfNode(l, e, r, s, new JSEmptyNode(s));
+		:}
+	;
+
+IfStatement_NoIf
+	=	IF LPAREN.l Expression.e RPAREN.r Statement_NoIf.sn ELSE Statement_NoIf.s
+		{:
+			return new JSIfNode(l, e, r, sn, s);
 		:}
 	;
 
@@ -1243,6 +1276,87 @@ IterationStatement
  			return new JSForOfNode(l, decl, of, o, r, s);
  		:}
 	;
+	
+IterationStatement_NoIf
+	=	DO Statement.s WHILE LPAREN.l Expression.e RPAREN.r SEMICOLON.s1
+		{:
+ 			JSNode node = new JSDoNode(s, l, e, r);
+ 			node.setSemicolonIncluded(true);
+ 			return node;
+ 		:}
+	|	WHILE LPAREN.l Expression.e RPAREN.r Statement_NoIf.s
+		{:
+ 			return new JSWhileNode(l, e, r, s);
+ 		:}
+// FIXME [lookahead not in {let [}]
+	|	FOR LPAREN.l Expression.e1? SEMICOLON.s1 Expression.e2? SEMICOLON.s2 Expression.e3? RPAREN.r Statement_NoIf.s
+		{:
+			JSNode expr1 = e1;
+			if (expr1 == null) {
+				expr1 = new JSEmptyNode(l);
+			}
+			JSNode expr2 = e2;
+			if (expr2 == null) {
+				expr2 = new JSEmptyNode(s1);
+			}
+			JSNode expr3 = e3;
+			if (expr3 == null) {
+				expr3 = new JSEmptyNode(s2);
+			}
+ 			return new JSForNode(l, expr1, s1, expr2, s2, expr3, r, s);
+ 		:}
+	|	FOR LPAREN.l VAR.v VariableDeclarationList.i SEMICOLON.s1 Expression.e1? SEMICOLON.s2 Expression.e2? RPAREN.r Statement_NoIf.s
+		{:
+			JSNode expr1 = e1;
+			if (expr1 == null) {
+				expr1 = new JSEmptyNode(s1);
+			}
+			JSNode expr2 = e2;
+			if (expr2 == null) {
+				expr2 = new JSEmptyNode(s2);
+			}
+ 			return new JSForNode(l, new JSVarNode(v, i), s1, expr1, s2, expr2, r, s);
+ 		:}
+	|	FOR LPAREN.l LexicalDeclaration.decl Expression.e1? SEMICOLON.s1 Expression.e2? RPAREN.r Statement_NoIf.s
+		{:
+			JSNode expr1 = e1;
+			if (expr1 == null) {
+				expr1 = new JSEmptyNode(l);
+			}
+			JSNode expr2 = e2;
+			if (expr2 == null) {
+				expr2 = new JSEmptyNode(s1);
+			}
+			// FIXME Grab semicolon from decl to inject here?
+ 			return new JSForNode(l, decl, null, expr1, s1, expr2, r, s);
+ 		:}
+// FIXME [lookahead not in {let [}]
+	|	FOR LPAREN.l SingleExpression.i IN.in Expression.o RPAREN.r Statement_NoIf.s
+		{:
+ 			return new JSForInNode(l, i, in, o, r, s);
+ 		:}
+	|	FOR LPAREN.l VAR.v ForBinding.i IN.in Expression.o RPAREN.r Statement_NoIf.s
+		{:
+ 			return new JSForInNode(l, new JSVarNode(v, i), in, o, r, s);
+ 		:}
+	|	FOR LPAREN.l ForDeclaration.decl IN.in Expression.o RPAREN.r Statement_NoIf.s
+		{:
+ 			return new JSForInNode(l, decl, in, o, r, s);
+ 		:}
+// FIXME [lookahead not in {let [}]
+	|	FOR LPAREN.l SingleExpression.i OF.of SingleExpression.o RPAREN.r Statement_NoIf.s
+		{:
+ 			return new JSForOfNode(l, i, of, o, r, s);
+ 		:}
+	|	FOR LPAREN.l VAR.v ForBinding.i OF.of SingleExpression.o RPAREN.r Statement_NoIf.s
+		{:
+ 			return new JSForOfNode(l, new JSVarNode(v, i), of, o, r, s);
+ 		:}
+	|	FOR LPAREN.l ForDeclaration.decl OF.of SingleExpression.o RPAREN.r Statement_NoIf.s
+		{:
+ 			return new JSForOfNode(l, decl, of, o, r, s);
+ 		:}
+	;
 
 ForDeclaration
 	=	LetOrConst ForBinding
@@ -1303,6 +1417,13 @@ ReturnStatement
 
 WithStatement
 	=	WITH LPAREN.l Expression.e RPAREN.r Statement.s
+		{:
+			return new JSWithNode(l, e, r, s);
+		:}
+	;
+	
+WithStatement_NoIf
+	=	WITH LPAREN.l Expression.e RPAREN.r Statement_NoIf.s
 		{:
 			return new JSWithNode(l, e, r, s);
 		:}
@@ -1374,9 +1495,24 @@ LabelledStatement
 			return new JSLabelledNode(id, c, s);
 		:}
 	;
+	
+LabelledStatement_NoIf
+	=	Identifier.i COLON.c LabelledItem_NoIf.s
+		{:
+			JSNode id = new JSIdentifierNode(i);
+			id.setLocation(i.getStart(), i.getEnd());
+
+			return new JSLabelledNode(id, c, s);
+		:}
+	;
 
 LabelledItem
 	=	Statement
+	|	FunctionDeclaration
+	;
+	
+LabelledItem_NoIf
+	=	Statement_NoIf
 	|	FunctionDeclaration
 	;
 
