@@ -467,11 +467,17 @@
 %typeof StringLiteral = "JSStringNode";
 %typeof RegularExpressionLiteral = "JSRegexNode";
 %typeof Elision = "JSElisionNode";
-%typeof StatementListItem, Statement, Declaration, LexicalBinding, VariableDeclaration, BindingProperty, SingleExpression, ModuleItem, PropertyDefinition, ArgumentListItem = "JSNode";
+%typeof StatementListItem, Statement, Declaration, VariableDeclaration, BindingProperty, SingleExpression, ModuleItem, PropertyDefinition, ArgumentListItem = "JSNode";
+%typeof BindingElisionElement, LexicalBinding, ForBinding, ForDeclaration, LabelledItem, CatchParameter, FormalParameter, PropertyName = "JSNode";
 %typeof LexicalDeclaration, VariableStatement = "JSVarNode";
 %typeof Expression = "JSCommaNode";
 %typeof ElementList = "JSElementsNode";
 %typeof Arguments = "JSArgumentsNode";
+%typeof Initializer = "JSInitializerNode";
+%typeof SingleNameBinding, CoverInitializedName = "JSDeclarationNode";
+%typeof CaseBlock, FormalParameterList = "ArrayList";
+%typeof Block = "JSStatementsNode";
+%typeof FormalParameters = "JSParametersNode";
 
 %left LPAREN, RPAREN, LBRACKET, RBRACKET, DOT;
 %right PLUS_PLUS, MINUS_MINUS, EXCLAMATION, TILDE, DELETE, NEW, TYPEOF, VOID;
@@ -501,61 +507,59 @@
 // IdentifierName minus ReservedWords
 Identifier
 	=	IDENTIFIER
-	;
-//	|	GET
-//	|	IMPLEMENTS
-//	|	INTERFACE
+	|	GET
+	|	IMPLEMENTS
+	|	INTERFACE
 //	|	LET
-//	|	OF
-//	|	PACKAGE
-//	|	PRIVATE
-//	|	PROTECTED
-//	|	PUBLIC
-//	|	SET
-//	|	STATIC
-//	|	TARGET
-//	;
+	|	OF
+	|	PACKAGE
+	|	PRIVATE
+	|	PROTECTED
+	|	PUBLIC
+	|	SET
+	|	STATIC
+	|	TARGET
+	;
 
 IdentifierName
 	=	Identifier
+	|	AWAIT
+	|	BREAK
+	|	CASE
+	|	CATCH
+	|	CLASS
+	|	CONST
+	|	CONTINUE
+	|	DEBUGGER
+	|	DEFAULT
+	|	DELETE
+	|	DO
+	|	ELSE
+	|	ENUM
+	|	EXPORT
+	|	EXTENDS
+	|	FINALLY
+	|	FOR
+	|	FUNCTION
+	|	IF
+	|	IMPORT
+	|	INSTANCEOF
+	|	IN
+	|	NEW
+	|	RETURN
+	|	SUPER
+	|	SWITCH
+	|	THIS
+	|	THROW
+	|	TRY
+	|	TYPEOF
+	|	VAR
+	|	VOID
+	|	WHILE
+	|	WITH
+	|	BooleanLiteral
+	|	NullLiteral
 	;
-//	|	AWAIT
-//	|	BREAK
-//	|	CASE
-//	|	CATCH
-//	|	CLASS
-//	|	CONST
-//	|	CONTINUE
-//	|	DEBUGGER
-//	|	DEFAULT
-//	|	DELETE
-//	|	DO
-//	|	ELSE
-//	|	ENUM
-//	|	EXPORT
-//	|	EXTENDS
-//	|	FINALLY
-//	|	FOR
-//	|	FUNCTION
-//	|	IF
-//	|	IMPORT
-//	|	INSTANCEOF
-//	|	IN
-//	|	NEW
-//	|	RETURN
-//	|	SUPER
-//	|	SWITCH
-//	|	THIS
-//	|	THROW
-//	|	TRY
-//	|	TYPEOF
-//	|	VAR
-//	|	VOID
-//	|	WHILE
-//	|	WITH
-//	|	BooleanLiteral
-//	|	NullLiteral
-//	;
 
 CoverParenthesizedExpressionAndArrowParameterList
 	=	LPAREN.l Expression.e RPAREN.r
@@ -720,11 +724,17 @@ ComputedPropertyName
 	;
 
 CoverInitializedName
-	=	Identifier Initializer
+	=	Identifier.i Initializer.z
+		{:
+			return new JSDeclarationNode(new JSIdentifierNode(i), z.getEquals(), z.getExpression());
+		:}
 	;
 
 Initializer
-	=	EQUAL SingleExpression
+	=	EQUAL.e SingleExpression.expr
+		{:
+			return new JSInitializerNode(e, expr);
+		:}
 	;
 
 TemplateLiteral
@@ -1011,7 +1021,14 @@ BindingList
 	;
 
 LexicalBinding
-	=	Identifier Initializer?
+	=	Identifier.i Initializer.z?
+		{:
+			if (z == null) {
+				return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
+			} else {
+				return new JSDeclarationNode(new JSIdentifierNode(i), z.getEquals(), z.getExpression());
+			}
+		:}
 	|	BindingPattern Initializer
 	;
 
@@ -1035,7 +1052,7 @@ VariableDeclaration
 			if (z == null) {
 				return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
 			} else {
-				return new JSDeclarationNode(new JSIdentifierNode(i), z);
+				return new JSDeclarationNode(new JSIdentifierNode(i), z.getEquals(), z.getExpression());
 			}
 		:}
 	|	BindingPattern Initializer
@@ -1064,10 +1081,18 @@ ObjectBindingPattern
 ArrayBindingPattern
 	=	LBRACKET.l Elision.e? BindingRestElement.n? RBRACKET.r
 		{:
+			// FIXME Handle elision, rest element
 			return new JSArrayNode(l, r, e);
 		:}
 	|	LBRACKET.l BindingElementList.n RBRACKET.r
+		{:
+			return new JSArrayNode(l, r, n);
+		:}
 	|	LBRACKET.l BindingElementList.n COMMA Elision.e? BindingRestElement.z? RBRACKET.r
+		{:
+			// FIXME Handle elision, rest element
+			return new JSArrayNode(l, r, n);
+		:}
 	;
 
 BindingPropertyList
@@ -1095,7 +1120,10 @@ BindingElement
 	;
 
 SingleNameBinding
-	=	Identifier Initializer?
+	=	Identifier.i Initializer.z
+		{:
+			return new JSDeclarationNode(new JSIdentifierNode(i), z.getEquals(), z.getExpression());
+		:}
 	;
 
 BindingRestElement
@@ -1167,7 +1195,8 @@ IterationStatement
 			if (expr2 == null) {
 				expr2 = new JSEmptyNode(s1);
 			}
- 			return new JSForNode(l, new JSVarNode(decl, expr1), s1, expr2, r, s);
+			// FIXME Grab semicolon from decl to inject here?
+ 			return new JSForNode(l, decl, null, expr1, s1, expr2, r, s);
  		:}
 // FIXME [lookahead not in {let [}]
 	|	FOR LPAREN.l SingleExpression.i IN.in Expression.o RPAREN.r Statement.s
@@ -1262,7 +1291,8 @@ WithStatement
 SwitchStatement
 	=	SWITCH LPAREN.lp Expression.e RPAREN.rp CaseBlock.children
 		{:
-			return new JSSwitchNode(lp, e, rp, null, null, children);
+			final JSNode[] c1 = children == null ? new JSNode[0] : (JSNode[]) children.toArray(new JSNode[children.size()]);
+			return new JSSwitchNode(lp, e, rp, null, null, c1);
 		:}
 	;
 
@@ -1284,8 +1314,7 @@ CaseBlock
 					nodes.add(statement);
 				}
 			}
-			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
-			return nodes;
+			return new Symbol(nodes);
 		:}
 	;
 
@@ -1415,6 +1444,10 @@ StrictFormalParameters
 
 FormalParameters
 	=	FormalParameterList.params
+		{:
+			final JSNode[] p = params == null ? new JSNode[0] : (JSNode[]) params.toArray(new JSNode[params.size()]);
+			return new JSParametersNode(p);
+		:}
 	|
 		{:
 			return new JSParametersNode();
@@ -1422,9 +1455,18 @@ FormalParameters
 	;
 
 FormalParameterList
-	=	FunctionRestParameter
-	|	FormalsList
-	|	FormalsList COMMA FunctionRestParameter
+	=	FunctionRestParameter.p
+		{:
+			ArrayList lst = new ArrayList();
+			lst.add(p);
+			return new Symbol(lst);
+		:}
+	|	FormalsList.l
+	|	FormalsList.l COMMA FunctionRestParameter.p
+		{:
+			_list_l.add(p);
+			return _symbol_l;
+		:}
 	;
 
 FormalsList

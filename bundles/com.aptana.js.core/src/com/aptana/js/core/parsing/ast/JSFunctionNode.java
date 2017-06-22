@@ -35,6 +35,17 @@ public class JSFunctionNode extends JSNode
 	{
 		super(IJSNodeTypes.FUNCTION, children);
 	}
+	
+	/**
+	 * 
+	 * @param name JSIdentifierNode or JSEmptyNode
+	 * @param params
+	 * @param body
+	 */
+	public JSFunctionNode(JSNode name, JSParametersNode params, JSNode[] body)
+	{
+		this(name, params, new JSStatementsNode(body));
+	}
 
 	/*
 	 * (non-Javadoc)

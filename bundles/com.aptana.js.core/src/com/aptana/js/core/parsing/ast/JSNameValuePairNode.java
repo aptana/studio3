@@ -33,12 +33,22 @@ public class JSNameValuePairNode extends JSNode
 		super(IJSNodeTypes.NAME_VALUE_PAIR, name, functionBody);
 	}
 
+	public JSNameValuePairNode(JSNode name, JSNode[] functionBody)
+	{
+		this(name, new JSStatementsNode(functionBody));
+	}
+
 	/**
 	 * Represents an ECMAScript 5 set property
 	 */
 	public JSNameValuePairNode(JSNode name, JSParametersNode param, JSNode functionBody)
 	{
 		super(IJSNodeTypes.NAME_VALUE_PAIR, name, param, functionBody);
+	}
+
+	public JSNameValuePairNode(JSNode name, JSParametersNode param, JSNode[] functionBody)
+	{
+		this(name, param, new JSStatementsNode(functionBody));
 	}
 
 	/*

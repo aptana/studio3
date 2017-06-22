@@ -104,4 +104,6 @@ public interface IJSNodeTypes
 	public static final short VSDOC_COMMENT = 91;
 	public static final short SINGLE_LINE_COMMENT = 92;
 	public static final short MULTI_LINE_COMMENT = 93;
+	public static final short INITIALIZER = 94;
+	public static final short FOR_OF = 95;
 }
