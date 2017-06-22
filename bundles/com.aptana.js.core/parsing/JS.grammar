@@ -470,14 +470,16 @@
 %typeof StatementListItem, Statement, Declaration, VariableDeclaration, BindingProperty, SingleExpression, ModuleItem, PropertyDefinition, ArgumentListItem = "JSNode";
 %typeof BindingElisionElement, LexicalBinding, ForBinding, ForDeclaration, LabelledItem, CatchParameter, FormalParameter, PropertyName = "JSNode";
 %typeof LexicalDeclaration, VariableStatement = "JSVarNode";
-%typeof Expression = "JSCommaNode";
+%typeof Expression = "JSNode";
 %typeof ElementList = "JSElementsNode";
 %typeof Arguments = "JSArgumentsNode";
 %typeof Initializer = "JSInitializerNode";
-%typeof SingleNameBinding, CoverInitializedName = "JSDeclarationNode";
+%typeof CoverInitializedName = "JSDeclarationNode";
+%typeof SingleNameBinding= "JSNode";
 %typeof CaseBlock, FormalParameterList = "ArrayList";
-%typeof Block = "JSStatementsNode";
+%typeof Block, FunctionStatementList, FunctionBody = "JSStatementsNode";
 %typeof FormalParameters = "JSParametersNode";
+%typeof BindingPattern, BindingElement = "JSNode";
 
 %left LPAREN, RPAREN, LBRACKET, RBRACKET, DOT;
 %right PLUS_PLUS, MINUS_MINUS, EXCLAMATION, TILDE, DELETE, NEW, TYPEOF, VOID;
@@ -701,7 +703,10 @@ PropertyDefinition
 // FIXME This Identifier rule plus PropertyDefinitionList = PropertyDefinitionList COMMA PropertyDefinition cause a conflict around trailing COMMA
 //	=	Identifier
 	=	CoverInitializedName
-	|	PropertyName COLON SingleExpression
+	|	PropertyName.n COLON.c SingleExpression.v
+		{:
+			return new JSNameValuePairNode(n, c, v);
+		:}
 	|	MethodDefinition
 	;
 
@@ -1046,6 +1051,8 @@ VariableDeclarationList
 	|	VariableDeclaration
 	;
 
+// TODO Combine LexicalBinding and VariableDeclaration!
+// TODO Refactor with CoverInitializedName and SingleNameBinding
 VariableDeclaration
 	=	Identifier.i Initializer.z?
 		{:
@@ -1111,7 +1118,10 @@ BindingElisionElement
 
 BindingProperty
 	=	SingleNameBinding
-	|	PropertyName COLON BindingElement
+	|	PropertyName.n COLON.c BindingElement.e
+		{:
+			return new JSNameValuePairNode(n, c, e);
+		:}
 	;
 
 BindingElement
@@ -1120,8 +1130,11 @@ BindingElement
 	;
 
 SingleNameBinding
-	=	Identifier.i Initializer.z
+	=	Identifier.i Initializer.z?
 		{:
+			if (z == null) {
+				return new JSIdentifierNode(i);
+			}
 			return new JSDeclarationNode(new JSIdentifierNode(i), z.getEquals(), z.getExpression());
 		:}
 	;
@@ -1131,10 +1144,15 @@ BindingRestElement
 	;
 
 ExpressionStatement
-	=	Expression SEMICOLON
+	=	Expression.e SEMICOLON
+		{:
+			e.setSemicolonIncluded(true);
+			return e;
+		:}
 	;
 
 IfStatement
+// FIXME: Dangling else, use Statement_NoIf like we did before here
 	=	IF LPAREN.l Expression.e RPAREN.r Statement.sn ELSE Statement.s
 		{:
 			return new JSIfNode(l, e, r, sn, s);
@@ -1231,7 +1249,10 @@ ForDeclaration
 	;
 
 ForBinding
-	=	Identifier
+	=	Identifier.i
+		{:
+			return new JSIdentifierNode(i);
+		:}
 	|	BindingPattern
 	;
 	
@@ -1398,7 +1419,10 @@ Finally
 	;
 
 CatchParameter
-	=	Identifier
+	=	Identifier.i
+		{:
+			return new JSIdentifierNode(i);
+		:}
 	|	BindingPattern
 	;
 
@@ -1487,7 +1511,14 @@ FunctionBody
 	;
 
 FunctionStatementList
-	=	StatementList?
+	=	StatementList.s
+		{:
+			return new JSStatementsNode(s);
+		:}
+	|
+		{:
+			return new JSStatementsNode();
+		:}
 	;
 
 ArrowFunction
@@ -1517,9 +1548,8 @@ MethodDefinition
 		:}
 	|	SET PropertyName.n LPAREN PropertySetParameterList.p RPAREN LCURLY FunctionBody.body RCURLY
 		{:
-			JSIdentifierNode ident = new JSIdentifierNode(p);
-			JSParametersNode params = new JSParametersNode(ident);
-			params.setLocation(ident.getStartingOffset(), ident.getEndingOffset());
+			JSParametersNode params = new JSParametersNode(p);
+			params.setLocation(p.getStartingOffset(), p.getEndingOffset());
 			return new JSNameValuePairNode(n, params, body);
 		:}
 	;

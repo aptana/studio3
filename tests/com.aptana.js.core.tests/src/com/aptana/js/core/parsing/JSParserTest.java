@@ -69,7 +69,8 @@ public class JSParserTest
 	@Test
 	public void testEmptyBlock() throws Exception
 	{
-		assertParseResult("{}" + EOL); //$NON-NLS-1$
+		// semicolon recovery
+		assertParseResult("{}" + EOL, "{};" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -773,13 +774,13 @@ public class JSParserTest
 	@Test
 	public void testWhile() throws Exception
 	{
-		assertParseResult("while (true) {}" + EOL); //$NON-NLS-1$
+		assertParseResult("while (true) {};" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
 	public void testLabeledStatement() throws Exception
 	{
-		assertParseResult("myLabel: while (true) {}" + EOL); //$NON-NLS-1$
+		assertParseResult("myLabel: while (true) {};" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -1045,17 +1046,18 @@ public class JSParserTest
 	@Test
 	public void testPlusNegativeNumber() throws Exception
 	{
-		assertParseResult("var x = 5 + -3" + EOL);
-		assertParseResult("var x = 5+ -3" + EOL, "var x = 5 + -3" + EOL);
-		assertParseResult("var x = 5 +-3" + EOL, "var x = 5 + -3" + EOL);
-		assertParseResult("var x = 5+-3" + EOL, "var x = 5 + -3" + EOL);
+		assertParseResult("var x = 5 + -3;" + EOL);
+		assertParseResult("var x = 5+ -3" + EOL, "var x = 5 + -3;" + EOL);
+		assertParseResult("var x = 5 +-3" + EOL, "var x = 5 + -3;" + EOL);
+		assertParseResult("var x = 5+-3" + EOL, "var x = 5 + -3;" + EOL);
 	}
 
 	@Test
 	public void testPlusPositiveNumber() throws Exception
 	{
-		assertParseResult("var x = 5 + +3" + EOL);
-		assertParseResult("var x = 5+ +3" + EOL, "var x = 5 + +3" + EOL);
+		assertParseResult("var x = 5 + +3;" + EOL);
+		// Due to semicolon insertion recovery, the expected result will be terminated with a semicolon
+		assertParseResult("var x = 5+ +3" + EOL, "var x = 5 + +3;" + EOL);
 
 		// NOTE: The following commented tests are currently failing
 		// parseTest("var x = 5 ++3" + EOL, "var x = 5 + +3" + EOL);
@@ -1065,8 +1067,8 @@ public class JSParserTest
 	@Test
 	public void testMinusNegativeNumber() throws Exception
 	{
-		assertParseResult("var x = 5 - -3" + EOL);
-		assertParseResult("var x = 5- -3" + EOL, "var x = 5 - -3" + EOL);
+		assertParseResult("var x = 5 - -3;" + EOL);
+		assertParseResult("var x = 5- -3" + EOL, "var x = 5 - -3;" + EOL);
 
 		// NOTE: The following commented tests are currently failing
 		// parseTest("var x = 5 --3" + EOL, "var x = 5 - -3" + EOL);
@@ -1076,10 +1078,10 @@ public class JSParserTest
 	@Test
 	public void testMinusPositiveNumber() throws Exception
 	{
-		assertParseResult("var x = 5 - +3" + EOL);
-		assertParseResult("var x = 5- +3" + EOL, "var x = 5 - +3" + EOL);
-		assertParseResult("var x = 5 -+3" + EOL, "var x = 5 - +3" + EOL);
-		assertParseResult("var x = 5-+3" + EOL, "var x = 5 - +3" + EOL);
+		assertParseResult("var x = 5 - +3;" + EOL);
+		assertParseResult("var x = 5- +3" + EOL, "var x = 5 - +3;" + EOL);
+		assertParseResult("var x = 5 -+3" + EOL, "var x = 5 - +3;" + EOL);
+		assertParseResult("var x = 5-+3" + EOL, "var x = 5 - +3;" + EOL);
 	}
 
 	// begin recovery strategy tests
@@ -1101,7 +1103,7 @@ public class JSParserTest
 	@Test
 	public void testMissingIdentifier() throws Exception
 	{
-		assertParseResult("var x =", "var x = " + EOL);
+		assertParseResult("var x =", "var x = ;" + EOL);
 		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
 	}
 
@@ -1224,7 +1226,7 @@ public class JSParserTest
 	@Test
 	public void testUnclosedString() throws Exception
 	{
-		assertParseResult("var string = 'something", "var string = " + EOL);
+		assertParseResult("var string = 'something", "var string = ;" + EOL);
 		assertParseErrors("Syntax Error: unexpected token \"'\"");
 	}
 
@@ -1281,6 +1283,20 @@ public class JSParserTest
 	public void testSetterProperty() throws Exception
 	{
 		parse("Field.prototype = { set value(val) { this._value = val; } };" + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testConstDeclaration() throws Exception
+	{
+		parse("const PI = 3.141593;" + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testLetDeclaration() throws Exception
+	{
+		parse("let callbacks = [];" + EOL);
 		assertTrue(fParseResult.getErrors().isEmpty());
 	}
 

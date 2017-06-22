@@ -1,12 +1,12 @@
 // $codepro.audit.disable
 /**
  * Aptana Studio
- * Copyright (c) 2005-2012 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2005-2017 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.parsing;
+package com.aptana.editor.js.text;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -15,8 +15,7 @@ import beaver.Symbol;
 import beaver.Scanner;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.js.parsing.lexer.JSTokenType;
-import com.aptana.editor.js.parsing.JSTokenTypeSymbol;
+import com.aptana.js.core.parsing.JSTokenType;
 import com.aptana.editor.common.parsing.ForceReturnException;
 
 %%
@@ -144,6 +143,12 @@ Scientific = ({Integer} | {Float}) [eE][-+]?[:digit:]+
 Number = {Integer} | {Hex} | {Float} | {Scientific}
 
 
+// Templates
+TemplateMiddle = "}" ~"${"
+TemplateTail = "}" ~"`"
+TemplateHead = "`" ~"${"
+NoSubstitutionTemplate = "`" ~"`"
+
 CharClass = "[" ([^\]\\\r\n]|\\[^\r\n])* "]"
 Character = ([^\[\\\/\r\n]|\\[^\r\n])+
 Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
@@ -187,7 +192,6 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 	"break"			{ return newToken(JSTokenType.BREAK, StringUtil.EMPTY); }
 	"case"			{ return newToken(JSTokenType.CASE, StringUtil.EMPTY); }
 	"catch"			{ return newToken(JSTokenType.CATCH, StringUtil.EMPTY); }
-	"const"			{ return newToken(JSTokenType.VAR, StringUtil.EMPTY); }
 	"continue"		{ return newToken(JSTokenType.CONTINUE, StringUtil.EMPTY); }
 	"default"		{ return newToken(JSTokenType.DEFAULT, StringUtil.EMPTY); }
 	"delete"		{ return newToken(JSTokenType.DELETE, StringUtil.EMPTY); }
@@ -213,6 +217,30 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 	"void"			{ return newToken(JSTokenType.VOID, StringUtil.EMPTY); }
 	"while"			{ return newToken(JSTokenType.WHILE, StringUtil.EMPTY); }
 	"with"			{ return newToken(JSTokenType.WITH, StringUtil.EMPTY); }
+	"get"			{ return newToken(JSTokenType.GET, StringUtil.EMPTY); }
+	"set"			{ return newToken(JSTokenType.SET, StringUtil.EMPTY); }
+	
+	// ES6
+	"class"			{ return newToken(JSTokenType.CLASS, StringUtil.EMPTY); }
+	"const"			{ return newToken(JSTokenType.CONST, StringUtil.EMPTY); }
+	"export"		{ return newToken(JSTokenType.EXPORT, StringUtil.EMPTY); }
+	"extends"		{ return newToken(JSTokenType.EXTENDS, StringUtil.EMPTY); }
+	"import"		{ return newToken(JSTokenType.IMPORT, StringUtil.EMPTY); }
+	"let"			{ return newToken(JSTokenType.LET, StringUtil.EMPTY); }
+	"of"			{ return newToken(JSTokenType.OF, StringUtil.EMPTY); }
+	"static"		{ return newToken(JSTokenType.STATIC, StringUtil.EMPTY); }
+	"super"			{ return newToken(JSTokenType.SUPER, StringUtil.EMPTY); }
+	"target"		{ return newToken(JSTokenType.TARGET, StringUtil.EMPTY); }
+	"yield"			{ return newToken(JSTokenType.YIELD, StringUtil.EMPTY); }
+	
+	// Future Use Reserved Words
+	"await"			{ return newToken(JSTokenType.AWAIT, StringUtil.EMPTY); }
+	
+	// ES6 Templates
+	{TemplateHead}				{ return newToken(JSTokenType.TEMPLATE_HEAD, StringUtil.EMPTY); }
+	{NoSubstitutionTemplate}	{ return newToken(JSTokenType.NO_SUB_TEMPLATE, StringUtil.EMPTY); }
+	{TemplateMiddle}			{ return newToken(JSTokenType.TEMPLATE_MIDDLE, StringUtil.EMPTY); }
+	{TemplateTail}				{ return newToken(JSTokenType.TEMPLATE_TAIL, StringUtil.EMPTY); }
 
     // identifiers
     {Identifier}    { return newToken(JSTokenType.IDENTIFIER, StringUtil.EMPTY); }

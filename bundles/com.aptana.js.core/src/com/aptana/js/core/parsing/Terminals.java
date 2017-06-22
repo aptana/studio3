@@ -64,9 +64,9 @@ public class Terminals {
 	static public final short INSTANCEOF = 56;
 	static public final short COMMA = 57;
 	static public final short EQUAL = 58;
-	static public final short COLON = 59;
-	static public final short CLASS = 60;
-	static public final short CONST = 61;
+	static public final short CLASS = 59;
+	static public final short CONST = 60;
+	static public final short COLON = 61;
 	static public final short DOT = 62;
 	static public final short FORWARD_SLASH = 63;
 	static public final short PERCENT = 64;
@@ -104,8 +104,8 @@ public class Terminals {
 	static public final short IMPORT = 96;
 	static public final short EXTENDS = 97;
 	static public final short FINALLY = 98;
-	static public final short CATCH = 99;
-	static public final short LET = 100;
+	static public final short LET = 99;
+	static public final short CATCH = 100;
 	static public final short ELSE = 101;
 	static public final short AWAIT = 102;
 	static public final short ENUM = 103;
