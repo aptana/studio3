@@ -5,29 +5,60 @@ import beaver.Symbol;
 public class JSExportNode extends JSNode
 {
 
+	private final boolean _isDefault;
+	private final String _from;
+
 	public JSExportNode(boolean isDefault, Symbol star, String from)
 	{
-		// TODO Auto-generated constructor stub
+		super(IJSNodeTypes.EXPORT);
+		this._isDefault = isDefault;
+		this._from = from;
 	}
 
 	public JSExportNode(boolean isDefault, JSNode[] exportClauses, String from)
 	{
-		// TODO Auto-generated constructor stub
+		super(IJSNodeTypes.EXPORT, exportClauses);
+		this._isDefault = isDefault;
+		this._from = from;
 	}
 
 	public JSExportNode(boolean isDefault, JSNode[] exportClauses)
 	{
-		// TODO Auto-generated constructor stub
+		this(isDefault, exportClauses, null);
 	}
 
 	public JSExportNode(boolean isDefault, JSVarNode var)
 	{
-		// TODO Auto-generated constructor stub
+		super(IJSNodeTypes.EXPORT, var);
+		this._isDefault = isDefault;
+		this._from = null;
 	}
 
 	public JSExportNode(boolean isDefault, JSNode decl)
 	{
-		// TODO Auto-generated constructor stub
+		super(IJSNodeTypes.EXPORT, decl);
+		this._isDefault = isDefault;
+		this._from = null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+
+	public String getFrom()
+	{
+		return _from;
+	}
+
+	public boolean isDefault()
+	{
+		return _isDefault;
 	}
 
 }

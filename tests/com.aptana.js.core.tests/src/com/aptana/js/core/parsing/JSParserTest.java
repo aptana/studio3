@@ -1289,56 +1289,56 @@ public class JSParserTest
 	@Test
 	public void testConstDeclaration() throws Exception
 	{
-		parse("const PI = 3.141593;" + EOL);
+		assertParseResult("const PI = 3.141593;" + EOL);
 		assertNoErrors();
 	}
 
 	@Test
 	public void testLetDeclaration() throws Exception
 	{
-		parse("let callbacks = [];" + EOL);
+		assertParseResult("let callbacks = [];" + EOL);
 		assertNoErrors();
 	}
 
 	@Test
 	public void testSpreadOperatorInArrayLiteral() throws Exception
 	{
-		parse("var other = [ 1, 2, ...params ];" + EOL);
+		assertParseResult("var other = [1, 2, ...params];" + EOL);
 		assertNoErrors();
 	}
 
 	@Test
 	public void testSpreadOperatorInFunctionParameters() throws Exception
 	{
-		parse("function f (x, y, ...a) { return (x + y) * a.length; }" + EOL);
+		assertParseResult("function f (x, y, ...a) {return (x + y) * a.length;}" + EOL);
 		assertNoErrors();
 	}
 
 	@Test
 	public void testSpreadOperatorInFunctionCall() throws Exception
 	{
-		parse("f(1, 2, ...params) === 9;" + EOL);
+		assertParseResult("f(1, 2, ...params) === 9;" + EOL);
 		assertNoErrors();
 	}
 
 	@Test
 	public void testDefaultParameters() throws Exception
 	{
-		parse("function f (x, y = 7, z = 42) { return x + y + z; }" + EOL);
+		assertParseResult("function f (x, y = 7, z = 42) {return x + y + z;}" + EOL);
 		assertNoErrors();
 	}
 
 	@Test
 	public void testExportFunction() throws Exception
 	{
-		parse("export function sum (x, y) { return x + y; }" + EOL);
+		assertParseResult("export function sum (x, y) {return x + y;}" + EOL);
 		assertNoErrors();
 	}
 
 	@Test
 	public void testExportVar() throws Exception
 	{
-		parse("export var pi = 3.141593;" + EOL);
+		assertParseResult("export var pi = 3.141593;" + EOL);
 		assertNoErrors();
 	}
 	
@@ -1352,7 +1352,7 @@ public class JSParserTest
 	@Test
 	public void testExportDefault() throws Exception
 	{
-		parse("export default (x) => Math.exp(x);" + EOL);
+		assertParseResult("export default (x) => Math.exp(x);" + EOL);
 		assertNoErrors();
 	}
 	
@@ -1367,6 +1367,34 @@ public class JSParserTest
 	public void testImportBoundNames() throws Exception
 	{
 		parse("import { sum, pi } from 'lib/math';" + EOL);
+		assertNoErrors();
+	}
+	
+	@Test
+	public void testForOf() throws Exception
+	{
+		assertParseResult("for (let n of fibonacci) {console.log(n);}" + EOL);
+		assertNoErrors();
+	}
+	
+	@Test
+	public void testFunctionParameterArrayDestructuring() throws Exception
+	{
+		assertParseResult("function f ([ name, val ]) {console.log(name, val);}" + EOL);
+		assertNoErrors();
+	}
+	
+	@Test
+	public void testFunctionParameterObjectDestructuringWithAliases() throws Exception
+	{
+		assertParseResult("function g ({ name: n, val: v }) {console.log(n, v);}" + EOL);
+		assertNoErrors();
+	}
+	
+	@Test
+	public void testFunctionParameterObjectDestructuring() throws Exception
+	{
+		assertParseResult("function h ({ name, val }) {console.log(name, val);}" + EOL);
 		assertNoErrors();
 	}
 

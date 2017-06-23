@@ -108,4 +108,7 @@ public interface IJSNodeTypes
 	public static final short FOR_OF = 95;
 	public static final short SPREAD_ELEMENT = 96;
 	public static final short REST_ELEMENT = 97;
+	public static final short EXPORT = 98;
+	public static final short DESTRUCTURE = 99;
+	public static final short ARROW_FUNCTION = 100;
 }

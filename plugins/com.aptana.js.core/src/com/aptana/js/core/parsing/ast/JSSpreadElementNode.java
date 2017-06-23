@@ -12,6 +12,16 @@ public class JSSpreadElementNode extends JSNode
 		this._ellipsis = ellipsis;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+	
 	public Symbol getEllipsis()
 	{
 		return this._ellipsis;

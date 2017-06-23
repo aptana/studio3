@@ -72,4 +72,13 @@ public class JSVarNode extends JSNode
 	{
 		return this._var;
 	}
+	
+	/**
+	 * "let", "const", or "var"
+	 * @return
+	 */
+	public String getVariableType()
+	{
+		return (String) this._var.value;
+	}
 }

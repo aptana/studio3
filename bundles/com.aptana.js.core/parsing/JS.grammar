@@ -477,7 +477,7 @@
 %typeof SingleNameBinding= "JSNode";
 %typeof CaseBlock, FormalParameterList = "ArrayList";
 %typeof Block, FunctionStatementList, FunctionBody = "JSStatementsNode";
-%typeof FormalParameters = "JSParametersNode";
+%typeof FormalParameters, CoverParenthesizedExpressionAndArrowParameterList, ArrowParameters = "JSParametersNode";
 %typeof BindingPattern, BindingElement = "JSNode";
 %typeof IfStatement, IfStatement_NoIf = "JSIfNode";
 %typeof LeftHandSideExpression, MemberExpression, NewExpression, CallExpression, PrimaryExpression, SuperProperty = "JSNode";
@@ -492,6 +492,7 @@
 %typeof HoistableDeclaration = "JSNode"; // TODO: Make JSFunctionNode and have GeneratorDeclaration return a special subclass of JSFunctionNode?
 %typeof ClassExpression, ClassDeclaration = "JSClassNode";
 %typeof ClassTail = "JSNode";
+%typeof ConciseBody = "JSNode";
 
 %left LPAREN, RPAREN, LBRACKET, RBRACKET, DOT;
 %right PLUS_PLUS, MINUS_MINUS, EXCLAMATION, TILDE, DELETE, NEW, TYPEOF, VOID;
@@ -577,13 +578,22 @@ IdentifierName
 	;
 
 CoverParenthesizedExpressionAndArrowParameterList
-	=	LPAREN.l Expression.e RPAREN.r
+	=	LPAREN Expression.e RPAREN
 		{:
-			return new JSGroupNode(l, e, r);
+			return new JSParametersNode(e);
 		:}
 	|	LPAREN RPAREN
-	|	LPAREN BindingRestElement RPAREN
-	|	LPAREN Expression COMMA BindingRestElement RPAREN
+		{:
+			return new JSParametersNode();
+		:}
+	|	LPAREN BindingRestElement.e RPAREN
+		{:
+			return new JSParametersNode(e);
+		:}
+	|	LPAREN Expression.e COMMA BindingRestElement.r RPAREN
+		{:
+			return new JSParametersNode(e, r);
+		:}
 	;
 
 Literal
@@ -1099,6 +1109,7 @@ StatementListItem
 LexicalDeclaration
 	=	LetOrConst.v BindingList.l SEMICOLON
 		{:
+			// FIXME Determine if this was let or const and use special subclass!
 			JSNode node = new JSVarNode(v, l);
 			node.setSemicolonIncluded(true);
 			return node;
@@ -1199,7 +1210,13 @@ BindingProperty
 
 BindingElement
 	=	SingleNameBinding
-	|	BindingPattern Initializer?
+	|	BindingPattern.p Initializer.i?
+		{:
+			if (i == null) {
+				return new JSDestructuringNode(p);
+			}
+			return new JSDestructuringNode(p, i.getExpression());
+		:}
 	;
 
 SingleNameBinding
@@ -1408,7 +1425,11 @@ IterationStatement_NoIf
 	;
 
 ForDeclaration
-	=	LetOrConst ForBinding
+	=	LetOrConst.v ForBinding.l
+		{:
+			// FIXME Determine if this was let or const and use special subclass!
+			return new JSVarNode(v, l);
+		:}
 	;
 
 ForBinding
@@ -1707,11 +1728,17 @@ FunctionStatementList
 	;
 
 ArrowFunction
-	=	ArrowParameters ARROW ConciseBody
+	=	ArrowParameters.p ARROW ConciseBody.body
+		{:
+			return new JSArrowFunctionNode(p, body);
+		:}
 	;
 
 ArrowParameters
-	=	Identifier
+	=	Identifier.i
+		{:
+			return new JSParametersNode(new JSIdentifierNode(i));
+		:}
 	|	CoverParenthesizedExpressionAndArrowParameterList
 	;
 

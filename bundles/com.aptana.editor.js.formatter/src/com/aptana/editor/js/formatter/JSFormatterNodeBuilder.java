@@ -91,7 +91,9 @@ import com.aptana.js.core.parsing.ast.JSParseRootNode;
 import com.aptana.js.core.parsing.ast.JSPostUnaryOperatorNode;
 import com.aptana.js.core.parsing.ast.JSPreUnaryOperatorNode;
 import com.aptana.js.core.parsing.ast.JSRegexNode;
+import com.aptana.js.core.parsing.ast.JSRestElementNode;
 import com.aptana.js.core.parsing.ast.JSReturnNode;
+import com.aptana.js.core.parsing.ast.JSSpreadElementNode;
 import com.aptana.js.core.parsing.ast.JSStatementsNode;
 import com.aptana.js.core.parsing.ast.JSStringNode;
 import com.aptana.js.core.parsing.ast.JSSwitchNode;
@@ -226,6 +228,12 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 */
 	private class JSFormatterTreeWalker extends JSTreeWalker
 	{
+	
+		// FIXME Handle formatting of:
+		// - JSRestElementNode
+		// - JSSpreadElementNode
+		// - JSExportNode
+		// - JSImportNode
 
 		/*
 		 * (non-Javadoc)

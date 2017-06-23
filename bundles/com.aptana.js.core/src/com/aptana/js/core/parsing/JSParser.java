@@ -631,14 +631,33 @@ public class JSParser extends Parser implements IParser {
 
 	protected Symbol invokeReduceAction(int rule_num, int offset) {
 		switch(rule_num) {
-			case 51: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN.l Expression.e RPAREN.r
+			case 51: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN Expression.e RPAREN
 			{
-					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
-					final Symbol r = _symbols[offset + 3];
 					
-			return new JSGroupNode(l, e, r);
+			return new JSParametersNode(e);
+			}
+			case 52: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN RPAREN
+			{
+					
+			return new JSParametersNode();
+			}
+			case 53: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN BindingRestElement.e RPAREN
+			{
+					final Symbol _symbol_e = _symbols[offset + 2];
+					final JSRestElementNode e = (JSRestElementNode) _symbol_e.value;
+					
+			return new JSParametersNode(e);
+			}
+			case 54: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN Expression.e COMMA BindingRestElement.r RPAREN
+			{
+					final Symbol _symbol_e = _symbols[offset + 2];
+					final JSNode e = (JSNode) _symbol_e.value;
+					final Symbol _symbol_r = _symbols[offset + 4];
+					final JSRestElementNode r = (JSRestElementNode) _symbol_r.value;
+					
+			return new JSParametersNode(e, r);
 			}
 			case 59: // NullLiteral = NULL.n
 			{
@@ -1069,6 +1088,7 @@ public class JSParser extends Parser implements IParser {
 					final ArrayList _list_l = (ArrayList) _symbol_l.value;
 					final JSNode[] l = _list_l == null ? new JSNode[0] : (JSNode[]) _list_l.toArray(new JSNode[_list_l.size()]);
 					
+			// FIXME Determine if this was let or const and use special subclass!
 			JSNode node = new JSVarNode(v, l);
 			node.setSemicolonIncluded(true);
 			return node;
@@ -1189,6 +1209,18 @@ public class JSParser extends Parser implements IParser {
 					final JSNode e = (JSNode) _symbol_e.value;
 					
 			return new JSNameValuePairNode(n, c, e);
+			}
+			case 269: // BindingElement = BindingPattern.p opt$Initializer.i
+			{
+					final Symbol _symbol_p = _symbols[offset + 1];
+					final JSNode p = (JSNode) _symbol_p.value;
+					final Symbol _symbol_i = _symbols[offset + 2];
+					final JSInitializerNode i = (JSInitializerNode) _symbol_i.value;
+					
+			if (i == null) {
+				return new JSDestructuringNode(p);
+			}
+			return new JSDestructuringNode(p, i.getExpression());
 			}
 			case 270: // SingleNameBinding = Identifier.i opt$Initializer.z
 			{
@@ -1637,6 +1669,15 @@ public class JSParser extends Parser implements IParser {
 					
  			return new JSForOfNode(l, decl, of, o, r, s);
 			}
+			case 300: // ForDeclaration = LetOrConst.v ForBinding.l
+			{
+					final Symbol v = _symbols[offset + 1];
+					final Symbol _symbol_l = _symbols[offset + 2];
+					final JSNode l = (JSNode) _symbol_l.value;
+					
+			// FIXME Determine if this was let or const and use special subclass!
+			return new JSVarNode(v, l);
+			}
 			case 301: // ForBinding = Identifier.i
 			{
 					final Symbol i = _symbols[offset + 1];
@@ -1958,6 +1999,21 @@ public class JSParser extends Parser implements IParser {
 			{
 					
 			return new JSStatementsNode();
+			}
+			case 352: // ArrowFunction = ArrowParameters.p ARROW ConciseBody.body
+			{
+					final Symbol _symbol_p = _symbols[offset + 1];
+					final JSParametersNode p = (JSParametersNode) _symbol_p.value;
+					final Symbol _symbol_body = _symbols[offset + 3];
+					final JSNode body = (JSNode) _symbol_body.value;
+					
+			return new JSArrowFunctionNode(p, body);
+			}
+			case 353: // ArrowParameters = Identifier.i
+			{
+					final Symbol i = _symbols[offset + 1];
+					
+			return new JSParametersNode(new JSIdentifierNode(i));
 			}
 			case 358: // MethodDefinition = GET PropertyName.n LPAREN RPAREN LCURLY FunctionBody.body RCURLY
 			{
@@ -2348,7 +2404,6 @@ public class JSParser extends Parser implements IParser {
 			case 347: // FunctionRestParameter = BindingRestElement
 			case 348: // FormalParameter = BindingElement
 			case 349: // FunctionBody = FunctionStatementList
-			case 353: // ArrowParameters = Identifier
 			case 354: // ArrowParameters = CoverParenthesizedExpressionAndArrowParameterList
 			case 355: // ConciseBody = SingleExpression
 			case 357: // MethodDefinition = GeneratorMethod
@@ -2380,15 +2435,12 @@ public class JSParser extends Parser implements IParser {
 				return _symbols[offset + 1];
 			}
 			case 1: // $goal = $Script Script
-			case 52: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN RPAREN
 			case 95: // TemplateSpans = TemplateMiddleList TemplateTail
 			case 96: // TemplateMiddleList = TemplateMiddle Expression
 			case 152: // CallExpression = SUPER Arguments
 			case 156: // CallExpression = CallExpression TemplateLiteral
 			case 248: // VariableDeclaration = BindingPattern Initializer
 			case 263: // BindingElisionElement = opt$Elision BindingElement
-			case 269: // BindingElement = BindingPattern opt$Initializer
-			case 300: // ForDeclaration = LetOrConst ForBinding
 			case 314: // CaseBlock = LCURLY opt$CaseClauses.c RCURLY
 			case 334: // DebuggerStatement = DEBUGGER SEMICOLON
 			case 356: // ConciseBody = LCURLY FunctionBody.body RCURLY
@@ -2402,13 +2454,11 @@ public class JSParser extends Parser implements IParser {
 			{
 				return _symbols[offset + 2];
 			}
-			case 53: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN BindingRestElement RPAREN
 			case 90: // ComputedPropertyName = LBRACKET SingleExpression RBRACKET
 			case 93: // TemplateLiteral = TemplateHead Expression TemplateSpans
 			case 97: // TemplateMiddleList = TemplateMiddleList TemplateMiddle Expression
 			case 145: // MemberExpression = NEW DOT TARGET
 			case 148: // SuperProperty = SUPER DOT IdentifierName
-			case 352: // ArrowFunction = ArrowParameters ARROW ConciseBody
 			case 367: // YieldExpression = YIELD STAR SingleExpression
 			case 371: // ClassTail = LCURLY ClassBody RCURLY
 			case 372: // ClassTail = ClassHeritage LCURLY RCURLY
@@ -2425,10 +2475,6 @@ public class JSParser extends Parser implements IParser {
 			case 405: // NamedImports = LCURLY ImportsList COMMA RCURLY
 			{
 				return _symbols[offset + 4];
-			}
-			case 54: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN Expression COMMA BindingRestElement RPAREN
-			{
-				return _symbols[offset + 5];
 			}
 			case 361: // GeneratorMethod = STAR PropertyName LPAREN StrictFormalParameters RPAREN LCURLY GeneratorBody RCURLY
 			{

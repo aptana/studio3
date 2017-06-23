@@ -17,6 +17,16 @@ public class JSRestElementNode extends JSNode
 		super(IJSNodeTypes.REST_ELEMENT, ident);
 		this._ellipsis = ellipsis;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
 
 	public Symbol getEllipsis()
 	{
