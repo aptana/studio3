@@ -10,6 +10,7 @@ package com.aptana.js.core.parsing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -532,8 +533,7 @@ public class JSParserTest
 	@Test
 	public void testEmptyInIfElse() throws Exception
 	{
-		// TODO: should be a semicolon between (true) and else
-		assertParseResult("if (true)  else true;" + EOL); //$NON-NLS-1$
+		assertParseResult("if (true)  else true;" + EOL, "if (true) ; else true;" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -755,8 +755,8 @@ public class JSParserTest
 	@Test
 	public void testObjectLiteralWithTrailingComma() throws Exception
 	{
-		assertParseResult(
-				"abc = {name: \"Name\", index: 2, id: 10,};" + EOL, "abc = {name: \"Name\", index: 2, id: 10};" + EOL); //$NON-NLS-1$ //$NON-NLS-2$
+		assertParseResult("abc = {name: \"Name\", index: 2, id: 10,};" + EOL, //$NON-NLS-1$
+				"abc = {name: \"Name\", index: 2, id: 10};" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -1248,21 +1248,21 @@ public class JSParserTest
 	public void testReservedWordAsPropertyName() throws Exception
 	{
 		assertParseResult("this.default = 1;" + EOL);
-		assertTrue(fParseResult.getErrors().isEmpty());
+		assertNoErrors();
 	}
 
 	@Test
 	public void testReservedWordAsPropertyName2() throws Exception
 	{
 		assertParseResult("a[\"public\"] = 1;" + EOL);
-		assertTrue(fParseResult.getErrors().isEmpty());
+		assertNoErrors();
 	}
 
 	@Test
 	public void testReservedWordAsPropertyName3() throws Exception
 	{
 		assertParseResult("a = {default: \"test\"};" + EOL);
-		assertTrue(fParseResult.getErrors().isEmpty());
+		assertNoErrors();
 	}
 
 	@Test
@@ -1276,28 +1276,115 @@ public class JSParserTest
 	public void testGetterProperty() throws Exception
 	{
 		parse("Field.prototype = { get value() { return this._value; } };" + EOL);
-		assertTrue(fParseResult.getErrors().isEmpty());
+		assertNoErrors();
 	}
 
 	@Test
 	public void testSetterProperty() throws Exception
 	{
 		parse("Field.prototype = { set value(val) { this._value = val; } };" + EOL);
-		assertTrue(fParseResult.getErrors().isEmpty());
+		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testConstDeclaration() throws Exception
 	{
 		parse("const PI = 3.141593;" + EOL);
-		assertTrue(fParseResult.getErrors().isEmpty());
+		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testLetDeclaration() throws Exception
 	{
 		parse("let callbacks = [];" + EOL);
-		assertTrue(fParseResult.getErrors().isEmpty());
+		assertNoErrors();
+	}
+
+	@Test
+	public void testSpreadOperatorInArrayLiteral() throws Exception
+	{
+		parse("var other = [ 1, 2, ...params ];" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testSpreadOperatorInFunctionParameters() throws Exception
+	{
+		parse("function f (x, y, ...a) { return (x + y) * a.length; }" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testSpreadOperatorInFunctionCall() throws Exception
+	{
+		parse("f(1, 2, ...params) === 9;" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testDefaultParameters() throws Exception
+	{
+		parse("function f (x, y = 7, z = 42) { return x + y + z; }" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testExportFunction() throws Exception
+	{
+		parse("export function sum (x, y) { return x + y; }" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testExportVar() throws Exception
+	{
+		parse("export var pi = 3.141593;" + EOL);
+		assertNoErrors();
+	}
+	
+	@Test
+	public void testExportStar() throws Exception
+	{
+		parse("export * from 'lib/math';" + EOL);
+		assertNoErrors();
+	}
+	
+	@Test
+	public void testExportDefault() throws Exception
+	{
+		parse("export default (x) => Math.exp(x);" + EOL);
+		assertNoErrors();
+	}
+	
+	@Test
+	public void testImportStarAs() throws Exception
+	{
+		parse("import * as math from 'lib/math';" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testImportBoundNames() throws Exception
+	{
+		parse("import { sum, pi } from 'lib/math';" + EOL);
+		assertNoErrors();
+	}
+
+	private void assertNoErrors()
+	{
+		if (fParseResult.getErrors().isEmpty())
+		{
+			assertTrue(true);
+			return;
+		}
+		StringBuilder builder = new StringBuilder();
+		for (IParseError error : fParseResult.getErrors())
+		{
+			builder.append(error.toString());
+			builder.append("\n");
+		}
+		builder.deleteCharAt(builder.length() - 1); // remove extra newline at end
+		fail(builder.toString());
 	}
 
 	/**

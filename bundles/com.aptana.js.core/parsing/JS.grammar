@@ -467,20 +467,31 @@
 %typeof StringLiteral = "JSStringNode";
 %typeof RegularExpressionLiteral = "JSRegexNode";
 %typeof Elision = "JSElisionNode";
-%typeof StatementListItem, Statement, Statement_NoIf, Declaration, VariableDeclaration, BindingProperty, SingleExpression, ModuleItem, PropertyDefinition, ArgumentListItem = "JSNode";
+%typeof StatementListItem, Statement, Statement_NoIf, Declaration, VariableDeclaration, BindingProperty, SingleExpression, PropertyDefinition, ArgumentListItem = "JSNode";
 %typeof BindingElisionElement, LexicalBinding, ForBinding, ForDeclaration, LabelledItem, LabelledItem_NoIf, CatchParameter, FormalParameter, PropertyName = "JSNode";
 %typeof LexicalDeclaration, VariableStatement = "JSVarNode";
 %typeof Expression = "JSNode";
 %typeof ElementList = "JSElementsNode";
 %typeof Arguments = "JSArgumentsNode";
 %typeof Initializer = "JSInitializerNode";
-%typeof CoverInitializedName = "JSDeclarationNode";
 %typeof SingleNameBinding= "JSNode";
 %typeof CaseBlock, FormalParameterList = "ArrayList";
 %typeof Block, FunctionStatementList, FunctionBody = "JSStatementsNode";
 %typeof FormalParameters = "JSParametersNode";
 %typeof BindingPattern, BindingElement = "JSNode";
 %typeof IfStatement, IfStatement_NoIf = "JSIfNode";
+%typeof LeftHandSideExpression, MemberExpression, NewExpression, CallExpression, PrimaryExpression, SuperProperty = "JSNode";
+%typeof SpreadElement = "JSSpreadElementNode";
+%typeof BindingRestElement = "JSRestElementNode";
+%typeof ModuleItem = "JSNode";
+%typeof ImportDeclaration = "JSImportNode";
+%typeof ExportDeclaration = "JSExportNode";
+%typeof ExportSpecifier = "JSExportSpecifierNode";
+%typeof ModuleSpecifier, FromClause = "String";
+%typeof ExportClause = "ArrayList";
+%typeof HoistableDeclaration = "JSNode"; // TODO: Make JSFunctionNode and have GeneratorDeclaration return a special subclass of JSFunctionNode?
+%typeof ClassExpression, ClassDeclaration = "JSClassNode";
+%typeof ClassTail = "JSNode";
 
 %left LPAREN, RPAREN, LBRACKET, RBRACKET, DOT;
 %right PLUS_PLUS, MINUS_MINUS, EXCLAMATION, TILDE, DELETE, NEW, TYPEOF, VOID;
@@ -513,6 +524,7 @@ Identifier
 	|	GET
 	|	IMPLEMENTS
 	|	INTERFACE
+// FIXME Allow LET as an identifier. Currently it conflicts with LetOrConst
 //	|	LET
 	|	OF
 	|	PACKAGE
@@ -570,8 +582,8 @@ CoverParenthesizedExpressionAndArrowParameterList
 			return new JSGroupNode(l, e, r);
 		:}
 	|	LPAREN RPAREN
-	|	LPAREN DOT_DOT_DOT Identifier RPAREN
-	|	LPAREN Expression COMMA DOT_DOT_DOT Identifier RPAREN
+	|	LPAREN BindingRestElement RPAREN
+	|	LPAREN Expression COMMA BindingRestElement RPAREN
 	;
 
 Literal
@@ -643,7 +655,6 @@ ArrayLiteral
 		:}
 	;
 
-// TODO: handle SpreadElement cases!
 ElementList
 	=	Elision.n? SingleExpression.e
 		{:
@@ -653,6 +664,12 @@ ElementList
 			return new JSElementsNode(n, e);
 		:}
 	|	Elision.n? SpreadElement.e
+		{:
+			if (n == null) {
+				return new JSElementsNode(e);
+			}
+			return new JSElementsNode(n, e);
+		:}
 	|	ElementList.l COMMA Elision.n? SingleExpression.e
 		{:
 			if (n != null) {
@@ -663,6 +680,14 @@ ElementList
 			return l;
 		:}
 	|	ElementList.l COMMA Elision.n? SpreadElement.e
+		{:
+			if (n != null) {
+				l.addChild(n);
+			}
+			l.addChild(e);
+
+			return l;
+		:}
 	;
 
 Elision
@@ -679,9 +704,11 @@ Elision
 	;
 
 SpreadElement
-	=	DOT_DOT_DOT SingleExpression
+	=	DOT_DOT_DOT.d SingleExpression.e
+		{:
+			return new JSSpreadElementNode(d, e);
+		:}
 	;
-
 
 ObjectLiteral
 	=	LCURLY.l RCURLY.r
@@ -701,10 +728,13 @@ PropertyDefinitionList
 	;
 
 PropertyDefinition
-// FIXME This Identifier rule plus PropertyDefinitionList = PropertyDefinitionList COMMA PropertyDefinition cause a conflict around trailing COMMA
+// FIXME There's a fundamental ambiguity here where an identifier inside a block (within {}) (with an initializer or not) could be rolled up into a SingleExpression (assignment) OR a property definition within an object literal.
+// How can we disambiguate this case?
 //	=	Identifier
-	=	CoverInitializedName
-	|	PropertyName.n COLON.c SingleExpression.v
+//	|	CoverInitializedName
+// Combination of Identifier | CoverInitializedName = Identifier Initializer? - which is what SingleNameBinding is
+//	=	SingleNameBinding
+	=	PropertyName.n COLON.c SingleExpression.v
 		{:
 			return new JSNameValuePairNode(n, c, v);
 		:}
@@ -727,13 +757,6 @@ LiteralPropertyName
 
 ComputedPropertyName
 	=	LBRACKET SingleExpression RBRACKET
-	;
-
-CoverInitializedName
-	=	Identifier.i Initializer.z
-		{:
-			return new JSDeclarationNode(new JSIdentifierNode(i), z.getEquals(), z.getExpression());
-		:}
 	;
 
 Initializer
@@ -776,7 +799,7 @@ ArgumentList
 	
 ArgumentListItem
 	=	SingleExpression
-	|	DOT_DOT_DOT SingleExpression
+	|	SpreadElement
 	;
 
 MultiplicativeOperator
@@ -812,42 +835,9 @@ Expression
 		:}
 	;
 
-// try to generate a huge variant of all the expressions
+// We expand the enforced operator precedence written into the language and use precedence rules above instead.
 SingleExpression
-	=	FunctionExpression
-// FIXME: The grammar is ambiguous here. ClassExpression is CLASS BindingIdentifier? ClassTail, while ClassDeclaration is effectively the same thing
-// It's very similar to FunctionExpression/FunctionDeclaration (identifier is optional for expression)
-// AND GeneratorExpression/GeneratorDeclaration (identifier is optional for expression)
-//	|	ClassDeclaration			// ClassExpression is equivalent
-	|	GeneratorExpression
-	|	RegularExpressionLiteral
-	|	TemplateLiteral
-	|	CoverParenthesizedExpressionAndArrowParameterList
-	|	SingleExpression.l LBRACKET.lb Expression.r RBRACKET.rb
-		{:
-			return new JSGetElementNode(l, lb, r, rb);
-		:}
-	|	SingleExpression.l TemplateLiteral
-	|	SUPER LBRACKET Expression RBRACKET
-	|	SUPER DOT IdentifierName
-	|	NEW DOT TARGET
-	|	NEW SingleExpression.e
-		{:
-			// FIXME The second argument should be the Arguments node here
-			return new JSConstructNode(e, new JSEmptyNode(e));
-		:}
-// FIXME This conflicts with MethodDeclaration = PropertyName LPAREN StrictFormalParameters RPAREN LCURLY FunctionBody RCURLY
-// Where PropertyName is a NumericLiteral, StringLiteral or Identifier...
-	|	SingleExpression.l Arguments.r
-		{:
-			return new JSInvokeNode(l, r);
-		:}
-	|	SUPER Arguments
-	|	SingleExpression.l DOT.o IdentifierName.r
-		{:
-			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
-		:}
-	|	SingleExpression.e PostUnaryOperator.o
+	=	SingleExpression.e PostUnaryOperator.o
 		{:
 			return new JSPostUnaryOperatorNode(o, e);
 		:}
@@ -869,15 +859,19 @@ SingleExpression
 		:}
 	|	YieldExpression
 	|	ArrowFunction
-	|	SingleExpression.l EQUAL.o SingleExpression.r
+	|	LeftHandSideExpression.l EQUAL.o SingleExpression.r
 		{:
 			return new JSAssignmentNode(l, o, r);
 		:}
-	|	SingleExpression.l AssignmentOperator.o SingleExpression.r
+	|	LeftHandSideExpression.l AssignmentOperator.o SingleExpression.r
 		{:
 			return new JSAssignmentNode(l, o, r);
 		:}
-	|	THIS.t
+	|	LeftHandSideExpression
+	;
+
+PrimaryExpression
+	=	THIS.t
 		{:
 			return new JSThisNode(t);
 		:}
@@ -888,6 +882,75 @@ SingleExpression
 	|	Literal
 	|	ArrayLiteral
 	|	ObjectLiteral
+	|	FunctionExpression
+// FIXME: The grammar is ambiguous here. ClassExpression is CLASS BindingIdentifier? ClassTail, while ClassDeclaration is effectively the same thing
+// It's very similar to FunctionExpression/FunctionDeclaration (identifier is optional for expression)
+// AND GeneratorExpression/GeneratorDeclaration (identifier is optional for expression)
+//	|	ClassDeclaration			// ClassExpression is equivalent
+	|	GeneratorExpression
+	|	RegularExpressionLiteral
+	|	TemplateLiteral
+	|	CoverParenthesizedExpressionAndArrowParameterList
+	;
+
+MemberExpression
+	=	PrimaryExpression
+	|	MemberExpression.l LBRACKET.lb Expression.r RBRACKET.rb
+		{:
+			return new JSGetElementNode(l, lb, r, rb);
+		:}
+	|	MemberExpression.l DOT.o IdentifierName.r
+		{:
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
+		:}
+	|	MemberExpression.l TemplateLiteral
+	|	SuperProperty
+	|	NEW DOT TARGET
+	|	NEW MemberExpression.e Arguments.r
+		{:
+			return new JSConstructNode(e, r);
+		:}
+	;
+
+SuperProperty
+	=	SUPER LBRACKET Expression RBRACKET
+	|	SUPER DOT IdentifierName
+	;
+
+NewExpression
+	=	MemberExpression
+	|	NEW NewExpression.e
+		{:
+			return new JSConstructNode(e, new JSEmptyNode(e));
+		:}
+	;
+
+CallExpression
+// FIXME This conflicts with MethodDeclaration = PropertyName LPAREN StrictFormalParameters RPAREN LCURLY FunctionBody RCURLY
+// Where PropertyName is a NumericLiteral, StringLiteral or Identifier...
+	=	MemberExpression.l Arguments.r
+		{:
+			return new JSInvokeNode(l, r);
+		:}
+	|	SUPER Arguments
+	|	CallExpression.l Arguments.r
+		{:
+			return new JSInvokeNode(l, r);
+		:}
+	|	CallExpression.l LBRACKET.lb Expression.r RBRACKET.rb
+		{:
+			return new JSGetElementNode(l, lb, r, rb);
+		:}
+	|	CallExpression.l DOT.o IdentifierName.r
+		{:
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
+		:}
+	|	CallExpression TemplateLiteral
+	;
+
+LeftHandSideExpression
+	=	NewExpression
+	|	CallExpression
 	;
 
 PostUnaryOperator
@@ -1053,15 +1116,7 @@ BindingList
 	;
 
 LexicalBinding
-	=	Identifier.i Initializer.z?
-		{:
-			if (z == null) {
-				return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
-			} else {
-				return new JSDeclarationNode(new JSIdentifierNode(i), z.getEquals(), z.getExpression());
-			}
-		:}
-	|	BindingPattern Initializer
+	=	VariableDeclaration
 	;
 
 VariableStatement
@@ -1078,17 +1133,8 @@ VariableDeclarationList
 	|	VariableDeclaration
 	;
 
-// TODO Combine LexicalBinding and VariableDeclaration!
-// TODO Refactor with CoverInitializedName and SingleNameBinding
 VariableDeclaration
-	=	Identifier.i Initializer.z?
-		{:
-			if (z == null) {
-				return new JSDeclarationNode(new JSIdentifierNode(i), null, new JSEmptyNode(i));
-			} else {
-				return new JSDeclarationNode(new JSIdentifierNode(i), z.getEquals(), z.getExpression());
-			}
-		:}
+	=	SingleNameBinding
 	|	BindingPattern Initializer
 	;
 
@@ -1167,7 +1213,10 @@ SingleNameBinding
 	;
 
 BindingRestElement
-	=	DOT_DOT_DOT Identifier
+	=	DOT_DOT_DOT.d Identifier.i
+		{:
+			return new JSRestElementNode(d, new JSIdentifierNode(i));
+		:}
 	;
 
 ExpressionStatement
@@ -1717,11 +1766,20 @@ YieldExpression
 	;
 
 ClassDeclaration
-	=	CLASS Identifier ClassTail
+	=	CLASS Identifier.i ClassTail.t
+		{:
+			return new JSClassNode(new JSIdentifierNode(i), t);
+		:}
 	;
 	
 ClassExpression
-	=	CLASS Identifier? ClassTail
+	=	CLASS Identifier.i? ClassTail.t
+		{:
+			if (i == null) {
+				return new JSClassNode(t);
+			}
+			return new JSClassNode(new JSIdentifierNode(i), t);
+		:}
 	;
 
 ClassTail
@@ -1816,8 +1874,14 @@ ModuleItem
 	;
 
 ImportDeclaration
-	=	IMPORT ImportClause FromClause SEMICOLON
-	|	IMPORT ModuleSpecifier SEMICOLON
+	=	IMPORT ImportClause.n FromClause.f SEMICOLON
+		{:
+			return new JSImportNode(n, f);
+		:}
+	|	IMPORT ModuleSpecifier.s SEMICOLON
+		{:
+			return new JSImportNode(s);
+		:}
 	;
 
 ImportClause
@@ -1843,7 +1907,7 @@ NamedImports
 	;
 
 FromClause
-	=	FROM ModuleSpecifier
+	=	FROM ModuleSpecifier.s
 	;
 
 ImportsList
@@ -1865,20 +1929,48 @@ ImportedBinding
 	;
 
 ExportDeclaration
-	=	EXPORT STAR FromClause SEMICOLON
-	|	EXPORT ExportClause FromClause SEMICOLON
-	|	EXPORT ExportClause SEMICOLON
-	|	EXPORT VariableStatement
-	|	EXPORT Declaration
-	|	EXPORT DEFAULT HoistableDeclaration
-	|	EXPORT DEFAULT ClassExpression
-	|	EXPORT DEFAULT Identifier SingleExpression SEMICOLON
+	=	EXPORT STAR.s FromClause.f SEMICOLON
+		{:
+			return new JSExportNode(false, s, f);
+		:}
+	|	EXPORT ExportClause.c FromClause.f SEMICOLON
+		{:
+			final JSNode[] p = c == null ? new JSNode[0] : (JSNode[]) c.toArray(new JSNode[c.size()]);
+			return new JSExportNode(false, p, f);
+		:}
+	|	EXPORT ExportClause.d SEMICOLON
+		{:
+			final JSNode[] p = d == null ? new JSNode[0] : (JSNode[]) d.toArray(new JSNode[d.size()]);
+			return new JSExportNode(false, p);
+		:}
+	|	EXPORT VariableStatement.d
+		{:
+			return new JSExportNode(false, d);
+		:}
+	|	EXPORT Declaration.d
+		{:
+			return new JSExportNode(false, d);
+		:}
+	|	EXPORT DEFAULT HoistableDeclaration.d
+		{:
+			return new JSExportNode(true, d);
+		:}
+	|	EXPORT DEFAULT ClassExpression.e
+		{:
+			return new JSExportNode(true, e);
+		:}
+	|	EXPORT DEFAULT SingleExpression.e SEMICOLON
+		{:
+			return new JSExportNode(true, e);
+		:}
 	;
 
 ExportClause
 	=	LCURLY RCURLY
-	|	LCURLY ExportsList RCURLY
-	|	LCURLY ExportsList COMMA RCURLY
+		{:
+			return new Symbol(new ArrayList());
+		:}
+	|	LCURLY ExportsList.l COMMA? RCURLY
 	;
 	
 ExportsList
@@ -1887,8 +1979,14 @@ ExportsList
 	;
 
 ExportSpecifier
-	=	IdentifierName AS IdentifierName
-	|	IdentifierName
+	=	IdentifierName.i AS IdentifierName.alias
+		{:
+			return new JSExportSpecifierNode(new JSIdentifierNode(i), new JSIdentifierNode(alias));
+		:}
+	|	IdentifierName.i
+		{:
+			return new JSExportSpecifierNode(new JSIdentifierNode(i));
+		:}
 	;
 
 ////////////////////////////////////
