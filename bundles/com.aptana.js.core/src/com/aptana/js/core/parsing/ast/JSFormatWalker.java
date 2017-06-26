@@ -8,11 +8,12 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
+import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSFormatWalker extends JSTreeWalker
 {
@@ -161,7 +162,7 @@ public class JSFormatWalker extends JSTreeWalker
 	{
 		this.formatNaryNode(node, "[", ", ", "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
-	
+
 	@Override
 	public void visit(JSArrowFunctionNode node)
 	{
@@ -183,9 +184,8 @@ public class JSFormatWalker extends JSTreeWalker
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode
-	 * )
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.
+	 * JSBinaryArithmeticOperatorNode )
 	 */
 	@Override
 	public void visit(JSBinaryArithmeticOperatorNode node)
@@ -363,7 +363,7 @@ public class JSFormatWalker extends JSTreeWalker
 	{
 		this.formatNaryNode(node, "default: ", "", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSDestructuringNode)
@@ -373,9 +373,10 @@ public class JSFormatWalker extends JSTreeWalker
 	{
 		IParseNode binding = node.getChild(0);
 		this.formatNode(binding);
-		
+
 		IParseNode value = node.getChild(1);
-		if (value != null) {
+		if (value != null)
+		{
 			this._printer.print(" = "); //$NON-NLS-1$
 			this.formatNode(value);
 		}
@@ -435,22 +436,27 @@ public class JSFormatWalker extends JSTreeWalker
 	{
 		this.addSemicolon(node);
 	}
-	
+
 	@Override
 	public void visit(JSExportNode node)
 	{
 		this._printer.print("export "); //$NON-NLS-1$
-		if (node.isDefault()) {
+		if (node.isDefault())
+		{
 			this._printer.print("default "); //$NON-NLS-1$
 		}
 		IParseNode[] children = node.getChildren();
-		if (children == null || children.length == 0) {
+		if (children == null || children.length == 0)
+		{
 			this._printer.print("* "); //$NON-NLS-1$
-		} else {
+		}
+		else
+		{
 			formatNaryNode(node, StringUtil.EMPTY, StringUtil.EMPTY, StringUtil.EMPTY);
 		}
 		String from = node.getFrom();
-		if (!StringUtil.isEmpty(from)) {
+		if (!StringUtil.isEmpty(from))
+		{
 			this._printer.print("from "); //$NON-NLS-1$
 			this._printer.print(from);
 		}
@@ -495,7 +501,7 @@ public class JSFormatWalker extends JSTreeWalker
 		this.formatNode(node.getBody());
 		this.addSemicolon(node);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSForOfNode)
@@ -651,6 +657,38 @@ public class JSFormatWalker extends JSTreeWalker
 		this.addSemicolon(node);
 	}
 
+	@Override
+	public void visit(JSImportNode node)
+	{
+		this._printer.print("import "); //$NON-NLS-1$
+
+		// FIXME If we have multiple children, we have to either represent them as "{ name, name as whatever}", or as
+		// "name, * as another", or as "name, { another, third as alias}"
+		IParseNode[] children = node.getChildren();
+		if (!ArrayUtil.isEmpty(children))
+		{
+			formatNaryNode(node, StringUtil.EMPTY, StringUtil.EMPTY, StringUtil.EMPTY);
+		}
+		String from = node.getFrom();
+		if (!StringUtil.isEmpty(from))
+		{
+			this._printer.print(" from "); //$NON-NLS-1$
+			this._printer.print(from);
+		}
+		this.addSemicolon(node);
+	}
+
+	@Override
+	public void visit(JSImportSpecifierNode node)
+	{
+		this._printer.print(node.getSpecifier());
+		if (node.hasAlias())
+		{
+			this._printer.print(" as "); //$NON-NLS-1$
+			this._printer.print(node.getAlias());
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSInvokeNode)
@@ -709,6 +747,12 @@ public class JSFormatWalker extends JSTreeWalker
 			this.formatNode(node.getValue());
 			this.addSemicolon(node);
 		}
+	}
+
+	@Override
+	public void visit(JSNamedImportsNode node)
+	{
+		formatNaryNode(node, "{", ", ", "}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/*
@@ -868,7 +912,7 @@ public class JSFormatWalker extends JSTreeWalker
 		this._printer.print(node.getText());
 		this.addSemicolon(node);
 	}
-	
+
 	@Override
 	public void visit(JSRestElementNode node)
 	{
@@ -895,7 +939,7 @@ public class JSFormatWalker extends JSTreeWalker
 
 		this.addSemicolon(node);
 	}
-	
+
 	@Override
 	public void visit(JSSpreadElementNode node)
 	{

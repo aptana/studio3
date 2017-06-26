@@ -123,9 +123,11 @@ public enum JSTokenType implements ITypePredicate
 	PROTECTED("protected", Terminals.PROTECTED),
 	PUBLIC("public", Terminals.PUBLIC),
 	STATIC("static", Terminals.STATIC),
+	FROM(JSLanguageConstants.FROM, Terminals.FROM),
 	YIELD(JSLanguageConstants.YIELD, Terminals.YIELD),
 	SET(JSLanguageConstants.SET, Terminals.SET),
 	GET(JSLanguageConstants.GET, Terminals.GET),
+	AS(JSLanguageConstants.AS, Terminals.AS),
 	
 	
 	SINGLELINE_COMMENT("SINGLELINE_COMMENT", 1024), //$NON-NLS-1$

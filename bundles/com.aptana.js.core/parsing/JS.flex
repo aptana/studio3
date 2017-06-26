@@ -294,10 +294,12 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 	"set"			{ return newToken(JSTokenType.SET); }
 	
 	// ES6
+	"as"			{ return newToken(JSTokenType.AS); }
 	"class"			{ return newToken(JSTokenType.CLASS); }
 	"const"			{ return newToken(JSTokenType.CONST); }
 	"export"		{ return newToken(JSTokenType.EXPORT); }
 	"extends"		{ return newToken(JSTokenType.EXTENDS); }
+	"from"			{ return newToken(JSTokenType.FROM); }
 	"import"		{ return newToken(JSTokenType.IMPORT); }
 	"let"			{ return newToken(JSTokenType.LET); }
 	"of"			{ return newToken(JSTokenType.OF); }

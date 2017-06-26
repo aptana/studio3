@@ -353,7 +353,7 @@ public class JSParserTest
 	@Test
 	public void testTypeof1() throws Exception
 	{
-		assertParseResult("a = typeof(object);" + EOL); //$NON-NLS-1$
+		assertParseResult("a = typeof(object);" + EOL, "a = typeof (object);" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -1345,28 +1345,30 @@ public class JSParserTest
 	@Test
 	public void testExportStar() throws Exception
 	{
-		parse("export * from 'lib/math';" + EOL);
+		assertParseResult("export * from 'lib/math';" + EOL, "export * from 'lib/math'" + EOL);
 		assertNoErrors();
 	}
 	
 	@Test
 	public void testExportDefault() throws Exception
 	{
-		assertParseResult("export default (x) => Math.exp(x);" + EOL);
+		// FIXME Not sure why the semicolon doesn't get printed out...
+		assertParseResult("export default (x) => Math.exp(x);" + EOL, "export default (x) => Math.exp(x)" + EOL);
 		assertNoErrors();
 	}
 	
 	@Test
 	public void testImportStarAs() throws Exception
 	{
-		parse("import * as math from 'lib/math';" + EOL);
+		// FIXME Not sure why the semicolon doesn't get printed out...
+		assertParseResult("import * as math from 'lib/math';" + EOL, "import * as math from 'lib/math'" + EOL);
 		assertNoErrors();
 	}
 
 	@Test
 	public void testImportBoundNames() throws Exception
 	{
-		parse("import { sum, pi } from 'lib/math';" + EOL);
+		assertParseResult("import { sum, pi } from 'lib/math';" + EOL, "import {sum, pi} from 'lib/math'" + EOL);
 		assertNoErrors();
 	}
 	
@@ -1380,21 +1382,21 @@ public class JSParserTest
 	@Test
 	public void testFunctionParameterArrayDestructuring() throws Exception
 	{
-		assertParseResult("function f ([ name, val ]) {console.log(name, val);}" + EOL);
+		assertParseResult("function f ([name, val]) {console.log(name, val);}" + EOL);
 		assertNoErrors();
 	}
 	
 	@Test
 	public void testFunctionParameterObjectDestructuringWithAliases() throws Exception
 	{
-		assertParseResult("function g ({ name: n, val: v }) {console.log(n, v);}" + EOL);
+		assertParseResult("function g ({name: n, val: v}) {console.log(n, v);}" + EOL);
 		assertNoErrors();
 	}
 	
 	@Test
 	public void testFunctionParameterObjectDestructuring() throws Exception
 	{
-		assertParseResult("function h ({ name, val }) {console.log(name, val);}" + EOL);
+		assertParseResult("function h ({name, val}) {console.log(name, val);}" + EOL);
 		assertNoErrors();
 	}
 

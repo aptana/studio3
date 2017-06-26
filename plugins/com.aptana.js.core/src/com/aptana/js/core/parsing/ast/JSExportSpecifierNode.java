@@ -5,12 +5,22 @@ public class JSExportSpecifierNode extends JSNode
 
 	public JSExportSpecifierNode(JSIdentifierNode name, JSIdentifierNode alias)
 	{
-		// TODO Auto-generated constructor stub
+		super(IJSNodeTypes.EXPORT_SPECIFIER, name, alias);
 	}
 
 	public JSExportSpecifierNode(JSIdentifierNode name)
 	{
-		// TODO Auto-generated constructor stub
+		super(IJSNodeTypes.EXPORT_SPECIFIER, name);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
 	}
 
 }

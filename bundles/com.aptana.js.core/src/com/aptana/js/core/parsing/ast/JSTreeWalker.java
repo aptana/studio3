@@ -20,7 +20,7 @@ public class JSTreeWalker
 	{
 		this.visitChildren(node);
 	}
-	
+
 	public void visit(JSArrowFunctionNode node)
 	{
 		this.visitChildren(node);
@@ -85,7 +85,7 @@ public class JSTreeWalker
 	{
 		this.visitChildren(node);
 	}
-	
+
 	public void visit(JSDestructuringNode node)
 	{
 		this.visitChildren(node);
@@ -115,8 +115,13 @@ public class JSTreeWalker
 	{
 		this.visitChildren(node);
 	}
-	
+
 	public void visit(JSExportNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSExportSpecifierNode node)
 	{
 		this.visitChildren(node);
 	}
@@ -135,7 +140,7 @@ public class JSTreeWalker
 	{
 		this.visitChildren(node);
 	}
-	
+
 	public void visit(JSForOfNode node)
 	{
 		this.visitChildren(node);
@@ -172,6 +177,21 @@ public class JSTreeWalker
 	}
 
 	public void visit(JSIfNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSNamedImportsNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSImportNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSImportSpecifierNode node)
 	{
 		this.visitChildren(node);
 	}
@@ -296,12 +316,12 @@ public class JSTreeWalker
 	{
 		this.visitChildren(node);
 	}
-	
+
 	public void visit(JSSpreadElementNode node)
 	{
 		this.visitChildren(node);
 	}
-	
+
 	public void visit(JSRestElementNode node)
 	{
 		this.visitChildren(node);

@@ -18,4 +18,13 @@ public class JSDestructuringNode extends JSNode
 		super(IJSNodeTypes.DESTRUCTURE, binding, valueExpression);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
 }

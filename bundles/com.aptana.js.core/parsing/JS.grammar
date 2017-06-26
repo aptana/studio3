@@ -487,12 +487,15 @@
 %typeof ImportDeclaration = "JSImportNode";
 %typeof ExportDeclaration = "JSExportNode";
 %typeof ExportSpecifier = "JSExportSpecifierNode";
+%typeof ImportSpecifier, NameSpaceImport, ImportedDefaultBinding = "JSImportSpecifierNode";
 %typeof ModuleSpecifier, FromClause = "String";
-%typeof ExportClause = "ArrayList";
+%typeof ExportClause, ImportClause = "ArrayList";
+%typeof NamedImports = "JSNamedImportsNode";
 %typeof HoistableDeclaration = "JSNode"; // TODO: Make JSFunctionNode and have GeneratorDeclaration return a special subclass of JSFunctionNode?
 %typeof ClassExpression, ClassDeclaration = "JSClassNode";
 %typeof ClassTail = "JSNode";
 %typeof ConciseBody = "JSNode";
+%typeof ImportedBinding = "JSIdentifierNode";
 
 %left LPAREN, RPAREN, LBRACKET, RBRACKET, DOT;
 %right PLUS_PLUS, MINUS_MINUS, EXCLAMATION, TILDE, DELETE, NEW, TYPEOF, VOID;
@@ -1901,9 +1904,10 @@ ModuleItem
 	;
 
 ImportDeclaration
-	=	IMPORT ImportClause.n FromClause.f SEMICOLON
+	=	IMPORT ImportClause.c FromClause.f SEMICOLON
 		{:
-			return new JSImportNode(n, f);
+			final JSNode[] clauses = c == null ? new JSNode[0] : (JSNode[]) c.toArray(new JSNode[c.size()]);
+			return new JSImportNode(clauses, f);
 		:}
 	|	IMPORT ModuleSpecifier.s SEMICOLON
 		{:
@@ -1912,25 +1916,63 @@ ImportDeclaration
 	;
 
 ImportClause
-	=	ImportedDefaultBinding
-	|	NameSpaceImport
-	|	NamedImports
-	|	ImportedDefaultBinding COMMA NameSpaceImport
-	|	ImportedDefaultBinding COMMA NamedImports
+	=	ImportedDefaultBinding.i
+		{:
+			List<JSNode> nodes = new ArrayList<JSNode>();
+			nodes.add(i);
+			return new Symbol(nodes);
+		:}
+	|	NameSpaceImport.i
+		{:
+			List<JSNode> nodes = new ArrayList<JSNode>();
+			nodes.add(i);
+			return new Symbol(nodes);
+		:}
+	|	NamedImports.l
+		{:
+			List<JSNode> nodes = new ArrayList<JSNode>();
+			nodes.add(l);
+			return new Symbol(nodes);
+		:}
+	|	ImportedDefaultBinding.i COMMA NameSpaceImport.n
+		{:
+			List<JSNode> nodes = new ArrayList<JSNode>();
+			nodes.add(i);
+			nodes.add(n);
+			return new Symbol(nodes);
+		:}
+	|	ImportedDefaultBinding.i COMMA NamedImports.l
+		{:
+			List<JSNode> nodes = new ArrayList<JSNode>();
+			nodes.add(i);
+			nodes.add(l);
+			return new Symbol(nodes);
+		:}
 	;
 
 ImportedDefaultBinding
-	=	ImportedBinding
+	=	ImportedBinding.i
+		{:
+			return new JSImportSpecifierNode(i);
+		:}
 	;
 
 NameSpaceImport
-	=	STAR AS ImportedBinding
+	=	STAR.s AS ImportedBinding.i
+		{:
+			return new JSImportSpecifierNode(s, i);
+		:}
 	;
 
 NamedImports
 	=	LCURLY RCURLY
-	|	LCURLY ImportsList RCURLY
-	|	LCURLY ImportsList COMMA RCURLY
+		{:
+			return new JSNamedImportsNode();
+		:}
+	|	LCURLY ImportsList.l COMMA? RCURLY
+		{:
+			return new JSNamedImportsNode(l);
+		:}
 	;
 
 FromClause
@@ -1943,8 +1985,14 @@ ImportsList
 	;
 
 ImportSpecifier
-	=	IdentifierName AS ImportedBinding
-	|	ImportedBinding
+	=	IdentifierName.i AS ImportedBinding.alias
+		{:
+			return new JSImportSpecifierNode(new JSIdentifierNode(i), alias);
+		:}
+	|	ImportedBinding.i
+		{:
+			return new JSImportSpecifierNode(i);
+		:}
 	;
 
 ModuleSpecifier
@@ -1952,7 +2000,10 @@ ModuleSpecifier
 	;
 
 ImportedBinding
-	=	Identifier
+	=	Identifier.i
+		{:
+			return new JSIdentifierNode(i);
+		:}
 	;
 
 ExportDeclaration

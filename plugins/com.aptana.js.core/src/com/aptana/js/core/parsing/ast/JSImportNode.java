@@ -1,18 +1,34 @@
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 public class JSImportNode extends JSNode
 {
 
-	public JSImportNode(Symbol n, String from)
+	private final String _from;
+
+	public JSImportNode(JSNode[] clauses, String from)
 	{
-		// TODO Auto-generated constructor stub
+		super(IJSNodeTypes.IMPORT, clauses);
+		this._from = from;
 	}
 
-	public JSImportNode(String specifier)
+	public JSImportNode(String from)
 	{
-		// TODO Auto-generated constructor stub
+		super(IJSNodeTypes.IMPORT);
+		this._from = from;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
+	 */
+	@Override
+	public void accept(JSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+
+	public String getFrom()
+	{
+		return _from;
+	}
 }

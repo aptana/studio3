@@ -62,8 +62,8 @@ public class Terminals {
 	static public final short IN = 54;
 	static public final short COMMA = 55;
 	static public final short STAR = 56;
-	static public final short INSTANCEOF = 57;
-	static public final short RCURLY = 58;
+	static public final short RCURLY = 57;
+	static public final short INSTANCEOF = 58;
 	static public final short CONST = 59;
 	static public final short CLASS = 60;
 	static public final short COLON = 61;

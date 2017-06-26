@@ -17,6 +17,8 @@ public class JSLanguageConstants
 	public static final String AWAIT = "await"; //$NON-NLS-1$
 	public static final String CONST = "const"; //$NON-NLS-1$
 	public static final String LET = "let"; //$NON-NLS-1$
+	public static final String AS = "as"; //$NON-NLS-1$
+	public static final String FROM = "from"; //$NON-NLS-1$
 	public static final String YIELD = "yield"; //$NON-NLS-1$
 	public static final String IMPORT = "import"; //$NON-NLS-1$
 	public static final String EXPORT = "export"; //$NON-NLS-1$
@@ -108,7 +110,7 @@ public class JSLanguageConstants
 
 	public static final String REQUIRE = "require"; //$NON-NLS-1$
 
-	public static final String[] KEYWORD_OPERATORS = new String[] { DELETE, INSTANCEOF, IN, NEW, TYPEOF, WITH };
+	public static final String[] KEYWORD_OPERATORS = new String[] { DELETE, INSTANCEOF, IN, NEW, TYPEOF, WITH, FROM, AS };
 	@SuppressWarnings("nls")
 	public static final String[] SUPPORT_FUNCTIONS = new String[] { "small", "savePreferences", "slice", "sqrt",
 			"shift", "showModelessDialog", "showModalDialog", "showHelp", "scrollX", "scrollByPages", "scrollByLines",

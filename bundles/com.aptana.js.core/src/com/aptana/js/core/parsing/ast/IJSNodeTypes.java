@@ -111,4 +111,8 @@ public interface IJSNodeTypes
 	public static final short EXPORT = 98;
 	public static final short DESTRUCTURE = 99;
 	public static final short ARROW_FUNCTION = 100;
+	public static final short EXPORT_SPECIFIER = 101;
+	public static final short IMPORT_SPECIFIER = 102;
+	public static final short IMPORT = 103;
+	public static final short NAMED_IMPORTS = 104;
 }
