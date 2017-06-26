@@ -1408,7 +1408,35 @@ public class JSParserTest
 		assertParseResult("var [ a, , b ] = list;" + EOL, "var [a, null, b] = list;" + EOL);
 		assertNoErrors();
 	}
-
+	
+	@Test
+	public void testArrayDestructuringAssignmentSwappingVariables() throws Exception
+	{
+		assertParseResult("[ b, a ] = [ a, b ];" + EOL, "[b, a] = [a, b];" + EOL);
+		assertNoErrors();
+	}
+	
+	@Test
+	public void testClassDeclarationWithNoProperties() throws Exception
+	{
+		assertParseResult("class Shape {}" + EOL);
+		assertNoErrors();
+	}
+	
+	@Test
+	public void testClassDefinitionWithConstructorMethod() throws Exception
+	{
+		assertParseResult("class Shape {constructor (id, x, y) {this.id = id;this.move(x, y);}}" + EOL);
+		assertNoErrors();
+	}
+	
+	@Test
+	public void testClassDefinitionWithStaticMethod() throws Exception
+	{
+		assertParseResult("class Rectangle {static defaultRectangle () {return new Rectangle('default', 0, 0, 100, 100);}}" + EOL);
+		assertNoErrors();
+	}
+	
 	private void assertNoErrors()
 	{
 		if (fParseResult.getErrors().isEmpty())

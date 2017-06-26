@@ -56,6 +56,11 @@ public class JSTreeWalker
 		this.visitChildren(node);
 	}
 
+	public void visit(JSClassNode node)
+	{
+		this.visitChildren(node);
+	}
+
 	public void visit(JSCommaNode node)
 	{
 		this.visitChildren(node);

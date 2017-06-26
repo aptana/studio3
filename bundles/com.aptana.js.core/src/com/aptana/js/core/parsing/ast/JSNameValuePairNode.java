@@ -7,9 +7,9 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSNameValuePairNode extends JSNode
 {
@@ -96,5 +96,15 @@ public class JSNameValuePairNode extends JSNode
 			return (JSParametersNode) this.getChild(1);
 		}
 		return null;
+	}
+
+	public void setStatic()
+	{
+		IParseNode node = getLastChild();
+		if (node instanceof JSFunctionNode)
+		{
+			JSFunctionNode func = (JSFunctionNode) node;
+			func.setStatic();
+		}
 	}
 }

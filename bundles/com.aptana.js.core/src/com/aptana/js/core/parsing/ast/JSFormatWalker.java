@@ -269,6 +269,18 @@ public class JSFormatWalker extends JSTreeWalker
 		this.addSemicolon(node);
 	}
 
+	@Override
+	public void visit(JSClassNode node)
+	{
+		this._printer.print("class "); //$NON-NLS-1$
+		if (node.hasName()) {
+			this.formatNode(node.getFirstChild());
+			this._printer.print(" "); //$NON-NLS-1$
+		}
+		// TODO Handle heritage of class (extends superclass)
+		formatNode(node.getTail());
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSCommaNode)
@@ -569,8 +581,13 @@ public class JSFormatWalker extends JSTreeWalker
 	{
 		String name = node.getName().getText();
 
-		this._printer.print("function "); //$NON-NLS-1$
-
+		if (!node.isClassMethodDefinition()) {
+			this._printer.print("function "); //$NON-NLS-1$
+		} else {
+			if (node.isStatic()) {
+				this._printer.print("static "); //$NON-NLS-1$
+			}
+		}
 		if (name != null && name.length() > 0)
 		{
 			this._printer.print(name).print(' ');

@@ -25,6 +25,7 @@ import com.aptana.parsing.ast.ParseNodeAttribute;
 public class JSFunctionNode extends JSNode
 {
 	private List<String> fReturnTypes;
+	private boolean _isStatic;
 
 	/**
 	 * JSFunctionNode
@@ -35,10 +36,10 @@ public class JSFunctionNode extends JSNode
 	{
 		super(IJSNodeTypes.FUNCTION, children);
 	}
-	
+
 	/**
-	 * 
-	 * @param name JSIdentifierNode or JSEmptyNode
+	 * @param name
+	 *            JSIdentifierNode or JSEmptyNode
 	 * @param params
 	 * @param body
 	 */
@@ -182,5 +183,29 @@ public class JSFunctionNode extends JSNode
 	public String getText()
 	{
 		return this.getName().getText();
+	}
+
+	public boolean isClassMethodDefinition()
+	{
+		if (isStatic()) // if it's static, we know it's part of es6+ class definition.
+		{
+			return true;
+		}
+		IParseNode parent = getParent();
+		if (parent instanceof JSStatementsNode)
+		{
+			return (parent.getParent() instanceof JSClassNode);
+		}
+		return false;
+	}
+
+	public boolean isStatic()
+	{
+		return this._isStatic;
+	}
+
+	public void setStatic()
+	{
+		this._isStatic = true;
 	}
 }

@@ -493,9 +493,11 @@
 %typeof NamedImports = "JSNamedImportsNode";
 %typeof HoistableDeclaration = "JSNode"; // TODO: Make JSFunctionNode and have GeneratorDeclaration return a special subclass of JSFunctionNode?
 %typeof ClassExpression, ClassDeclaration = "JSClassNode";
-%typeof ClassTail = "JSNode";
+%typeof ClassTail = "JSStatementsNode";
 %typeof ConciseBody = "JSNode";
 %typeof ImportedBinding = "JSIdentifierNode";
+%typeof ClassElement = "JSNode";
+%typeof MethodDefinition= "JSNode";
 
 %left LPAREN, RPAREN, LBRACKET, RBRACKET, DOT;
 %right PLUS_PLUS, MINUS_MINUS, EXCLAMATION, TILDE, DELETE, NEW, TYPEOF, VOID;
@@ -536,7 +538,7 @@ Identifier
 	|	PROTECTED
 	|	PUBLIC
 	|	SET
-	|	STATIC
+//	|	STATIC
 	|	TARGET
 	;
 
@@ -938,7 +940,7 @@ NewExpression
 	;
 
 CallExpression
-// FIXME This conflicts with MethodDeclaration = PropertyName LPAREN StrictFormalParameters RPAREN LCURLY FunctionBody RCURLY
+// FIXME This conflicts with MethodDefinition = PropertyName LPAREN StrictFormalParameters RPAREN LCURLY FunctionBody RCURLY
 // Where PropertyName is a NumericLiteral, StringLiteral or Identifier...
 	=	MemberExpression.l Arguments.r
 		{:
@@ -1783,12 +1785,19 @@ ConciseBody
 	|	LCURLY FunctionBody.body RCURLY
 	;
 
-// TODO: Handle  propertyName function cases!
-// TODO: Handle GeneratorMethod cases!
+// TODO: Handle PropertyName method definition case!
 MethodDefinition
-// FIXME: This conflicts with SingleExpression = SingleExpression Arguments
-//	=	PropertyName LPAREN StrictFormalParameters RPAREN LCURLY FunctionBody RCURLY
-	=	GeneratorMethod
+// FIXME: Using PropertyName in place of Identifier here conflicts with CallExpression = MemberExpression Arguments
+	=	Identifier.ident LPAREN StrictFormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
+		{:
+			// TODO Use JSNameValuePairNode to hold name with function as value?
+			return new JSFunctionNode(
+				new JSIdentifierNode(ident),
+				params,
+				body
+			);
+		:}
+	|	GeneratorMethod
 	|	GET PropertyName.n LPAREN RPAREN LCURLY FunctionBody.body RCURLY
 		{:
 			return new JSNameValuePairNode(n, body);
@@ -1806,7 +1815,15 @@ PropertySetParameterList
 	;
 
 GeneratorMethod
-	=	STAR PropertyName LPAREN StrictFormalParameters RPAREN LCURLY GeneratorBody RCURLY
+	=	STAR PropertyName.n LPAREN StrictFormalParameters.params RPAREN LCURLY GeneratorBody.body RCURLY
+		{:
+			JSFunctionNode f = new JSFunctionNode(
+				new JSEmptyNode(n),
+				params,
+				body
+			);
+			return new JSNameValuePairNode(n, f);
+		:}
 	;
 
 GeneratorDeclaration
@@ -1845,10 +1862,24 @@ ClassExpression
 	;
 
 ClassTail
-	=	ClassHeritage LCURLY ClassBody RCURLY
-	|	LCURLY ClassBody RCURLY
-	|	ClassHeritage LCURLY RCURLY
+	=	ClassHeritage.h LCURLY ClassBody.b RCURLY
+		{:
+			// TODO Handle heritage!
+			return new JSStatementsNode(b);
+		:}
+	|	LCURLY ClassBody.b RCURLY
+		{:
+			return new JSStatementsNode(b);
+		:}
+	|	ClassHeritage.h LCURLY RCURLY
+		{:
+			// TODO Handle heritage!
+			return new JSStatementsNode();
+		:}
 	|	LCURLY RCURLY
+		{:
+			return new JSStatementsNode();
+		:}
 	;
 
 ClassHeritage
@@ -1866,38 +1897,17 @@ ClassElementList
 
 ClassElement
 	=	MethodDefinition
-	|	STATIC MethodDefinition
-	|	SEMICOLON
+	|	STATIC MethodDefinition.d
+		{:
+			if (d instanceof JSFunctionNode) {
+				((JSFunctionNode)d).setStatic();
+			} else if (d instanceof JSNameValuePairNode) {
+				((JSNameValuePairNode)d).setStatic();
+			}
+			return d;
+		:}
+	|	EmptyStatement
 	;
-
-//FormalParameterList
-//	=	FormalParameterList.list COMMA Identifier.ident
-//		{:
-//			JSNode identifier = new JSIdentifierNode(ident);
-//			// add identifier to existing list
-//			list.addChild(identifier);
-//
-//			return list;
-//		:}
-//	|	Identifier.ident
-//		{:
-//			JSNode identifier = new JSIdentifierNode(ident);
-//
-//			return new JSParametersNode(identifier);
-//		:}
-//	;
-
-//FunctionBody
-//	=	LCURLY RCURLY
-//		{:
-//			return new JSStatementsNode();
-//		:}
-//	|	LCURLY SourceElements.s RCURLY
-//		{:
-//			return new JSStatementsNode(s);
-//		:}
-//	;
-
 
 ////////////////////////////////////
 // A.5 Scripts and Modules
