@@ -468,10 +468,10 @@
 %typeof RegularExpressionLiteral = "JSRegexNode";
 %typeof Elision = "JSElisionNode";
 %typeof StatementListItem, Statement, Statement_NoIf, Declaration, VariableDeclaration, BindingProperty, SingleExpression, PropertyDefinition, ArgumentListItem = "JSNode";
-%typeof BindingElisionElement, LexicalBinding, ForBinding, ForDeclaration, LabelledItem, LabelledItem_NoIf, CatchParameter, FormalParameter, PropertyName = "JSNode";
+%typeof LexicalBinding, ForBinding, ForDeclaration, LabelledItem, LabelledItem_NoIf, CatchParameter, FormalParameter, PropertyName = "JSNode";
 %typeof LexicalDeclaration, VariableStatement = "JSVarNode";
 %typeof Expression = "JSNode";
-%typeof ElementList = "JSElementsNode";
+%typeof ElementList, BindingElementList = "JSElementsNode";
 %typeof Arguments = "JSArgumentsNode";
 %typeof Initializer = "JSInitializerNode";
 %typeof SingleNameBinding= "JSNode";
@@ -651,7 +651,6 @@ ArrayLiteral
 			if (e == null) {
 				return new JSArrayNode(l, r);
 			}
-			e.addChild(new JSNullNode());
 			return new JSArrayNode(l, r, e);
 		:}
 	|	LBRACKET.l ElementList.e RBRACKET.r
@@ -661,10 +660,10 @@ ArrayLiteral
 	|	LBRACKET.l ElementList.e COMMA Elision.n? RBRACKET.r
 		{:
 			if (n == null) {
-				return new JSArrayNode(l, r, e, new JSNullNode());
+				return new JSArrayNode(l, r, e);
 			}
-			n.addChild(new JSNullNode());
-			return new JSArrayNode(l, r, e, n);
+			e.addChild(n);
+			return new JSArrayNode(l, r, e);
 		:}
 	;
 
@@ -1149,7 +1148,10 @@ VariableDeclarationList
 
 VariableDeclaration
 	=	SingleNameBinding
-	|	BindingPattern Initializer
+	|	BindingPattern.p Initializer.i
+		{:
+			return new JSDestructuringNode(p, i.getExpression());
+		:}
 	;
 
 BindingPattern
@@ -1175,8 +1177,19 @@ ObjectBindingPattern
 ArrayBindingPattern
 	=	LBRACKET.l Elision.e? BindingRestElement.n? RBRACKET.r
 		{:
-			// FIXME Handle elision, rest element
-			return new JSArrayNode(l, r, e);
+			if (e == null && n == null) {
+				return new JSArrayNode(l, r);
+			}
+			JSElementsNode node;
+			if (e != null) {
+				node = new JSElementsNode(e);
+				if (n != null) {
+					node.addChild(n);
+				}
+			} else {
+				node = new JSElementsNode(n);
+			}
+			return new JSArrayNode(l, r, node);
 		:}
 	|	LBRACKET.l BindingElementList.n RBRACKET.r
 		{:
@@ -1184,7 +1197,13 @@ ArrayBindingPattern
 		:}
 	|	LBRACKET.l BindingElementList.n COMMA Elision.e? BindingRestElement.z? RBRACKET.r
 		{:
-			// FIXME Handle elision, rest element
+			if (e != null) {
+				n.addChild(e);
+			}
+			// TODO Add null node to elision here?
+			if (z != null) {
+				n.addChild(z);
+			}
 			return new JSArrayNode(l, r, n);
 		:}
 	;
@@ -1195,13 +1214,26 @@ BindingPropertyList
 	;
 
 BindingElementList
-	=	BindingElementList COMMA BindingElisionElement
-	|	BindingElisionElement
+	=	BindingElementList.l COMMA Elision.e? BindingElement.elem
+		{:
+			if (e != null) {
+				l.addChild(e);
+			}
+			l.addChild(elem);
+			return l;
+		:}
+	|	Elision.e? BindingElement.elem
+		{:
+			if (e == null) {
+				return new JSElementsNode(elem);
+			}
+			return new JSElementsNode(e, elem);
+		:}
 	;
 
-BindingElisionElement
-	=	Elision? BindingElement
-	;
+//BindingElisionElement
+//	=	Elision? BindingElement
+//	;
 
 BindingProperty
 	=	SingleNameBinding

@@ -683,7 +683,7 @@ public class JSParserTest
 	@Test
 	public void testElisionArray() throws Exception
 	{
-		assertParseResult("abc = [,,];" + EOL, "abc = [null, null, null];" + EOL); //$NON-NLS-1$
+		assertParseResult("abc = [,,];" + EOL, "abc = [null, null];" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -707,13 +707,15 @@ public class JSParserTest
 	@Test
 	public void testArrayLiteralTrailingComma() throws Exception
 	{
-		assertParseResult("abc = [1, 2, 3,];" + EOL, "abc = [1, 2, 3, null];" + EOL); //$NON-NLS-1$
+		// Trailing comma is NOT treated a elision
+		assertParseResult("abc = [1, 2, 3,];" + EOL, "abc = [1, 2, 3];" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
 	public void testArrayLiteralTrailingElision() throws Exception
 	{
-		assertParseResult("abc = [1, 2, 3,,,];" + EOL, "abc = [1, 2, 3, null, null, null];" + EOL); //$NON-NLS-1$
+		// Trailing comma is NOT treated a elision
+		assertParseResult("abc = [1, 2, 3,,,];" + EOL, "abc = [1, 2, 3, null, null];" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -1397,6 +1399,13 @@ public class JSParserTest
 	public void testFunctionParameterObjectDestructuring() throws Exception
 	{
 		assertParseResult("function h ({name, val}) {console.log(name, val);}" + EOL);
+		assertNoErrors();
+	}
+	
+	@Test
+	public void testArrayDestructuringAssignment() throws Exception
+	{
+		assertParseResult("var [ a, , b ] = list;" + EOL, "var [a, null, b] = list;" + EOL);
 		assertNoErrors();
 	}
 

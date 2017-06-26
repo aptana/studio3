@@ -55,9 +55,10 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	public final static String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
 	public final static String STRING_SINGLE = PREFIX + "string_single"; //$NON-NLS-1$
 	public final static String JS_REGEXP = PREFIX + "regexp"; //$NON-NLS-1$
+	public final static String JS_TEMPLATE = PREFIX + "template"; //$NON-NLS-1$
 
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, JS_MULTILINE_COMMENT, JS_SINGLELINE_COMMENT,
-			JS_DOC, STRING_DOUBLE, STRING_SINGLE, JS_REGEXP };
+			JS_DOC, STRING_DOUBLE, STRING_SINGLE, JS_REGEXP, JS_TEMPLATE };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSConstants.CONTENT_TYPE_JS } };
 
@@ -68,6 +69,9 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 			new EmptyCommentRule(getToken(JS_MULTILINE_COMMENT)),
 			new MultiLineRule("/**", "*/", getToken(JS_DOC), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("/*", "*/", getToken(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("`", "${", getToken(JS_TEMPLATE), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("}", "`", getToken(JS_TEMPLATE), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("`", "`", getToken(JS_TEMPLATE), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new JSRegExpRule(getToken(JS_REGEXP)) };
 
 	private static JSSourceConfiguration INSTANCE;
@@ -91,6 +95,8 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 					"comment.block.js")); //$NON-NLS-1$
 			c.addTranslation(new QualifiedContentType(JS_DOC), new QualifiedContentType(
 					"comment.block.documentation.js")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(JS_TEMPLATE), new QualifiedContentType(
+					"string.quoted.single.js")); //$NON-NLS-1$
 		}
 	}
 
@@ -194,6 +200,10 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		dr = new ThemeingDamagerRepairer(getRegexpScanner());
 		reconciler.setDamager(dr, JS_REGEXP);
 		reconciler.setRepairer(dr, JS_REGEXP);
+		
+		dr = new ThemeingDamagerRepairer(getSingleQuotedStringScanner());
+		reconciler.setDamager(dr, JS_TEMPLATE);
+		reconciler.setRepairer(dr, JS_TEMPLATE);
 	}
 
 	/*

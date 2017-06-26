@@ -238,6 +238,7 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 	
 	// ES6 Templates
 	{TemplateHead}				{ return newToken(JSTokenType.TEMPLATE_HEAD, StringUtil.EMPTY); }
+	// FIXME The lexer prefers longest sequence, so will grab _all_ of the template literal together in preference to the head/middle/tail!
 	{NoSubstitutionTemplate}	{ return newToken(JSTokenType.NO_SUB_TEMPLATE, StringUtil.EMPTY); }
 	{TemplateMiddle}			{ return newToken(JSTokenType.TEMPLATE_MIDDLE, StringUtil.EMPTY); }
 	{TemplateTail}				{ return newToken(JSTokenType.TEMPLATE_TAIL, StringUtil.EMPTY); }

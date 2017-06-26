@@ -27,6 +27,7 @@ public class JSSourcePartitionScannerJFlex extends AbstractFlexPartitionScanner
 	private static final Token REGEXP_TOKEN = new Token(JSSourceConfiguration.JS_REGEXP);
 	private static final Token MULTILINE_COMMENT_TOKEN = new Token(JSSourceConfiguration.JS_MULTILINE_COMMENT);
 	private static final Token SINGLELINE_COMMENT_TOKEN = new Token(JSSourceConfiguration.JS_SINGLELINE_COMMENT);
+	private static final Token TEMPLATE_TOKEN = new Token(JSSourceConfiguration.JS_TEMPLATE);
 
 	public JSSourcePartitionScannerJFlex()
 	{
@@ -67,6 +68,13 @@ public class JSSourcePartitionScannerJFlex extends AbstractFlexPartitionScanner
 			case SINGLELINE_COMMENT:
 				return returnToken(symbol, symbolStart, returnDefaultContentType, symbol.getEnd() - symbol.getStart()
 						+ 1, SINGLELINE_COMMENT_TOKEN);
+				
+			case TEMPLATE_HEAD:
+			case TEMPLATE_MIDDLE:
+			case TEMPLATE_TAIL:
+			case NO_SUB_TEMPLATE:
+				return returnToken(symbol, symbolStart, returnDefaultContentType, symbol.getEnd() - symbol.getStart()
+						+ 1, TEMPLATE_TOKEN);
 
 			case EOF:
 				return returnToken(symbol, symbolStart, returnDefaultContentType, 0, Token.EOF);

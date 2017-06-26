@@ -194,11 +194,13 @@ Whitespace = {LineTerminator} | [ \t\f] | {RubyBlock} | {PHPBlock} | {DjangoBloc
 Identifier = ([:jletter:]|\$)([:jletterdigit:]|\$)*
 
 // Numbers
-Integer = [:digit:][:digit:]*
+Integer = "0" | [1-9][:digit:]*
 Hex = "0" [xX] [a-fA-F0-9]+
+Binary = "0" [bB] [01]+
+Octal = "0" [oO] [0-7]+
 Float = ({Integer} \.[:digit:]*) | (\.[:digit:]+)
 Scientific = ({Integer} | {Float}) [eE][-+]?[:digit:]+
-Number = {Integer} | {Hex} | {Float} | {Scientific}
+Number = {Integer} | {Binary} | {Octal} | {Hex} | {Float} | {Scientific}
 
 // Strings
 DoubleQuotedString = \"([^\\\"\r\n]|\\[^])*\"

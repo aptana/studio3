@@ -10,8 +10,10 @@ package com.aptana.editor.js.text;
 import static org.junit.Assert.assertEquals;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -90,7 +92,8 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		}
 	}
 
-	@Test public void testBasicTokenizing()
+	@Test
+	public void testBasicTokenizing()
 	{
 		String src = "var one = 1;";
 		IDocument document = new Document(src);
@@ -115,7 +118,8 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 
 	}
 
-	@Test public void testStartWithWhitespace() throws Exception
+	@Test
+	public void testStartWithWhitespace() throws Exception
 	{
 		String src = " / ";
 		IDocument document = new Document(src);
@@ -126,7 +130,8 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(Token.EOF, 3, 0);
 	}
 
-	@Test public void testNumbers()
+	@Test
+	public void testNumbers()
 	{
 		String src = "0xff 0X123 1 9.234 1E8 .1 0.";
 		IDocument document = new Document(src);
@@ -147,7 +152,8 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("constant.numeric.js"), 26, 2);
 	}
 
-	@Test public void testHexNumbers()
+	@Test
+	public void testHexNumbers()
 	{
 		// @formatter:off
 		String[][] lists = {
@@ -162,7 +168,38 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		this.enumerateLists(lists, "constant.numeric.js");
 	}
 
-	@Test public void testScientificNotation()
+	@Test
+	public void testBinaryNumbers()
+	{
+		// @formatter:off
+		String[][] lists = {
+			{ "0" },
+			{ "b", "B" },
+			{ "0", "1" },
+			{ "0", "1" }
+		};
+		// @formatter:on
+
+		this.enumerateLists(lists, "constant.numeric.js");
+	}
+
+	@Test
+	public void testOctalNumbers()
+	{
+		// @formatter:off
+		String[][] lists = {
+			{ "0" },
+			{ "o", "O" },
+			{ "0", "1", "2", "3", "4", "5", "6", "7" },
+			{ "0", "1", "2", "3", "4", "5", "6", "7" }
+		};
+		// @formatter:on
+
+		this.enumerateLists(lists, "constant.numeric.js");
+	}
+
+	@Test
+	public void testScientificNotation()
 	{
 		// @formatter:off
 		String[][] lists = {
@@ -177,7 +214,8 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		this.enumerateLists(lists, "constant.numeric.js");
 	}
 
-	@Test public void testConstantWords()
+	@Test
+	public void testConstantWords()
 	{
 		String src = "true false null Infinity NaN undefined super this debugger";
 		IDocument document = new Document(src);
@@ -202,7 +240,8 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("keyword.other.js"), 50, 8);
 	}
 
-	@Test public void testMetaChars()
+	@Test
+	public void testMetaChars()
 	{
 		String src = "(){}[],;";
 		IDocument document = new Document(src);
@@ -218,7 +257,8 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.terminator.statement.js"), 7, 1);
 	}
 
-	@Test public void testPrototypeSnippet()
+	@Test
+	public void testPrototypeSnippet()
 	{
 		//@formatter:off
 		String src = 
@@ -320,7 +360,8 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		// TODO Test all the rest of the lines! (Or at least the "interesting" parts with new token types
 	}
 
-	@Test public void testUnderscoreInIdentifierWithKeyword()
+	@Test
+	public void testUnderscoreInIdentifierWithKeyword()
 	{
 		String src = "add_child";
 		IDocument document = new Document(src);
@@ -329,7 +370,8 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("source.js"), 0, 9);
 	}
 
-	@Test public void testFunctionName()
+	@Test
+	public void testFunctionName()
 	{
 		String src = "function chris() {}";
 		IDocument document = new Document(src);
@@ -345,7 +387,8 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("meta.brace.curly.js"), 18, 1);
 	}
 
-	@Test public void testAnonymousFunctionName()
+	@Test
+	public void testAnonymousFunctionName()
 	{
 		String src = "var eatCakeAnon = function(){};";
 		IDocument document = new Document(src);
@@ -365,7 +408,8 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("punctuation.terminator.statement.js"), 30, 1);
 	}
 
-	@Test public void testFunctionWithArguments()
+	@Test
+	public void testFunctionWithArguments()
 	{
 		String src = "function Pet(name, species, hello){}";
 		IDocument document = new Document(src);
@@ -387,7 +431,8 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("meta.brace.curly.js"), 35, 1);
 	}
 
-	@Test public void testBrokenStuff()
+	@Test
+	public void testBrokenStuff()
 	{
 		String src = "function sayHello() { alert(this.hello); }";
 		IDocument document = new Document(src);
@@ -422,14 +467,15 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 	 * Note: just aAdding exception just for the 'log' function that was properly gotten as a firebug function.
 	 */
 	//@formatter:on
-	@Test public void testSupportFunctions() throws Exception
+	@Test
+	public void testSupportFunctions() throws Exception
 	{
 		Object[] tokens = new Object[] { "meta.delimiter.method.period.js", "source.js", "meta.brace.round.js",
 				"meta.brace.round.js", "null", "source.js", "meta.delimiter.method.period.js", "source.js", "null",
 				"source.js", "null" };
 
-		Object[] tokensLog = new Object[] { "support.function.js.firebug", "meta.brace.round.js",
-				"meta.brace.round.js", "null", "source.js", "support.function.js.firebug", "null", "source.js", "null", };
+		Object[] tokensLog = new Object[] { "support.function.js.firebug", "meta.brace.round.js", "meta.brace.round.js",
+				"null", "source.js", "support.function.js.firebug", "null", "source.js", "null", };
 
 		Object[] tokensLog2 = new Object[] { "meta.delimiter.method.period.js", "support.function.js.firebug",
 				"meta.brace.round.js", "meta.brace.round.js", "null", "source.js", "meta.delimiter.method.period.js",
@@ -475,68 +521,70 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 
 	}
 
-	@Test public void testKeywordOperators() throws Exception
+	@Test
+	public void testKeywordOperators() throws Exception
 	{
-		String src = StringUtil.join(" ", JSLanguageConstants.KEYWORD_OPERATORS);
-		IDocument document = new Document(src);
-		scanner.setRange(document, 0, src.length());
-		assertTokens("keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
-				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null");
+		assertTokenList(JSLanguageConstants.KEYWORD_OPERATORS, "keyword.operator.js");
 
 	}
 
-	@Test public void testOperators() throws Exception
+	private void assertTokenList(String[] keywords, String token)
 	{
-
-		String src = StringUtil.join(" ", JSLanguageConstants.OPERATORS);
+		int keywordsLength = keywords.length;
+		String src = StringUtil.join(" ", keywords);
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
-		assertTokens("keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
-				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
-				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
-				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
-				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
-				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
-				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
-				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null");
+		List<String> expectedTokens = createExpectedTokenList(token, keywordsLength);
+		assertTokens(expectedTokens.toArray());
 	}
 
-	@Test public void testSingleCharacterOperators() throws Exception
+	private void assertTokenList(char[] keywords, String token)
 	{
-
-		String src = StringUtil.join(" ", JSLanguageConstants.SINGLE_CHARACTER_OPERATORS);
+		int keywordsLength = keywords.length;
+		String src = StringUtil.join(" ", keywords);
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
-		assertTokens("keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
-				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
-				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
-				"keyword.operator.js", "null", "keyword.operator.js", "null", "keyword.operator.js", "null",
-				"keyword.operator.js", "null", "keyword.operator.js", "null");
+		List<String> expectedTokens = createExpectedTokenList(token, keywordsLength);
+		assertTokens(expectedTokens.toArray());
 	}
 
-	@Test public void testKeyWordControl() throws Exception
+	private List<String> createExpectedTokenList(String token, int count)
 	{
-
-		String src = StringUtil.join(" ", JSLanguageConstants.KEYWORD_CONTROL);
-		IDocument document = new Document(src);
-		scanner.setRange(document, 0, src.length());
-		assertTokens("keyword.control.js", "null", "keyword.control.js", "null", "keyword.control.js", "null",
-				"keyword.control.js", "null", "keyword.control.js", "null", "keyword.control.js", "null",
-				"keyword.control.js", "null", "keyword.control.js", "null", "keyword.control.js", "null",
-				"keyword.control.js", "null", "keyword.control.js", "null", "keyword.control.js", "null",
-				"keyword.control.js", "null", "keyword.control.js", "null", "keyword.control.js", "null");
+		List<String> expectedTokens = new ArrayList<String>();
+		for (int i = 0; i < count; i++)
+		{
+			expectedTokens.add(token);
+			expectedTokens.add("null");
+		}
+		return expectedTokens;
 	}
 
-	@Test public void testKeyWordControlFuture() throws Exception
+	@Test
+	public void testOperators() throws Exception
 	{
-
-		String src = StringUtil.join(" ", JSLanguageConstants.KEYWORD_CONTROL_FUTURE);
-		IDocument document = new Document(src);
-		scanner.setRange(document, 0, src.length());
-		assertTokens("keyword.control.js", "null", "keyword.control.js", "null", "keyword.control.js", "null");
+		assertTokenList(JSLanguageConstants.OPERATORS, "keyword.operator.js");
 	}
 
-	@Test public void testStorageTypes() throws Exception
+	@Test
+	public void testSingleCharacterOperators() throws Exception
+	{
+		assertTokenList(JSLanguageConstants.SINGLE_CHARACTER_OPERATORS, "keyword.operator.js");
+	}
+
+	@Test
+	public void testKeyWordControl() throws Exception
+	{
+		assertTokenList(JSLanguageConstants.KEYWORD_CONTROL, "keyword.control.js");
+	}
+
+	@Test
+	public void testKeyWordControlFuture() throws Exception
+	{
+		assertTokenList(JSLanguageConstants.KEYWORD_CONTROL_FUTURE, "keyword.control.js");
+	}
+
+	@Test
+	public void testStorageTypes() throws Exception
 	{
 
 		String[] storageTypes = JSLanguageConstants.STORAGE_TYPES;
@@ -563,18 +611,19 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 				"null", "storage.type.js", "null", "storage.type.js", "null", "storage.type.js", "null");
 	}
 
-	@Test public void testStorageModifiers() throws Exception
+	@Test
+	public void testStorageModifiers() throws Exception
 	{
 
 		String[] storageTypes = JSLanguageConstants.STORAGE_MODIFIERS;
 		String src = StringUtil.join(" ", storageTypes);
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
-		Object[] expected = new Object[] { "undefined.js", "null", "storage.modifier.js", "null",
+		Object[] expected = new Object[] { "undefined.js", "null", "storage.modifier.js", "null", "storage.modifier.js",
+				"null", "storage.modifier.js", "null", "storage.modifier.js", "null", "storage.modifier.js", "null",
 				"storage.modifier.js", "null", "storage.modifier.js", "null", "storage.modifier.js", "null",
 				"storage.modifier.js", "null", "storage.modifier.js", "null", "storage.modifier.js", "null",
-				"storage.modifier.js", "null", "storage.modifier.js", "null", "storage.modifier.js", "null",
-				"storage.modifier.js", "null", "storage.modifier.js", "null", "storage.modifier.js", "null" };
+				"storage.modifier.js", "null", "storage.modifier.js", "null" };
 		try
 		{
 			assertTokensMsg("Tested: " + src, expected);
@@ -588,45 +637,20 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		}
 	}
 
-	@Test public void testSupportClasses() throws Exception
+	@Test
+	public void testSupportClasses() throws Exception
 	{
-		String src = StringUtil.join(" ", JSLanguageConstants.SUPPORT_CLASSES);
-		IDocument document = new Document(src);
-		scanner.setRange(document, 0, src.length());
-		assertTokens("support.class.js", "null", "support.class.js", "null", "support.class.js", "null",
-				"support.class.js", "null", "support.class.js", "null", "support.class.js", "null", "support.class.js",
-				"null", "support.class.js", "null", "support.class.js", "null", "support.class.js", "null",
-				"support.class.js", "null", "support.class.js", "null", "support.class.js", "null", "support.class.js",
-				"null", "support.class.js", "null", "support.class.js", "null", "support.class.js", "null",
-				"support.class.js", "null", "support.class.js", "null", "support.class.js", "null", "support.class.js",
-				"null", "support.class.js", "null", "support.class.js", "null", "support.class.js", "null",
-				"support.class.js", "null", "support.class.js", "null", "support.class.js", "null", "support.class.js",
-				"null", "support.class.js", "null", "support.class.js", "null", "support.class.js", "null",
-				"support.class.js", "null", "support.class.js", "null", "support.class.js", "null", "support.class.js",
-				"null", "support.class.js", "null", "support.class.js", "null", "support.class.js", "null",
-				"support.class.js", "null", "support.class.js", "null", "support.class.js", "null", "support.class.js",
-				"null", "support.class.js", "null", "support.class.js", "null", "support.class.js", "null",
-				"support.class.js", "null", "support.class.js", "null", "support.class.js", "null", "support.class.js",
-				"null");
+		assertTokenList(JSLanguageConstants.SUPPORT_CLASSES, "support.class.js");
 	}
 
-	@Test public void testSupportDomConstants() throws Exception
+	@Test
+	public void testSupportDomConstants() throws Exception
 	{
-		String src = StringUtil.join(" ", JSLanguageConstants.SUPPORT_DOM_CONSTANTS);
-		IDocument document = new Document(src);
-		scanner.setRange(document, 0, src.length());
-		assertTokens("support.constant.dom.js", "null", "support.constant.dom.js", "null", "support.constant.dom.js",
-				"null", "support.constant.dom.js", "null", "support.constant.dom.js", "null",
-				"support.constant.dom.js", "null", "support.constant.dom.js", "null", "support.constant.dom.js",
-				"null", "support.constant.dom.js", "null", "support.constant.dom.js", "null",
-				"support.constant.dom.js", "null", "support.constant.dom.js", "null", "support.constant.dom.js",
-				"null", "support.constant.dom.js", "null", "support.constant.dom.js", "null",
-				"support.constant.dom.js", "null", "support.constant.dom.js", "null", "support.constant.dom.js",
-				"null", "support.constant.dom.js", "null", "support.constant.dom.js", "null",
-				"support.constant.dom.js", "null", "support.constant.dom.js", "null");
+		assertTokenList(JSLanguageConstants.SUPPORT_DOM_CONSTANTS, "support.constant.dom.js");
 	}
 
-	@Test public void testOperatorTokens()
+	@Test
+	public void testOperatorTokens()
 	{
 		// Note: the original testOperatorTokens did have a '/' in the end which was removed because
 		// it matched a regexp with /= %= += -= &= |= ^= ? ! % & * - + ~ = < > ^ | /
@@ -661,7 +685,8 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 
 	}
 
-	@Test public void testNumberRegression()
+	@Test
+	public void testNumberRegression()
 	{
 		String src = "var i = 1+\n//\n2;";
 		IDocument document = new Document(src);
@@ -688,7 +713,8 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 	/**
 	 * This is a new test for corner-cases in the jflex scanner that the old scanner did not support.
 	 */
-	@Test public void testFunctionHandlingOnJFlex() throws Exception
+	@Test
+	public void testFunctionHandlingOnJFlex() throws Exception
 	{
 		String src = "a = a = function"; // a should be a function name (i.e.: deal with look-ahead issues).
 		IDocument document = new Document(src);
