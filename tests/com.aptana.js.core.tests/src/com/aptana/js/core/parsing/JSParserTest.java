@@ -1343,14 +1343,14 @@ public class JSParserTest
 		assertParseResult("export var pi = 3.141593;" + EOL);
 		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testExportStar() throws Exception
 	{
 		assertParseResult("export * from 'lib/math';" + EOL, "export * from 'lib/math'" + EOL);
 		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testExportDefault() throws Exception
 	{
@@ -1358,7 +1358,7 @@ public class JSParserTest
 		assertParseResult("export default (x) => Math.exp(x);" + EOL, "export default (x) => Math.exp(x)" + EOL);
 		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testImportStarAs() throws Exception
 	{
@@ -1373,70 +1373,131 @@ public class JSParserTest
 		assertParseResult("import { sum, pi } from 'lib/math';" + EOL, "import {sum, pi} from 'lib/math'" + EOL);
 		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testForOf() throws Exception
 	{
 		assertParseResult("for (let n of fibonacci) {console.log(n);}" + EOL);
 		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testFunctionParameterArrayDestructuring() throws Exception
 	{
 		assertParseResult("function f ([name, val]) {console.log(name, val);}" + EOL);
 		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testFunctionParameterObjectDestructuringWithAliases() throws Exception
 	{
 		assertParseResult("function g ({name: n, val: v}) {console.log(n, v);}" + EOL);
 		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testFunctionParameterObjectDestructuring() throws Exception
 	{
 		assertParseResult("function h ({name, val}) {console.log(name, val);}" + EOL);
 		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testArrayDestructuringAssignment() throws Exception
 	{
 		assertParseResult("var [ a, , b ] = list;" + EOL, "var [a, null, b] = list;" + EOL);
 		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testArrayDestructuringAssignmentSwappingVariables() throws Exception
 	{
 		assertParseResult("[ b, a ] = [ a, b ];" + EOL, "[b, a] = [a, b];" + EOL);
 		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testClassDeclarationWithNoProperties() throws Exception
 	{
 		assertParseResult("class Shape {}" + EOL);
 		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testClassDefinitionWithConstructorMethod() throws Exception
 	{
 		assertParseResult("class Shape {constructor (id, x, y) {this.id = id;this.move(x, y);}}" + EOL);
 		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testClassDefinitionWithStaticMethod() throws Exception
 	{
-		assertParseResult("class Rectangle {static defaultRectangle () {return new Rectangle('default', 0, 0, 100, 100);}}" + EOL);
+		assertParseResult(
+				"class Rectangle {static defaultRectangle () {return new Rectangle('default', 0, 0, 100, 100);}}"
+						+ EOL);
 		assertNoErrors();
 	}
-	
+
+	@Test
+	public void testClassDefinitionWithGetterMethod() throws Exception
+	{
+		assertParseResult("class Rectangle {get width() {return this._width;}}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testClassDefinitionWithSetterMethod() throws Exception
+	{
+		assertParseResult("class Rectangle {set width(width) {this._width = width;}}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testClassDefinitionWithSuperclass() throws Exception
+	{
+		assertParseResult("class Circle extends Shape {}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testClassDefinitionWithCallToSuper() throws Exception
+	{
+		assertParseResult("class Circle extends Shape {constructor (id, x, y, radius) {super(id, x, y);}}" + EOL);
+		assertNoErrors();
+	}
+
+	// TODO Add test cases for grammar I had to explicitly disable so we can eventually work on enabling it in some way!
+	// - Property Definitions with just an identifier "{property}"
+	// - Property Definitions with an identifier and initializer "{property = 1}"
+	// - class' method definition with string literal, numeric literal or computed property as method name
+
+	// TODO Add test for class extending expression: http://es6-features.org/#ClassInheritanceFromExpressions
+	// TODO Add test for generator function, iterator protocol:
+	// http://es6-features.org/#GeneratorFunctionIteratorProtocol
+
+	@Test
+	public void testGeneratorFunction() throws Exception
+	{
+		assertParseResult(
+				"function* range (start, end, step) {while (start < end) {yield start;start += step;}}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testGeneratorMethodInsideClass() throws Exception
+	{
+		assertParseResult("class Clz {* bar () {}}" + EOL, "class Clz {* bar () {}}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testGeneratorMethodInsideObject() throws Exception
+	{
+		assertParseResult("let Obj = {* foo () {}};" + EOL, "let Obj = {* foo () {}};" + EOL);
+		assertNoErrors();
+	}
+
 	private void assertNoErrors()
 	{
 		if (fParseResult.getErrors().isEmpty())

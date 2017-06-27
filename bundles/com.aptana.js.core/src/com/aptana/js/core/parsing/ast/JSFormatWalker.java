@@ -11,6 +11,7 @@ package com.aptana.js.core.parsing.ast;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
+import com.aptana.js.core.JSLanguageConstants;
 import com.aptana.parsing.ast.IParseNode;
 
 import beaver.Symbol;
@@ -273,14 +274,20 @@ public class JSFormatWalker extends JSTreeWalker
 	public void visit(JSClassNode node)
 	{
 		this._printer.print("class "); //$NON-NLS-1$
-		if (node.hasName()) {
+		if (node.hasName())
+		{
 			this.formatNode(node.getFirstChild());
 			this._printer.print(" "); //$NON-NLS-1$
 		}
-		// TODO Handle heritage of class (extends superclass)
-		formatNode(node.getTail());
+		if (node.hasSuperClass())
+		{
+			this._printer.print("extends "); //$NON-NLS-1$
+			this.formatNode(node.getSuperClass());
+			this._printer.print(" "); //$NON-NLS-1$
+		}
+		formatNode(node.getBody());
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSCommaNode)
@@ -581,13 +588,47 @@ public class JSFormatWalker extends JSTreeWalker
 	{
 		String name = node.getName().getText();
 
-		if (!node.isClassMethodDefinition()) {
+		if (!node.isPropertyOfClassOrObject())
+		{
 			this._printer.print("function "); //$NON-NLS-1$
-		} else {
-			if (node.isStatic()) {
+		}
+		else
+		{
+			if (node.isStatic())
+			{
 				this._printer.print("static "); //$NON-NLS-1$
 			}
 		}
+		if (name != null && name.length() > 0)
+		{
+			this._printer.print(name).print(' ');
+		}
+
+		this.formatNode(node.getParameters());
+		this._printer.print(' ');
+		this.formatNode(node.getBody());
+		this.addSemicolon(node);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSGeneratorFunctionNode)
+	 */
+	@Override
+	public void visit(JSGeneratorFunctionNode node)
+	{
+		String name = node.getName().getText();
+
+		if (!node.isPropertyOfClassOrObject())
+		{
+			this._printer.print("function* "); //$NON-NLS-1$
+		}
+		else
+		{
+			this._printer.print("* "); //$NON-NLS-1$
+		}
+
 		if (name != null && name.length() > 0)
 		{
 			this._printer.print(name).print(' ');
@@ -760,7 +801,7 @@ public class JSFormatWalker extends JSTreeWalker
 			// get
 			this._printer.print("get "); //$NON-NLS-1$
 			this.formatNode(node.getName());
-			this._printer.print(' ');
+			this._printer.print("() "); //$NON-NLS-1$
 			this.formatNode(node.getValue());
 			this.addSemicolon(node);
 		}
@@ -1117,6 +1158,26 @@ public class JSFormatWalker extends JSTreeWalker
 		this.formatNode(node.getExpression());
 		this._printer.print(") "); //$NON-NLS-1$
 		this.formatNode(node.getBody());
+		this.addSemicolon(node);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSYieldNode)
+	 */
+	@Override
+	public void visit(JSYieldNode node)
+	{
+		this._printer.print(JSLanguageConstants.YIELD);
+		if (node.hasStar())
+		{
+			this._printer.print(JSLanguageConstants.STAR);
+		}
+		if (node.hasExpression())
+		{
+			this._printer.print(' ');
+			this.formatNode(node.getExpression());
+		}
 		this.addSemicolon(node);
 	}
 

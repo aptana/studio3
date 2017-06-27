@@ -491,13 +491,14 @@
 %typeof ModuleSpecifier, FromClause = "String";
 %typeof ExportClause, ImportClause = "ArrayList";
 %typeof NamedImports = "JSNamedImportsNode";
-%typeof HoistableDeclaration = "JSNode"; // TODO: Make JSFunctionNode and have GeneratorDeclaration return a special subclass of JSFunctionNode?
+%typeof HoistableDeclaration = "JSFunctionNode";
+%typeof GeneratorExpression, GeneratorDeclaration, GeneratorMethod = "JSGeneratorFunctionNode";
 %typeof ClassExpression, ClassDeclaration = "JSClassNode";
-%typeof ClassTail = "JSStatementsNode";
 %typeof ConciseBody = "JSNode";
 %typeof ImportedBinding = "JSIdentifierNode";
 %typeof ClassElement = "JSNode";
 %typeof MethodDefinition= "JSNode";
+%typeof YieldExpression = "JSYieldNode";
 
 %left LPAREN, RPAREN, LBRACKET, RBRACKET, DOT;
 %right PLUS_PLUS, MINUS_MINUS, EXCLAMATION, TILDE, DELETE, NEW, TYPEOF, VOID;
@@ -538,7 +539,7 @@ Identifier
 	|	PROTECTED
 	|	PUBLIC
 	|	SET
-//	|	STATIC
+	|	STATIC
 	|	TARGET
 	;
 
@@ -737,16 +738,14 @@ ObjectLiteral
 
 PropertyDefinitionList
 	=	PropertyDefinition
-// FIXME This plus PropertyDefinition = Identifier cause a conflict!
 	|	PropertyDefinitionList COMMA PropertyDefinition
 	;
 
 PropertyDefinition
-// FIXME There's a fundamental ambiguity here where an identifier inside a block (within {}) (with an initializer or not) could be rolled up into a SingleExpression (assignment) OR a property definition within an object literal.
-// How can we disambiguate this case?
 //	=	Identifier
 //	|	CoverInitializedName
 // Combination of Identifier | CoverInitializedName = Identifier Initializer? - which is what SingleNameBinding is
+// FIXME This conflicts with PrimaryExpression = Identifier.i @ 891
 //	=	SingleNameBinding
 	=	PropertyName.n COLON.c SingleExpression.v
 		{:
@@ -770,7 +769,7 @@ LiteralPropertyName
 	;
 
 ComputedPropertyName
-	=	LBRACKET SingleExpression RBRACKET
+	=	LBRACKET SingleExpression.e RBRACKET
 	;
 
 Initializer
@@ -897,10 +896,9 @@ PrimaryExpression
 	|	ArrayLiteral
 	|	ObjectLiteral
 	|	FunctionExpression
-// FIXME: The grammar is ambiguous here. ClassExpression is CLASS BindingIdentifier? ClassTail, while ClassDeclaration is effectively the same thing
 // It's very similar to FunctionExpression/FunctionDeclaration (identifier is optional for expression)
 // AND GeneratorExpression/GeneratorDeclaration (identifier is optional for expression)
-//	|	ClassDeclaration			// ClassExpression is equivalent
+	|	ClassExpression
 	|	GeneratorExpression
 	|	RegularExpressionLiteral
 	|	TemplateLiteral
@@ -946,7 +944,10 @@ CallExpression
 		{:
 			return new JSInvokeNode(l, r);
 		:}
-	|	SUPER Arguments
+	|	SUPER.s Arguments.r
+		{:
+			return new JSInvokeNode(new JSIdentifierNode(s), r);
+		:}
 	|	CallExpression.l Arguments.r
 		{:
 			return new JSInvokeNode(l, r);
@@ -1113,7 +1114,6 @@ StatementListItem
 LexicalDeclaration
 	=	LetOrConst.v BindingList.l SEMICOLON
 		{:
-			// FIXME Determine if this was let or const and use special subclass!
 			JSNode node = new JSVarNode(v, l);
 			node.setSemicolonIncluded(true);
 			return node;
@@ -1464,7 +1464,6 @@ IterationStatement_NoIf
 ForDeclaration
 	=	LetOrConst.v ForBinding.l
 		{:
-			// FIXME Determine if this was let or const and use special subclass!
 			return new JSVarNode(v, l);
 		:}
 	;
@@ -1788,6 +1787,7 @@ ConciseBody
 // TODO: Handle PropertyName method definition case!
 MethodDefinition
 // FIXME: Using PropertyName in place of Identifier here conflicts with CallExpression = MemberExpression Arguments
+// A number of the allowed identifier names that can also be keywords seem to cause the issue here
 	=	Identifier.ident LPAREN StrictFormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
 		{:
 			// TODO Use JSNameValuePairNode to hold name with function as value?
@@ -1817,21 +1817,28 @@ PropertySetParameterList
 GeneratorMethod
 	=	STAR PropertyName.n LPAREN StrictFormalParameters.params RPAREN LCURLY GeneratorBody.body RCURLY
 		{:
-			JSFunctionNode f = new JSFunctionNode(
-				new JSEmptyNode(n),
-				params,
-				body
-			);
-			return new JSNameValuePairNode(n, f);
+			return new JSGeneratorFunctionNode(n, params, body);
 		:}
 	;
 
 GeneratorDeclaration
-	=	FUNCTION STAR Identifier LPAREN FormalParameters RPAREN LCURLY GeneratorBody RCURLY
+	=	FUNCTION STAR Identifier.i LPAREN FormalParameters.params RPAREN LCURLY GeneratorBody.body RCURLY
+		{:
+			return new JSGeneratorFunctionNode(new JSIdentifierNode(i), params, body);
+		:}
 	;
 
 GeneratorExpression
-	=	FUNCTION STAR Identifier? LPAREN FormalParameters RPAREN LCURLY GeneratorBody RCURLY
+	=	FUNCTION.f STAR Identifier.i? LPAREN FormalParameters.params RPAREN LCURLY GeneratorBody.body RCURLY
+		{:
+			JSNode name;
+			if (i != null) {
+				name = new JSIdentifierNode(i);
+			} else {
+				name = new JSEmptyNode(f);
+			}
+			return new JSGeneratorFunctionNode(name, params, body);
+		:}
 	;
 
 GeneratorBody
@@ -1839,51 +1846,76 @@ GeneratorBody
 	;
 	
 YieldExpression
-	=	YIELD
-	|	YIELD SingleExpression
-	|	YIELD STAR SingleExpression
+	=	YIELD.y
+		{:
+			return new JSYieldNode(y);
+		:}
+	|	YIELD.y SingleExpression.e
+		{:
+			return new JSYieldNode(y, e);
+		:}
+	|	YIELD.y STAR.s SingleExpression.e
+		{:
+			return new JSYieldNode(y, s, e);
+		:}
 	;
 
 ClassDeclaration
-	=	CLASS Identifier.i ClassTail.t
+	=	CLASS Identifier.i LCURLY ClassBody.b? RCURLY
 		{:
-			return new JSClassNode(new JSIdentifierNode(i), t);
+			JSIdentifierNode name = new JSIdentifierNode(i);
+			JSStatementsNode body;
+			if (b != null) {
+				body = new JSStatementsNode(b);
+			} else {
+				body = new JSStatementsNode();
+			}
+			
+			return new JSClassNode(name, body);
+		:}
+	|	CLASS Identifier.i EXTENDS SingleExpression.h LCURLY ClassBody.b? RCURLY
+		{:
+			JSIdentifierNode name = new JSIdentifierNode(i);
+			JSStatementsNode body;
+			if (b != null) {
+				body = new JSStatementsNode(b);
+			} else {
+				body = new JSStatementsNode();
+			}
+			
+			return new JSClassNode(name, h, body);
 		:}
 	;
 	
 ClassExpression
-	=	CLASS Identifier.i? ClassTail.t
+	=	CLASS Identifier.i? LCURLY ClassBody.b? RCURLY
 		{:
-			if (i == null) {
-				return new JSClassNode(t);
+			JSStatementsNode body;
+			if (b != null) {
+				body = new JSStatementsNode(b);
+			} else {
+				body = new JSStatementsNode();
 			}
-			return new JSClassNode(new JSIdentifierNode(i), t);
+			if (i != null) {
+				JSIdentifierNode name = new JSIdentifierNode(i);
+				return new JSClassNode(name, body);
+			}
+			return new JSClassNode(body);
 		:}
-	;
-
-ClassTail
-	=	ClassHeritage.h LCURLY ClassBody.b RCURLY
+	|	CLASS Identifier.i? EXTENDS SingleExpression.h LCURLY ClassBody.b? RCURLY
 		{:
-			// TODO Handle heritage!
-			return new JSStatementsNode(b);
+			JSStatementsNode body;
+			if (b != null) {
+				body = new JSStatementsNode(b);
+			} else {
+				body = new JSStatementsNode();
+			}
+			if (i != null) {
+				JSIdentifierNode name = new JSIdentifierNode(i);
+				return new JSClassNode(name, h, body);
+			}
+			return new JSClassNode(h, body);
 		:}
-	|	LCURLY ClassBody.b RCURLY
-		{:
-			return new JSStatementsNode(b);
-		:}
-	|	ClassHeritage.h LCURLY RCURLY
-		{:
-			// TODO Handle heritage!
-			return new JSStatementsNode();
-		:}
-	|	LCURLY RCURLY
-		{:
-			return new JSStatementsNode();
-		:}
-	;
-
-ClassHeritage
-	=	EXTENDS SingleExpression
 	;
 
 ClassBody
@@ -2075,10 +2107,11 @@ ExportDeclaration
 		{:
 			return new JSExportNode(true, d);
 		:}
-	|	EXPORT DEFAULT ClassExpression.e
-		{:
-			return new JSExportNode(true, e);
-		:}
+// The rule below should cover this case as well! Only difference seems to be the trailing semicolon...
+//	|	EXPORT DEFAULT ClassExpression.e
+//		{:
+//			return new JSExportNode(true, e);
+//		:}
 	|	EXPORT DEFAULT SingleExpression.e SEMICOLON
 		{:
 			return new JSExportNode(true, e);

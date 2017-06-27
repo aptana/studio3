@@ -3,19 +3,35 @@ package com.aptana.js.core.parsing.ast;
 public class JSClassNode extends JSNode
 {
 
-	public JSClassNode(JSIdentifierNode ident, JSStatementsNode tail)
+	private final boolean _hasName;
+	private final boolean _hasSuperclass;
+
+	public JSClassNode(JSIdentifierNode ident, JSNode heritage, JSStatementsNode body)
 	{
-		super(IJSNodeTypes.CLASS, ident, tail);
+		super(IJSNodeTypes.CLASS, ident, heritage, body);
+		_hasName = true;
+		_hasSuperclass = true;
 	}
 
-	/**
-	 * ClassExpression (no identifier)
-	 * 
-	 * @param tail
-	 */
-	public JSClassNode(JSStatementsNode tail)
+	public JSClassNode(JSNode heritage, JSStatementsNode body)
 	{
-		super(IJSNodeTypes.CLASS, tail);
+		super(IJSNodeTypes.CLASS, heritage, body);
+		_hasName = false;
+		_hasSuperclass = true;
+	}
+
+	public JSClassNode(JSIdentifierNode ident, JSStatementsNode body)
+	{
+		super(IJSNodeTypes.CLASS, ident, body);
+		_hasName = true;
+		_hasSuperclass = false;
+	}
+
+	public JSClassNode(JSStatementsNode body)
+	{
+		super(IJSNodeTypes.CLASS, body);
+		_hasName = false;
+		_hasSuperclass = false;
 	}
 
 	/*
@@ -30,11 +46,23 @@ public class JSClassNode extends JSNode
 
 	public boolean hasName()
 	{
-		return getChildCount() > 1;
+		return _hasName;
 	}
 
-	public JSStatementsNode getTail()
+	public JSStatementsNode getBody()
 	{
 		return (JSStatementsNode) getLastChild();
+	}
+
+	public boolean hasSuperClass()
+	{
+		return _hasSuperclass;
+	}
+
+	public JSNode getSuperClass()
+	{
+		// second to last child
+		int count = getChildCount();
+		return (JSNode) getChild(count - 2);
 	}
 }

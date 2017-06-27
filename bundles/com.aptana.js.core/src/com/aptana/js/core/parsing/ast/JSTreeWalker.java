@@ -161,6 +161,11 @@ public class JSTreeWalker
 		this.visitChildren(node);
 	}
 
+	public void visit(JSGeneratorFunctionNode node)
+	{
+		this.visitChildren(node);
+	}
+
 	public void visit(JSGetElementNode node)
 	{
 		this.visitChildren(node);
@@ -318,6 +323,11 @@ public class JSTreeWalker
 	}
 
 	public void visit(JSWithNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSYieldNode node)
 	{
 		this.visitChildren(node);
 	}

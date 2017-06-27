@@ -7,7 +7,6 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-
 public class JSInvokeNode extends JSNode
 {
 	/**

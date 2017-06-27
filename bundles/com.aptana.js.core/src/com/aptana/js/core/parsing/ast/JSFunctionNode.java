@@ -30,22 +30,14 @@ public class JSFunctionNode extends JSNode
 	/**
 	 * JSFunctionNode
 	 * 
-	 * @param children
-	 */
-	public JSFunctionNode(JSNode... children)
-	{
-		super(IJSNodeTypes.FUNCTION, children);
-	}
-
-	/**
 	 * @param name
-	 *            JSIdentifierNode or JSEmptyNode
+	 *            (JSIdentifierNode, or JSEmptyNode)
 	 * @param params
 	 * @param body
 	 */
-	public JSFunctionNode(JSNode name, JSParametersNode params, JSNode[] body)
+	public JSFunctionNode(JSNode name, JSParametersNode params, JSStatementsNode body)
 	{
-		this(name, params, new JSStatementsNode(body));
+		super(IJSNodeTypes.FUNCTION, name, params, body);
 	}
 
 	/*
@@ -185,13 +177,23 @@ public class JSFunctionNode extends JSNode
 		return this.getName().getText();
 	}
 
-	public boolean isClassMethodDefinition()
+	/**
+	 * Determines if this function is actually a property of a class or an object literal (and therefore should be
+	 * printed differently than a typical function.)
+	 * 
+	 * @return
+	 */
+	public boolean isPropertyOfClassOrObject()
 	{
 		if (isStatic()) // if it's static, we know it's part of es6+ class definition.
 		{
 			return true;
 		}
 		IParseNode parent = getParent();
+		if (parent instanceof JSObjectNode)
+		{
+			return true;
+		}
 		if (parent instanceof JSStatementsNode)
 		{
 			return (parent.getParent() instanceof JSClassNode);

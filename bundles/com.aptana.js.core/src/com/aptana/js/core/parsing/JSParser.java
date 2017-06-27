@@ -32,188 +32,190 @@ public class JSParser extends Parser implements IParser {
 	}
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9pjNGTy5CNtVpEN2WaGceGYDVGUGYZstaN0ygFRkoO8M554x80YHOeYeWXI1QHP006HeYW" +
-		"TH7gJBeWWnPt$TsOdjtkNsylbSdUW$zjytixipBmtt$VcpTkPtRiBKRE5z3bDOLUpNZI6nj" +
-		"8u6ayJQ29DeWNiHKxKY1hJ7NGdJ#NbU5NUWARH5pILb#QDUHEMnggnwgm6gqhjw2xw7ntYw" +
-		"Jo3b#4NyBAyAQ$FI$8KNeKtvALu8sCfzQLxQOWGF846ynAy0YzEQsaDhQFrD9DMqmpgIJ$H" +
-		"2lgPVg6Lj8fVICjeEI$FnhFPz0hrfpTf4Br3xr8VUfdwHG8nPPk8sSJy8HQ6ByJi9MhDCta" +
-		"p9fYXkRlRkQcRvAR7w5cwbMwanwaJtKotq66gGCcKH8bKc8fGKIf6ALISIb19AaMbwG8gGw" +
-		"bqalwMEhDbh0cLPpTHMPP1YzWdL8uAqVTKYIMp7cmSpUIpQ8QOngwa1#aW$u9FuRFfOTf1E" +
-		"#a0LKRfTdOLLPTsfSzeifTTjx4xsVsykV4otHTcFPvWbx6hB3rONNw5r8DTWLBeOVH6dzDf" +
-		"1a#ZD9h76h5BQOdWMWzLe$JmgOKnbRRnhrW3remrXnubgBNNQ8PG3pwTLw9lREFnDVjDwi5" +
-		"RqfVyf$3spJPGPpxLrlSSkb$vGhQh64lc9#bFjemlvpzIDalXbr8y#moUFfk#OkcqaL$Enh" +
-		"6k$0Q#rCRFwG4gn$$cI$WFd1cj#PVKI#odJ#XJzWnxcjKEhpOKGt4KQ$E87dH4UKGSy2Upj" +
-		"gmTIsNjwH5sZVA1Woo6jM6pK5U5$mdFzktFsTAVgHVqXXRqZ36ApGZpcCInMwYcpQOleM#f" +
-		"nQVi2QL5LsZHbjtA#Yb$FWY4zx5PF8sreIUTj63BbHRVoNX6jQWEfRCbuTR2#8Yjj8t5Uto" +
-		"6wLbi54isnjCBo7t1lgNAj0Jw7MI$ieFGeXhosKvQy9RcMB2JEHx5YuHPYp$PGjZQvb7iBp" +
-		"KMRQH7OKRqOgaAoykcHz4yUCe#vIa$q84mnutAV2F$rSA6cJXJnOqONXD#qfLwyLeI2Uy4$" +
-		"ryg$OHNOeNvkov2J0ipDbSXleNtjM7RmXzGTbkexFOKVuRtvn#giPP$1$bd$0Ps8H#7scvX" +
-		"jzkhj9T$QfjVlzD#YStub6zcoM8Q7UMxgBAOndztnT5Vm7Q2ph0Rw2m9BiADZH5VnU9j$fR" +
-		"82Ycx9R6Y6DEoh3ohmEgpYgmMgylgODRKXmU#fZomNjYnDMJfBDE6hOKhGM6xY7RZFdMjyP" +
-		"931CLAYpRahBJOP7gEvjAFvagBsj3jr3RtIeikPE#mGUmD#eCLOH$IAVg7CLQ9DMOrMKdsE" +
-		"DyWZl67kSiLp#RmPQmfkuvTJzNLVSftzBjHnWqsctNXHz1k1Ul6kY6EFqRL3QISiuTebs0v" +
-		"COLSORvBrUHRMPP7J7bAsR4twuCnVfMzpjvYRxF#vae5wvPtsM2vKc7l#rjniH5y4zsdOtk" +
-		"3C7l2C3QIVMpJO3GRhpGOmyP2W$7iSpQLJMTViaLifZ68DN9OOqrIqTptY4qAhmR61EDpup" +
-		"ER1elP3qg3fUn7bemej9gjnGetZUrcUusXJXg8SNuq#8a$5Am6$1P#ColDR#AtIWruQzw6j" +
-		"vKQy3lvNVn$l1sTvFU8iQmRByGVTLg$yiTuAtuRlvtVmHyFSpnDOgLuiYtM5pKcgpkzO9cK" +
-		"80xI6LvD$2xMirfY3MijLl57Z1SY4Id4prILgeaL$69sExi3aU9ArjHXNN6r6iSgh3w$nfX" +
-		"XVCbcYtH#H3H6f0YhvKGZqL0qi2mdwejwqdAYhgX32M7kkxQe9MohJ553L5Tzf$4Eb62y4e" +
-		"aHubtuVSPXKSvORip7#dKEzN0Q8UCREKB6jrAoAC#psMoZLqGGPl5knZRUmzZAdwSNuKCz7" +
-		"Nte9RNllPQ$p5ytjl0tiQ#F1Bxh#11ZjFHlOxFnAvjZh7V4DrHPy3TZax71s6YiYmm#h3ad" +
-		"6vyOFVaSVfKXxRVA4Tyloduh#Hg#sdZKU212zbl7VpD6KokUPcJ3##Rm7Qmf$uP$o#VoUNm" +
-		"#$uulu0lv8luzNynt6bbIgl64yRZn6DyR6NpYcF6KCTheoe$IYx3T77xCqNx7#L#k65UYAz" +
-		"Q5TQAhQ6JmiQb48fNqWHbCJlZ8wuYG$#70#Fw7yB7MaSJ7xc7tIdmomhZnsQtq7PkF7I#vd" +
-		"$3Cq#Lp8uIlXm$xuU29QZ$kuuYi$UGA1F7v0RK2wMgpdyzdqkmsr3zBqYjs0zzxz3uDen6w" +
-		"xxTe98sIVRirQOLrwgFq4NrC0#Xj6aYZQJYzJhrfA7r0Rz27QD9NJAKXRB1y9aslGUwhvlv" +
-		"070FtTYSKydblm4$HIMm7uaEcN2V4x6AgodO0XUb7VX6hf#ZRD682Ok$n#yMTMyykjrNaGb" +
-		"omzJU$qV$wsvTlUHp7hVLtf2A9pKgvPkgvdWaoagZU72E95xf$tBa8HMBsIlxiP#4xjvx6E" +
-		"rkULZ0aTAA0IEuE5H9Ml8187WmPae45HF9io91yK40alKE6P5q1aRmLCYIR2eZadP0XsLf0" +
-		"90D3XkJt0Y8P5Z8aXmg8P6J8a1mj89BH8KDIq1WxDcH8JWU0n64lelRg4$9SuP1Sp$BzM7d" +
-		"ADs8EgqDZ8jbNBtvNX#mk6a97aSFga8rKgqDpvMaTItIgPF8zkjxdUjONOh5Lhi3vFh61TZ" +
-		"kkmCsdxFNpGint0t47h6VVDH5RAt3gnKegcpYjgjS6YjWO9LRclG8ttfJsa2jm8bT27Yjm0" +
-		"kAYDiJax0diSlNaD5ysTXKMlwXTZb$4iaknskKAn2iaOjNAqyRaRvUZsWVi5MfVbeUD#INv" +
-		"sEL86s$JY7tiSdWVT#vj$xkSWDR6iQ7SMs1SzeQoLzwTFyUVuEtvlLwzHaApywMFClyHFQ9" +
-		"zHFk8zX7j8uAn$Rpl8y3O$b#v3vxtun7j8zh7$zC#2lQP4bOwZq#suJ1Ei0lyli6iATlWx6" +
-		"CNvRtFo6lVnxTXtrUJgdlj#ypTUId7J$O7lelAsKSwxllqamlvzc2AsXbjo$jzdEAnxwsTS" +
-		"Dgq2HrYVZrvx#Vy8dPn2p5F0#9vVX3Nj3sDoIzY4XjnSaPiVyxZ$CIbKZvj73nYVyylb2y4" +
-		"XfYydr#GxVb5NfzK21InuJ7UVcUU#2Cen3b7g12VbetvVYAd9uSsn0U2HynQEo7cUu913Bv" +
-		"zVcnSbTHpBVCTg5y$Fa1zsJO76ykZOaw6RoVl8$VtoGhsIS8JUNmQk63tbE9XbVvcMAKF3A" +
-		"lq3y8gVLrOfMyAg$IjOPN#UrYb7mghzADXbHxUI73wtni9#9Dvh8mTrlQqDNzhU#C0#zdFV" +
-		"TQKPzxPvaXvlA9RdbbgoRCTpf#moJy#xlJ9SVDutjtd76l5uF1snWWzFlCDcE#3JmnLBqhS" +
-		"af19ysVFpVHhgFfXd3RpM5EiEEH$9IT2rgifprN4vuWuVSSyk5usEu#zFZg4USo26PEyZf3" +
-		"vcU7q3UWWnzJt4RfUedZ3YpTFpyF1kfrlCoO0qEuu8DRzVntRA5wFG$9dKhC0UmdaayRNkM" +
-		"LVJpTG4ygWfjISMj15T35TGfVIPNGvNKLNqpLqBTNZndatYw9o$XjoxZdFy4JbHEL4vKJbH" +
-		"EL4vKJbHEL4vKH6pbE1FTrc##nFjzcAN3kbNUJ#hhTP8Bz5wlucwKvsnchAkdktLQL30iN2" +
-		"XtjYaT$rbczGvJT9rVUf9Hr3cVaxIPsKUFaxINUZbnvy43kZFc5l7G#XlBFxU#4LYVWB0MC" +
-		"vw$7KttQmZZav$edlNJ1hecfFiuo0H#4vZzu2nLWd62wlznaBFQ1lLFYxUkwIeOjxb3aZnt" +
-		"V#V2klQudYth#mS0LVWrtobSWruFK2sILJIoLd4wX6SDh1duFbSppOqE36Xmq$zphaZ0zRv" +
-		"QoVQbVRGVSrvru7DvPT0SlSv25pptcWms$QpYy6x4jnTfcyrxdNWSVhzBM0PTxjeSCRvru7" +
-		"jow30vPPmqE7zvrbwgDBa74vAqY#fuFacnKatxT1yiqFcAzh2Evon$8S9wB5GVgLAqY#Oa7" +
-		"oLGwIhs#GV0E2vFieIBu9GV9j39BlG91yn$F#J0RkKW5$9YEmGsmAsakju$d8UXxl62JV$K" +
-		"7oTGsIByZOoVi5oVT1a7nZWkIR5Z1VxQ1YRjsWkEe7nTKmAAwRWkAwBIYkza5nTGoAwz6Wk" +
-		"8Axisu9XijhXvkpimoKUxDFxfpZ2f2vivH7m3jBjiMRcpqV63Sxx2T4vrUt8$vqO$k3rEsF" +
-		"e2qJAEw$2pAY$3BVprVOgM1n6s$bt$PyG3ZyYhyNB3V$A7H#nKVvqusF25AtZxrrurj2wrV" +
-		"yymBvrTU#$OgFj#FcX$EXjRTNcF8EyaFk$5ftBkStx6my$6U#tiOOZ4y5m#CJTHw7CqyKTH" +
-		"Hr5FLvWvgrZYHgpr$op7setmIs8MOBTFdNJFusqZVigw1jdPzFrJcybN3#Zmq1r7aTnaJdu" +
-		"J8cvhmLirccjLy#yvVBVFU$n0ysLUVr#whohPndISwewFxP0hE4VSsBcQDYZXDmMoNT8SVs" +
-		"1a$#cfPRgpqMRhCdNjY7HoYTx7rB2JQFA6Tv1EkatkorDX6p7lBNjEpl#amvvXiyoBWoHmT" +
-		"s9UHCOxTPEYZ9tsl9LQcQYxcjSDQLn9iZxIbRyUPA$WkMBqFApKh0XLhEm#mHJqiozoT8#H" +
-		"#if$axiInRjl8OwPlb$wRJUVbVwXvKtsAHNATy3JrleLe#cPFBVR2Mx1BTzYBa675oKGp5K" +
-		"Xp5Km8bKY4gJ4cKxFWjfB9KZifJ1MXMaIfHPQgYlesQHjMfXlekSssgWnrxFUo$6s0tBUTk" +
-		"XfvXXAWZPraMvfbybj8DQwqUz3GzGy$IS$GylK0zwKLwYNhHozIRNi7#k1MeDRMXjdIxV4E" +
-		"jta170d6cHjmoduZ99#8ioWw8km#zIg$Hw$G6lKblqTlKb$fHV$Njsm7q7WsaGJIOXj3xD9" +
-		"I6qN0QGH$GXpHIwRoEHgllDu$1h4wdpPZVuw536kRqPDgb#ym0ZaoiSU#XUsaEVKLVqpVqB" +
-		"KgoQ3vzXtMjRxkkK7Rj1yrMXrcFfGg7fOUqdjH3baezIFUPHDy3qKoirzjHUws7MIDREdd7" +
-		"2ZgE5VqUsXi1FJhIhpOzjW6Jr2CPDPF2t7TJwkpLznhj2$lHTt$unZewGd$WEXt#EHEUaad" +
-		"7w4zuoXBQ0azP3dp2ucUny1hmg$yUjf4bmTvPc1Cv#4#6LniMn#9nfxUqcGoSKfi5G3q9Nc" +
-		"1wT4lj0pDH#pCy6txFNF1itvwGgVnPyadSxM6lLM4UamN0bUsXHQRI8WCsbrf8ct#lHaJwy" +
-		"qpaf1P9E1TnrAADqgAzYcSVqIZwE09QT8OUzYZJKNjMEhH81yfCPTLCQ26ZJ3h#vi3ZPOcJ" +
-		"5ibwB9WRTxYrQ0ezllSOYtIbnS$Aesv7xrcgznoFakZcg99qQ15UR9Ff01sqOSj2YSIsH5b" +
-		"ukTjdqw53blAJZi36L4mBFxOisCwEBTqs4zFrNwR#awEVfR2PenzUR6depOujsOnPE2y3jW" +
-		"pC98b2NicxkemI4fiyBuW0jWxetpvhaZMs961BKjSIRr$SxRO0MxBRt$g67Lk6ie7TRfCzi" +
-		"554LbejrUYqLEbXhBJsOwKbhT99tQTy8yXG25g1fpNQjLKIEYCQTeArPIhlKktTbhilp7RC" +
-		"1fhsFk9xafgtSdHh89$cZYb9#9ChbJI$Awvqh3nNwzZ#IzYzD8dEU7Z2RKg34y0#2VbrsbE" +
-		"JS9q13NpZJbUuVTU5MmCp$lYQPosXGQQA4PqG#TDKEoSDMfv33QJ$oqZXDEUcgFVyqsWwVH" +
-		"bsM#w67InRPkXOB##Dau0p2tTrEL$xgdnBEXknI26VLRG47lcqeWMaN#JN4#VYt5UDTol4$" +
-		"TQWjc6sN1FrPrbENadBoJJSAt$dlfFKhor4OeHaNqtqNn96g8ZZ23LH$JPHacNRLX52M0Er" +
-		"9ieah9vQuCe9OPfUcwOh3kb3aS0t3hMcVqiRjW3vz$4cxh$8u9Eh$GoCLGR9Dr8jSBzrmhT" +
-		"1zPi6wKTnJeiGlZJg0coT8BK3fBR0xlSYkfyUe0Vf8NgO7g57wJ5wd9wW9z6gWvBQGVrrYH" +
-		"2#BkXBzhm1tjV1h$zjGDqQfKqMC6H525#I49GXz44jG0xuXDSH6Nogf$yKFigA93vr1mK#6" +
-		"M5oy7bOQHRDbeZSzwbvkdnXXF1Dpcq$bLDhP#ynFLVsmuvSHkZbDdo##vwBcYAKZREympdq" +
-		"xTPaBQBhN$vyIp#JJjBFfBFXM#R#eALf1mSKydblW4$H8QEbYjgcN2ThPIWxD3FzA034Sqt" +
-		"4tjwcjFxHdLj9TzlA8$mKtPTlUU2qhxyZ54bilVkqtRcU2QetnqZYXMwUEnUXI4n$vyz#Dd" +
-		"pdZwT5aKIHH954aKIHH96408dZga$UUVDSuIW9HTmedUxGwNB5wzOlWFKiSitDvtd8gPMdZ" +
-		"R#TJfLCcgnNflbRpsRJCgH9ZeXDcSbv8QP3NeYj5NZEMt5d585#ZgLpW2jmkQjefctYryOW" +
-		"3yHQIz#ztwqy8LysfiFQnduHgpvRifX0l48YLgqyRAnA77SvgZPWhr1#7C9TZhBnN1Dn0NS" +
-		"v4TzRAE#Cn8uXsaUqZsWVqJwYVKJxYFOHxIFQHxIFQ1y5woFyJmpId3wJPEtBAHCeV6ZYus" +
-		"b7tay3igcJrzxQFEzsicS#Tb5w7#bdtvVjrgcPtXa5WDXpR#quxdPjGeUucVrfIw0sjfwuK" +
-		"14$YBDjE#zy8fQs0paYjZ$dyUFV7VDfuw0H#tr#OVf2G8Yzdr#eJm3aZ68UdrG8676QntZx" +
-		"dNbo5FAFsCqTKiJkJnQ43R7wBe7l9t2JWxCnBNEsiUSxq3oV7CxrRMDLvdu#nBZmEYB#VRA" +
-		"ezAZqgFIezAXqP#aXNDlxNSyao$MPQj72KvukTSlpk6E4zXCs$bR$7TrzjiXhnM2jMaA8hv" +
-		"dttT9cXVHGzQAajGiPPd$sbDy03TtOGPgMw$26nsshaBq1ql9yZakeHyHvx7DGX7VCWXcJF" +
-		"367pi#SlbyMv9Y6UvP5yOONRrwUfthBFDzcJ02OtN4WfE#n$rLZ6yNhWJE7FtHutVSps#z3" +
-		"NK5NkdyZwZhrEr8tqatgrm6TljDpxkuxKJbHEL4vKJbHEL4vKJbHEL4vKJbHEVzUEK4#tSw" +
-		"rKx9zrzjMalDDqa$eKtzjLUcCe9#qJpRVe2gIdx2Nz9lGt$MciKgw$9saMUex3l9tJUPwO5" +
-		"yXRDyBbszGWyNY8NMdE$URmovuj3gRlu8MZEQHvF8OSLgYpiizTyb2CEivy4Rd9$ZmqPzii" +
-		"cPxMQKfVBGPDLTFORO7j4k#LV79xrUS2jg7GZGFGk3FmS#3aEcGCpuqmra$LRyznBf7ny5X" +
-		"7A8w$BjzoLccbcn4Mil$E5$8nzuzKhF$9HQ8yfqlV7b#9iFxSu6wpETdCW8xr2yg5d06KCT" +
-		"$ZOMZVES3NvGhoXLQhfmd6GNYTiUpfkgJFCtrLU0xotHlRceV63SnFn7wFDKjKEvpCQ8swm" +
-		"MFE$a$OFj$eLy1px$Eh$HtDWB3xMKvBUy07NJdZxfpETy9iV4mOhPH3SehWk7nYTh$uSmJH" +
-		"Hr57KLz$g16D8mWQkzliUN2CyjyrkzkFq#NBwH5E2#c7uAsTNu#LUVyLiBXFpRaNPTBqtG$" +
-		"uvMUyrRCLfRpdimdd$cvL8Ud2EsSiUawpzzNbU$UF4jcMMzWPFyqpoonHiKS9#2sIdB#kv5" +
-		"#W#Vnhc#hXTliYRRczWYjqopxsn$8dATpdXunLhtPop8HqsJlTtsc7FssBqkrcsV#$hIKGt" +
-		"Cj7JoqaXAItLPOIIMe7zArgbK$LRlJycL8sQ7IwbgEQIER9UcqMuzcj5P$NtTMhhTRE#IRI" +
-		"9sNxoGt8Msbhjhu7Flrwhmf9#UZnU#qpyeHkL9wgV$969kCKrEY#3#HZYLY9UL$YoHAk4hM" +
-		"XuFGTsESbkh#Rx7AwJCphJgUgCdREhy2#H#H7aEwXwXQQQBQXv6s8CgC2nV6t9YhTIBAg65" +
-		"T9oQXh3TmjS#RjnBict4vsd#6YrMmxvl8BpFhCdhBCT7wpqVT9ZDVUBIPykfe2tqpFj3Nyy" +
-		"qqhRZyBw58fUpDAAyCcebnguIoTiXNq$9F4bsu03Qled5t9YhRFL9sEnS4$L#4$TwnhkbzN" +
-		"JuQTlbJ$ezJv1SZ$ufPNb7#vzAPPhxI4x3LtMO#hePTRlvnk4v1zkDclcapZM4$ygs1xqpk" +
-		"zeKn$ugT88ff0Eg0iHo4DCEiYsc6wrrcdZVMPVSJLIy2VHOHbU2ulX9f4q#PvHxKRU$KkXR" +
-		"JrszfVT$JCYytqzHng1k3kTK6QH$G1FXC4wIlMJ9Zla2$cCDiAVfxm2oBZKL#g6VVPHdQJe" +
-		"Eikv7s1Ks7B2cpdrbV$GxqUxMp$MA#n0d#6$E4llxAJ1FN8B$4p2SDGtwZ9r$S6y0sJlFy3" +
-		"RlkHhh6ga$vpCfNhA7R6ReESofMwdC1w1AYGjMGfcaTlmLUZJqkrORpS6xiAOMqNMlfwtiz" +
-		"wsEhGiPpjckkqph07eEqgAqk1QJbnTQ5pCUGNcUhVygMJ$3if$fpH8tBUPRHNS3pC57nKcZ" +
-		"$CM8$Obliyw1Fe6ytf2#OxKeiG$vj4Foo#aZq#nxox#X#9g4CSONZNbBYh2wRZ5Wp7EbG#D" +
-		"KIf8XBbGuXnHYLhA$RO3oh8uvpnBJOVtJPLxX#G#OH2l$1zQ#wNCUw6eLmQekntcTUbqLya" +
-		"$#NE2uUllKascr7FW7OCGzYTsZUdJQRuDuHrr3#tsFGpyWtCilZ6bjjuj17vXIac6TnY965" +
-		"SH#CQs6hpo1ARgxpBJ4NCKVvKQBAbN1z2zAhaIB6b#nYjc5JWRk##L#JI#evLWFplZ5YJSb" +
-		"5bjmo1y07Nwly35BKL$uGAMILF67MDyQzeaOFo3bDLAgcbWCRDyOyBTNEl7QXtnfpaIAkbU" +
-		"ghs#mWIeSVbPfhNYVqqjYl0Tq8WjpAly0sHNHvVyo5GMQ#wK0pBOvO68UnoOJVnwq36R3BV" +
-		"KX$qpnRCHOpm3SRUOnrEHcBjY2$3Rm$eErFY2SOjnJOha7V79qrvfV1kyBCLuIlf1upyvLS" +
-		"kluZCwqIhp5DidXJcgCFZ7aLp9KKQRUTICyWnJnFWHufU#7JPK4LB9xYyFduQjPrpJZOvre" +
-		"p7tyRx0DRn6U2TEoFlnY4#H$tWyKJVoa8jexl2deAXBaIZ$aLZxaJZtjE$4iWnCPuZ7qyub" +
-		"uyx18$1uIO4WziDMj3Bwm1Ii4Fu#6JfQiWFGxw2$sNGptyo8NvL1esYyTz83OH#TUGnvn9W" +
-		"Aydm4SJi5uh3Ra9hK2uzzS45jSHv16l4#0t2HYpcaDGXZvAurwJS2qe2$DIvZ5lgZo057Ed" +
-		"2kPrGaUY2yeZnVnFX1$7N8Ho#542uaiLs3IX2#g1AG7psOMnhWbVSC7dBu0v4Z2dQsAiqo7" +
-		"l0kYQC09h8QpD4X13gihvyJdATo75$ICTFb8BzoSNT2uZsqp4DTOrwOZZPQx3DM99J3sKtO" +
-		"0sYDTbODC4n99QqAK9vcqPj4#OelrujwSVrK9CIjXcNPUphT4IzkWsM1SrpHMZ$H7i0Vz9h" +
-		"03RLybTLmUn9c4XwdLCJYm1mhWamlyJhp3BOWk31kEw60XhiqJm9Cu7LJFhKn7J4zEWDsoL" +
-		"Y35AX3rI7z7oS6yeLCo6HT#x4x4cIEnavfjXhYVYlfeutBoEWSyaZikDjUeJLhv9jfaMmhY" +
-		"wT0nCNQZvuTk98ynysVAwFyJMShqi$efOEoLYtLG8FfvunYfdsWxCVKyoh#CU2SJMmH0mdh" +
-		"JrCyNAqs0phUT2pDHZqH3nCnP#r700Oj9bIE5FXU7Z3H6ZYdqUBeovCJT4J2usnuOLCR0Xx" +
-		"dV5TkRDswWCuXhMKutIaTOpo#f#RAOfZ#AaTMNbBPvQjZLm8ypZbDTql$h#Ng#XhiDQ86Mw" +
-		"3TSsrDraNQV8lVeoMptkwRnmE6nqlX3qVmYsjAt1QAKkxsEc776ltYYhllPzDjvlhBphqOB" +
-		"XO8Z9TJQR#J8w1ZRgWpnYRaokFOHPdvbcvVa6pxhuU1#whZVJmhlDjDmZdlKnXRokapslwy" +
-		"TwOHvgfatRsUnGFNU$zIlh$ePPPMMUz99rHEjqhrNcwcQJSR6tN2#ikAUp6k3PgwylCrDpl" +
-		"MtcutFjGT3k7Pm6MDUPQpphoROVijffpECyhrqBR7AcMlb2VzXuFFPEkkrhdjUrnkHkKsku" +
-		"JSOPBNSLUETxjxMrmzeYSxMVUiFpkj5769VrNlhhPpLSpukaxbPTZEtULMw9bQ$$lznzrU#" +
-		"kszdYUQr7pRJsQfrg7oXVtSOtm4nZ4pKUt7zZosZyLQnsiHVfzfFqzRqQTslvlCJCPxvkqz" +
-		"rzBt4YsBULSrtckrQU5yzT7xl8oXVkPgPrz1w$pcrQpzjjUkhdPENxc6aZhC$ARCArBLvpx" +
-		"9DZiUQievzpr9ckUVHUA1LhhlfwRbVGp$qQOn#Pcehhoomv3PXkywHkWtrqAkwR5KPgtVhd" +
-		"rgTsVIllmdgrxgMwpoPcMcYOvhMruzqzPSID0Mb$YllSAg$mavQhnvMgvkxVTO76ZlLzdBP" +
-		"VxUizszH9rPYoSlCtm5epJljIhLnpqBDjfjTpXiRO5wU#QLqdLDGwxFHiv#heJsv#27Y7c6" +
-		"boMPrszggVfii$jShYqknjpB8APsqyAtpqir$BsMULrPfgfdLEcMdTKcPQHE$jKtIChTjUf" +
-		"q$hUjlpYOPnkcoscJR6lYGLUzuY#bb0tMzrkj5CY#frJUfIyEfdc4LVDzDqZ7agrbH5VxJ9" +
-		"lyHCYsa$JyVSIDs3wpkyTRJnjFEyTbNAtIPzDUISS9BXZn0FE$cGDmh#qjQwJhZCDo$Vv8N" +
-		"jKojVTh7c7M6L5RFD7zS4$xWOrZW9jkSa2STzjwjbYyrbIsZPsDDoVRz9ITVyfsqwtsN3SR" +
-		"#LJzJxwqJx$Jo5l0vHMfGK9SGLud9ncRXKN28k5XU9bgA5Q2wQYKpHL6I89gAgg28gYxAgV" +
-		"HAei43y4TXdYJ42aKjWvonUrVBwYBj55t6dk4FSBjgADgArk4sq4hUAMyJDuYPnexX1N2#k" +
-		"4zUAQyJLuYfnfHWgtXVOHOlNnIkYjy2#NhmiEejEegFe8DgBTk9$uYvZe86zfp50oZS#DaQ" +
-		"YpNJL5tP7OhBAJHBtYdl4Wnh3cwAdw2uULVcdn5igVL9UYwxYc3Wg$X17n65nI1mK1yH#iK" +
-		"$yBlQAFMAts2LsYXrYkzWcjeejOhFuJMmIlugDOeDOBzQ9jMADM2rMYPNY5$6pM27#4MV56" +
-		"N5Qd19$YvFYXFXB71T$YaLYeVXUP8idnAUgtq$4Q9m$1dsaqJskpZ#fyp9eT4nq4rdYHV62" +
-		"U5uy9vuLpuYdHG#nL2mHFuZ5OXvQVIk#4dEGOeQ9AMAYc236syVG#439geRSKO$oFyI50Zj" +
-		"h0wiKOoNe5z3Fe1MWdppzm9WYIhdpFugUE7zdp3FcUhMQfivVY$bYWVZEkCEuNLr$PSp6UQ" +
-		"P2SO70$icOBYg9YghkNStPt#YBy#i6VCM0hnWZn5cRtE6AjpYeg4WsJXX$6d#9U167wrXG3" +
-		"CXb$6ESKct$DawYnN5f6PIJSLgL2lFQC8mpOgwOAMOO9yJdOfmOgrfzPfmLHP3s5CSzz1dc" +
-		"SNN8dJj8NeUnpvrRPY126Z#e$69ZYR58zP1gBCp58$qwHHIpbOm3ZJ76UhGQR7ol#1SO#xt" +
-		"uVtVdTkjqXoXah35MszhiDVqRkJqwtUckswNJxQ2rw6CnF4hwqpVg$BMOBMPvzVY#cPgOHI" +
-		"UhHZmYvvJAFQREY6X2paJSKSG8CLmC4$12yQAgwm3gg79Bn5AZZ$66ajtFU5kbSzozwTwDB" +
-		"umZEH58SQa8f78w0dcYb3xjplTK4hpyr3wM1JzoBEotpO#WvKOReotIKU9XWLshk5$S1oJI" +
-		"Ght4O35831JlYG7YNV6Ew2$wYRxYROtrUUDPundZQNtLmwr3Tyy#ZFizhXvHvuUC1utxZOT" +
-		"L$abTSvywtslSOznjT46kiu6HD3eQMBaQs6qP7LHzUr0xuqwSxpB#vvQALHgRn9A8WRZwrU" +
-		"L0QV9vIBt81U8wZQNdK6Od#N$Tkchg1keEUWcq1APOWlHvy9aKIniXnwGOHSkHNuusFo5z0" +
-		"RG6F6jm$GBgLYDT3RuLYXXzfUbh6ts3kk$1zpJoJoD$3EanNF#fo4LBaIv5UWhbfv1kHohf" +
-		"OniTpmUzhSX5VI3N99UcM13Jb5F6wEK0wLb5CI0NYEjhbwBUAE#Dz1MKlOAwrpqe1kHI#LT" +
-		"HBobRqsjvq4S1qAXyqZi5e2a5e7wWyJOQescWfgcQtWNX3WvYr1TscmcxpKH#agPFKFOfKa" +
-		"axaD#1T2seF$8$Ac8qLn6dSKWbJK1#0kecO2omrmKnceZyH9HDf3WwZVGqolv2sLzeknFvd" +
-		"IYRXHGh2H13djDOq6pG0D1x50#AfI#GVgWebcQWxGoq$P0IGOL02Rek9xNoNogA1IM22e4I" +
-		"T5bEQkL$Gtyh8LVI8EG70TjWf8EH3a4w1Edxa3KDD1Aq6JWse#qPb9$1zIxaTw7TEkXt0cL" +
-		"3GTD1ydzII3ghQHZAXhifXaw2Tmlu$a6Tf178ZmQc1P2$0DSzaT#AT94YeX#GckIYnOeOBG" +
-		"JD0yq1VQk8w2tKlO6y94EHY#P3p$d8csa2$OtyTqW$WtrU1At2zPkAECX5dvEB5KQw1pZtg" +
-		"5GIfxsWtz5kdo9Ewv6kDrE6jJo8iJXGFAYGVDU0D1QKY7O2xUGdtlRRw0Za7q5VQ6eZboA6" +
-		"#WFezo3u3gBT1kACevoZ$13A3o4z2be6#WFr9hb0N9DBKmnpWTU5D0RyCMX$6EM7aJu3wW7" +
-		"w5RGDzC7$0UDVeSK=");
+		"U9pjNGUS4yNtVpEvaWEE0r5wKyfHfNa7TthsWbt0JhSNr3jx0KInO04h81O412bI51MG9ar" +
+		"w5v4kWjABD4N0dVztPoVPtIIRIt99WDy$Uv#tRsPsvittlNbJa#mHvUwcaVGrQyfke64qd4" +
+		"RGAFgAHjCO6aUpMM$s7ZMXfdGhtSQhyVByR5wNPz6tz0sDvvLv2vxBUh7NsHliJVOQtKctq" +
+		"nsqd#VmytbLNeLNvnVmytX5NexNuTcy4cyk1DrDRxC1r8#gKrzUGQ#NlgInVlN#n3gpnyGt" +
+		"T3RDPOtfVhQ2tg6Ur8VUe0$fNNg5NgBUSSEiUJ4Va9WN26ADM1D7x0KwTfeH23FhGwrv7h#" +
+		"GlSlUeOdq2qsWfsWfBQFbj89Mqi#qYfwaHRIOkj1pT2DTIuzG1xgURg2$A9sgK0bAe#9KaZ" +
+		"Ae59McCwWCdKbdKLagH#Mf0lrBntIjjHxi2ghCRgMAx4h#0vz4bQWOsmfK6Qo7n3wDZl3QL" +
+		"A2zHFkGEeksiYPy9czD3z8Vz2VjTTABPKgzjj14FeCcw9BvDBedvXfjPswgRMf4w$drKgEk" +
+		"h8pKQ1hLeW9Q02gWgUnIbiUlr3LYxzEZIYC7VVXiwMC7e54FTZ5zGKFfMPe5ZSwYrlGhhQO" +
+		"rj3OM6h4Eh1AxsjJ8bKuTfKRjUNs#ccPeBpXw5ZoRrdaycyrdLz7pz2CjCJoRsj0jTBE$Pr" +
+		"DLDfADPKFe82l59j9n4ip5pc6NiHnMbb$iAW6xtUign#QobIo5kVag$ejJ$TeuNfklXC#iu" +
+		"AtPFVmeSVuhkrSRo5VmvLhhMDiDrhc27ZFjnbgoPtMxqNtmXGpK#1rgV8ZLbjgVJwanRyUQ" +
+		"sa2srO9d1fyksx43C6ImMUnsra7x3DOraErZZ$8jV2kVoWQpzfH4APHCUtaDTeSFncvsZBo" +
+		"cZf6VmpwFjJxqFNNLvbdqwSidgvus7FQTp4QpoMZxPz1ZzBw6iOFNe$byEnjCFz0KDeVNmD" +
+		"WHcYvFeqSlYtdxJ6Uxg8v5dtnQQEYZZM0PV1ixn9FPQlOXvXYf3xkSbsJTqJS7iuNGym$Qw" +
+		"JmMYfroBAnBzQaPUufzGBlOxp7NnmtFsc3gWzbnZwuFtylQGvzpCQQqP9Me1syanx9zsX3U" +
+		"cjzFFMYtZ1VG8TeRSnzwaVxX5rlcdqpwJzgyDj1daCOOuomDu#q60oChpahmnn1FDp2oqh7" +
+		"7o7$aVU2rvlYRmKfAEtRbBw7VLkRzTN$WN#f#mQfAFn$7Zl1Ih3ghXfIpMTtOOsG7U0cjjs" +
+		"NMsuxMrZ4US1K7nlDO5ijcBTX5B9VbiGjWnulOXNm0$uOrPvTmmIvdryR1Zdtv6BxUqhzkO" +
+		"grbMxTXjm3ZGwmxUldZeEwQOCy3OpSnN7o9jhvPRslqj4$YOCVFs40so3hNQkzBZ4FPCBvQ" +
+		"wnwtcNO46yN6kKgnRzYt$6VCjD#pIMnAiBdMvTP76BQ2JMK$ygCONNzrdfN95NCxpkIFizc" +
+		"Mjfx35aaxBc5BqTRBjQ#qaTfmRIZRo7vZczcbZbW7od7JQOLvSSprsC9$PtzQ#bK1asCesm" +
+		"S$pQ1QJEEaZMQC$XExnVOWUZmHL8zvCUzxzSHgz7rpBlXPhD3r44l54fQXzUDNySlvrUmYV" +
+		"etshJRUMG$UAgWUstX1f7hmswWAlvMLvxVmstKzU5lUZhVNzU2TU6T#5x#R$kKFYoQYiMZ4" +
+		"dtJ4znI$Wz$9E$2E$6bnRgojAXgA1goSnQhrHJrfrRgY3hb5fgWjQecQeWQ$bpyHynP#KDi" +
+		"ZAbXcqaUq1JeMRRescTonhbsR8YhovoorFy#xoNxIJjj4RktbU8sRL8DgyXUrZQmZwyHVOI" +
+		"iT$UGrtOzvB$wcje7EuU#o5TgBySAehUVlyyzvVMqDFQtz4WJZO3cYGwgsJbkhhMOhueRmL" +
+		"sqGdqZTWN4LFUsCq3YvuBDqkVnQhMiS4NRJ1lFh#5hghhTq41kkbmZNyOryW$QGbXz7XFTg" +
+		"W#Wc$fls66$9$sGh#KzyBf$7v$C5V25Vn1Vp9NmfNyPtQuzeNVWUxM7jSQs0$mMySKCe3g2" +
+		"LZ$7Z$3#kkTASRUWgwIhcEiDr9gliAejPdEA7a0Wsz5v1$D3dYYT2KIuaX3tmM5$5linUYZ" +
+		"T2RH3hOK7eTx5cyjJhL4PuuocFy6E9yAJv8Hk7lhp3g5Kxh10wdNSJrM4zjSDKHo9ydrwb$" +
+		"ZI0Fb5rlqa3QP1Ujow2$s7859lfSnfCxz5Rz04DeO$fTNgPFg9FgHTzHhN5r#gy#n3rfTUC" +
+		"Kmvr9sSaxDmmpkWbPh49cFUpISwOjJxOsGxmDe0pPlAUqPClPl6hV$jwBh7A7tDHrxpyvk1" +
+		"hNcSqwlhRNFF6hqVO$3n0Z$3h2#taFNuzeWjxHDQ8zK4WXCpFhgSSmdM1xCWlOYlYut6ibL" +
+		"DRyWTCZoig5ZfQDE$d3qKF2pkpY5ZoeuXbJ16nl1n5B1EAYEMjA6BPNqGi7qGHo#4YOlaeY" +
+		"bYAsey#ZHuMpeg8PKWKiQGK4SlmA68fLaGiNqKHIqOHiNmTHInb2iNYj88qi7mNmWf8hY3r" +
+		"ErQGeuAi87jXvWjf1SdkehUHenyhxRU2N2xBXhNgTSOibkcO4GwowWqPytq6Pl9RzHRItA5" +
+		"Zjg#IKbcjQAuqiGBV5ksQUNVUap$3x#5TV6gEbuQdLZqLOrOFBlJ0EgeX7RsPDROrUB0z7D" +
+		"cyUJkxtkBBpfz#XUFD1cPY3LaJLZO8vWMiWVBFtu9ZrWRQC0T1YbhrpreyzWfpr90ZNL0x2" +
+		"tt7OTehT3kV3gD6efv4FObw4lN4g9vuhHbEatf2NZFyhwsrJfFsITIJg2THJu1wYlgz65Q#" +
+		"aE#toeiv$sx5iqeFibRtxW12sXFndLYhrt5UgpFFvzMUUZtFGb#h6oM2xkC2x162ODO$FxH" +
+		"W9jk#nEaKfKu4cFS7ixFj5CN87mIpAzKFiuawkfY3s1cOwuIEEO2ToMDZXxso8JEgli7R#7" +
+		"bqONlFGBuHRSnK2EOm#Y2HtnxVQ#T0dswBG#fvMESIbYlm7dy0#LuHOdRuRKzzF9qHPSmBp" +
+		"0nYJSIOrSLh#wS5jdEHlnzvj93l4HTrdZapnlA$YB7yCJ6MFo76ylV7MFxX6CkFiNzo5cFv" +
+		"AJ6MNop6yZDYBB$CwJq#y6SBMKSxxWVezt3t0zfEjiDvNbCIvSLM6X9vBQz48zsKgAvWtng" +
+		"A125$EyWi#e8vaONudTWJqKQ8sNcFmznA$7jw8a9loFSJjY2ggADgWI3NRxJ16uxK5dCyib" +
+		"Y$QE9cINo25riXlYFMHhDcrrdE1kCDRD48RSQsA#j7qrxZWxQqVhKxLNsK9GL17TsU5TB5W" +
+		"ln#Cf9HCbuQHBUc1ExuuexZg6#xXEDlTVy$MJ#1#pJszeIi$tLPTvsYk1Ao4h8IiXAo4h8I" +
+		"iXAo4h8IiXAoOYbhVaYoGZwNvDpdND89nJQolTF0kDW9VgRpVf4Pzw$3GFD5W5DINKOFksH" +
+		"UNBAjh8danjjGYNycqJXfy81ymygheQDXhzZEkNrtmwEyQ4Q7eM4JcqozLPjJ2reG13VHUc" +
+		"M5hhXvIWIoz$lKaYv5u39OlX5TJTVGUPH5sPH3kNG1vT65T15TJ9VGvNG5NKbNKKCwdrgA$" +
+		"Rof4X122Ux$Iug0Y7Z3q6tYIhBPfAL5JA68s1LwDfUBNLc4i$YYdU87Qedl8lK8jljawE7o" +
+		"mU$n2BRNHo$p$NBwLSa5H#EMNq5n$Vj1#likYVrN13r2#CGJDVXzuidt1$h4K#OL2j#9mEt" +
+		"53#ftiIvop7oV5FH2z7o9lrvKMVoDAA9vfyXeteiYce5XoEeSQ1JdWoB#lFEPY4jEYhZazC" +
+		"1#wt1rYhYUcM6KVDnMClHo6uFDgW6kUH5hSpXaYssAs3UJ8ovvHiGbQuInXkaVOIlPQ$mou" +
+		"f9V#HkRVHInj1yYBlbJn2KFHbgI9qLSClqa#6CONkM3zhw8IpuQSSc8PrhU8#AI$I8kEIpY" +
+		"acCZBZabZ9AP4OuIzI8iro32SkT6MAvnXEMkYx1SgmZBjOsmNFi8opqSORb8v$xDaPNpsOc" +
+		"7NkxloCfnTuJbIaTOxf88ozqGORcF8omtCi9ouoCiDoVWQOd$5VpD5CRbNzfpMgA$Jo#aqn" +
+		"BZp8VzOosD#AkXbUQfQlrZl4zlWV4#FU$bnSUUO4#6eXlVuQ2Nqewx#4PeLn2gTZnDlaVJg" +
+		"rUevNmG5F9TJNwfCsP#XiUoQ1CTmObGJx7eKh4h7CpyHZiA#piE$I#sZgqDq5BhsIfM3FmN" +
+		"zhE9MxuN9ZGKd$XuqlKXbXlXnHK8jrKlXLj$Bun56nrt5Izk8#qwJpccVlN6whDwofE6KbZ" +
+		"zX8#ownMX9zMWcbRTPFs5z7Jsh$AaRtqGL0iFWUpfFlNxNwvakxLf6#gtdvBh21O0GRMGRH" +
+		"2nrNnFoTNbSqhkwo4#rnPOsKHmJwmnXz7pR9Yb1oysF5ZwHVW88hTpw6E5jIVgY3Tv#bpac" +
+		"FdsE69UmtpVCHondVa$uVk6UV4Z$6zlU9CVV4i9lePlZXRcyEqSoBOEL$0I9nTpAEififxt" +
+		"Mp67jPvog8cr2$R$MmmSNFtYt64zfTwJRFYsDegzIDvFCFb1rbZlZxmiEwRtHporz0zhJey" +
+		"SitzWZbu0pG$J3eyCRv#suM0FoDoD#Ix9Uw2c5x2kgy6Ewp9Kda$bimUO79kDEHgZk9ntl7" +
+		"cEiRPUZQvZQXHdrx3dP8gQe$Ky$2pr$hUtmTzIDRKphS9kKp9K7duPknln#xtpF6PFv44vh" +
+		"0NKIC5lSgKWlDF8uohZAYtp$MLt5y#iIvuviwegtTkUZt#ekCfll4lQrC$vOYiCxk88tqcC" +
+		"EBaeYP8fXLB9JMca$owo1AKx$ZQl8bMYobI5gc8chavdqpaIQIsgJPdotHBrg3urW4#UIus" +
+		"eiUmPpU2$1F$LUqWESfqFBtQgDqlMcmrFpwLyK2liSDhGpNIB$fcz$4J#v65kI#reCarnh3" +
+		"zNrfyH47C#5M2l$mJsOq$Hq$GCFKlFqVFq0dMbRjITNgGUz1AzJ3tf5NgLNgFNgHUzGM$IM" +
+		"$GszQO#z0wzI#$H#$G1VKXzgH$rfuze07rCdz2dz1aDfC#briO8CWpzV3ZTHNVBNhuUgCQY" +
+		"d#lOVuTrEo1Es2lcqWwforGWcqu$qWoQwQXNIQdN2eLRbzmEEyvOQvHEqwYZHQC5iAgkqH9" +
+		"eeMkqYUP2YxRIK$w0HhgbTOqsqaAbaPC#XwK#UT0e7tjaNOTsST5eBceeQT5e77MI6gs4hc" +
+		"E1YEBcsNcmvJxORItjGlW2v9r6##cl8FLt825xOpxwnCqi6PwTIvrO6Yl6YiV14xP0UzDk#" +
+		"V05tMxPy8MngiOyQA1h$myy8TPuCj5kworuVeTrT3npWM4i#bKcGfrW7wFkYMZVtRG7NZcL" +
+		"zF#VcyhSw6lws1OQnbzZhiz2j7gshQTjilIqFt3FahqiJzxriMCXKlAXpq4wX94k7$g4Xgy" +
+		"TUdJizSb62nJOzCctwBFOgq#kqYTJnlFbM9YBKJiho5YO9tlY81fCG#W8z2aP1tscISyozS" +
+		"d6dwvFBZnhh9mny#MVuL4JyJHVjOyUpqN$cHbpZECmKxQsZMs6pQV9Ff69M2Pmv2DcODHHn" +
+		"n#ZZiEAqR1ZblIBTEKLdlj4UMVucmgikTBgiSUOWpzhNqnN61VBUJnTsYqRr0VptHPWr4C6" +
+		"HjthC#E6iRqDOvR4g2CRAqU9ZhAdvyfvTQ8SEVBYtDQ6dVpRkgwSQ#Ctq#fUduwvLc#RNPX" +
+		"fin0x7cokPKaIGIlS$yOQiWrcMcUizyHXBCsppNLjKAlHPqh2ZjcoxsH9hVIKYOvOEqcjd9" +
+		"x#70SzT2yqzSX5UnXwT8GUS#KSa2L7KTrNdVLeVvBrM0XqVInww6XrFNG#LhP3jco9Fb8VP" +
+		"psoJx8UpUNV5uu8lfRVHFoMlgFlaIyUQ7PQhAh7TQlgVAp2gl#bqucuMSOSNQrOub5xNLlj" +
+		"HZ$9bxN7RzmSGIEbvlefLNgGyu9CMQ$UUvlJBF1MSSJO7BLcIfGPeCBED7IfHjksYYF2RBd" +
+		"dDp0w8ynLfowwNFsDFF53g9#nZAGDmAYtj3F2zggTgz41tDl74Q6#fkeew$oFEWFXlNGVtK" +
+		"yFq8Fq43rCNUWHUfGUmqwwFVwovRqzyiKJOMVKkm4vT5eRn8QTvSuWNwx3quM87qBKbIsyb" +
+		"pD2uNETUWWf7q$L#1j$X3JEHEXhAwGPfru9X4L6UFByKAxVIgfQCms4phq5Qu4CZDq54g5Z" +
+		"tL962oKpBqZT7RtdtUdolDiuvP1tLTh92Y6VqIlCURZhCwUplVJrQGkl$OEtgCICa0zcolD" +
+		"lNw$4lFYVqJkZKPYiQzwuzGWRWW0zmWzbVfnx15Q2iaQi3m8Xf4cd7qAPEbkUfiV1u#YeOr" +
+		"jQFUvKylu4bWIM19O4bWIM$p4imNT#eQo0Z1Mal1UoWZHNlOMl874FiEerLf3HNVKY74NC$" +
+		"glUGbhxf7sRnWz9NjpMPubwebgFRBqCVTSfGyxrvDlQEwXdsBmv7QE9rvUTjGt7cmtC8FqR" +
+		"Gdb1CBUWHHx$BAG7Th9Y3eOKJqfQx1NcgA7V2x6pZjIqL#XsFWr6ZKGzYNeIzIJgITIJg2T" +
+		"HJwAUH3s9UWBM4v#JTCVlAtbNwS7MwWL#w#h2FjSgS5whqqx5LRsUPs6irGsPmVTn$lM6Z5" +
+		"dcBdmVLn01vioWThQSegZyOM4sKKSNSr0xPmD3aJ07toihcT7rZHQ#7btOtZEGRqGRinUB0" +
+		"#Pm#g1zlnoAdSFTB$jWEIcOvKbAHkmmgrFK231x9NJmJtEmSwo$7vcGdv2Va9#Gdv0VcVme" +
+		"xmU2pcibzTDpEKzSu2jHfNibUcUKw7zho7d7O9dLGljEhFpqCAe8FRDpmDarAt9ly9FLDgf" +
+		"sZQe5d2$zL$FUS15j8N#17rtV#i6BhH3VYV9dhNxhKQlFs695ibcKVMP2i9QMzRKuLNtKit" +
+		"TqyD4uzGPBdRbHzkHuzUUi1ExJ67VSHdsVUBI$gN9wMZ#1#xJrzeIiXAo4h8IiXAo4h8IiX" +
+		"Ao4h8IiXAo4hF#tiYB$bCC9XSyx3TIES2WD2x9VbATwDA7ef#pcEmrKVBEyJwOfagjt6XXe" +
+		"73LO8UqOCHh$tR299c8DFQtQDkYlAnQeUfQ0L8c0zjxeVKz0fkKjsfVIPTutQRUKRzk#bgw" +
+		"J$oNbHhe99V9ecIeVIea$$MeDY8Z#ZTWcrczM58xe2vdFU6jgf3uVjK#1lBWZz$aYz9OYb7" +
+		"p71x$78tm#Kp3VcoLZe#Wht2qUuHabYjRhG$d4q$zxESOeuV#9frKFvd9ehyNodbS4p7kbX" +
+		"0vH$4InoEDcD4RU$pKqqT3dL1ff0dgpTX8GHcbM3Q3D3x6t6YqxlRmXtgqKNS$zVsFjHCb4" +
+		"oTEnPA9SeboYNABSgLREyUmZ#9ifL1w$qjxJalmGppvkCivyr5sL1hKBiJHJzShtwL5Rutr" +
+		"wNZHUV3J9$EPZSDq2wsLgXztm#VHREDgXb5UlaClP41JwNSsIGJ1xBGiVqIsR6V8fLWvsx#" +
+		"5Wza5XVyTX00#pj8cbfMRJ7Fe9V1xDDt67xK#c9$KEpvC2uxRffN1xpafL3XjkbRR8UngvN" +
+		"AMieb#i#2BNAq9Fyj5Drbz8JwTPlfwaBBiqF0IoBnJY4yO9jytQ#JJBVaekVQ8jRBSqP1j4" +
+		"R3NVKtA5mEUKtDT3V7Bh$pFCjDgQM6CElUVv#8R5WwLVX8yWSZk7F5ROVCC#LaICsHWPuuV" +
+		"P9r$4TjRFM2CP1LIzkscFDtp03xsb12F6V9x6qJS2sJRm5Rp4oSKSodfAvlEUzrinXpDFE7" +
+		"$UA3#j2$x6CJNU1LvF2U5vFvlks$flVOJt4qnQ3FcoFuBh8qYMjN$ulRyztzO$UijFw$RIL" +
+		"eyCRv#suQ0HHbd69TV$NvYEmyZJM#NPgl0RxusN8pLoslFaU#OqEKTxFkjShg$hB7Cqyj1g" +
+		"OxIdTU3RbPHyqogqJSdmv5bEnsHE9KENGjlaVoPPv1afaAUad3rb7lqp5vbljO#$c0YDMkk" +
+		"eqajzygtsU8hY5zXBEr$KIl5RGEk8NELxoF$oclm2RkSHkSk1zm5j0nr3$47zUIo8IFxltZ" +
+		"ECiEijCvt#CdZDBucQdwt2Yn6#2$mWEB3MAa$Ku2Bm2y47nmgZF#PQzw3#gMOy3JQhzIOmt" +
+		"5vusRDlGDbVaFzhH5Rf$#yNuTN6inPbzLPH#fz5nEiOuU8h3CupaVS4yZLIyIiCNliSt7u4" +
+		"Rubd#KW$7tGTskr3f3sAEZAL$3U8gdM2dTM$h7UZVIkAUDdjP15ieF$$uubcdDvKwPDXfys" +
+		"mpmI4TQxiNKt$dzDbZF3Pho7FTYESabrqBAvhYAgVPuHRB3HuPWh2MubArFVFpoucgdyKvM" +
+		"u1lOys0sRNC2NhE$XUSQLJ5vNs9#GrG60MkbKUull02#mogtrjyAGI1g$VNyLBAfr7gxet6" +
+		"BmY$2IfBeO6zBkaL50ZrDiE$6fJPb9prDiQPMgXFeMFJKTuhRtkIj0dwLcYxEtWju5UXQmn" +
+		"u1sLBV2CFw7i$J5a9C4kPV6yawe7RLcwkKNUnofzji7Bf2Ey4FG5Q15aQ#13LPuba5SI$3K" +
+		"LNsdmOZSYFCu8bq2Pf1bsp2cGmKQXtlVmRBpzMPdxCMwYhoPFnJFOEXbZKh5121zGPT5dUK" +
+		"yLjenlIOkjSeoqqjSfksrLyI$jpvFsGCP#Itofulh$1KUVJrfkUVOpwbslmeTn6m2#olByg" +
+		"1dcFcsKEH1jlTeNdpzUkWFwmyUI$WRz0x$v7VvscP8luETt6k6ScifMCs6VXeYZNPFXByaO" +
+		"#ueT06zXF4$6M7vc9N2qHt8Nu9W3R9YVajzGpuSYRHVIDYBVZIfj6FnPbzMRw1ozBEQjSou" +
+		"5xuayokx9eudgb4AvJGZ$gDAw0QlgXtmfukjK#ay6hvEDTa3zwPMDU2NOaAEVffG0$cN81$" +
+		"zDoS3OhDUrqswNvDqWj9KBprWomdjL#ZupJmhcs1mT3zek1JvJ$0Fm2otFSr3t8oeCEUusa" +
+		"7SvT7i6yLl1qKOfrqB7YShUxm0p#gJh2gJjLZgyZ7OyWgcacYct#72Kmtnn3lmZfJquvlUK" +
+		"cv2dZV4y2#NhZ82SAv7skf83#sHrHdoAgkjTfC4UBinbP#qtqkfMH9uXH6Lh676t6WDIMc5" +
+		"Ul1bj15kcO4xAceHoRH6#7cE3ZcSA$0Br5qSVQ#ZZXmG$gNI74QwECRhI4HK#P72N6gTggF" +
+		"am9yyiMw89wlWKpp1kbe1VfM0yA0DVIO4FbSOuLVevX7LRGDUKyS1$CR01IqNCvIdVMjfXF" +
+		"NI1VwTy3zgeqg13oWyeSn$A07T5#5pAN4lxg$aw5MsV2fz9nPYP2jzCXVwfq3iLzaW5hjJR" +
+		"GUX3gR17Ajek5UsHsW64Vf6AzKJTjw7ZHDWKusGgnlwoRu73Jr8n1gR2ddM1EoaDwPZxKpz" +
+		"1lLXFb3s4C7mZzNFG2j1Aed8OWrBHDzqkb5c3CZe6zADK#9$x4gJfOoJQiXnmkE6BRlX0jL" +
+		"xWyC4Q#fnp0JZqTMFSBmS$Sv#BSVKgb46xrS2OvuRjQc8CT3#4vxF1CIOceRvwDS7H$kKmD" +
+		"hWVHXnpNpRyf7nznB7kgucu6#rGim0S$R4yz7R3TDcGKm$hc2JOgJpqTR#4U3#aOoukFmzn" +
+		"#7NI5gJfO#wTI3kEDBH9FQHbuta5u7HFKtxeNQSPyVfkf2qmuvKiRUrUhl90lvpkrdA54Un" +
+		"H30GxiBd#px8wGJPiaDPOvOLTqvg1e6UQfuzZ$2uEVTneYxGM88m$gV3Rj9R6ymhz4RuQ$W" +
+		"3$JOEzqj3tAwWv9WrsJDjfrfVsakBmjxJhZN0kx9Y6SJLjkX5FWi#asUOvfVlD1c$kDdZ5Q" +
+		"rL##5VQJ9Mc#dPQNwBAwMRPOhd01n#iZdP8suiu$3NDCb#niehxpA4fMyEnTJW4VyWsmwb3" +
+		"pJ1zPF2cM0$muofS3ss0zN9JZ7t5OUEcs6iKdm$U7NnHh33wOswASQ#KfJq9VjyKur#fFI6" +
+		"KHNylVHau#cNfAusqSxiQ$0pCWtIv4MQrpJBrppF3pU37PLGU6cJmQf#hPxNnh8EPbs6UE$" +
+		"SpCrwcixxlCECSVknwAXOsEfK8Dj3t4GtDEBseqdyrECSOsAYu#RnwBJFSg8uPThcAZeKmP" +
+		"pIwt0XNKEkRPbW$L6YkZus1o#HSOy7GrFuijQv$$aQF6xo4wi#LZjgVkwRvnEVub1$gW$az" +
+		"WsTriPHv9K2zQlofRB5P#SFsFEmg9Mk#HTPgCzneaoNl29LteLt66TCzOMp7DzcV5QjZZoT" +
+		"PiEXpACEuuJgXucfDbPnlvabzm5yljilWEP$wFolsdC5B7BFKyxmPpXblXdDBcM7Z$CGkAw" +
+		"UlJtoKVvuI8osuDXkSZyGwSeXlNai#h15o#WHv$gSztWnhd0fNEEMtw3367gy$m0nph5iQg" +
+		"N6xGWU35rFxwHoB7x5ZTXcLRpV3ZSlvrzbOzPdAlIprgZrsTRLtQF2goZF9KgwjmPDK7lty" +
+		"9ccDmZ3Jp9VSNEL$LiLN6To5$AvoHhXvNJC$lyiNenrlymr1dhriaRFG$tbA2pESyulIROZ" +
+		"YEvMEEomwzZLu5NLUsEnvs1xhj2ejpJmkxB#Jfs4jdsB46whrHnMbRuKd86UyIbFzhndMTX" +
+		"MmfwYonbBNCeDNLUkGPbZhLi0QhwhQA#OCikY1lPJBSsPGtaol#e32zAIoWMtTePvrK$NfU" +
+		"sjr$b5$jZrFWyKA#tB$yatIz7sD4Sv#slUvcQyPzb0LC5$cJFT$vXwWi7VmAOCrUaLiadAM" +
+		"szDTBpZL4mu1Uss3fwkzTBhF#D14xUNJrvjfAG76gAeVMSfq2b2Fid79iysq#gqDtd2uulD" +
+		"LdliDdgFMjWtt6VpS3FNSEoP0hZhxAQdsW#TXhrKHQxYC75KcI$5R3PwXvkMAs5SqKVlc3B" +
+		"NVFmzxuefTiCQopDDDLDyirKhbkH1viBSgrTzNHqkP0$Quos$EXHpiMIgETP8HZ0AV6pN$L" +
+		"zzpcN6ttnnZfBFvzZYts3Bd8bLsaPdMy2fBlUxWk1ecOQtlDkDfnGBdQw36WufpbLnb$xGC" +
+		"2qvBsBNC8hENukeyACrodkOgJpwNE5ES8KgBYyL5uaAH9ouGvujSaIDQYEOYMsI9yqGpqLI" +
+		"SBQgBQaAM5LZvYZI1lRg07ucXudNSNmMzekJr51r51t6Bk5cq4Qr5At6Jk57S8AuNrubhnJ" +
+		"NYQj5IN2Mk55U8oyLbub9nYUWl#WdiaCHhucNnai0UGlGGxKKxqLRSAUuGjulRnAtQUnh6F" +
+		"UqTNRxskVOfyeoNTOq3ZP6XqQApw2JkLHXwYQxY2V6W31U8DoH$H8#BV750$2NsYtrYhzWZ" +
+		"TejTOgVO8RQBRU9FyOVOAhQ8tyLcyPlO93QA3MAzM2VMYZNYLx5Q$29MYP$5Ih52B1VBn5A" +
+		"nHFmdJeZZufZuLnmL$uY$nH5nM1mI1yLiCKlC4O#9Bk8BMVCGCHZtGQ212j$3yhvOtXT0fx" +
+		"$4u#9HqKsy89uNpubdnJFYQV6KU5BC5$F4NF6Jc8vyKyKF0YEx#1OqLdmbHecHrdRKFfRIq" +
+		"3#r$RRqVQAog0I#7BGCX15MMm92xTeYkozeOqGPRtYXw8hxZzeqRQfFhg$b$GTjd8g$AU#l" +
+		"QV023LwW3H0dBBa$alT96dPcsdSIurcYBCBVYAgYYbV6szhhMazns5PFVvcx52XT5DSEQmU" +
+		"qGo9Pe0S95uY3c7PS#qVc$LixWXm7TKiXfcb79VzFnKze$uffudlndNPOZ133nPTIyZ3nev" +
+		"WfPcYtQhTenqG9f7I5hUTAQq#HzybYefZWetrVd$XkRsWN#LpQTczelZOFzvzaU8usLvib4" +
+		"PJJPlgL#L1aY9AMEB1gNsZ3R7a#q6RBqZEq7Jwbjtb3MnNVBDpQIcs59S#VHez0w0$5V$S#" +
+		"swBuRw2VPMYSWKQqCoM81$J#9KCFoVjzeCz0Ui$yM0mG7ubF4Eecds4K5srbQ9wORq7nbZR" +
+		"H6$xUfiCRsbZSzth695bMZaaofCOakzwwXtl3NQKK7w#rjbJHBuy5W#P1xn8BjJOQvb7nkR" +
+		"XVt0D#jxWBI7Jhl2W#51#8zyLxubtnZkWZUektnLlYJONrUUrPxHdjQHLxogl3a$Owj7jiC" +
+		"JdYQVThzsdtQ0$8yAFgoTtoVfVMMUkaTKG8UmkjFKYsgeRsqUxKRiFzTkqEcyJdCC#COSM9" +
+		"WJZb4mkBnfs2z1AvG5pnP7eUQLPw0lIueYT1Ju5wW31EWnYzW7869TD6o34eIT8IX9SWppB" +
+		"mhY3z4zArY7V5ipNWQr1kXIH6qnNzQA4PU3ONvPv1#1c43u8VHFoG91Sj15y8$Y$I$mN$4r" +
+		"od8HOw70QzBSb5hqAkGIv5oI2co9F6wEKmw3b9II0NYAkuIr9FfFS4VmLfh#1PBnibWLmo$" +
+		"1gUwrIWwFL2Q508D3XCUhS8z7KHg3VeAmjzgUX3HUCLlGVIH#gVmVl0RXDXjua8ZrKq56d3" +
+		"m7NQXl0sy7MWTn1UAedHB4cSHeBhD1hXqNWs6cs1cG34Q0p2Ov0sXbBe6FWnf1r1sX7atOx" +
+		"mTgHD0b#9$2l19o5z1EW7qFkW3oWLb4pVW0#Kb4pwt3e1UGTI6gWOoAsUURWP$bvICYWDL0" +
+		"paLcaUReOtexxLaAjJNuJx0bi$y7xW$S7xWty4MT#2FWVfyz$lo7iSwSSHtu7m3kHR3$t#H" +
+		"je0q7UWdKZNwOIYZv7sYPUIw1#KtO9o$#6PJfyY$0KmOQSFOjGDuQtWFqaYcWzka8lcIM8q" +
+		"1pGRD1KqKnBHMtZs1i8wQP9SD1bwJaROu6uwYl0KyE6mpukWNn5$Kn87kGZhFn2ZKS0u2cM" +
+		"wWtS7$mLfgoHnMWI#oE3CZP7V3Pu2IWLXtGzYB1cKXdm2#VHlxUsoq7xOO3#v6B9Qo2M9uV" +
+		"bkuDY3SdkGRmDnnf7EaRuNwNl13u0MW$x2SuDS8Av83oSn5ygvm9DGDWbvzo5z7$YpeAT1c" +
+		"q1$W3xxFqSzkg4=");
 
 	private WorkingParseResult fWorking;
 
@@ -632,26 +634,26 @@ public class JSParser extends Parser implements IParser {
 
 	protected Symbol invokeReduceAction(int rule_num, int offset) {
 		switch(rule_num) {
-			case 50: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN Expression.e RPAREN
+			case 51: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN Expression.e RPAREN
 			{
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
 					
 			return new JSParametersNode(e);
 			}
-			case 51: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN RPAREN
+			case 52: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN RPAREN
 			{
 					
 			return new JSParametersNode();
 			}
-			case 52: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN BindingRestElement.e RPAREN
+			case 53: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN BindingRestElement.e RPAREN
 			{
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSRestElementNode e = (JSRestElementNode) _symbol_e.value;
 					
 			return new JSParametersNode(e);
 			}
-			case 53: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN Expression.e COMMA BindingRestElement.r RPAREN
+			case 54: // CoverParenthesizedExpressionAndArrowParameterList = LPAREN Expression.e COMMA BindingRestElement.r RPAREN
 			{
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
@@ -660,43 +662,43 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSParametersNode(e, r);
 			}
-			case 58: // NullLiteral = NULL.n
+			case 59: // NullLiteral = NULL.n
 			{
 					final Symbol n = _symbols[offset + 1];
 					
 			return new JSNullNode(n);
 			}
-			case 59: // BooleanLiteral = TRUE.t
+			case 60: // BooleanLiteral = TRUE.t
 			{
 					final Symbol t = _symbols[offset + 1];
 					
 			return new JSTrueNode(t);
 			}
-			case 60: // BooleanLiteral = FALSE.f
+			case 61: // BooleanLiteral = FALSE.f
 			{
 					final Symbol f = _symbols[offset + 1];
 					
 			return new JSFalseNode(f);
 			}
-			case 61: // NumericLiteral = NUMBER.n
+			case 62: // NumericLiteral = NUMBER.n
 			{
 					final Symbol n = _symbols[offset + 1];
 					
 			return new JSNumberNode(n);
 			}
-			case 62: // StringLiteral = STRING.s
+			case 63: // StringLiteral = STRING.s
 			{
 					final Symbol s = _symbols[offset + 1];
 					
 			return new JSStringNode(s);
 			}
-			case 63: // RegularExpressionLiteral = REGEX.r
+			case 64: // RegularExpressionLiteral = REGEX.r
 			{
 					final Symbol r = _symbols[offset + 1];
 					
 			return new JSRegexNode(r);
 			}
-			case 66: // ArrayLiteral = LBRACKET.l opt$Elision.e RBRACKET.r
+			case 67: // ArrayLiteral = LBRACKET.l opt$Elision.e RBRACKET.r
 			{
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -708,7 +710,7 @@ public class JSParser extends Parser implements IParser {
 			}
 			return new JSArrayNode(l, r, e);
 			}
-			case 67: // ArrayLiteral = LBRACKET.l ElementList.e RBRACKET.r
+			case 68: // ArrayLiteral = LBRACKET.l ElementList.e RBRACKET.r
 			{
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -717,7 +719,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSArrayNode(l, r, e);
 			}
-			case 68: // ArrayLiteral = LBRACKET.l ElementList.e COMMA opt$Elision.n RBRACKET.r
+			case 69: // ArrayLiteral = LBRACKET.l ElementList.e COMMA opt$Elision.n RBRACKET.r
 			{
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -732,7 +734,7 @@ public class JSParser extends Parser implements IParser {
 			e.addChild(n);
 			return new JSArrayNode(l, r, e);
 			}
-			case 69: // ElementList = opt$Elision.n SingleExpression.e
+			case 70: // ElementList = opt$Elision.n SingleExpression.e
 			{
 					final Symbol _symbol_n = _symbols[offset + 1];
 					final JSElisionNode n = (JSElisionNode) _symbol_n.value;
@@ -744,7 +746,7 @@ public class JSParser extends Parser implements IParser {
 			}
 			return new JSElementsNode(n, e);
 			}
-			case 70: // ElementList = opt$Elision.n SpreadElement.e
+			case 71: // ElementList = opt$Elision.n SpreadElement.e
 			{
 					final Symbol _symbol_n = _symbols[offset + 1];
 					final JSElisionNode n = (JSElisionNode) _symbol_n.value;
@@ -756,7 +758,7 @@ public class JSParser extends Parser implements IParser {
 			}
 			return new JSElementsNode(n, e);
 			}
-			case 71: // ElementList = ElementList.l COMMA opt$Elision.n SingleExpression.e
+			case 72: // ElementList = ElementList.l COMMA opt$Elision.n SingleExpression.e
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSElementsNode l = (JSElementsNode) _symbol_l.value;
@@ -772,7 +774,7 @@ public class JSParser extends Parser implements IParser {
 
 			return l;
 			}
-			case 72: // ElementList = ElementList.l COMMA opt$Elision.n SpreadElement.e
+			case 73: // ElementList = ElementList.l COMMA opt$Elision.n SpreadElement.e
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSElementsNode l = (JSElementsNode) _symbol_l.value;
@@ -788,7 +790,7 @@ public class JSParser extends Parser implements IParser {
 
 			return l;
 			}
-			case 73: // Elision = Elision.e COMMA
+			case 74: // Elision = Elision.e COMMA
 			{
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final JSElisionNode e = (JSElisionNode) _symbol_e.value;
@@ -797,12 +799,12 @@ public class JSParser extends Parser implements IParser {
 
 			return e;
 			}
-			case 74: // Elision = COMMA
+			case 75: // Elision = COMMA
 			{
 					
 			return new JSElisionNode(new JSNullNode());
 			}
-			case 75: // SpreadElement = DOT_DOT_DOT.d SingleExpression.e
+			case 76: // SpreadElement = DOT_DOT_DOT.d SingleExpression.e
 			{
 					final Symbol d = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -810,14 +812,14 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSSpreadElementNode(d, e);
 			}
-			case 76: // ObjectLiteral = LCURLY.l RCURLY.r
+			case 77: // ObjectLiteral = LCURLY.l RCURLY.r
 			{
 					final Symbol l = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 2];
 					
 			return new JSObjectNode(l, r);
 			}
-			case 79: // ObjectLiteral = LCURLY.l PropertyDefinitionList.p opt$COMMA RCURLY.r
+			case 80: // ObjectLiteral = LCURLY.l PropertyDefinitionList.p opt$COMMA RCURLY.r
 			{
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_p = _symbols[offset + 2];
@@ -827,15 +829,15 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSObjectNode(l, r, p);
 			}
-			case 80: // PropertyDefinitionList = PropertyDefinition
+			case 81: // PropertyDefinitionList = PropertyDefinition
 			{
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 			}
-			case 81: // PropertyDefinitionList = PropertyDefinitionList COMMA PropertyDefinition
+			case 82: // PropertyDefinitionList = PropertyDefinitionList COMMA PropertyDefinition
 			{
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
 			}
-			case 82: // PropertyDefinition = PropertyName.n COLON.c SingleExpression.v
+			case 83: // PropertyDefinition = PropertyName.n COLON.c SingleExpression.v
 			{
 					final Symbol _symbol_n = _symbols[offset + 1];
 					final JSNode n = (JSNode) _symbol_n.value;
@@ -845,13 +847,13 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSNameValuePairNode(n, c, v);
 			}
-			case 86: // LiteralPropertyName = IdentifierName.i
+			case 87: // LiteralPropertyName = IdentifierName.i
 			{
 					final Symbol i = _symbols[offset + 1];
 					
 			return new JSIdentifierNode(i);
 			}
-			case 90: // Initializer = EQUAL.e SingleExpression.expr
+			case 91: // Initializer = EQUAL.e SingleExpression.expr
 			{
 					final Symbol e = _symbols[offset + 1];
 					final Symbol _symbol_expr = _symbols[offset + 2];
@@ -859,12 +861,12 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSInitializerNode(e, expr);
 			}
-			case 97: // Arguments = LPAREN RPAREN
+			case 98: // Arguments = LPAREN RPAREN
 			{
 					
 			return new JSArgumentsNode();
 			}
-			case 98: // Arguments = LPAREN ArgumentList.a RPAREN
+			case 99: // Arguments = LPAREN ArgumentList.a RPAREN
 			{
 					final Symbol _symbol_a = _symbols[offset + 2];
 					final ArrayList _list_a = (ArrayList) _symbol_a.value;
@@ -872,15 +874,15 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSArgumentsNode(a);
 			}
-			case 99: // ArgumentList = ArgumentListItem
+			case 100: // ArgumentList = ArgumentListItem
 			{
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 			}
-			case 100: // ArgumentList = ArgumentList COMMA ArgumentListItem
+			case 101: // ArgumentList = ArgumentList COMMA ArgumentListItem
 			{
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
 			}
-			case 118: // Expression = Expression.l COMMA SingleExpression.r
+			case 119: // Expression = Expression.l COMMA SingleExpression.r
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -889,7 +891,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSCommaNode(l, r);
 			}
-			case 119: // SingleExpression = SingleExpression.e PostUnaryOperator.o
+			case 120: // SingleExpression = SingleExpression.e PostUnaryOperator.o
 			{
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final JSNode e = (JSNode) _symbol_e.value;
@@ -897,7 +899,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSPostUnaryOperatorNode(o, e);
 			}
-			case 120: // SingleExpression = PreUnaryOperator.o SingleExpression.e
+			case 121: // SingleExpression = PreUnaryOperator.o SingleExpression.e
 			{
 					final Symbol o = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -905,7 +907,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSPreUnaryOperatorNode(o, e);
 			}
-			case 121: // SingleExpression = SingleExpression.l BinaryArithmeticOperator.o SingleExpression.r
+			case 122: // SingleExpression = SingleExpression.l BinaryArithmeticOperator.o SingleExpression.r
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -915,7 +917,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSBinaryArithmeticOperatorNode(l, o, r);
 			}
-			case 122: // SingleExpression = SingleExpression.l BinaryBooleanOperator.o SingleExpression.r
+			case 123: // SingleExpression = SingleExpression.l BinaryBooleanOperator.o SingleExpression.r
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -925,7 +927,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSBinaryBooleanOperatorNode(l, o, r);
 			}
-			case 123: // SingleExpression = SingleExpression.l QUESTION.q SingleExpression.t COLON.c SingleExpression.f
+			case 124: // SingleExpression = SingleExpression.l QUESTION.q SingleExpression.t COLON.c SingleExpression.f
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -938,7 +940,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSConditionalNode(l, q, t, c, f);
 			}
-			case 126: // SingleExpression = LeftHandSideExpression.l EQUAL.o SingleExpression.r
+			case 127: // SingleExpression = LeftHandSideExpression.l EQUAL.o SingleExpression.r
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -948,7 +950,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSAssignmentNode(l, o, r);
 			}
-			case 127: // SingleExpression = LeftHandSideExpression.l AssignmentOperator.o SingleExpression.r
+			case 128: // SingleExpression = LeftHandSideExpression.l AssignmentOperator.o SingleExpression.r
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -958,19 +960,19 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSAssignmentNode(l, o, r);
 			}
-			case 129: // PrimaryExpression = THIS.t
+			case 130: // PrimaryExpression = THIS.t
 			{
 					final Symbol t = _symbols[offset + 1];
 					
 			return new JSThisNode(t);
 			}
-			case 130: // PrimaryExpression = Identifier.i
+			case 131: // PrimaryExpression = Identifier.i
 			{
 					final Symbol i = _symbols[offset + 1];
 					
 			return new JSIdentifierNode(i);
 			}
-			case 140: // MemberExpression = MemberExpression.l LBRACKET.lb Expression.r RBRACKET.rb
+			case 142: // MemberExpression = MemberExpression.l LBRACKET.lb Expression.r RBRACKET.rb
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -981,7 +983,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSGetElementNode(l, lb, r, rb);
 			}
-			case 141: // MemberExpression = MemberExpression.l DOT.o IdentifierName.r
+			case 143: // MemberExpression = MemberExpression.l DOT.o IdentifierName.r
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -990,7 +992,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
 			}
-			case 145: // MemberExpression = NEW MemberExpression.e Arguments.r
+			case 147: // MemberExpression = NEW MemberExpression.e Arguments.r
 			{
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
@@ -999,14 +1001,14 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSConstructNode(e, r);
 			}
-			case 149: // NewExpression = NEW NewExpression.e
+			case 151: // NewExpression = NEW NewExpression.e
 			{
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
 					
 			return new JSConstructNode(e, new JSEmptyNode(e));
 			}
-			case 150: // CallExpression = MemberExpression.l Arguments.r
+			case 152: // CallExpression = MemberExpression.l Arguments.r
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1015,7 +1017,15 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSInvokeNode(l, r);
 			}
-			case 152: // CallExpression = CallExpression.l Arguments.r
+			case 153: // CallExpression = SUPER.s Arguments.r
+			{
+					final Symbol s = _symbols[offset + 1];
+					final Symbol _symbol_r = _symbols[offset + 2];
+					final JSArgumentsNode r = (JSArgumentsNode) _symbol_r.value;
+					
+			return new JSInvokeNode(new JSIdentifierNode(s), r);
+			}
+			case 154: // CallExpression = CallExpression.l Arguments.r
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1024,7 +1034,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSInvokeNode(l, r);
 			}
-			case 153: // CallExpression = CallExpression.l LBRACKET.lb Expression.r RBRACKET.rb
+			case 155: // CallExpression = CallExpression.l LBRACKET.lb Expression.r RBRACKET.rb
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1035,7 +1045,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSGetElementNode(l, lb, r, rb);
 			}
-			case 154: // CallExpression = CallExpression.l DOT.o IdentifierName.r
+			case 156: // CallExpression = CallExpression.l DOT.o IdentifierName.r
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1044,17 +1054,17 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
 			}
-			case 203: // Statement = error
+			case 205: // Statement = error
 			{
 					
 			return new JSErrorNode();
 			}
-			case 218: // Statement_NoIf = error
+			case 220: // Statement_NoIf = error
 			{
 					
 			return new JSErrorNode();
 			}
-			case 219: // EmptyStatement = SEMICOLON.s
+			case 221: // EmptyStatement = SEMICOLON.s
 			{
 					final Symbol s = _symbols[offset + 1];
 					
@@ -1062,7 +1072,7 @@ public class JSParser extends Parser implements IParser {
 			node.setSemicolonIncluded(true);
 			return node;
 			}
-			case 232: // Block = LCURLY opt$StatementList.a RCURLY
+			case 234: // Block = LCURLY opt$StatementList.a RCURLY
 			{
 					final Symbol _symbol_a = _symbols[offset + 2];
 					final ArrayList _list_a = (ArrayList) _symbol_a.value;
@@ -1073,35 +1083,15 @@ public class JSParser extends Parser implements IParser {
 			}
 			return new JSStatementsNode(a);
 			}
-			case 233: // StatementList = StatementList StatementListItem
+			case 235: // StatementList = StatementList StatementListItem
 			{
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
 			}
-			case 234: // StatementList = StatementListItem
+			case 236: // StatementList = StatementListItem
 			{
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 			}
-			case 237: // LexicalDeclaration = LetOrConst.v BindingList.l SEMICOLON
-			{
-					final Symbol v = _symbols[offset + 1];
-					final Symbol _symbol_l = _symbols[offset + 2];
-					final ArrayList _list_l = (ArrayList) _symbol_l.value;
-					final JSNode[] l = _list_l == null ? new JSNode[0] : (JSNode[]) _list_l.toArray(new JSNode[_list_l.size()]);
-					
-			// FIXME Determine if this was let or const and use special subclass!
-			JSNode node = new JSVarNode(v, l);
-			node.setSemicolonIncluded(true);
-			return node;
-			}
-			case 240: // BindingList = BindingList COMMA LexicalBinding
-			{
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
-			}
-			case 241: // BindingList = LexicalBinding
-			{
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
-			}
-			case 243: // VariableStatement = VAR.v VariableDeclarationList.l SEMICOLON
+			case 239: // LexicalDeclaration = LetOrConst.v BindingList.l SEMICOLON
 			{
 					final Symbol v = _symbols[offset + 1];
 					final Symbol _symbol_l = _symbols[offset + 2];
@@ -1112,15 +1102,34 @@ public class JSParser extends Parser implements IParser {
 			node.setSemicolonIncluded(true);
 			return node;
 			}
-			case 244: // VariableDeclarationList = VariableDeclarationList COMMA VariableDeclaration
+			case 242: // BindingList = BindingList COMMA LexicalBinding
 			{
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
 			}
-			case 245: // VariableDeclarationList = VariableDeclaration
+			case 243: // BindingList = LexicalBinding
 			{
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 			}
-			case 247: // VariableDeclaration = BindingPattern.p Initializer.i
+			case 245: // VariableStatement = VAR.v VariableDeclarationList.l SEMICOLON
+			{
+					final Symbol v = _symbols[offset + 1];
+					final Symbol _symbol_l = _symbols[offset + 2];
+					final ArrayList _list_l = (ArrayList) _symbol_l.value;
+					final JSNode[] l = _list_l == null ? new JSNode[0] : (JSNode[]) _list_l.toArray(new JSNode[_list_l.size()]);
+					
+			JSNode node = new JSVarNode(v, l);
+			node.setSemicolonIncluded(true);
+			return node;
+			}
+			case 246: // VariableDeclarationList = VariableDeclarationList COMMA VariableDeclaration
+			{
+					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
+			}
+			case 247: // VariableDeclarationList = VariableDeclaration
+			{
+					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
+			}
+			case 249: // VariableDeclaration = BindingPattern.p Initializer.i
 			{
 					final Symbol _symbol_p = _symbols[offset + 1];
 					final JSNode p = (JSNode) _symbol_p.value;
@@ -1129,14 +1138,14 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSDestructuringNode(p, i.getExpression());
 			}
-			case 250: // ObjectBindingPattern = LCURLY.l RCURLY.r
+			case 252: // ObjectBindingPattern = LCURLY.l RCURLY.r
 			{
 					final Symbol l = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 2];
 					
 			return new JSObjectNode(l, r);
 			}
-			case 251: // ObjectBindingPattern = LCURLY.l BindingPropertyList.p RCURLY.r
+			case 253: // ObjectBindingPattern = LCURLY.l BindingPropertyList.p RCURLY.r
 			{
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_p = _symbols[offset + 2];
@@ -1146,7 +1155,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSObjectNode(l, r, p);
 			}
-			case 252: // ObjectBindingPattern = LCURLY.l BindingPropertyList.p COMMA RCURLY.r
+			case 254: // ObjectBindingPattern = LCURLY.l BindingPropertyList.p COMMA RCURLY.r
 			{
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_p = _symbols[offset + 2];
@@ -1156,7 +1165,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSObjectNode(l, r, p);
 			}
-			case 255: // ArrayBindingPattern = LBRACKET.l opt$Elision.e opt$BindingRestElement.n RBRACKET.r
+			case 257: // ArrayBindingPattern = LBRACKET.l opt$Elision.e opt$BindingRestElement.n RBRACKET.r
 			{
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -1179,7 +1188,7 @@ public class JSParser extends Parser implements IParser {
 			}
 			return new JSArrayNode(l, r, node);
 			}
-			case 256: // ArrayBindingPattern = LBRACKET.l BindingElementList.n RBRACKET.r
+			case 258: // ArrayBindingPattern = LBRACKET.l BindingElementList.n RBRACKET.r
 			{
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_n = _symbols[offset + 2];
@@ -1188,7 +1197,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSArrayNode(l, r, n);
 			}
-			case 257: // ArrayBindingPattern = LBRACKET.l BindingElementList.n COMMA opt$Elision.e opt$BindingRestElement.z RBRACKET.r
+			case 259: // ArrayBindingPattern = LBRACKET.l BindingElementList.n COMMA opt$Elision.e opt$BindingRestElement.z RBRACKET.r
 			{
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_n = _symbols[offset + 2];
@@ -1208,15 +1217,15 @@ public class JSParser extends Parser implements IParser {
 			}
 			return new JSArrayNode(l, r, n);
 			}
-			case 258: // BindingPropertyList = BindingPropertyList COMMA BindingProperty
+			case 260: // BindingPropertyList = BindingPropertyList COMMA BindingProperty
 			{
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
 			}
-			case 259: // BindingPropertyList = BindingProperty
+			case 261: // BindingPropertyList = BindingProperty
 			{
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 			}
-			case 260: // BindingElementList = BindingElementList.l COMMA opt$Elision.e BindingElement.elem
+			case 262: // BindingElementList = BindingElementList.l COMMA opt$Elision.e BindingElement.elem
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSElementsNode l = (JSElementsNode) _symbol_l.value;
@@ -1231,7 +1240,7 @@ public class JSParser extends Parser implements IParser {
 			l.addChild(elem);
 			return l;
 			}
-			case 261: // BindingElementList = opt$Elision.e BindingElement.elem
+			case 263: // BindingElementList = opt$Elision.e BindingElement.elem
 			{
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final JSElisionNode e = (JSElisionNode) _symbol_e.value;
@@ -1243,7 +1252,7 @@ public class JSParser extends Parser implements IParser {
 			}
 			return new JSElementsNode(e, elem);
 			}
-			case 263: // BindingProperty = PropertyName.n COLON.c BindingElement.e
+			case 265: // BindingProperty = PropertyName.n COLON.c BindingElement.e
 			{
 					final Symbol _symbol_n = _symbols[offset + 1];
 					final JSNode n = (JSNode) _symbol_n.value;
@@ -1253,7 +1262,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSNameValuePairNode(n, c, e);
 			}
-			case 267: // BindingElement = BindingPattern.p opt$Initializer.i
+			case 269: // BindingElement = BindingPattern.p opt$Initializer.i
 			{
 					final Symbol _symbol_p = _symbols[offset + 1];
 					final JSNode p = (JSNode) _symbol_p.value;
@@ -1265,7 +1274,7 @@ public class JSParser extends Parser implements IParser {
 			}
 			return new JSDestructuringNode(p, i.getExpression());
 			}
-			case 268: // SingleNameBinding = Identifier.i opt$Initializer.z
+			case 270: // SingleNameBinding = Identifier.i opt$Initializer.z
 			{
 					final Symbol i = _symbols[offset + 1];
 					final Symbol _symbol_z = _symbols[offset + 2];
@@ -1276,14 +1285,14 @@ public class JSParser extends Parser implements IParser {
 			}
 			return new JSDeclarationNode(new JSIdentifierNode(i), z.getEquals(), z.getExpression());
 			}
-			case 269: // BindingRestElement = DOT_DOT_DOT.d Identifier.i
+			case 271: // BindingRestElement = DOT_DOT_DOT.d Identifier.i
 			{
 					final Symbol d = _symbols[offset + 1];
 					final Symbol i = _symbols[offset + 2];
 					
 			return new JSRestElementNode(d, new JSIdentifierNode(i));
 			}
-			case 270: // ExpressionStatement = Expression.e SEMICOLON
+			case 272: // ExpressionStatement = Expression.e SEMICOLON
 			{
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final JSNode e = (JSNode) _symbol_e.value;
@@ -1291,7 +1300,7 @@ public class JSParser extends Parser implements IParser {
 			e.setSemicolonIncluded(true);
 			return e;
 			}
-			case 271: // IfStatement = IF LPAREN.l Expression.e RPAREN.r Statement_NoIf.sn ELSE Statement.s
+			case 273: // IfStatement = IF LPAREN.l Expression.e RPAREN.r Statement_NoIf.sn ELSE Statement.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -1304,7 +1313,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSIfNode(l, e, r, sn, s);
 			}
-			case 272: // IfStatement = IF LPAREN.l Expression.e RPAREN.r Statement.s
+			case 274: // IfStatement = IF LPAREN.l Expression.e RPAREN.r Statement.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -1315,7 +1324,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSIfNode(l, e, r, s, new JSEmptyNode(s));
 			}
-			case 273: // IfStatement_NoIf = IF LPAREN.l Expression.e RPAREN.r Statement_NoIf.sn ELSE Statement_NoIf.s
+			case 275: // IfStatement_NoIf = IF LPAREN.l Expression.e RPAREN.r Statement_NoIf.sn ELSE Statement_NoIf.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -1328,7 +1337,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSIfNode(l, e, r, sn, s);
 			}
-			case 274: // IterationStatement = DO Statement.s WHILE LPAREN.l Expression.e RPAREN.r SEMICOLON.s1
+			case 276: // IterationStatement = DO Statement.s WHILE LPAREN.l Expression.e RPAREN.r SEMICOLON.s1
 			{
 					final Symbol _symbol_s = _symbols[offset + 2];
 					final JSNode s = (JSNode) _symbol_s.value;
@@ -1342,7 +1351,7 @@ public class JSParser extends Parser implements IParser {
  			node.setSemicolonIncluded(true);
  			return node;
 			}
-			case 275: // IterationStatement = WHILE LPAREN.l Expression.e RPAREN.r Statement.s
+			case 277: // IterationStatement = WHILE LPAREN.l Expression.e RPAREN.r Statement.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -1353,7 +1362,7 @@ public class JSParser extends Parser implements IParser {
 					
  			return new JSWhileNode(l, e, r, s);
 			}
-			case 278: // IterationStatement = FOR LPAREN.l opt$Expression.e1 SEMICOLON.s1 opt$Expression.e2 SEMICOLON.s2 opt$Expression.e3 RPAREN.r Statement.s
+			case 280: // IterationStatement = FOR LPAREN.l opt$Expression.e1 SEMICOLON.s1 opt$Expression.e2 SEMICOLON.s2 opt$Expression.e3 RPAREN.r Statement.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_e1 = _symbols[offset + 3];
@@ -1382,7 +1391,7 @@ public class JSParser extends Parser implements IParser {
 			}
  			return new JSForNode(l, expr1, s1, expr2, s2, expr3, r, s);
 			}
-			case 279: // IterationStatement = FOR LPAREN.l VAR.v VariableDeclarationList.i SEMICOLON.s1 opt$Expression.e1 SEMICOLON.s2 opt$Expression.e2 RPAREN.r Statement.s
+			case 281: // IterationStatement = FOR LPAREN.l VAR.v VariableDeclarationList.i SEMICOLON.s1 opt$Expression.e1 SEMICOLON.s2 opt$Expression.e2 RPAREN.r Statement.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol v = _symbols[offset + 3];
@@ -1409,7 +1418,7 @@ public class JSParser extends Parser implements IParser {
 			}
  			return new JSForNode(l, new JSVarNode(v, i), s1, expr1, s2, expr2, r, s);
 			}
-			case 280: // IterationStatement = FOR LPAREN.l LexicalDeclaration.decl opt$Expression.e1 SEMICOLON.s1 opt$Expression.e2 RPAREN.r Statement.s
+			case 282: // IterationStatement = FOR LPAREN.l LexicalDeclaration.decl opt$Expression.e1 SEMICOLON.s1 opt$Expression.e2 RPAREN.r Statement.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_decl = _symbols[offset + 3];
@@ -1434,7 +1443,7 @@ public class JSParser extends Parser implements IParser {
 			// FIXME Grab semicolon from decl to inject here?
  			return new JSForNode(l, decl, null, expr1, s1, expr2, r, s);
 			}
-			case 281: // IterationStatement = FOR LPAREN.l SingleExpression.i IN.in Expression.o RPAREN.r Statement.s
+			case 283: // IterationStatement = FOR LPAREN.l SingleExpression.i IN.in Expression.o RPAREN.r Statement.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -1448,7 +1457,7 @@ public class JSParser extends Parser implements IParser {
 					
  			return new JSForInNode(l, i, in, o, r, s);
 			}
-			case 282: // IterationStatement = FOR LPAREN.l VAR.v ForBinding.i IN.in Expression.o RPAREN.r Statement.s
+			case 284: // IterationStatement = FOR LPAREN.l VAR.v ForBinding.i IN.in Expression.o RPAREN.r Statement.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol v = _symbols[offset + 3];
@@ -1463,7 +1472,7 @@ public class JSParser extends Parser implements IParser {
 					
  			return new JSForInNode(l, new JSVarNode(v, i), in, o, r, s);
 			}
-			case 283: // IterationStatement = FOR LPAREN.l ForDeclaration.decl IN.in Expression.o RPAREN.r Statement.s
+			case 285: // IterationStatement = FOR LPAREN.l ForDeclaration.decl IN.in Expression.o RPAREN.r Statement.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_decl = _symbols[offset + 3];
@@ -1477,7 +1486,7 @@ public class JSParser extends Parser implements IParser {
 					
  			return new JSForInNode(l, decl, in, o, r, s);
 			}
-			case 284: // IterationStatement = FOR LPAREN.l SingleExpression.i OF.of SingleExpression.o RPAREN.r Statement.s
+			case 286: // IterationStatement = FOR LPAREN.l SingleExpression.i OF.of SingleExpression.o RPAREN.r Statement.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -1491,7 +1500,7 @@ public class JSParser extends Parser implements IParser {
 					
  			return new JSForOfNode(l, i, of, o, r, s);
 			}
-			case 285: // IterationStatement = FOR LPAREN.l VAR.v ForBinding.i OF.of SingleExpression.o RPAREN.r Statement.s
+			case 287: // IterationStatement = FOR LPAREN.l VAR.v ForBinding.i OF.of SingleExpression.o RPAREN.r Statement.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol v = _symbols[offset + 3];
@@ -1506,7 +1515,7 @@ public class JSParser extends Parser implements IParser {
 					
  			return new JSForOfNode(l, new JSVarNode(v, i), of, o, r, s);
 			}
-			case 286: // IterationStatement = FOR LPAREN.l ForDeclaration.decl OF.of SingleExpression.o RPAREN.r Statement.s
+			case 288: // IterationStatement = FOR LPAREN.l ForDeclaration.decl OF.of SingleExpression.o RPAREN.r Statement.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_decl = _symbols[offset + 3];
@@ -1520,7 +1529,7 @@ public class JSParser extends Parser implements IParser {
 					
  			return new JSForOfNode(l, decl, of, o, r, s);
 			}
-			case 287: // IterationStatement_NoIf = DO Statement.s WHILE LPAREN.l Expression.e RPAREN.r SEMICOLON.s1
+			case 289: // IterationStatement_NoIf = DO Statement.s WHILE LPAREN.l Expression.e RPAREN.r SEMICOLON.s1
 			{
 					final Symbol _symbol_s = _symbols[offset + 2];
 					final JSNode s = (JSNode) _symbol_s.value;
@@ -1534,7 +1543,7 @@ public class JSParser extends Parser implements IParser {
  			node.setSemicolonIncluded(true);
  			return node;
 			}
-			case 288: // IterationStatement_NoIf = WHILE LPAREN.l Expression.e RPAREN.r Statement_NoIf.s
+			case 290: // IterationStatement_NoIf = WHILE LPAREN.l Expression.e RPAREN.r Statement_NoIf.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -1545,7 +1554,7 @@ public class JSParser extends Parser implements IParser {
 					
  			return new JSWhileNode(l, e, r, s);
 			}
-			case 289: // IterationStatement_NoIf = FOR LPAREN.l opt$Expression.e1 SEMICOLON.s1 opt$Expression.e2 SEMICOLON.s2 opt$Expression.e3 RPAREN.r Statement_NoIf.s
+			case 291: // IterationStatement_NoIf = FOR LPAREN.l opt$Expression.e1 SEMICOLON.s1 opt$Expression.e2 SEMICOLON.s2 opt$Expression.e3 RPAREN.r Statement_NoIf.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_e1 = _symbols[offset + 3];
@@ -1574,7 +1583,7 @@ public class JSParser extends Parser implements IParser {
 			}
  			return new JSForNode(l, expr1, s1, expr2, s2, expr3, r, s);
 			}
-			case 290: // IterationStatement_NoIf = FOR LPAREN.l VAR.v VariableDeclarationList.i SEMICOLON.s1 opt$Expression.e1 SEMICOLON.s2 opt$Expression.e2 RPAREN.r Statement_NoIf.s
+			case 292: // IterationStatement_NoIf = FOR LPAREN.l VAR.v VariableDeclarationList.i SEMICOLON.s1 opt$Expression.e1 SEMICOLON.s2 opt$Expression.e2 RPAREN.r Statement_NoIf.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol v = _symbols[offset + 3];
@@ -1601,7 +1610,7 @@ public class JSParser extends Parser implements IParser {
 			}
  			return new JSForNode(l, new JSVarNode(v, i), s1, expr1, s2, expr2, r, s);
 			}
-			case 291: // IterationStatement_NoIf = FOR LPAREN.l LexicalDeclaration.decl opt$Expression.e1 SEMICOLON.s1 opt$Expression.e2 RPAREN.r Statement_NoIf.s
+			case 293: // IterationStatement_NoIf = FOR LPAREN.l LexicalDeclaration.decl opt$Expression.e1 SEMICOLON.s1 opt$Expression.e2 RPAREN.r Statement_NoIf.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_decl = _symbols[offset + 3];
@@ -1626,7 +1635,7 @@ public class JSParser extends Parser implements IParser {
 			// FIXME Grab semicolon from decl to inject here?
  			return new JSForNode(l, decl, null, expr1, s1, expr2, r, s);
 			}
-			case 292: // IterationStatement_NoIf = FOR LPAREN.l SingleExpression.i IN.in Expression.o RPAREN.r Statement_NoIf.s
+			case 294: // IterationStatement_NoIf = FOR LPAREN.l SingleExpression.i IN.in Expression.o RPAREN.r Statement_NoIf.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -1640,7 +1649,7 @@ public class JSParser extends Parser implements IParser {
 					
  			return new JSForInNode(l, i, in, o, r, s);
 			}
-			case 293: // IterationStatement_NoIf = FOR LPAREN.l VAR.v ForBinding.i IN.in Expression.o RPAREN.r Statement_NoIf.s
+			case 295: // IterationStatement_NoIf = FOR LPAREN.l VAR.v ForBinding.i IN.in Expression.o RPAREN.r Statement_NoIf.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol v = _symbols[offset + 3];
@@ -1655,7 +1664,7 @@ public class JSParser extends Parser implements IParser {
 					
  			return new JSForInNode(l, new JSVarNode(v, i), in, o, r, s);
 			}
-			case 294: // IterationStatement_NoIf = FOR LPAREN.l ForDeclaration.decl IN.in Expression.o RPAREN.r Statement_NoIf.s
+			case 296: // IterationStatement_NoIf = FOR LPAREN.l ForDeclaration.decl IN.in Expression.o RPAREN.r Statement_NoIf.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_decl = _symbols[offset + 3];
@@ -1669,7 +1678,7 @@ public class JSParser extends Parser implements IParser {
 					
  			return new JSForInNode(l, decl, in, o, r, s);
 			}
-			case 295: // IterationStatement_NoIf = FOR LPAREN.l SingleExpression.i OF.of SingleExpression.o RPAREN.r Statement_NoIf.s
+			case 297: // IterationStatement_NoIf = FOR LPAREN.l SingleExpression.i OF.of SingleExpression.o RPAREN.r Statement_NoIf.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -1683,7 +1692,7 @@ public class JSParser extends Parser implements IParser {
 					
  			return new JSForOfNode(l, i, of, o, r, s);
 			}
-			case 296: // IterationStatement_NoIf = FOR LPAREN.l VAR.v ForBinding.i OF.of SingleExpression.o RPAREN.r Statement_NoIf.s
+			case 298: // IterationStatement_NoIf = FOR LPAREN.l VAR.v ForBinding.i OF.of SingleExpression.o RPAREN.r Statement_NoIf.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol v = _symbols[offset + 3];
@@ -1698,7 +1707,7 @@ public class JSParser extends Parser implements IParser {
 					
  			return new JSForOfNode(l, new JSVarNode(v, i), of, o, r, s);
 			}
-			case 297: // IterationStatement_NoIf = FOR LPAREN.l ForDeclaration.decl OF.of SingleExpression.o RPAREN.r Statement_NoIf.s
+			case 299: // IterationStatement_NoIf = FOR LPAREN.l ForDeclaration.decl OF.of SingleExpression.o RPAREN.r Statement_NoIf.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_decl = _symbols[offset + 3];
@@ -1712,29 +1721,28 @@ public class JSParser extends Parser implements IParser {
 					
  			return new JSForOfNode(l, decl, of, o, r, s);
 			}
-			case 298: // ForDeclaration = LetOrConst.v ForBinding.l
+			case 300: // ForDeclaration = LetOrConst.v ForBinding.l
 			{
 					final Symbol v = _symbols[offset + 1];
 					final Symbol _symbol_l = _symbols[offset + 2];
 					final JSNode l = (JSNode) _symbol_l.value;
 					
-			// FIXME Determine if this was let or const and use special subclass!
 			return new JSVarNode(v, l);
 			}
-			case 299: // ForBinding = Identifier.i
+			case 301: // ForBinding = Identifier.i
 			{
 					final Symbol i = _symbols[offset + 1];
 					
 			return new JSIdentifierNode(i);
 			}
-			case 301: // ContinueStatement = CONTINUE SEMICOLON
+			case 303: // ContinueStatement = CONTINUE SEMICOLON
 			{
 					
 			JSNode node = new JSContinueNode();
 			node.setSemicolonIncluded(true);
 			return node;
 			}
-			case 302: // ContinueStatement = CONTINUE Identifier.i SEMICOLON
+			case 304: // ContinueStatement = CONTINUE Identifier.i SEMICOLON
 			{
 					final Symbol i = _symbols[offset + 2];
 					
@@ -1742,14 +1750,14 @@ public class JSParser extends Parser implements IParser {
 			node.setSemicolonIncluded(true);
 			return node;
 			}
-			case 303: // BreakStatement = BREAK SEMICOLON
+			case 305: // BreakStatement = BREAK SEMICOLON
 			{
 					
 			JSNode node = new JSBreakNode();
 			node.setSemicolonIncluded(true);
 			return node;
 			}
-			case 304: // BreakStatement = BREAK Identifier.i SEMICOLON
+			case 306: // BreakStatement = BREAK Identifier.i SEMICOLON
 			{
 					final Symbol i = _symbols[offset + 2];
 					
@@ -1757,7 +1765,7 @@ public class JSParser extends Parser implements IParser {
 			node.setSemicolonIncluded(true);
 			return node;
 			}
-			case 305: // ReturnStatement = RETURN.r SEMICOLON
+			case 307: // ReturnStatement = RETURN.r SEMICOLON
 			{
 					final Symbol r = _symbols[offset + 1];
 					
@@ -1765,7 +1773,7 @@ public class JSParser extends Parser implements IParser {
 			node.setSemicolonIncluded(true);
 			return node;
 			}
-			case 306: // ReturnStatement = RETURN Expression.e SEMICOLON
+			case 308: // ReturnStatement = RETURN Expression.e SEMICOLON
 			{
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
@@ -1774,7 +1782,7 @@ public class JSParser extends Parser implements IParser {
 			node.setSemicolonIncluded(true);
 			return node;
 			}
-			case 307: // WithStatement = WITH LPAREN.l Expression.e RPAREN.r Statement.s
+			case 309: // WithStatement = WITH LPAREN.l Expression.e RPAREN.r Statement.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -1785,7 +1793,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSWithNode(l, e, r, s);
 			}
-			case 308: // WithStatement_NoIf = WITH LPAREN.l Expression.e RPAREN.r Statement_NoIf.s
+			case 310: // WithStatement_NoIf = WITH LPAREN.l Expression.e RPAREN.r Statement_NoIf.s
 			{
 					final Symbol l = _symbols[offset + 2];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -1796,7 +1804,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSWithNode(l, e, r, s);
 			}
-			case 309: // SwitchStatement = SWITCH LPAREN.lp Expression.e RPAREN.rp CaseBlock.children
+			case 311: // SwitchStatement = SWITCH LPAREN.lp Expression.e RPAREN.rp CaseBlock.children
 			{
 					final Symbol lp = _symbols[offset + 2];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -1808,7 +1816,7 @@ public class JSParser extends Parser implements IParser {
 			final JSNode[] c1 = children == null ? new JSNode[0] : (JSNode[]) children.toArray(new JSNode[children.size()]);
 			return new JSSwitchNode(lp, e, rp, null, null, c1);
 			}
-			case 313: // CaseBlock = LCURLY opt$CaseClauses.c1 DefaultClause.d opt$CaseClauses.c2 RCURLY
+			case 315: // CaseBlock = LCURLY opt$CaseClauses.c1 DefaultClause.d opt$CaseClauses.c2 RCURLY
 			{
 					final Symbol _symbol_c1 = _symbols[offset + 2];
 					final ArrayList _list_c1 = (ArrayList) _symbol_c1.value;
@@ -1835,15 +1843,15 @@ public class JSParser extends Parser implements IParser {
 			}
 			return new Symbol(nodes);
 			}
-			case 314: // CaseClauses = CaseClause
+			case 316: // CaseClauses = CaseClause
 			{
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 			}
-			case 315: // CaseClauses = CaseClauses CaseClause
+			case 317: // CaseClauses = CaseClauses CaseClause
 			{
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
 			}
-			case 316: // CaseClause = CASE Expression.e COLON.c opt$StatementList.s
+			case 318: // CaseClause = CASE Expression.e COLON.c opt$StatementList.s
 			{
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
@@ -1857,7 +1865,7 @@ public class JSParser extends Parser implements IParser {
 			}
 			return new JSCaseNode(e, c, s);
 			}
-			case 317: // DefaultClause = DEFAULT COLON.c opt$StatementList.s
+			case 319: // DefaultClause = DEFAULT COLON.c opt$StatementList.s
 			{
 					final Symbol c = _symbols[offset + 2];
 					final Symbol _symbol_s = _symbols[offset + 3];
@@ -1869,7 +1877,7 @@ public class JSParser extends Parser implements IParser {
 			}
 			return new JSDefaultNode(c, s);
 			}
-			case 318: // LabelledStatement = Identifier.i COLON.c LabelledItem.s
+			case 320: // LabelledStatement = Identifier.i COLON.c LabelledItem.s
 			{
 					final Symbol i = _symbols[offset + 1];
 					final Symbol c = _symbols[offset + 2];
@@ -1881,7 +1889,7 @@ public class JSParser extends Parser implements IParser {
 
 			return new JSLabelledNode(id, c, s);
 			}
-			case 319: // LabelledStatement_NoIf = Identifier.i COLON.c LabelledItem_NoIf.s
+			case 321: // LabelledStatement_NoIf = Identifier.i COLON.c LabelledItem_NoIf.s
 			{
 					final Symbol i = _symbols[offset + 1];
 					final Symbol c = _symbols[offset + 2];
@@ -1893,7 +1901,7 @@ public class JSParser extends Parser implements IParser {
 
 			return new JSLabelledNode(id, c, s);
 			}
-			case 324: // ThrowStatement = THROW Expression.e SEMICOLON
+			case 326: // ThrowStatement = THROW Expression.e SEMICOLON
 			{
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final JSNode e = (JSNode) _symbol_e.value;
@@ -1902,7 +1910,7 @@ public class JSParser extends Parser implements IParser {
 			node.setSemicolonIncluded(true);
 			return node;
 			}
-			case 325: // TryStatement = TRY Block.b Catch.c
+			case 327: // TryStatement = TRY Block.b Catch.c
 			{
 					final Symbol _symbol_b = _symbols[offset + 2];
 					final JSStatementsNode b = (JSStatementsNode) _symbol_b.value;
@@ -1911,7 +1919,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSTryNode(b, c, new JSEmptyNode(c));
 			}
-			case 326: // TryStatement = TRY Block.b Finally.f
+			case 328: // TryStatement = TRY Block.b Finally.f
 			{
 					final Symbol _symbol_b = _symbols[offset + 2];
 					final JSStatementsNode b = (JSStatementsNode) _symbol_b.value;
@@ -1920,7 +1928,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSTryNode(b, new JSEmptyNode(b), f);
 			}
-			case 327: // TryStatement = TRY Block.b Catch.c Finally.f
+			case 329: // TryStatement = TRY Block.b Catch.c Finally.f
 			{
 					final Symbol _symbol_b = _symbols[offset + 2];
 					final JSStatementsNode b = (JSStatementsNode) _symbol_b.value;
@@ -1931,7 +1939,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSTryNode(b, c, f);
 			}
-			case 328: // Catch = CATCH LPAREN CatchParameter.p RPAREN Block.b
+			case 330: // Catch = CATCH LPAREN CatchParameter.p RPAREN Block.b
 			{
 					final Symbol _symbol_p = _symbols[offset + 3];
 					final JSNode p = (JSNode) _symbol_p.value;
@@ -1940,20 +1948,20 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSCatchNode(p, b);
 			}
-			case 329: // Finally = FINALLY Block.b
+			case 331: // Finally = FINALLY Block.b
 			{
 					final Symbol _symbol_b = _symbols[offset + 2];
 					final JSStatementsNode b = (JSStatementsNode) _symbol_b.value;
 					
 			return new JSFinallyNode(b);
 			}
-			case 330: // CatchParameter = Identifier.i
+			case 332: // CatchParameter = Identifier.i
 			{
 					final Symbol i = _symbols[offset + 1];
 					
 			return new JSIdentifierNode(i);
 			}
-			case 333: // FunctionDeclaration = FUNCTION Identifier.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
+			case 335: // FunctionDeclaration = FUNCTION Identifier.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
 			{
 					final Symbol ident = _symbols[offset + 2];
 					final Symbol _symbol_params = _symbols[offset + 4];
@@ -1967,7 +1975,7 @@ public class JSParser extends Parser implements IParser {
 				body
 			);
 			}
-			case 336: // FunctionExpression = FUNCTION.f opt$Identifier.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
+			case 338: // FunctionExpression = FUNCTION.f opt$Identifier.ident LPAREN FormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
 			{
 					final Symbol f = _symbols[offset + 1];
 					final Symbol ident = _symbols[offset + 2];
@@ -1989,7 +1997,7 @@ public class JSParser extends Parser implements IParser {
 				body
 			);
 			}
-			case 338: // FormalParameters = FormalParameterList.params
+			case 340: // FormalParameters = FormalParameterList.params
 			{
 					final Symbol _symbol_params = _symbols[offset + 1];
 					final ArrayList params = (ArrayList) _symbol_params.value;
@@ -1997,12 +2005,12 @@ public class JSParser extends Parser implements IParser {
 			final JSNode[] p = params == null ? new JSNode[0] : (JSNode[]) params.toArray(new JSNode[params.size()]);
 			return new JSParametersNode(p);
 			}
-			case 339: // FormalParameters = 
+			case 341: // FormalParameters = 
 			{
 					
 			return new JSParametersNode();
 			}
-			case 340: // FormalParameterList = FunctionRestParameter.p
+			case 342: // FormalParameterList = FunctionRestParameter.p
 			{
 					final Symbol _symbol_p = _symbols[offset + 1];
 					final JSRestElementNode p = (JSRestElementNode) _symbol_p.value;
@@ -2011,7 +2019,7 @@ public class JSParser extends Parser implements IParser {
 			lst.add(p);
 			return new Symbol(lst);
 			}
-			case 342: // FormalParameterList = FormalsList.l COMMA FunctionRestParameter.p
+			case 344: // FormalParameterList = FormalsList.l COMMA FunctionRestParameter.p
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final ArrayList _list_l = (ArrayList) _symbol_l.value;
@@ -2022,15 +2030,15 @@ public class JSParser extends Parser implements IParser {
 			_list_l.add(p);
 			return _symbol_l;
 			}
-			case 343: // FormalsList = FormalsList COMMA FormalParameter
+			case 345: // FormalsList = FormalsList COMMA FormalParameter
 			{
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
 			}
-			case 344: // FormalsList = FormalParameter
+			case 346: // FormalsList = FormalParameter
 			{
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 			}
-			case 348: // FunctionStatementList = StatementList.s
+			case 350: // FunctionStatementList = StatementList.s
 			{
 					final Symbol _symbol_s = _symbols[offset + 1];
 					final ArrayList _list_s = (ArrayList) _symbol_s.value;
@@ -2038,12 +2046,12 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSStatementsNode(s);
 			}
-			case 349: // FunctionStatementList = 
+			case 351: // FunctionStatementList = 
 			{
 					
 			return new JSStatementsNode();
 			}
-			case 350: // ArrowFunction = ArrowParameters.p ARROW ConciseBody.body
+			case 352: // ArrowFunction = ArrowParameters.p ARROW ConciseBody.body
 			{
 					final Symbol _symbol_p = _symbols[offset + 1];
 					final JSParametersNode p = (JSParametersNode) _symbol_p.value;
@@ -2052,13 +2060,13 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSArrowFunctionNode(p, body);
 			}
-			case 351: // ArrowParameters = Identifier.i
+			case 353: // ArrowParameters = Identifier.i
 			{
 					final Symbol i = _symbols[offset + 1];
 					
 			return new JSParametersNode(new JSIdentifierNode(i));
 			}
-			case 355: // MethodDefinition = Identifier.ident LPAREN StrictFormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
+			case 357: // MethodDefinition = Identifier.ident LPAREN StrictFormalParameters.params RPAREN LCURLY FunctionBody.body RCURLY
 			{
 					final Symbol ident = _symbols[offset + 1];
 					final Symbol _symbol_params = _symbols[offset + 3];
@@ -2073,7 +2081,7 @@ public class JSParser extends Parser implements IParser {
 				body
 			);
 			}
-			case 357: // MethodDefinition = GET PropertyName.n LPAREN RPAREN LCURLY FunctionBody.body RCURLY
+			case 359: // MethodDefinition = GET PropertyName.n LPAREN RPAREN LCURLY FunctionBody.body RCURLY
 			{
 					final Symbol _symbol_n = _symbols[offset + 2];
 					final JSNode n = (JSNode) _symbol_n.value;
@@ -2082,7 +2090,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSNameValuePairNode(n, body);
 			}
-			case 358: // MethodDefinition = SET PropertyName.n LPAREN PropertySetParameterList.p RPAREN LCURLY FunctionBody.body RCURLY
+			case 360: // MethodDefinition = SET PropertyName.n LPAREN PropertySetParameterList.p RPAREN LCURLY FunctionBody.body RCURLY
 			{
 					final Symbol _symbol_n = _symbols[offset + 2];
 					final JSNode n = (JSNode) _symbol_n.value;
@@ -2095,7 +2103,7 @@ public class JSParser extends Parser implements IParser {
 			params.setLocation(p.getStartingOffset(), p.getEndingOffset());
 			return new JSNameValuePairNode(n, params, body);
 			}
-			case 360: // GeneratorMethod = STAR PropertyName.n LPAREN StrictFormalParameters.params RPAREN LCURLY GeneratorBody.body RCURLY
+			case 362: // GeneratorMethod = STAR PropertyName.n LPAREN StrictFormalParameters.params RPAREN LCURLY GeneratorBody.body RCURLY
 			{
 					final Symbol _symbol_n = _symbols[offset + 2];
 					final JSNode n = (JSNode) _symbol_n.value;
@@ -2104,71 +2112,143 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_body = _symbols[offset + 7];
 					final JSStatementsNode body = (JSStatementsNode) _symbol_body.value;
 					
-			JSFunctionNode f = new JSFunctionNode(
-				new JSEmptyNode(n),
-				params,
-				body
-			);
-			return new JSNameValuePairNode(n, f);
+			return new JSGeneratorFunctionNode(n, params, body);
 			}
-			case 367: // ClassDeclaration = CLASS Identifier.i ClassTail.t
+			case 363: // GeneratorDeclaration = FUNCTION STAR Identifier.i LPAREN FormalParameters.params RPAREN LCURLY GeneratorBody.body RCURLY
+			{
+					final Symbol i = _symbols[offset + 3];
+					final Symbol _symbol_params = _symbols[offset + 5];
+					final JSParametersNode params = (JSParametersNode) _symbol_params.value;
+					final Symbol _symbol_body = _symbols[offset + 8];
+					final JSStatementsNode body = (JSStatementsNode) _symbol_body.value;
+					
+			return new JSGeneratorFunctionNode(new JSIdentifierNode(i), params, body);
+			}
+			case 364: // GeneratorExpression = FUNCTION.f STAR opt$Identifier.i LPAREN FormalParameters.params RPAREN LCURLY GeneratorBody.body RCURLY
+			{
+					final Symbol f = _symbols[offset + 1];
+					final Symbol i = _symbols[offset + 3];
+					final Symbol _symbol_params = _symbols[offset + 5];
+					final JSParametersNode params = (JSParametersNode) _symbol_params.value;
+					final Symbol _symbol_body = _symbols[offset + 8];
+					final JSStatementsNode body = (JSStatementsNode) _symbol_body.value;
+					
+			JSNode name;
+			if (i != null) {
+				name = new JSIdentifierNode(i);
+			} else {
+				name = new JSEmptyNode(f);
+			}
+			return new JSGeneratorFunctionNode(name, params, body);
+			}
+			case 366: // YieldExpression = YIELD.y
+			{
+					final Symbol y = _symbols[offset + 1];
+					
+			return new JSYieldNode(y);
+			}
+			case 367: // YieldExpression = YIELD.y SingleExpression.e
+			{
+					final Symbol y = _symbols[offset + 1];
+					final Symbol _symbol_e = _symbols[offset + 2];
+					final JSNode e = (JSNode) _symbol_e.value;
+					
+			return new JSYieldNode(y, e);
+			}
+			case 368: // YieldExpression = YIELD.y STAR.s SingleExpression.e
+			{
+					final Symbol y = _symbols[offset + 1];
+					final Symbol s = _symbols[offset + 2];
+					final Symbol _symbol_e = _symbols[offset + 3];
+					final JSNode e = (JSNode) _symbol_e.value;
+					
+			return new JSYieldNode(y, s, e);
+			}
+			case 371: // ClassDeclaration = CLASS Identifier.i LCURLY opt$ClassBody.b RCURLY
 			{
 					final Symbol i = _symbols[offset + 2];
-					final Symbol _symbol_t = _symbols[offset + 3];
-					final JSStatementsNode t = (JSStatementsNode) _symbol_t.value;
-					
-			return new JSClassNode(new JSIdentifierNode(i), t);
-			}
-			case 368: // ClassExpression = CLASS opt$Identifier.i ClassTail.t
-			{
-					final Symbol i = _symbols[offset + 2];
-					final Symbol _symbol_t = _symbols[offset + 3];
-					final JSStatementsNode t = (JSStatementsNode) _symbol_t.value;
-					
-			if (i == null) {
-				return new JSClassNode(t);
-			}
-			return new JSClassNode(new JSIdentifierNode(i), t);
-			}
-			case 369: // ClassTail = ClassHeritage.h LCURLY ClassBody.b RCURLY
-			{
-					final Symbol h = _symbols[offset + 1];
-					final Symbol _symbol_b = _symbols[offset + 3];
+					final Symbol _symbol_b = _symbols[offset + 4];
 					final ArrayList _list_b = (ArrayList) _symbol_b.value;
 					final JSNode[] b = _list_b == null ? new JSNode[0] : (JSNode[]) _list_b.toArray(new JSNode[_list_b.size()]);
 					
-			// TODO Handle heritage!
-			return new JSStatementsNode(b);
+			JSIdentifierNode name = new JSIdentifierNode(i);
+			JSStatementsNode body;
+			if (b != null) {
+				body = new JSStatementsNode(b);
+			} else {
+				body = new JSStatementsNode();
 			}
-			case 370: // ClassTail = LCURLY ClassBody.b RCURLY
+			
+			return new JSClassNode(name, body);
+			}
+			case 372: // ClassDeclaration = CLASS Identifier.i EXTENDS SingleExpression.h LCURLY opt$ClassBody.b RCURLY
 			{
-					final Symbol _symbol_b = _symbols[offset + 2];
+					final Symbol i = _symbols[offset + 2];
+					final Symbol _symbol_h = _symbols[offset + 4];
+					final JSNode h = (JSNode) _symbol_h.value;
+					final Symbol _symbol_b = _symbols[offset + 6];
 					final ArrayList _list_b = (ArrayList) _symbol_b.value;
 					final JSNode[] b = _list_b == null ? new JSNode[0] : (JSNode[]) _list_b.toArray(new JSNode[_list_b.size()]);
 					
-			return new JSStatementsNode(b);
+			JSIdentifierNode name = new JSIdentifierNode(i);
+			JSStatementsNode body;
+			if (b != null) {
+				body = new JSStatementsNode(b);
+			} else {
+				body = new JSStatementsNode();
 			}
-			case 371: // ClassTail = ClassHeritage.h LCURLY RCURLY
+			
+			return new JSClassNode(name, h, body);
+			}
+			case 373: // ClassExpression = CLASS opt$Identifier.i LCURLY opt$ClassBody.b RCURLY
 			{
-					final Symbol h = _symbols[offset + 1];
+					final Symbol i = _symbols[offset + 2];
+					final Symbol _symbol_b = _symbols[offset + 4];
+					final ArrayList _list_b = (ArrayList) _symbol_b.value;
+					final JSNode[] b = _list_b == null ? new JSNode[0] : (JSNode[]) _list_b.toArray(new JSNode[_list_b.size()]);
 					
-			// TODO Handle heritage!
-			return new JSStatementsNode();
+			JSStatementsNode body;
+			if (b != null) {
+				body = new JSStatementsNode(b);
+			} else {
+				body = new JSStatementsNode();
 			}
-			case 372: // ClassTail = LCURLY RCURLY
+			if (i != null) {
+				JSIdentifierNode name = new JSIdentifierNode(i);
+				return new JSClassNode(name, body);
+			}
+			return new JSClassNode(body);
+			}
+			case 374: // ClassExpression = CLASS opt$Identifier.i EXTENDS SingleExpression.h LCURLY opt$ClassBody.b RCURLY
 			{
+					final Symbol i = _symbols[offset + 2];
+					final Symbol _symbol_h = _symbols[offset + 4];
+					final JSNode h = (JSNode) _symbol_h.value;
+					final Symbol _symbol_b = _symbols[offset + 6];
+					final ArrayList _list_b = (ArrayList) _symbol_b.value;
+					final JSNode[] b = _list_b == null ? new JSNode[0] : (JSNode[]) _list_b.toArray(new JSNode[_list_b.size()]);
 					
-			return new JSStatementsNode();
+			JSStatementsNode body;
+			if (b != null) {
+				body = new JSStatementsNode(b);
+			} else {
+				body = new JSStatementsNode();
 			}
-			case 375: // ClassElementList = ClassElement
+			if (i != null) {
+				JSIdentifierNode name = new JSIdentifierNode(i);
+				return new JSClassNode(name, h, body);
+			}
+			return new JSClassNode(h, body);
+			}
+			case 376: // ClassElementList = ClassElement
 			{
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 			}
-			case 376: // ClassElementList = ClassElementList ClassElement
+			case 377: // ClassElementList = ClassElementList ClassElement
 			{
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
 			}
-			case 378: // ClassElement = STATIC MethodDefinition.d
+			case 379: // ClassElement = STATIC MethodDefinition.d
 			{
 					final Symbol _symbol_d = _symbols[offset + 2];
 					final JSNode d = (JSNode) _symbol_d.value;
@@ -2180,7 +2260,7 @@ public class JSParser extends Parser implements IParser {
 			}
 			return d;
 			}
-			case 382: // Script = opt$ScriptBody.s
+			case 383: // Script = opt$ScriptBody.s
 			{
 					final Symbol _symbol_s = _symbols[offset + 1];
 					final ArrayList _list_s = (ArrayList) _symbol_s.value;
@@ -2188,7 +2268,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSParseRootNode(s);
 			}
-			case 386: // Module = opt$ModuleBody.m
+			case 387: // Module = opt$ModuleBody.m
 			{
 					final Symbol _symbol_m = _symbols[offset + 1];
 					final ArrayList _list_m = (ArrayList) _symbol_m.value;
@@ -2196,15 +2276,15 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSParseRootNode(m);
 			}
-			case 388: // ModuleItemList = ModuleItemList ModuleItem
+			case 389: // ModuleItemList = ModuleItemList ModuleItem
 			{
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
 			}
-			case 389: // ModuleItemList = ModuleItem
+			case 390: // ModuleItemList = ModuleItem
 			{
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 			}
-			case 393: // ImportDeclaration = IMPORT ImportClause.c FromClause.f SEMICOLON
+			case 394: // ImportDeclaration = IMPORT ImportClause.c FromClause.f SEMICOLON
 			{
 					final Symbol _symbol_c = _symbols[offset + 2];
 					final ArrayList c = (ArrayList) _symbol_c.value;
@@ -2214,14 +2294,14 @@ public class JSParser extends Parser implements IParser {
 			final JSNode[] clauses = c == null ? new JSNode[0] : (JSNode[]) c.toArray(new JSNode[c.size()]);
 			return new JSImportNode(clauses, f);
 			}
-			case 394: // ImportDeclaration = IMPORT ModuleSpecifier.s SEMICOLON
+			case 395: // ImportDeclaration = IMPORT ModuleSpecifier.s SEMICOLON
 			{
 					final Symbol _symbol_s = _symbols[offset + 2];
 					final String s = (String) _symbol_s.value;
 					
 			return new JSImportNode(s);
 			}
-			case 395: // ImportClause = ImportedDefaultBinding.i
+			case 396: // ImportClause = ImportedDefaultBinding.i
 			{
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final JSImportSpecifierNode i = (JSImportSpecifierNode) _symbol_i.value;
@@ -2230,7 +2310,7 @@ public class JSParser extends Parser implements IParser {
 			nodes.add(i);
 			return new Symbol(nodes);
 			}
-			case 396: // ImportClause = NameSpaceImport.i
+			case 397: // ImportClause = NameSpaceImport.i
 			{
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final JSImportSpecifierNode i = (JSImportSpecifierNode) _symbol_i.value;
@@ -2239,7 +2319,7 @@ public class JSParser extends Parser implements IParser {
 			nodes.add(i);
 			return new Symbol(nodes);
 			}
-			case 397: // ImportClause = NamedImports.l
+			case 398: // ImportClause = NamedImports.l
 			{
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNamedImportsNode l = (JSNamedImportsNode) _symbol_l.value;
@@ -2248,7 +2328,7 @@ public class JSParser extends Parser implements IParser {
 			nodes.add(l);
 			return new Symbol(nodes);
 			}
-			case 398: // ImportClause = ImportedDefaultBinding.i COMMA NameSpaceImport.n
+			case 399: // ImportClause = ImportedDefaultBinding.i COMMA NameSpaceImport.n
 			{
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final JSImportSpecifierNode i = (JSImportSpecifierNode) _symbol_i.value;
@@ -2260,7 +2340,7 @@ public class JSParser extends Parser implements IParser {
 			nodes.add(n);
 			return new Symbol(nodes);
 			}
-			case 399: // ImportClause = ImportedDefaultBinding.i COMMA NamedImports.l
+			case 400: // ImportClause = ImportedDefaultBinding.i COMMA NamedImports.l
 			{
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final JSImportSpecifierNode i = (JSImportSpecifierNode) _symbol_i.value;
@@ -2272,14 +2352,14 @@ public class JSParser extends Parser implements IParser {
 			nodes.add(l);
 			return new Symbol(nodes);
 			}
-			case 400: // ImportedDefaultBinding = ImportedBinding.i
+			case 401: // ImportedDefaultBinding = ImportedBinding.i
 			{
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final JSIdentifierNode i = (JSIdentifierNode) _symbol_i.value;
 					
 			return new JSImportSpecifierNode(i);
 			}
-			case 401: // NameSpaceImport = STAR.s AS ImportedBinding.i
+			case 402: // NameSpaceImport = STAR.s AS ImportedBinding.i
 			{
 					final Symbol s = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -2287,12 +2367,12 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSImportSpecifierNode(s, i);
 			}
-			case 402: // NamedImports = LCURLY RCURLY
+			case 403: // NamedImports = LCURLY RCURLY
 			{
 					
 			return new JSNamedImportsNode();
 			}
-			case 403: // NamedImports = LCURLY ImportsList.l opt$COMMA RCURLY
+			case 404: // NamedImports = LCURLY ImportsList.l opt$COMMA RCURLY
 			{
 					final Symbol _symbol_l = _symbols[offset + 2];
 					final ArrayList _list_l = (ArrayList) _symbol_l.value;
@@ -2300,15 +2380,15 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSNamedImportsNode(l);
 			}
-			case 405: // ImportsList = ImportsList COMMA ImportSpecifier
+			case 406: // ImportsList = ImportsList COMMA ImportSpecifier
 			{
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
 			}
-			case 406: // ImportsList = ImportSpecifier
+			case 407: // ImportsList = ImportSpecifier
 			{
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 			}
-			case 407: // ImportSpecifier = IdentifierName.i AS ImportedBinding.alias
+			case 408: // ImportSpecifier = IdentifierName.i AS ImportedBinding.alias
 			{
 					final Symbol i = _symbols[offset + 1];
 					final Symbol _symbol_alias = _symbols[offset + 3];
@@ -2316,20 +2396,20 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSImportSpecifierNode(new JSIdentifierNode(i), alias);
 			}
-			case 408: // ImportSpecifier = ImportedBinding.i
+			case 409: // ImportSpecifier = ImportedBinding.i
 			{
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final JSIdentifierNode i = (JSIdentifierNode) _symbol_i.value;
 					
 			return new JSImportSpecifierNode(i);
 			}
-			case 410: // ImportedBinding = Identifier.i
+			case 411: // ImportedBinding = Identifier.i
 			{
 					final Symbol i = _symbols[offset + 1];
 					
 			return new JSIdentifierNode(i);
 			}
-			case 411: // ExportDeclaration = EXPORT STAR.s FromClause.f SEMICOLON
+			case 412: // ExportDeclaration = EXPORT STAR.s FromClause.f SEMICOLON
 			{
 					final Symbol s = _symbols[offset + 2];
 					final Symbol _symbol_f = _symbols[offset + 3];
@@ -2337,7 +2417,7 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSExportNode(false, s, f);
 			}
-			case 412: // ExportDeclaration = EXPORT ExportClause.c FromClause.f SEMICOLON
+			case 413: // ExportDeclaration = EXPORT ExportClause.c FromClause.f SEMICOLON
 			{
 					final Symbol _symbol_c = _symbols[offset + 2];
 					final ArrayList c = (ArrayList) _symbol_c.value;
@@ -2347,7 +2427,7 @@ public class JSParser extends Parser implements IParser {
 			final JSNode[] p = c == null ? new JSNode[0] : (JSNode[]) c.toArray(new JSNode[c.size()]);
 			return new JSExportNode(false, p, f);
 			}
-			case 413: // ExportDeclaration = EXPORT ExportClause.d SEMICOLON
+			case 414: // ExportDeclaration = EXPORT ExportClause.d SEMICOLON
 			{
 					final Symbol _symbol_d = _symbols[offset + 2];
 					final ArrayList d = (ArrayList) _symbol_d.value;
@@ -2355,33 +2435,26 @@ public class JSParser extends Parser implements IParser {
 			final JSNode[] p = d == null ? new JSNode[0] : (JSNode[]) d.toArray(new JSNode[d.size()]);
 			return new JSExportNode(false, p);
 			}
-			case 414: // ExportDeclaration = EXPORT VariableStatement.d
+			case 415: // ExportDeclaration = EXPORT VariableStatement.d
 			{
 					final Symbol _symbol_d = _symbols[offset + 2];
 					final JSVarNode d = (JSVarNode) _symbol_d.value;
 					
 			return new JSExportNode(false, d);
 			}
-			case 415: // ExportDeclaration = EXPORT Declaration.d
+			case 416: // ExportDeclaration = EXPORT Declaration.d
 			{
 					final Symbol _symbol_d = _symbols[offset + 2];
 					final JSNode d = (JSNode) _symbol_d.value;
 					
 			return new JSExportNode(false, d);
 			}
-			case 416: // ExportDeclaration = EXPORT DEFAULT HoistableDeclaration.d
+			case 417: // ExportDeclaration = EXPORT DEFAULT HoistableDeclaration.d
 			{
 					final Symbol _symbol_d = _symbols[offset + 3];
-					final JSNode d = (JSNode) _symbol_d.value;
+					final JSFunctionNode d = (JSFunctionNode) _symbol_d.value;
 					
 			return new JSExportNode(true, d);
-			}
-			case 417: // ExportDeclaration = EXPORT DEFAULT ClassExpression.e
-			{
-					final Symbol _symbol_e = _symbols[offset + 3];
-					final JSClassNode e = (JSClassNode) _symbol_e.value;
-					
-			return new JSExportNode(true, e);
 			}
 			case 418: // ExportDeclaration = EXPORT DEFAULT SingleExpression.e SEMICOLON
 			{
@@ -2416,16 +2489,17 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSExportSpecifierNode(new JSIdentifierNode(i));
 			}
-			case 64: // opt$Elision = 
-			case 77: // opt$COMMA = 
-			case 230: // opt$StatementList = 
-			case 253: // opt$BindingRestElement = 
-			case 265: // opt$Initializer = 
-			case 276: // opt$Expression = 
-			case 310: // opt$CaseClauses = 
-			case 334: // opt$Identifier = 
-			case 380: // opt$ScriptBody = 
-			case 384: // opt$ModuleBody = 
+			case 65: // opt$Elision = 
+			case 78: // opt$COMMA = 
+			case 232: // opt$StatementList = 
+			case 255: // opt$BindingRestElement = 
+			case 267: // opt$Initializer = 
+			case 278: // opt$Expression = 
+			case 312: // opt$CaseClauses = 
+			case 336: // opt$Identifier = 
+			case 369: // opt$ClassBody = 
+			case 381: // opt$ScriptBody = 
+			case 385: // opt$ModuleBody = 
 			{
 				return new Symbol(null);
 			}
@@ -2440,204 +2514,206 @@ public class JSParser extends Parser implements IParser {
 			case 9: // Identifier = PROTECTED
 			case 10: // Identifier = PUBLIC
 			case 11: // Identifier = SET
-			case 12: // Identifier = TARGET
-			case 13: // IdentifierName = Identifier
-			case 14: // IdentifierName = AWAIT
-			case 15: // IdentifierName = BREAK
-			case 16: // IdentifierName = CASE
-			case 17: // IdentifierName = CATCH
-			case 18: // IdentifierName = CLASS
-			case 19: // IdentifierName = CONST
-			case 20: // IdentifierName = CONTINUE
-			case 21: // IdentifierName = DEBUGGER
-			case 22: // IdentifierName = DEFAULT
-			case 23: // IdentifierName = DELETE
-			case 24: // IdentifierName = DO
-			case 25: // IdentifierName = ELSE
-			case 26: // IdentifierName = ENUM
-			case 27: // IdentifierName = EXPORT
-			case 28: // IdentifierName = EXTENDS
-			case 29: // IdentifierName = FINALLY
-			case 30: // IdentifierName = FOR
-			case 31: // IdentifierName = FUNCTION
-			case 32: // IdentifierName = IF
-			case 33: // IdentifierName = IMPORT
-			case 34: // IdentifierName = INSTANCEOF
-			case 35: // IdentifierName = IN
-			case 36: // IdentifierName = NEW
-			case 37: // IdentifierName = RETURN
-			case 38: // IdentifierName = SUPER
-			case 39: // IdentifierName = SWITCH
-			case 40: // IdentifierName = THIS
-			case 41: // IdentifierName = THROW
-			case 42: // IdentifierName = TRY
-			case 43: // IdentifierName = TYPEOF
-			case 44: // IdentifierName = VAR
-			case 45: // IdentifierName = VOID
-			case 46: // IdentifierName = WHILE
-			case 47: // IdentifierName = WITH
-			case 48: // IdentifierName = BooleanLiteral
-			case 49: // IdentifierName = NullLiteral
-			case 54: // Literal = NullLiteral
-			case 55: // Literal = BooleanLiteral
-			case 56: // Literal = NumericLiteral
-			case 57: // Literal = StringLiteral
-			case 65: // opt$Elision = Elision
-			case 78: // opt$COMMA = COMMA
-			case 83: // PropertyDefinition = MethodDefinition
-			case 84: // PropertyName = LiteralPropertyName
-			case 85: // PropertyName = ComputedPropertyName
-			case 87: // LiteralPropertyName = StringLiteral
-			case 88: // LiteralPropertyName = NumericLiteral
-			case 91: // TemplateLiteral = NoSubstitutionTemplate
-			case 93: // TemplateSpans = TemplateTail
-			case 101: // ArgumentListItem = SingleExpression
-			case 102: // ArgumentListItem = SpreadElement
-			case 103: // MultiplicativeOperator = STAR
-			case 104: // MultiplicativeOperator = FORWARD_SLASH
-			case 105: // MultiplicativeOperator = PERCENT
-			case 106: // AssignmentOperator = STAR_EQUAL
-			case 107: // AssignmentOperator = FORWARD_SLASH_EQUAL
-			case 108: // AssignmentOperator = PERCENT_EQUAL
-			case 109: // AssignmentOperator = PLUS_EQUAL
-			case 110: // AssignmentOperator = MINUS_EQUAL
-			case 111: // AssignmentOperator = LESS_LESS_EQUAL
-			case 112: // AssignmentOperator = GREATER_GREATER_EQUAL
-			case 113: // AssignmentOperator = GREATER_GREATER_GREATER_EQUAL
-			case 114: // AssignmentOperator = AMPERSAND_EQUAL
-			case 115: // AssignmentOperator = CARET_EQUAL
-			case 116: // AssignmentOperator = PIPE_EQUAL
-			case 117: // Expression = SingleExpression
-			case 124: // SingleExpression = YieldExpression
-			case 125: // SingleExpression = ArrowFunction
-			case 128: // SingleExpression = LeftHandSideExpression
-			case 131: // PrimaryExpression = Literal
-			case 132: // PrimaryExpression = ArrayLiteral
-			case 133: // PrimaryExpression = ObjectLiteral
-			case 134: // PrimaryExpression = FunctionExpression
-			case 135: // PrimaryExpression = GeneratorExpression
-			case 136: // PrimaryExpression = RegularExpressionLiteral
-			case 137: // PrimaryExpression = TemplateLiteral
-			case 138: // PrimaryExpression = CoverParenthesizedExpressionAndArrowParameterList
-			case 139: // MemberExpression = PrimaryExpression
-			case 142: // MemberExpression = MemberExpression.l TemplateLiteral
-			case 143: // MemberExpression = SuperProperty
-			case 148: // NewExpression = MemberExpression
-			case 156: // LeftHandSideExpression = NewExpression
-			case 157: // LeftHandSideExpression = CallExpression
-			case 158: // PostUnaryOperator = PLUS_PLUS
-			case 159: // PostUnaryOperator = MINUS_MINUS
-			case 160: // PreUnaryOperator = PostUnaryOperator
-			case 161: // PreUnaryOperator = DELETE
-			case 162: // PreUnaryOperator = VOID
-			case 163: // PreUnaryOperator = TYPEOF
-			case 164: // PreUnaryOperator = PLUS
-			case 165: // PreUnaryOperator = MINUS
-			case 166: // PreUnaryOperator = TILDE
-			case 167: // PreUnaryOperator = EXCLAMATION
-			case 168: // BinaryArithmeticOperator = MultiplicativeOperator
-			case 169: // BinaryArithmeticOperator = PIPE
-			case 170: // BinaryArithmeticOperator = CARET
-			case 171: // BinaryArithmeticOperator = AMPERSAND
-			case 172: // BinaryArithmeticOperator = PLUS
-			case 173: // BinaryArithmeticOperator = MINUS
-			case 174: // BinaryArithmeticOperator = LESS_LESS
-			case 175: // BinaryArithmeticOperator = GREATER_GREATER
-			case 176: // BinaryArithmeticOperator = GREATER_GREATER_GREATER
-			case 177: // BinaryBooleanOperator = PIPE_PIPE
-			case 178: // BinaryBooleanOperator = AMPERSAND_AMPERSAND
-			case 179: // BinaryBooleanOperator = EXCLAMATION_EQUAL_EQUAL
-			case 180: // BinaryBooleanOperator = EQUAL_EQUAL_EQUAL
-			case 181: // BinaryBooleanOperator = EXCLAMATION_EQUAL
-			case 182: // BinaryBooleanOperator = EQUAL_EQUAL
-			case 183: // BinaryBooleanOperator = IN
-			case 184: // BinaryBooleanOperator = INSTANCEOF
-			case 185: // BinaryBooleanOperator = LESS
-			case 186: // BinaryBooleanOperator = GREATER
-			case 187: // BinaryBooleanOperator = LESS_EQUAL
-			case 188: // BinaryBooleanOperator = GREATER_EQUAL
-			case 189: // Statement = BlockStatement
-			case 190: // Statement = VariableStatement
-			case 191: // Statement = EmptyStatement
-			case 192: // Statement = ExpressionStatement
-			case 193: // Statement = IfStatement
-			case 194: // Statement = BreakableStatement
-			case 195: // Statement = ContinueStatement
-			case 196: // Statement = BreakStatement
-			case 197: // Statement = ReturnStatement
-			case 198: // Statement = WithStatement
-			case 199: // Statement = LabelledStatement
-			case 200: // Statement = ThrowStatement
-			case 201: // Statement = TryStatement
-			case 202: // Statement = DebuggerStatement
-			case 204: // Statement_NoIf = BlockStatement
-			case 205: // Statement_NoIf = VariableStatement
-			case 206: // Statement_NoIf = EmptyStatement
-			case 207: // Statement_NoIf = ExpressionStatement
-			case 208: // Statement_NoIf = IfStatement_NoIf
-			case 209: // Statement_NoIf = BreakableStatement_NoIf
-			case 210: // Statement_NoIf = ContinueStatement
-			case 211: // Statement_NoIf = BreakStatement
-			case 212: // Statement_NoIf = ReturnStatement
-			case 213: // Statement_NoIf = WithStatement_NoIf
-			case 214: // Statement_NoIf = LabelledStatement_NoIf
-			case 215: // Statement_NoIf = ThrowStatement
-			case 216: // Statement_NoIf = TryStatement
-			case 217: // Statement_NoIf = DebuggerStatement
-			case 220: // Declaration = HoistableDeclaration
-			case 221: // Declaration = ClassDeclaration
-			case 222: // Declaration = LexicalDeclaration
-			case 223: // HoistableDeclaration = FunctionDeclaration
-			case 224: // HoistableDeclaration = GeneratorDeclaration
-			case 225: // BreakableStatement = IterationStatement
-			case 226: // BreakableStatement = SwitchStatement
-			case 227: // BreakableStatement_NoIf = IterationStatement_NoIf
-			case 228: // BreakableStatement_NoIf = SwitchStatement
-			case 229: // BlockStatement = Block
-			case 231: // opt$StatementList = StatementList
-			case 235: // StatementListItem = Statement
-			case 236: // StatementListItem = Declaration
-			case 238: // LetOrConst = LET
-			case 239: // LetOrConst = CONST
-			case 242: // LexicalBinding = VariableDeclaration
-			case 246: // VariableDeclaration = SingleNameBinding
-			case 248: // BindingPattern = ObjectBindingPattern
-			case 249: // BindingPattern = ArrayBindingPattern
-			case 254: // opt$BindingRestElement = BindingRestElement
-			case 262: // BindingProperty = SingleNameBinding
-			case 264: // BindingElement = SingleNameBinding
-			case 266: // opt$Initializer = Initializer
-			case 277: // opt$Expression = Expression
-			case 300: // ForBinding = BindingPattern
-			case 311: // opt$CaseClauses = CaseClauses
-			case 320: // LabelledItem = Statement
-			case 321: // LabelledItem = FunctionDeclaration
-			case 322: // LabelledItem_NoIf = Statement_NoIf
-			case 323: // LabelledItem_NoIf = FunctionDeclaration
-			case 331: // CatchParameter = BindingPattern
-			case 335: // opt$Identifier = Identifier
-			case 337: // StrictFormalParameters = FormalParameters
-			case 341: // FormalParameterList = FormalsList.l
-			case 345: // FunctionRestParameter = BindingRestElement
-			case 346: // FormalParameter = BindingElement
-			case 347: // FunctionBody = FunctionStatementList
-			case 352: // ArrowParameters = CoverParenthesizedExpressionAndArrowParameterList
-			case 353: // ConciseBody = SingleExpression
-			case 356: // MethodDefinition = GeneratorMethod
-			case 359: // PropertySetParameterList = FormalParameter
-			case 363: // GeneratorBody = FunctionBody
-			case 364: // YieldExpression = YIELD
-			case 374: // ClassBody = ClassElementList
-			case 377: // ClassElement = MethodDefinition
-			case 379: // ClassElement = EmptyStatement
-			case 381: // opt$ScriptBody = ScriptBody
-			case 383: // ScriptBody = StatementList
-			case 385: // opt$ModuleBody = ModuleBody
-			case 387: // ModuleBody = ModuleItemList
-			case 390: // ModuleItem = ImportDeclaration
-			case 391: // ModuleItem = ExportDeclaration
-			case 392: // ModuleItem = StatementListItem
-			case 409: // ModuleSpecifier = STRING
+			case 12: // Identifier = STATIC
+			case 13: // Identifier = TARGET
+			case 14: // IdentifierName = Identifier
+			case 15: // IdentifierName = AWAIT
+			case 16: // IdentifierName = BREAK
+			case 17: // IdentifierName = CASE
+			case 18: // IdentifierName = CATCH
+			case 19: // IdentifierName = CLASS
+			case 20: // IdentifierName = CONST
+			case 21: // IdentifierName = CONTINUE
+			case 22: // IdentifierName = DEBUGGER
+			case 23: // IdentifierName = DEFAULT
+			case 24: // IdentifierName = DELETE
+			case 25: // IdentifierName = DO
+			case 26: // IdentifierName = ELSE
+			case 27: // IdentifierName = ENUM
+			case 28: // IdentifierName = EXPORT
+			case 29: // IdentifierName = EXTENDS
+			case 30: // IdentifierName = FINALLY
+			case 31: // IdentifierName = FOR
+			case 32: // IdentifierName = FUNCTION
+			case 33: // IdentifierName = IF
+			case 34: // IdentifierName = IMPORT
+			case 35: // IdentifierName = INSTANCEOF
+			case 36: // IdentifierName = IN
+			case 37: // IdentifierName = NEW
+			case 38: // IdentifierName = RETURN
+			case 39: // IdentifierName = SUPER
+			case 40: // IdentifierName = SWITCH
+			case 41: // IdentifierName = THIS
+			case 42: // IdentifierName = THROW
+			case 43: // IdentifierName = TRY
+			case 44: // IdentifierName = TYPEOF
+			case 45: // IdentifierName = VAR
+			case 46: // IdentifierName = VOID
+			case 47: // IdentifierName = WHILE
+			case 48: // IdentifierName = WITH
+			case 49: // IdentifierName = BooleanLiteral
+			case 50: // IdentifierName = NullLiteral
+			case 55: // Literal = NullLiteral
+			case 56: // Literal = BooleanLiteral
+			case 57: // Literal = NumericLiteral
+			case 58: // Literal = StringLiteral
+			case 66: // opt$Elision = Elision
+			case 79: // opt$COMMA = COMMA
+			case 84: // PropertyDefinition = MethodDefinition
+			case 85: // PropertyName = LiteralPropertyName
+			case 86: // PropertyName = ComputedPropertyName
+			case 88: // LiteralPropertyName = StringLiteral
+			case 89: // LiteralPropertyName = NumericLiteral
+			case 92: // TemplateLiteral = NoSubstitutionTemplate
+			case 94: // TemplateSpans = TemplateTail
+			case 102: // ArgumentListItem = SingleExpression
+			case 103: // ArgumentListItem = SpreadElement
+			case 104: // MultiplicativeOperator = STAR
+			case 105: // MultiplicativeOperator = FORWARD_SLASH
+			case 106: // MultiplicativeOperator = PERCENT
+			case 107: // AssignmentOperator = STAR_EQUAL
+			case 108: // AssignmentOperator = FORWARD_SLASH_EQUAL
+			case 109: // AssignmentOperator = PERCENT_EQUAL
+			case 110: // AssignmentOperator = PLUS_EQUAL
+			case 111: // AssignmentOperator = MINUS_EQUAL
+			case 112: // AssignmentOperator = LESS_LESS_EQUAL
+			case 113: // AssignmentOperator = GREATER_GREATER_EQUAL
+			case 114: // AssignmentOperator = GREATER_GREATER_GREATER_EQUAL
+			case 115: // AssignmentOperator = AMPERSAND_EQUAL
+			case 116: // AssignmentOperator = CARET_EQUAL
+			case 117: // AssignmentOperator = PIPE_EQUAL
+			case 118: // Expression = SingleExpression
+			case 125: // SingleExpression = YieldExpression
+			case 126: // SingleExpression = ArrowFunction
+			case 129: // SingleExpression = LeftHandSideExpression
+			case 132: // PrimaryExpression = Literal
+			case 133: // PrimaryExpression = ArrayLiteral
+			case 134: // PrimaryExpression = ObjectLiteral
+			case 135: // PrimaryExpression = FunctionExpression
+			case 136: // PrimaryExpression = ClassExpression
+			case 137: // PrimaryExpression = GeneratorExpression
+			case 138: // PrimaryExpression = RegularExpressionLiteral
+			case 139: // PrimaryExpression = TemplateLiteral
+			case 140: // PrimaryExpression = CoverParenthesizedExpressionAndArrowParameterList
+			case 141: // MemberExpression = PrimaryExpression
+			case 144: // MemberExpression = MemberExpression.l TemplateLiteral
+			case 145: // MemberExpression = SuperProperty
+			case 150: // NewExpression = MemberExpression
+			case 158: // LeftHandSideExpression = NewExpression
+			case 159: // LeftHandSideExpression = CallExpression
+			case 160: // PostUnaryOperator = PLUS_PLUS
+			case 161: // PostUnaryOperator = MINUS_MINUS
+			case 162: // PreUnaryOperator = PostUnaryOperator
+			case 163: // PreUnaryOperator = DELETE
+			case 164: // PreUnaryOperator = VOID
+			case 165: // PreUnaryOperator = TYPEOF
+			case 166: // PreUnaryOperator = PLUS
+			case 167: // PreUnaryOperator = MINUS
+			case 168: // PreUnaryOperator = TILDE
+			case 169: // PreUnaryOperator = EXCLAMATION
+			case 170: // BinaryArithmeticOperator = MultiplicativeOperator
+			case 171: // BinaryArithmeticOperator = PIPE
+			case 172: // BinaryArithmeticOperator = CARET
+			case 173: // BinaryArithmeticOperator = AMPERSAND
+			case 174: // BinaryArithmeticOperator = PLUS
+			case 175: // BinaryArithmeticOperator = MINUS
+			case 176: // BinaryArithmeticOperator = LESS_LESS
+			case 177: // BinaryArithmeticOperator = GREATER_GREATER
+			case 178: // BinaryArithmeticOperator = GREATER_GREATER_GREATER
+			case 179: // BinaryBooleanOperator = PIPE_PIPE
+			case 180: // BinaryBooleanOperator = AMPERSAND_AMPERSAND
+			case 181: // BinaryBooleanOperator = EXCLAMATION_EQUAL_EQUAL
+			case 182: // BinaryBooleanOperator = EQUAL_EQUAL_EQUAL
+			case 183: // BinaryBooleanOperator = EXCLAMATION_EQUAL
+			case 184: // BinaryBooleanOperator = EQUAL_EQUAL
+			case 185: // BinaryBooleanOperator = IN
+			case 186: // BinaryBooleanOperator = INSTANCEOF
+			case 187: // BinaryBooleanOperator = LESS
+			case 188: // BinaryBooleanOperator = GREATER
+			case 189: // BinaryBooleanOperator = LESS_EQUAL
+			case 190: // BinaryBooleanOperator = GREATER_EQUAL
+			case 191: // Statement = BlockStatement
+			case 192: // Statement = VariableStatement
+			case 193: // Statement = EmptyStatement
+			case 194: // Statement = ExpressionStatement
+			case 195: // Statement = IfStatement
+			case 196: // Statement = BreakableStatement
+			case 197: // Statement = ContinueStatement
+			case 198: // Statement = BreakStatement
+			case 199: // Statement = ReturnStatement
+			case 200: // Statement = WithStatement
+			case 201: // Statement = LabelledStatement
+			case 202: // Statement = ThrowStatement
+			case 203: // Statement = TryStatement
+			case 204: // Statement = DebuggerStatement
+			case 206: // Statement_NoIf = BlockStatement
+			case 207: // Statement_NoIf = VariableStatement
+			case 208: // Statement_NoIf = EmptyStatement
+			case 209: // Statement_NoIf = ExpressionStatement
+			case 210: // Statement_NoIf = IfStatement_NoIf
+			case 211: // Statement_NoIf = BreakableStatement_NoIf
+			case 212: // Statement_NoIf = ContinueStatement
+			case 213: // Statement_NoIf = BreakStatement
+			case 214: // Statement_NoIf = ReturnStatement
+			case 215: // Statement_NoIf = WithStatement_NoIf
+			case 216: // Statement_NoIf = LabelledStatement_NoIf
+			case 217: // Statement_NoIf = ThrowStatement
+			case 218: // Statement_NoIf = TryStatement
+			case 219: // Statement_NoIf = DebuggerStatement
+			case 222: // Declaration = HoistableDeclaration
+			case 223: // Declaration = ClassDeclaration
+			case 224: // Declaration = LexicalDeclaration
+			case 225: // HoistableDeclaration = FunctionDeclaration
+			case 226: // HoistableDeclaration = GeneratorDeclaration
+			case 227: // BreakableStatement = IterationStatement
+			case 228: // BreakableStatement = SwitchStatement
+			case 229: // BreakableStatement_NoIf = IterationStatement_NoIf
+			case 230: // BreakableStatement_NoIf = SwitchStatement
+			case 231: // BlockStatement = Block
+			case 233: // opt$StatementList = StatementList
+			case 237: // StatementListItem = Statement
+			case 238: // StatementListItem = Declaration
+			case 240: // LetOrConst = LET
+			case 241: // LetOrConst = CONST
+			case 244: // LexicalBinding = VariableDeclaration
+			case 248: // VariableDeclaration = SingleNameBinding
+			case 250: // BindingPattern = ObjectBindingPattern
+			case 251: // BindingPattern = ArrayBindingPattern
+			case 256: // opt$BindingRestElement = BindingRestElement
+			case 264: // BindingProperty = SingleNameBinding
+			case 266: // BindingElement = SingleNameBinding
+			case 268: // opt$Initializer = Initializer
+			case 279: // opt$Expression = Expression
+			case 302: // ForBinding = BindingPattern
+			case 313: // opt$CaseClauses = CaseClauses
+			case 322: // LabelledItem = Statement
+			case 323: // LabelledItem = FunctionDeclaration
+			case 324: // LabelledItem_NoIf = Statement_NoIf
+			case 325: // LabelledItem_NoIf = FunctionDeclaration
+			case 333: // CatchParameter = BindingPattern
+			case 337: // opt$Identifier = Identifier
+			case 339: // StrictFormalParameters = FormalParameters
+			case 343: // FormalParameterList = FormalsList.l
+			case 347: // FunctionRestParameter = BindingRestElement
+			case 348: // FormalParameter = BindingElement
+			case 349: // FunctionBody = FunctionStatementList
+			case 354: // ArrowParameters = CoverParenthesizedExpressionAndArrowParameterList
+			case 355: // ConciseBody = SingleExpression
+			case 358: // MethodDefinition = GeneratorMethod
+			case 361: // PropertySetParameterList = FormalParameter
+			case 365: // GeneratorBody = FunctionBody
+			case 370: // opt$ClassBody = ClassBody
+			case 375: // ClassBody = ClassElementList
+			case 378: // ClassElement = MethodDefinition
+			case 380: // ClassElement = EmptyStatement
+			case 382: // opt$ScriptBody = ScriptBody
+			case 384: // ScriptBody = StatementList
+			case 386: // opt$ModuleBody = ModuleBody
+			case 388: // ModuleBody = ModuleItemList
+			case 391: // ModuleItem = ImportDeclaration
+			case 392: // ModuleItem = ExportDeclaration
+			case 393: // ModuleItem = StatementListItem
+			case 410: // ModuleSpecifier = STRING
 			case 425: // NoSubstitutionTemplate = NO_SUB_TEMPLATE
 			case 426: // TemplateHead = TEMPLATE_HEAD
 			case 427: // TemplateMiddle = TEMPLATE_MIDDLE
@@ -2646,37 +2722,28 @@ public class JSParser extends Parser implements IParser {
 				return _symbols[offset + 1];
 			}
 			case 1: // $goal = $Script Script
-			case 94: // TemplateSpans = TemplateMiddleList TemplateTail
-			case 95: // TemplateMiddleList = TemplateMiddle Expression
-			case 151: // CallExpression = SUPER Arguments
-			case 155: // CallExpression = CallExpression TemplateLiteral
-			case 312: // CaseBlock = LCURLY opt$CaseClauses.c RCURLY
-			case 332: // DebuggerStatement = DEBUGGER SEMICOLON
-			case 354: // ConciseBody = LCURLY FunctionBody.body RCURLY
-			case 365: // YieldExpression = YIELD SingleExpression
-			case 373: // ClassHeritage = EXTENDS SingleExpression
-			case 404: // FromClause = FROM ModuleSpecifier.s
+			case 90: // ComputedPropertyName = LBRACKET SingleExpression.e RBRACKET
+			case 95: // TemplateSpans = TemplateMiddleList TemplateTail
+			case 96: // TemplateMiddleList = TemplateMiddle Expression
+			case 157: // CallExpression = CallExpression TemplateLiteral
+			case 314: // CaseBlock = LCURLY opt$CaseClauses.c RCURLY
+			case 334: // DebuggerStatement = DEBUGGER SEMICOLON
+			case 356: // ConciseBody = LCURLY FunctionBody.body RCURLY
+			case 405: // FromClause = FROM ModuleSpecifier.s
 			case 420: // ExportClause = LCURLY ExportsList.l opt$COMMA RCURLY
 			{
 				return _symbols[offset + 2];
 			}
-			case 89: // ComputedPropertyName = LBRACKET SingleExpression RBRACKET
-			case 92: // TemplateLiteral = TemplateHead Expression TemplateSpans
-			case 96: // TemplateMiddleList = TemplateMiddleList TemplateMiddle Expression
-			case 144: // MemberExpression = NEW DOT TARGET
-			case 147: // SuperProperty = SUPER DOT IdentifierName
-			case 366: // YieldExpression = YIELD STAR SingleExpression
+			case 93: // TemplateLiteral = TemplateHead Expression TemplateSpans
+			case 97: // TemplateMiddleList = TemplateMiddleList TemplateMiddle Expression
+			case 146: // MemberExpression = NEW DOT TARGET
+			case 149: // SuperProperty = SUPER DOT IdentifierName
 			{
 				return _symbols[offset + 3];
 			}
-			case 146: // SuperProperty = SUPER LBRACKET Expression RBRACKET
+			case 148: // SuperProperty = SUPER LBRACKET Expression RBRACKET
 			{
 				return _symbols[offset + 4];
-			}
-			case 361: // GeneratorDeclaration = FUNCTION STAR Identifier LPAREN FormalParameters RPAREN LCURLY GeneratorBody RCURLY
-			case 362: // GeneratorExpression = FUNCTION STAR opt$Identifier LPAREN FormalParameters RPAREN LCURLY GeneratorBody RCURLY
-			{
-				return _symbols[offset + 9];
 			}
 			default:
 				throw new IllegalArgumentException("unknown production #" + rule_num);
