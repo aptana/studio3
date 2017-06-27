@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
@@ -49,6 +48,7 @@ public class XMLEditor extends AbstractThemeableEditor
 	private static final char[] XML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
 			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single
 	private Map<Annotation, Position> fTagPairOccurrences;
+	private String currentSelectedElementId;
 	private static Collection<String> tagPartitions = new ArrayList<String>();
 	static
 	{
@@ -170,6 +170,7 @@ public class XMLEditor extends AbstractThemeableEditor
 	 * 
 	 * @param offset
 	 */
+	@SuppressWarnings("deprecation")
 	private void highlightTagPair(int offset)
 	{
 		IDocumentProvider documentProvider = getDocumentProvider();
@@ -219,33 +220,58 @@ public class XMLEditor extends AbstractThemeableEditor
 					occurrences.put(new Annotation(IXMLEditorConstants.TAG_PAIR_OCCURRENCE_ID, false, null),
 							new Position(match.getOffset(), match.getLength()));
 
-					try
-					{
-						// The current tag we're in!
-						ITypedRegion partition = document.getPartition(offset);
-						occurrences.put(new Annotation(IXMLEditorConstants.TAG_PAIR_OCCURRENCE_ID, false, null),
-								new Position(partition.getOffset(), partition.getLength()));
-					}
-					catch (BadLocationException e)
-					{
-						IdeLog.logError(XMLPlugin.getDefault(), e);
-					}
-					for (Map.Entry<Annotation, Position> entry : occurrences.entrySet())
-					{
-						annotationModel.addAnnotation(entry.getKey(), entry.getValue());
-					}
-					fTagPairOccurrences = occurrences;
-					return;
 				}
 			}
+			handleOccurences(offset, annotationModel, occurrences, document);
+			return;
 		}
 		// no new pair, so don't highlight anything
 		fTagPairOccurrences = null;
+	}
+
+	private void handleOccurences(int offset, IAnnotationModel annotationModel, Map<Annotation, Position> occurrences,
+			IDocument document)
+	{
+		try
+		{
+			ITypedRegion partition = document.getPartition(offset);
+			String offsetString = document.get(offset, partition.getLength());
+
+			int startIndex = offsetString.indexOf("id="); //$NON-NLS-1$
+			int endIndex = offsetString.indexOf("\"", startIndex + 4); //$NON-NLS-1$
+			if (startIndex != -1 && endIndex != -1)
+			{
+				currentSelectedElementId = offsetString.substring(startIndex + 4, endIndex);
+
+				occurrences.put(new Annotation(IXMLEditorConstants.TAG_PAIR_OCCURRENCE_ID, false, null), new Position(
+						partition.getOffset(), partition.getLength()));
+			}
+		}
+		catch (Exception e)
+		{
+			IdeLog.logWarning(XMLPlugin.getDefault(), e);
+		}
+		for (Map.Entry<Annotation, Position> entry : occurrences.entrySet())
+		{
+			annotationModel.addAnnotation(entry.getKey(), entry.getValue());
+		}
+		fTagPairOccurrences = occurrences;
+		return;
 	}
 
 	@Override
 	public IFoldingComputer createFoldingComputer(IDocument document)
 	{
 		return new XMLFoldingComputer(this, document);
+	}
+
+	public String getCurrentSelectedElementId()
+	{
+		return currentSelectedElementId;
+	}
+
+	public void setSelection(int offset)
+	{
+		highlightTagPair(offset);
 	}
 }
