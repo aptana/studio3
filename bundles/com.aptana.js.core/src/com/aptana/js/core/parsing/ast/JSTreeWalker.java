@@ -66,6 +66,11 @@ public class JSTreeWalker
 		this.visitChildren(node);
 	}
 
+	public void visit(JSComputedPropertyNameNode node)
+	{
+		this.visitChildren(node);
+	}
+
 	public void visit(JSConditionalNode node)
 	{
 		this.visitChildren(node);

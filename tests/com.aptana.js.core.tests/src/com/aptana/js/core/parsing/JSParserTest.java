@@ -70,8 +70,7 @@ public class JSParserTest
 	@Test
 	public void testEmptyBlock() throws Exception
 	{
-		// semicolon recovery
-		assertParseResult("{}" + EOL, "{};" + EOL); //$NON-NLS-1$
+		assertParseResult("{}" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -776,13 +775,13 @@ public class JSParserTest
 	@Test
 	public void testWhile() throws Exception
 	{
-		assertParseResult("while (true) {};" + EOL); //$NON-NLS-1$
+		assertParseResult("while (true) {}" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
 	public void testLabeledStatement() throws Exception
 	{
-		assertParseResult("myLabel: while (true) {};" + EOL); //$NON-NLS-1$
+		assertParseResult("myLabel: while (true) {}" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -1495,6 +1494,27 @@ public class JSParserTest
 	public void testGeneratorMethodInsideObject() throws Exception
 	{
 		assertParseResult("let Obj = {* foo () {}};" + EOL, "let Obj = {* foo () {}};" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testComputedPropertyNameInObjectLiteral() throws Exception
+	{
+		assertParseResult("let obj = {['baz' + quux()]: 42};" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testPropertyShorthandInObjectLiteral() throws Exception
+	{
+		assertParseResult("obj = {x, y};" + EOL);
+		assertNoErrors();
+	}
+	
+	@Test
+	public void testInitializedPropertyInObjectLiteral() throws Exception
+	{
+		assertParseResult("obj = {x: x};" + EOL);
 		assertNoErrors();
 	}
 

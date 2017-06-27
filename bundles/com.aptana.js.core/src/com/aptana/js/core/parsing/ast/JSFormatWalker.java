@@ -300,6 +300,19 @@ public class JSFormatWalker extends JSTreeWalker
 
 	/*
 	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSComputedPropertyNameNode)
+	 */
+	@Override
+	public void visit(JSComputedPropertyNameNode node)
+	{
+		this._printer.print("["); //$NON-NLS-1$
+		this.formatNode(node.getFirstChild());
+		this._printer.print("]"); //$NON-NLS-1$
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSConditionalNode)
 	 */
 	@Override

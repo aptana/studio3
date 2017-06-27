@@ -467,20 +467,26 @@
 %typeof StringLiteral = "JSStringNode";
 %typeof RegularExpressionLiteral = "JSRegexNode";
 %typeof Elision = "JSElisionNode";
-%typeof StatementListItem, Statement, Statement_NoIf, Declaration, VariableDeclaration, BindingProperty, SingleExpression, PropertyDefinition, ArgumentListItem = "JSNode";
+%typeof StatementListItem, Statement, Statement_NoIf, Declaration, VariableDeclaration, BindingProperty, PropertyDefinition, ArgumentListItem = "JSNode";
 %typeof LexicalBinding, ForBinding, ForDeclaration, LabelledItem, LabelledItem_NoIf, CatchParameter, FormalParameter, PropertyName = "JSNode";
 %typeof LexicalDeclaration, VariableStatement = "JSVarNode";
-%typeof Expression = "JSNode";
+%typeof Expression, Expression_NoLBF = "JSNode";
+%typeof SingleExpression, SingleExpression_NoLBF = "JSNode";
 %typeof ElementList, BindingElementList = "JSElementsNode";
 %typeof Arguments = "JSArgumentsNode";
 %typeof Initializer = "JSInitializerNode";
-%typeof SingleNameBinding= "JSNode";
+%typeof SingleNameBinding = "JSNode";
 %typeof CaseBlock, FormalParameterList = "ArrayList";
 %typeof Block, FunctionStatementList, FunctionBody = "JSStatementsNode";
 %typeof FormalParameters, CoverParenthesizedExpressionAndArrowParameterList, ArrowParameters = "JSParametersNode";
 %typeof BindingPattern, BindingElement = "JSNode";
 %typeof IfStatement, IfStatement_NoIf = "JSIfNode";
-%typeof LeftHandSideExpression, MemberExpression, NewExpression, CallExpression, PrimaryExpression, SuperProperty = "JSNode";
+%typeof LeftHandSideExpression, LeftHandSideExpression_NoLBF = "JSNode";
+%typeof MemberExpression, MemberExpression_NoLBF = "JSNode";
+%typeof NewExpression, NewExpression_NoLBF = "JSNode";
+%typeof CallExpression, CallExpression_NoLBF = "JSNode";
+%typeof PrimaryExpression, PrimaryExpression_NoLBF = "JSNode";
+%typeof SuperProperty = "JSNode";
 %typeof SpreadElement = "JSSpreadElementNode";
 %typeof BindingRestElement = "JSRestElementNode";
 %typeof ModuleItem = "JSNode";
@@ -499,6 +505,7 @@
 %typeof ClassElement = "JSNode";
 %typeof MethodDefinition= "JSNode";
 %typeof YieldExpression = "JSYieldNode";
+%typeof ComputedPropertyName = "JSComputedPropertyNameNode";
 
 %left LPAREN, RPAREN, LBRACKET, RBRACKET, DOT;
 %right PLUS_PLUS, MINUS_MINUS, EXCLAMATION, TILDE, DELETE, NEW, TYPEOF, VOID;
@@ -735,7 +742,7 @@ ObjectLiteral
 			return new JSObjectNode(l, r, p);
 		:}
 	;
-
+// FIXME There's a fundamental ambiguity here. We could roll up (Identifier ",")+ as the property list of an object literal, or as PrimaryExpression+ (up into Expression)
 PropertyDefinitionList
 	=	PropertyDefinition
 	|	PropertyDefinitionList COMMA PropertyDefinition
@@ -747,7 +754,8 @@ PropertyDefinition
 // Combination of Identifier | CoverInitializedName = Identifier Initializer? - which is what SingleNameBinding is
 // FIXME This conflicts with PrimaryExpression = Identifier.i @ 891
 //	=	SingleNameBinding
-	=	PropertyName.n COLON.c SingleExpression.v
+	=	Identifier Initializer
+	|	PropertyName.n COLON.c SingleExpression.v
 		{:
 			return new JSNameValuePairNode(n, c, v);
 		:}
@@ -770,6 +778,9 @@ LiteralPropertyName
 
 ComputedPropertyName
 	=	LBRACKET SingleExpression.e RBRACKET
+		{:
+			return new JSComputedPropertyNameNode(e);
+		:}
 	;
 
 Initializer
@@ -847,6 +858,16 @@ Expression
 			return new JSCommaNode(l, r);
 		:}
 	;
+	
+Expression_NoLBF
+	=	SingleExpression_NoLBF
+// FIXME This roll up of single expression conflicts with roll up of PropertyDefinition when base rule is Identifier!
+// FIXME We shouldn't use this wrapping JSCommaNode in our AST! Just let it convert into JSNode[] as it does!
+	|	Expression_NoLBF.l COMMA SingleExpression.r
+		{:
+			return new JSCommaNode(l, r);
+		:}
+	;
 
 // We expand the enforced operator precedence written into the language and use precedence rules above instead.
 SingleExpression
@@ -872,7 +893,7 @@ SingleExpression
 		:}
 	|	YieldExpression
 	|	ArrowFunction
-	|	LeftHandSideExpression.l EQUAL.o SingleExpression.r
+	|	LeftHandSideExpression.l EQUAL.o SingleExpression.r // latter half is equivalent to Initializer
 		{:
 			return new JSAssignmentNode(l, o, r);
 		:}
@@ -882,8 +903,51 @@ SingleExpression
 		:}
 	|	LeftHandSideExpression
 	;
+	
+SingleExpression_NoLBF
+	=	SingleExpression_NoLBF.e PostUnaryOperator.o
+		{:
+			return new JSPostUnaryOperatorNode(o, e);
+		:}
+	|	PreUnaryOperator.o SingleExpression.e
+		{:
+			return new JSPreUnaryOperatorNode(o, e);
+		:}
+	|	SingleExpression_NoLBF.l BinaryArithmeticOperator.o SingleExpression.r
+		{:
+			return new JSBinaryArithmeticOperatorNode(l, o, r);
+		:}
+	|	SingleExpression_NoLBF.l BinaryBooleanOperator.o SingleExpression.r
+		{:
+			return new JSBinaryBooleanOperatorNode(l, o, r);
+		:}
+	|	SingleExpression_NoLBF.l QUESTION.q SingleExpression.t COLON.c SingleExpression.f
+		{:
+			return new JSConditionalNode(l, q, t, c, f);
+		:}
+	|	YieldExpression
+	|	ArrowFunction
+	|	LeftHandSideExpression_NoLBF.l EQUAL.o SingleExpression.r
+		{:
+			return new JSAssignmentNode(l, o, r);
+		:}
+	|	LeftHandSideExpression_NoLBF.l AssignmentOperator.o SingleExpression.r
+		{:
+			return new JSAssignmentNode(l, o, r);
+		:}
+	|	LeftHandSideExpression_NoLBF
+	;
 
+// NOTE: We explicitly "fork" the ruleset here for "inside an object literal" 
+// and "outside an object literal (PrimaryExpression_NoLBF where NoLBF stands for no left brace found?)"
+// Otherwise we get unexpected handling of some cases like: if (true) { a = 1 } else { b = '2' }
+// Note that this is highly related to the ambiguity in ObjectLiteral with a shorthand property with no initializer
 PrimaryExpression
+	=	PrimaryExpression_NoLBF
+	|	ObjectLiteral
+	;
+	
+PrimaryExpression_NoLBF
 	=	THIS.t
 		{:
 			return new JSThisNode(t);
@@ -894,10 +958,10 @@ PrimaryExpression
 		:}
 	|	Literal
 	|	ArrayLiteral
-	|	ObjectLiteral
 	|	FunctionExpression
-// It's very similar to FunctionExpression/FunctionDeclaration (identifier is optional for expression)
-// AND GeneratorExpression/GeneratorDeclaration (identifier is optional for expression)
+// TODO Clean up the Expression/Declaration rules for function/generator/class
+// FunctionExpression/FunctionDeclaration (identifier is optional for expression)
+// GeneratorExpression/GeneratorDeclaration (identifier is optional for expression)
 	|	ClassExpression
 	|	GeneratorExpression
 	|	RegularExpressionLiteral
@@ -923,6 +987,25 @@ MemberExpression
 			return new JSConstructNode(e, r);
 		:}
 	;
+	
+MemberExpression_NoLBF
+	=	PrimaryExpression_NoLBF
+	|	MemberExpression_NoLBF.l LBRACKET.lb Expression.r RBRACKET.rb
+		{:
+			return new JSGetElementNode(l, lb, r, rb);
+		:}
+	|	MemberExpression_NoLBF.l DOT.o IdentifierName.r
+		{:
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
+		:}
+	|	MemberExpression_NoLBF.l TemplateLiteral
+	|	SuperProperty
+	|	NEW DOT TARGET
+	|	NEW MemberExpression.e Arguments.r
+		{:
+			return new JSConstructNode(e, r);
+		:}
+	;
 
 SuperProperty
 	=	SUPER LBRACKET Expression RBRACKET
@@ -936,10 +1019,16 @@ NewExpression
 			return new JSConstructNode(e, new JSEmptyNode(e));
 		:}
 	;
+	
+NewExpression_NoLBF
+	=	MemberExpression_NoLBF
+	|	NEW NewExpression.e
+		{:
+			return new JSConstructNode(e, new JSEmptyNode(e));
+		:}
+	;
 
 CallExpression
-// FIXME This conflicts with MethodDefinition = PropertyName LPAREN StrictFormalParameters RPAREN LCURLY FunctionBody RCURLY
-// Where PropertyName is a NumericLiteral, StringLiteral or Identifier...
 	=	MemberExpression.l Arguments.r
 		{:
 			return new JSInvokeNode(l, r);
@@ -962,10 +1051,39 @@ CallExpression
 		:}
 	|	CallExpression TemplateLiteral
 	;
+	
+CallExpression_NoLBF
+	=	MemberExpression_NoLBF.l Arguments.r
+		{:
+			return new JSInvokeNode(l, r);
+		:}
+	|	SUPER.s Arguments.r
+		{:
+			return new JSInvokeNode(new JSIdentifierNode(s), r);
+		:}
+	|	CallExpression_NoLBF.l Arguments.r
+		{:
+			return new JSInvokeNode(l, r);
+		:}
+	|	CallExpression_NoLBF.l LBRACKET.lb Expression.r RBRACKET.rb
+		{:
+			return new JSGetElementNode(l, lb, r, rb);
+		:}
+	|	CallExpression_NoLBF.l DOT.o IdentifierName.r
+		{:
+			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
+		:}
+	|	CallExpression_NoLBF TemplateLiteral
+	;
 
 LeftHandSideExpression
 	=	NewExpression
 	|	CallExpression
+	;
+	
+LeftHandSideExpression_NoLBF
+	=	NewExpression_NoLBF
+	|	CallExpression_NoLBF
 	;
 
 PostUnaryOperator
@@ -1274,7 +1392,7 @@ BindingRestElement
 	;
 
 ExpressionStatement
-	=	Expression.e SEMICOLON
+	=	Expression_NoLBF.e SEMICOLON
 		{:
 			e.setSemicolonIncluded(true);
 			return e;
