@@ -17,6 +17,20 @@
 
     <taskdef name="beaver" classname="beaver.comp.run.AntTask" classpath="../../beaver/bin"/>
 
+	<target name="antlr">
+		<java classname="org.antlr.v4.Tool" fork="true" failonerror="true" dir="../src/com/aptana/js/core/parsing/antlr">
+			<arg value="-o"/>
+			<arg value="${basedir}/../src/com/aptana/js/core/parsing/antlr"/>
+			<arg value="-package"/>
+            <arg value="com.aptana.js.core.parsing.antlr"/>
+            <arg line="${basedir}/JS.g4"/>
+            <classpath>
+                <pathelement location="${basedir}/../lib/antlr-4.7-complete.jar"/>
+                <pathelement location="${java.class.path}"/>
+            </classpath>
+        </java>
+	</target>
+	
     <target name="build">
         <jflex 
             file="JS.flex" 

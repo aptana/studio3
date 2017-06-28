@@ -752,9 +752,9 @@ PropertyDefinition
 //	=	Identifier
 //	|	CoverInitializedName
 // Combination of Identifier | CoverInitializedName = Identifier Initializer? - which is what SingleNameBinding is
-// FIXME This conflicts with PrimaryExpression = Identifier.i @ 891
-//	=	SingleNameBinding
-	=	Identifier Initializer
+// FIXME This conflicts with PrimaryExpression_NoLBF = Identifier.i @ 966
+// I have no idea how to fix this ambiguity here
+	=	SingleNameBinding
 	|	PropertyName.n COLON.c SingleExpression.v
 		{:
 			return new JSNameValuePairNode(n, c, v);
@@ -849,10 +849,9 @@ AssignmentOperator
 // This seems to cause all sorts of issues.
 // In ES5.1, this grammar broke it down in a way they could handle: https://github.com/antlr/grammars-v4/blob/master/ecmascript/ECMAScript.g4
 
+// TODO Let the parser roll up the expression into JSNode[], don't stick it in JSCommaNode like this
 Expression
 	=	SingleExpression
-// FIXME This roll up of single expression conflicts with roll up of PropertyDefinition when base rule is Identifier!
-// FIXME We shouldn't use this wrapping JSCommaNode in our AST! Just let it convert into JSNode[] as it does!
 	|	Expression.l COMMA SingleExpression.r
 		{:
 			return new JSCommaNode(l, r);
@@ -862,11 +861,10 @@ Expression
 Expression_NoLBF
 	=	SingleExpression_NoLBF
 // FIXME This roll up of single expression conflicts with roll up of PropertyDefinition when base rule is Identifier!
-// FIXME We shouldn't use this wrapping JSCommaNode in our AST! Just let it convert into JSNode[] as it does!
 	|	Expression_NoLBF.l COMMA SingleExpression.r
 		{:
 			return new JSCommaNode(l, r);
-		:}
+	:}
 	;
 
 // We expand the enforced operator precedence written into the language and use precedence rules above instead.
@@ -941,20 +939,23 @@ SingleExpression_NoLBF
 // NOTE: We explicitly "fork" the ruleset here for "inside an object literal" 
 // and "outside an object literal (PrimaryExpression_NoLBF where NoLBF stands for no left brace found?)"
 // Otherwise we get unexpected handling of some cases like: if (true) { a = 1 } else { b = '2' }
+// Essentially this forking plus the use of Expression_NoLBF under Statement means we are enforcing that in a statement context
+// a { means we're entering a block and not an object literal. (which is right: https://whereswalden.com/tag/destructuring/)
 // Note that this is highly related to the ambiguity in ObjectLiteral with a shorthand property with no initializer
+// There we have an issue where an object literal can be: "{ a, b, c }", but a block could also be "{ a, b, c }"
 PrimaryExpression
 	=	PrimaryExpression_NoLBF
 	|	ObjectLiteral
+	|	Identifier.i
+		{:
+			return new JSIdentifierNode(i);
+		:}
 	;
 	
 PrimaryExpression_NoLBF
 	=	THIS.t
 		{:
 			return new JSThisNode(t);
-		:}
-	|	Identifier.i
-		{:
-			return new JSIdentifierNode(i);
 		:}
 	|	Literal
 	|	ArrayLiteral
@@ -994,16 +995,29 @@ MemberExpression_NoLBF
 		{:
 			return new JSGetElementNode(l, lb, r, rb);
 		:}
+	|	Identifier.i LBRACKET.lb Expression.r RBRACKET.rb
+		{:
+			return new JSGetElementNode(new JSIdentifierNode(i), lb, r, rb);
+		:}
 	|	MemberExpression_NoLBF.l DOT.o IdentifierName.r
 		{:
 			return new JSGetPropertyNode(l, o, new JSIdentifierNode(r));
 		:}
+	|	Identifier.i DOT.o IdentifierName.r
+		{:
+			return new JSGetPropertyNode(new JSIdentifierNode(i), o, new JSIdentifierNode(r));
+		:}
 	|	MemberExpression_NoLBF.l TemplateLiteral
+	|	Identifier.l TemplateLiteral
 	|	SuperProperty
 	|	NEW DOT TARGET
 	|	NEW MemberExpression.e Arguments.r
 		{:
 			return new JSConstructNode(e, r);
+		:}
+	|	NEW Identifier.i Arguments.r
+		{:
+			return new JSConstructNode(new JSIdentifierNode(i), r);
 		:}
 	;
 
@@ -1022,6 +1036,7 @@ NewExpression
 	
 NewExpression_NoLBF
 	=	MemberExpression_NoLBF
+	|	Identifier
 	|	NEW NewExpression.e
 		{:
 			return new JSConstructNode(e, new JSEmptyNode(e));
@@ -1057,6 +1072,7 @@ CallExpression_NoLBF
 		{:
 			return new JSInvokeNode(l, r);
 		:}
+	|	Identifier Arguments
 	|	SUPER.s Arguments.r
 		{:
 			return new JSInvokeNode(new JSIdentifierNode(s), r);
