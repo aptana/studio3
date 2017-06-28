@@ -532,6 +532,18 @@ public class JSBaseListener implements JSListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterLabelledItem(JSParser.LabelledItemContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLabelledItem(JSParser.LabelledItemContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterThrowStatement(JSParser.ThrowStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -575,6 +587,18 @@ public class JSBaseListener implements JSListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFinallyProduction(JSParser.FinallyProductionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCatchParameter(JSParser.CatchParameterContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCatchParameter(JSParser.CatchParameterContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -1180,6 +1204,18 @@ public class JSBaseListener implements JSListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterGeneratorExpressionExpression(JSParser.GeneratorExpressionExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitGeneratorExpressionExpression(JSParser.GeneratorExpressionExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterSuperMemberDotExpression(JSParser.SuperMemberDotExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1223,6 +1259,18 @@ public class JSBaseListener implements JSListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitThisExpression(JSParser.ThisExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRegularExpressionLiteralExpression(JSParser.RegularExpressionLiteralExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRegularExpressionLiteralExpression(JSParser.RegularExpressionLiteralExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -1432,6 +1480,18 @@ public class JSBaseListener implements JSListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterClassExpressionExpression(JSParser.ClassExpressionExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitClassExpressionExpression(JSParser.ClassExpressionExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterYieldExpression(JSParser.YieldExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1595,6 +1655,18 @@ public class JSBaseListener implements JSListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitCallTemplateLiteralExpression(JSParser.CallTemplateLiteralExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterTemplateLiteralExpression(JSParser.TemplateLiteralExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTemplateLiteralExpression(JSParser.TemplateLiteralExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

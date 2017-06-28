@@ -438,6 +438,16 @@ public interface JSListener extends ParseTreeListener {
 	 */
 	void exitLabelledStatement(JSParser.LabelledStatementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link JSParser#labelledItem}.
+	 * @param ctx the parse tree
+	 */
+	void enterLabelledItem(JSParser.LabelledItemContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link JSParser#labelledItem}.
+	 * @param ctx the parse tree
+	 */
+	void exitLabelledItem(JSParser.LabelledItemContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link JSParser#throwStatement}.
 	 * @param ctx the parse tree
 	 */
@@ -477,6 +487,16 @@ public interface JSListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFinallyProduction(JSParser.FinallyProductionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link JSParser#catchParameter}.
+	 * @param ctx the parse tree
+	 */
+	void enterCatchParameter(JSParser.CatchParameterContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link JSParser#catchParameter}.
+	 * @param ctx the parse tree
+	 */
+	void exitCatchParameter(JSParser.CatchParameterContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link JSParser#debuggerStatement}.
 	 * @param ctx the parse tree
@@ -996,6 +1016,18 @@ public interface JSListener extends ParseTreeListener {
 	 */
 	void exitNotExpression(JSParser.NotExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code GeneratorExpressionExpression}
+	 * labeled alternative in {@link JSParser#singleExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterGeneratorExpressionExpression(JSParser.GeneratorExpressionExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code GeneratorExpressionExpression}
+	 * labeled alternative in {@link JSParser#singleExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitGeneratorExpressionExpression(JSParser.GeneratorExpressionExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code SuperMemberDotExpression}
 	 * labeled alternative in {@link JSParser#singleExpression}.
 	 * @param ctx the parse tree
@@ -1043,6 +1075,18 @@ public interface JSListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitThisExpression(JSParser.ThisExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code RegularExpressionLiteralExpression}
+	 * labeled alternative in {@link JSParser#singleExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterRegularExpressionLiteralExpression(JSParser.RegularExpressionLiteralExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code RegularExpressionLiteralExpression}
+	 * labeled alternative in {@link JSParser#singleExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitRegularExpressionLiteralExpression(JSParser.RegularExpressionLiteralExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code FunctionExpression}
 	 * labeled alternative in {@link JSParser#singleExpression}.
@@ -1248,6 +1292,18 @@ public interface JSListener extends ParseTreeListener {
 	 */
 	void exitPostIncrementExpression(JSParser.PostIncrementExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code ClassExpressionExpression}
+	 * labeled alternative in {@link JSParser#singleExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterClassExpressionExpression(JSParser.ClassExpressionExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ClassExpressionExpression}
+	 * labeled alternative in {@link JSParser#singleExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitClassExpressionExpression(JSParser.ClassExpressionExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code YieldExpression}
 	 * labeled alternative in {@link JSParser#singleExpression}.
 	 * @param ctx the parse tree
@@ -1415,6 +1471,18 @@ public interface JSListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitCallTemplateLiteralExpression(JSParser.CallTemplateLiteralExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code TemplateLiteralExpression}
+	 * labeled alternative in {@link JSParser#singleExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterTemplateLiteralExpression(JSParser.TemplateLiteralExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code TemplateLiteralExpression}
+	 * labeled alternative in {@link JSParser#singleExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitTemplateLiteralExpression(JSParser.TemplateLiteralExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link JSParser#script}.
 	 * @param ctx the parse tree

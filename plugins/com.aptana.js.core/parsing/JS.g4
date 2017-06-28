@@ -169,6 +169,7 @@ grammar JS;
             case This:
             case CloseBracket:
             case CloseParen:
+            case BinaryIntegerLiteral:
             case OctalIntegerLiteral:
             case DecimalLiteral:
             case HexIntegerLiteral:
@@ -413,9 +414,9 @@ emptyStatement
  ;
 
 /// ExpressionStatement :
-///     [lookahead ∉ {{, function}] Expression ;
+///     [lookahead ∉ {{, function, class, let [}] Expression ;
 expressionStatement
- : {(_input.LA(1) != OpenBrace) && (_input.LA(1) != Function)}? expressionSequence eos
+ : {(_input.LA(1) != OpenBrace) && (_input.LA(1) != Function) && (_input.LA(1) != Class) && ((_input.LA(1) == Let) ? _input.LA(2) != OpenBracket : true)}? expressionSequence eos
  ;
 
 /// IfStatement :
@@ -440,10 +441,10 @@ ifStatement
 iterationStatement
  : Do statement While '(' expressionSequence ')' eos
  | While '(' expressionSequence ')' statement
- | For '(' {(_input.LA(1) != Let) && (_input.LA(2) != OpenBracket)}? expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement
+ | For '(' {((_input.LA(1) == Let) ? _input.LA(2) != OpenBracket : true)}? expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement
  | For '(' Var variableDeclarationList ';' expressionSequence? ';' expressionSequence? ')' statement
  | For '(' lexicalDeclaration expressionSequence? ';' expressionSequence? ')' statement
- | For '(' {(_input.LA(1) != Let) && (_input.LA(2) != OpenBracket)}? singleExpression In expressionSequence ')' statement
+ | For '(' {((_input.LA(1) == Let) ? _input.LA(2) != OpenBracket : true)}? singleExpression In expressionSequence ')' statement
  | For '(' Var forBinding In expressionSequence ')' statement
  | For '(' forDeclaration In expressionSequence ')' statement
  | For '(' {(_input.LA(1) != Let)}? singleExpression 'of' singleExpression ')' statement
@@ -528,7 +529,15 @@ defaultClause
 /// LabelledStatement :
 ///     Identifier ':' Statement
 labelledStatement
- : Identifier ':' statement
+ : Identifier ':' labelledItem
+ ;
+
+/// LabelledItem :
+///     Statement
+///     FunctionDeclaration
+labelledItem
+ : statement
+ | functionDeclaration
  ;
 
 /// ThrowStatement :
@@ -548,15 +557,23 @@ tryStatement
  ;
 
 /// Catch :
-///     catch ( Identifier ) Block
+///     catch ( CatchParameter ) Block
 catchProduction
- : Catch '(' Identifier ')' block
+ : Catch '(' catchParameter ')' block
  ;
 
 /// Finally :
 ///     finally Block
 finallyProduction
  : Finally block
+ ;
+
+/// CatchParameter :
+///     BindingIdentifier
+///     BindingPattern
+catchParameter
+ : bindingIdentifier
+ | bindingPattern
  ;
 
 /// DebuggerStatement :
@@ -572,6 +589,7 @@ functionDeclaration
  : Function bindingIdentifier '(' formalParameters ')' '{' functionBody '}'
  ;
 
+// Rolled into singleExpression
 /// FunctionExpression :
 ///     function BindingIdentifier? ( FormalParameters ) { FunctionBody }
 //functionExpression
@@ -1037,6 +1055,11 @@ singleExpression
  | literal                                                                   # LiteralExpression
  | arrayLiteral                                                              # ArrayLiteralExpression
  | objectLiteral                                                             # ObjectLiteralExpression
+ | classExpression                                                           # ClassExpressionExpression
+ | generatorExpression                                                       # GeneratorExpressionExpression
+ | RegularExpressionLiteral                                                  # RegularExpressionLiteralExpression
+ | templateLiteral                                                           # TemplateLiteralExpression
+// | coverParenthesizedExpressionAndArrowParameterList                         # CoverParenthesizedExpressionAndArrowParameterListExpression
  | '(' expressionSequence ')'                                                # ParenthesizedExpression
  ;
 
@@ -1056,7 +1079,7 @@ scriptBody
  ;
 
 /// Module :
-///     ModuleBodyopt
+///     ModuleBody?
 module
  : moduleBody?
  ;
@@ -1225,7 +1248,6 @@ literal
  : ( NullLiteral 
    | BooleanLiteral
    | StringLiteral
-   | RegularExpressionLiteral
    )
  | numericLiteral
  ;

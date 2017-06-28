@@ -218,6 +218,7 @@ public class JSLexer extends Lexer {
 	            case This:
 	            case CloseBracket:
 	            case CloseParen:
+	            case BinaryIntegerLiteral:
 	            case OctalIntegerLiteral:
 	            case DecimalLiteral:
 	            case HexIntegerLiteral:
