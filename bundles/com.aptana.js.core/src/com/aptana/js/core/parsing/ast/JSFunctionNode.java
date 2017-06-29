@@ -37,7 +37,16 @@ public class JSFunctionNode extends JSNode
 	 */
 	public JSFunctionNode(JSNode name, JSParametersNode params, JSStatementsNode body)
 	{
-		super(IJSNodeTypes.FUNCTION, name, params, body);
+		this();
+		setChildren(new JSNode[] { name, params, body });
+	}
+
+	/**
+	 * Used by ANTLR AST
+	 */
+	public JSFunctionNode()
+	{
+		super(IJSNodeTypes.FUNCTION);
 	}
 
 	/*

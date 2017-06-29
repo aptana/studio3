@@ -24,6 +24,17 @@ public class JSGetPropertyNode extends JSBinaryOperatorNode
 		this.setNodeType(IJSNodeTypes.GET_PROPERTY);
 	}
 
+	/**
+	 * Used by ANTLR AST
+	 * 
+	 * @param operator
+	 */
+	public JSGetPropertyNode(Symbol operator)
+	{
+		super(operator);
+		this.setNodeType(IJSNodeTypes.GET_PROPERTY);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)

@@ -24,8 +24,19 @@ public class JSPostUnaryOperatorNode extends JSNode
 	 */
 	public JSPostUnaryOperatorNode(Symbol operator, JSNode expression)
 	{
-		this._operator = operator;
+		this(operator);
 		this.setChildren(new JSNode[] { expression });
+	}
+
+	/**
+	 * Used by ANTLR AST
+	 * 
+	 * @param operator
+	 */
+	public JSPostUnaryOperatorNode(Symbol operator)
+	{
+		super();
+		this._operator = operator;
 
 		short type = DEFAULT_TYPE;
 		JSTokenType token = JSTokenType.get((String) operator.value);

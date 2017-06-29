@@ -20,6 +20,14 @@ public class JSInvokeNode extends JSNode
 		super(IJSNodeTypes.INVOKE, expression, args);
 	}
 
+	/**
+	 * Used by ANTLR AST
+	 */
+	public JSInvokeNode()
+	{
+		super(IJSNodeTypes.INVOKE);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)

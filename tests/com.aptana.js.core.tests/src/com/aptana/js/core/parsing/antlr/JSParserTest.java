@@ -16,12 +16,18 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.tree.IterativeParseTreeWalker;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.After;
 import org.junit.Test;
 
 import com.aptana.core.build.IProblem;
 import com.aptana.core.util.FileUtil;
+import com.aptana.js.core.parsing.antlr.JSParser.ProgramContext;
+import com.aptana.js.core.parsing.antlr.ast.JSASTWalker;
+import com.aptana.js.core.parsing.ast.JSParseRootNode;
 import com.aptana.parsing.ast.IParseError;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseError;
 
 public class JSParserTest
@@ -1515,7 +1521,7 @@ public class JSParserTest
 		assertParseResult(source, source);
 	}
 
-	protected void parse(String source)
+	protected ProgramContext parse(String source)
 	{
 		CharStream stream = new ANTLRInputStream(source);
 		JSLexer lexer = new JSLexer(stream);
@@ -1553,14 +1559,28 @@ public class JSParserTest
 
 			}
 		});
-		fParser.program();
+		return fParser.program();
 	}
 
 	protected void assertParseResult(String source, String expected) throws Exception
 	{
-		// TODO Generate source from the tree! We'd need to add a walker, likely one that generates our *own* AST so we
-		// can use everything we already have!
-		parse(source);
+		ProgramContext pc = parse(source);
+		JSParseRootNode root = convertAST(pc);
+		StringBuilder text = new StringBuilder();
+		IParseNode[] children = root.getChildren();
+		for (IParseNode child : children)
+		{
+			text.append(child).append(EOL);
+		}
+		assertEquals(expected, text.toString());
+	}
+
+	private JSParseRootNode convertAST(ProgramContext pc)
+	{
+		ParseTreeWalker walker = new IterativeParseTreeWalker();
+		JSASTWalker listener = new JSASTWalker();
+		walker.walk(listener, pc);
+		return listener.getRootNode();
 	}
 
 	private void assertNoErrors()

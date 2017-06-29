@@ -7,9 +7,9 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSForNode extends JSNode
 {
@@ -23,10 +23,25 @@ public class JSForNode extends JSNode
 	 * 
 	 * @param children
 	 */
-	public JSForNode(Symbol leftParenthesis, JSNode initializer, Symbol semicolon1, JSNode condition,
-			Symbol semicolon2, JSNode advance, Symbol rightParenthesis, JSNode body)
+	public JSForNode(Symbol leftParenthesis, JSNode initializer, Symbol semicolon1, JSNode condition, Symbol semicolon2,
+			JSNode advance, Symbol rightParenthesis, JSNode body)
 	{
-		super(IJSNodeTypes.FOR, initializer, condition, advance, body);
+		this(leftParenthesis, semicolon1, semicolon2, rightParenthesis);
+
+		this.setChildren(new JSNode[] { initializer, condition, advance, body });
+	}
+
+	/**
+	 * Used by ANTLR AST
+	 * 
+	 * @param leftParenthesis
+	 * @param semicolon1
+	 * @param semicolon2
+	 * @param rightParenthesis
+	 */
+	public JSForNode(Symbol leftParenthesis, Symbol semicolon1, Symbol semicolon2, Symbol rightParenthesis)
+	{
+		super(IJSNodeTypes.FOR);
 
 		this._leftParenthesis = leftParenthesis;
 		this._semicolon1 = semicolon1;

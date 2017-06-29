@@ -17,13 +17,11 @@ public class JSAssignmentNode extends JSNode
 	private Symbol _operator;
 
 	/**
-	 * JSAssignmentNode
+	 * JSAssignmentNode - used when we only have the operator and need to descend to add the left and right expressions as children later
 	 * 
-	 * @param left
 	 * @param assignOperator
-	 * @param right
 	 */
-	public JSAssignmentNode(JSNode left, Symbol assignOperator, JSNode right)
+	public JSAssignmentNode(Symbol assignOperator)
 	{
 		this._operator = assignOperator;
 
@@ -71,6 +69,11 @@ public class JSAssignmentNode extends JSNode
 		}
 
 		this.setNodeType(type);
+	}
+	
+	public JSAssignmentNode(JSNode left, Symbol assignOperator, JSNode right)
+	{
+		this(assignOperator);
 		this.setChildren(new JSNode[] { left, right });
 	}
 

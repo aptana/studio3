@@ -7,10 +7,10 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.js.core.parsing.JSTokenType;
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSPreUnaryOperatorNode extends JSNode
 {
@@ -24,22 +24,29 @@ public class JSPreUnaryOperatorNode extends JSNode
 	 */
 	protected JSPreUnaryOperatorNode(short type, JSNode expression)
 	{
+		this(type);
 		this.setChildren(new JSNode[] { expression });
+	}
 
+	/**
+	 * Used by ANTLR AST
+	 * 
+	 * @param operator
+	 */
+	protected JSPreUnaryOperatorNode(short type)
+	{
 		this.setNodeType(type);
 	}
 
 	/**
-	 * JSUnaryOperatorNode
+	 * Used by ANTLR AST
 	 * 
 	 * @param operator
-	 * @param expression
 	 */
-	public JSPreUnaryOperatorNode(Symbol operator, JSNode expression)
+	public JSPreUnaryOperatorNode(Symbol operator)
 	{
+		super();
 		this._operator = operator;
-		this.setChildren(new JSNode[] { expression });
-
 		short type;
 		JSTokenType token = JSTokenType.get((String) operator.value);
 
@@ -86,6 +93,18 @@ public class JSPreUnaryOperatorNode extends JSNode
 		}
 
 		setNodeType(type);
+	}
+
+	/**
+	 * JSUnaryOperatorNode
+	 * 
+	 * @param operator
+	 * @param expression
+	 */
+	public JSPreUnaryOperatorNode(Symbol operator, JSNode expression)
+	{
+		this(operator);
+		this.setChildren(new JSNode[] { expression });
 	}
 
 	/*

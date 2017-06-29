@@ -308,15 +308,147 @@ public interface JSListener extends ParseTreeListener {
 	 */
 	void exitIfStatement(JSParser.IfStatementContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link JSParser#iterationStatement}.
+	 * Enter a parse tree produced by the {@code DoWhileStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
 	 * @param ctx the parse tree
 	 */
-	void enterIterationStatement(JSParser.IterationStatementContext ctx);
+	void enterDoWhileStatement(JSParser.DoWhileStatementContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link JSParser#iterationStatement}.
+	 * Exit a parse tree produced by the {@code DoWhileStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
 	 * @param ctx the parse tree
 	 */
-	void exitIterationStatement(JSParser.IterationStatementContext ctx);
+	void exitDoWhileStatement(JSParser.DoWhileStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code WhileStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterWhileStatement(JSParser.WhileStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code WhileStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitWhileStatement(JSParser.WhileStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ForLoopStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterForLoopStatement(JSParser.ForLoopStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ForLoopStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitForLoopStatement(JSParser.ForLoopStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ForVarLoopStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterForVarLoopStatement(JSParser.ForVarLoopStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ForVarLoopStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitForVarLoopStatement(JSParser.ForVarLoopStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ForLexicalLoopStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterForLexicalLoopStatement(JSParser.ForLexicalLoopStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ForLexicalLoopStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitForLexicalLoopStatement(JSParser.ForLexicalLoopStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ForInStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterForInStatement(JSParser.ForInStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ForInStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitForInStatement(JSParser.ForInStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ForVarInStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterForVarInStatement(JSParser.ForVarInStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ForVarInStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitForVarInStatement(JSParser.ForVarInStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ForLexicalInStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterForLexicalInStatement(JSParser.ForLexicalInStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ForLexicalInStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitForLexicalInStatement(JSParser.ForLexicalInStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ForOfStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterForOfStatement(JSParser.ForOfStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ForOfStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitForOfStatement(JSParser.ForOfStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ForVarOfStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterForVarOfStatement(JSParser.ForVarOfStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ForVarOfStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitForVarOfStatement(JSParser.ForVarOfStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ForLexicalOfStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterForLexicalOfStatement(JSParser.ForLexicalOfStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ForLexicalOfStatement}
+	 * labeled alternative in {@link JSParser#iterationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitForLexicalOfStatement(JSParser.ForLexicalOfStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link JSParser#variableDeclarationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterVariableDeclarationStatement(JSParser.VariableDeclarationStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link JSParser#variableDeclarationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitVariableDeclarationStatement(JSParser.VariableDeclarationStatementContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link JSParser#forDeclaration}.
 	 * @param ctx the parse tree

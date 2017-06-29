@@ -21,8 +21,19 @@ public class JSGetElementNode extends JSBinaryOperatorNode
 	 */
 	public JSGetElementNode(JSNode left, Symbol leftBracket, JSNode right, Symbol rightBracket)
 	{
-		super(left, leftBracket, right);
+		this(leftBracket, rightBracket);
+		this.setChildren(new JSNode[] { left, right });
+	}
 
+	/**
+	 * Used by ANTLR AST.
+	 * 
+	 * @param lb
+	 * @param rb
+	 */
+	public JSGetElementNode(Symbol leftBracket, Symbol rightBracket)
+	{
+		super(leftBracket);
 		this._rightBracket = rightBracket;
 		this.setNodeType(IJSNodeTypes.GET_ELEMENT);
 	}

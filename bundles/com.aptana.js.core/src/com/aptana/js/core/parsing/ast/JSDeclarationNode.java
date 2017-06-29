@@ -7,9 +7,9 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSDeclarationNode extends JSNode
 {
@@ -23,6 +23,18 @@ public class JSDeclarationNode extends JSNode
 	public JSDeclarationNode(JSNode identifier, Symbol equalSign, JSNode value)
 	{
 		super(IJSNodeTypes.DECLARATION, identifier, value);
+
+		this._equalSign = equalSign;
+	}
+
+	/**
+	 * Used by ANTLR AST
+	 * 
+	 * @param equalSign
+	 */
+	public JSDeclarationNode(Symbol equalSign)
+	{
+		super(IJSNodeTypes.DECLARATION);
 
 		this._equalSign = equalSign;
 	}

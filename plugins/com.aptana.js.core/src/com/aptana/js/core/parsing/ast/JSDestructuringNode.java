@@ -18,6 +18,14 @@ public class JSDestructuringNode extends JSNode
 		super(IJSNodeTypes.DESTRUCTURE, binding, valueExpression);
 	}
 
+	/**
+	 * Used by ANTLR
+	 */
+	public JSDestructuringNode()
+	{
+		super(IJSNodeTypes.DESTRUCTURE);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)

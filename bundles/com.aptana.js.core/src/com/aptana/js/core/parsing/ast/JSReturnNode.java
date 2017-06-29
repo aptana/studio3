@@ -19,6 +19,14 @@ public class JSReturnNode extends JSPreUnaryOperatorNode
 		super(IJSNodeTypes.RETURN, expression);
 	}
 
+	/**
+	 * Used by ANTLR AST
+	 */
+	public JSReturnNode()
+	{
+		super(IJSNodeTypes.RETURN);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)

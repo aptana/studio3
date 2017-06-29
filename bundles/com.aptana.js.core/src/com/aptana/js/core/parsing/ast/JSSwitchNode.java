@@ -31,12 +31,26 @@ public class JSSwitchNode extends JSNode
 	public JSSwitchNode(Symbol leftParenthesis, JSNode expression, Symbol rightParenthesis, Symbol leftBrace,
 			Symbol rightBrace, JSNode... children)
 	{
-		super(IJSNodeTypes.SWITCH, expression);
+		this(leftParenthesis, rightParenthesis, leftBrace, rightBrace);
 
+		this.addChild(expression);
 		for (JSNode child : children)
 		{
 			this.addChild(child);
 		}
+	}
+
+	/**
+	 * Used by ANTLR AST
+	 * 
+	 * @param leftParenthesis
+	 * @param rightParenthesis
+	 * @param leftBrace
+	 * @param rightBrace
+	 */
+	public JSSwitchNode(Symbol leftParenthesis, Symbol rightParenthesis, Symbol leftBrace, Symbol rightBrace)
+	{
+		super(IJSNodeTypes.SWITCH);
 
 		this._leftParenthesis = leftParenthesis;
 		this._rightParenthesis = rightParenthesis;

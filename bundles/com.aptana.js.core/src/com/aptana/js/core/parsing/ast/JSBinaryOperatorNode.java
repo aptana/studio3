@@ -7,24 +7,22 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public abstract class JSBinaryOperatorNode extends JSNode
 {
 	private Symbol _operator;
 
+	
 	/**
-	 * JSBinaryOperatorNode
-	 * 
-	 * @param left
-	 * @param right
+	 * Used when building ANTLR AST. Children get added later!
+	 * @param operator
 	 */
-	protected JSBinaryOperatorNode(JSNode left, JSNode right)
+	protected JSBinaryOperatorNode(Symbol operator)
 	{
-		this.setLocation(left.getStart(), right.getEnd());
-		this.setChildren(new JSNode[] { left, right });
+		this._operator = operator;
 	}
 
 	/**
@@ -36,9 +34,10 @@ public abstract class JSBinaryOperatorNode extends JSNode
 	 */
 	protected JSBinaryOperatorNode(JSNode left, Symbol operator, JSNode right)
 	{
-		this(left, right);
+		this(operator);
 
-		this._operator = operator;
+		this.setLocation(left.getStart(), right.getEnd());
+		this.setChildren(new JSNode[] { left, right });
 	}
 
 	/**
