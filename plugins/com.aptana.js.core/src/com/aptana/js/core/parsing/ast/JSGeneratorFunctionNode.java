@@ -7,6 +7,14 @@ public class JSGeneratorFunctionNode extends JSFunctionNode
 		super(name, params, body);
 	}
 
+	/**
+	 * Used by ANTLR AST
+	 */
+	public JSGeneratorFunctionNode()
+	{
+		super();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)

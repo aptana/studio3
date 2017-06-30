@@ -799,7 +799,7 @@ public class JSFormatWalker extends JSTreeWalker
 			this.formatNode(node.getValue());
 			this.addSemicolon(node);
 		}
-		else if (node.getParameters() != null)
+		else if (node.isSetter())
 		{
 			// set
 			this._printer.print("set "); //$NON-NLS-1$
@@ -809,7 +809,7 @@ public class JSFormatWalker extends JSTreeWalker
 			this.formatNode(node.getValue());
 			this.addSemicolon(node);
 		}
-		else
+		else if (node.isGetter())
 		{
 			// get
 			this._printer.print("get "); //$NON-NLS-1$

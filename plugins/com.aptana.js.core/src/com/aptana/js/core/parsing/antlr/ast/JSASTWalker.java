@@ -8,102 +8,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import com.aptana.js.core.parsing.antlr.JSBaseListener;
 import com.aptana.js.core.parsing.antlr.JSParser;
-import com.aptana.js.core.parsing.antlr.JSParser.AdditiveExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ArgumentsContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ArgumentsExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ArrayLiteralContext;
-import com.aptana.js.core.parsing.antlr.JSParser.AssignmentExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.AssignmentOperatorExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.BindingElementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.BindingIdentifierContext;
-import com.aptana.js.core.parsing.antlr.JSParser.BindingPatternContext;
-import com.aptana.js.core.parsing.antlr.JSParser.BindingRestElementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.BitAndExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.BitNotExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.BitOrExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.BitShiftExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.BitXOrExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.BlockContext;
-import com.aptana.js.core.parsing.antlr.JSParser.BreakStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.CaseClauseContext;
-import com.aptana.js.core.parsing.antlr.JSParser.CatchProductionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ContinueStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.DefaultClauseContext;
-import com.aptana.js.core.parsing.antlr.JSParser.DeleteExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.DoWhileStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ElementListContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ElisionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.EmptyStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.EqualityExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ExportDeclarationContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ExportSpecifierContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ExpressionSequenceContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ExpressionStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.FinallyProductionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ForDeclarationContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ForInStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ForLexicalLoopStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ForLexicalOfStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ForLoopStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ForOfStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ForVarInStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ForVarLoopStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ForVarOfStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.FormalParametersContext;
-import com.aptana.js.core.parsing.antlr.JSParser.FromClauseContext;
-import com.aptana.js.core.parsing.antlr.JSParser.FunctionDeclarationContext;
-import com.aptana.js.core.parsing.antlr.JSParser.FunctionStatementListContext;
-import com.aptana.js.core.parsing.antlr.JSParser.IdentifierExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.IdentifierNameContext;
-import com.aptana.js.core.parsing.antlr.JSParser.IdentifierReferenceContext;
-import com.aptana.js.core.parsing.antlr.JSParser.IfStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ImportDeclarationContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ImportSpecifierContext;
-import com.aptana.js.core.parsing.antlr.JSParser.InExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.InitializerContext;
-import com.aptana.js.core.parsing.antlr.JSParser.LabelledStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.LexicalBindingContext;
-import com.aptana.js.core.parsing.antlr.JSParser.LexicalDeclarationContext;
-import com.aptana.js.core.parsing.antlr.JSParser.LiteralContext;
-import com.aptana.js.core.parsing.antlr.JSParser.LogicalAndExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.LogicalOrExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.MemberDotExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.MemberIndexExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ModuleSpecifierContext;
-import com.aptana.js.core.parsing.antlr.JSParser.MultiplicativeExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.NameSpaceImportContext;
-import com.aptana.js.core.parsing.antlr.JSParser.NamedImportsContext;
-import com.aptana.js.core.parsing.antlr.JSParser.NewExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.NotExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.NumericLiteralContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ObjectLiteralContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ParenthesizedExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.PostDecreaseExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.PostIncrementExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.PreDecreaseExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.PreIncrementExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ProgramContext;
-import com.aptana.js.core.parsing.antlr.JSParser.PropertyDefinitionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.PropertyNameContext;
-import com.aptana.js.core.parsing.antlr.JSParser.RegularExpressionLiteralExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.RelationalExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ReturnStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.SpreadElementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.SwitchStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.TernaryExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ThisExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.ThrowStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.TryStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.TypeofExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.UnaryMinusExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.UnaryPlusExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.VarForDeclarationContext;
-import com.aptana.js.core.parsing.antlr.JSParser.VariableDeclarationContext;
-import com.aptana.js.core.parsing.antlr.JSParser.VariableDeclarationStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.VariableStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.VoidExpressionContext;
-import com.aptana.js.core.parsing.antlr.JSParser.WhileStatementContext;
-import com.aptana.js.core.parsing.antlr.JSParser.WithStatementContext;
+import com.aptana.js.core.parsing.antlr.JSParser.*;
 import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSArrayNode;
 import com.aptana.js.core.parsing.ast.JSAssignmentNode;
@@ -112,6 +17,7 @@ import com.aptana.js.core.parsing.ast.JSBinaryBooleanOperatorNode;
 import com.aptana.js.core.parsing.ast.JSBreakNode;
 import com.aptana.js.core.parsing.ast.JSCaseNode;
 import com.aptana.js.core.parsing.ast.JSCatchNode;
+import com.aptana.js.core.parsing.ast.JSClassNode;
 import com.aptana.js.core.parsing.ast.JSCommaNode;
 import com.aptana.js.core.parsing.ast.JSConditionalNode;
 import com.aptana.js.core.parsing.ast.JSConstructNode;
@@ -131,8 +37,10 @@ import com.aptana.js.core.parsing.ast.JSForInNode;
 import com.aptana.js.core.parsing.ast.JSForNode;
 import com.aptana.js.core.parsing.ast.JSForOfNode;
 import com.aptana.js.core.parsing.ast.JSFunctionNode;
+import com.aptana.js.core.parsing.ast.JSGeneratorFunctionNode;
 import com.aptana.js.core.parsing.ast.JSGetElementNode;
 import com.aptana.js.core.parsing.ast.JSGetPropertyNode;
+import com.aptana.js.core.parsing.ast.JSGetterNode;
 import com.aptana.js.core.parsing.ast.JSGroupNode;
 import com.aptana.js.core.parsing.ast.JSIdentifierNode;
 import com.aptana.js.core.parsing.ast.JSIfNode;
@@ -153,6 +61,7 @@ import com.aptana.js.core.parsing.ast.JSPreUnaryOperatorNode;
 import com.aptana.js.core.parsing.ast.JSRegexNode;
 import com.aptana.js.core.parsing.ast.JSRestElementNode;
 import com.aptana.js.core.parsing.ast.JSReturnNode;
+import com.aptana.js.core.parsing.ast.JSSetterNode;
 import com.aptana.js.core.parsing.ast.JSSpreadElementNode;
 import com.aptana.js.core.parsing.ast.JSStatementsNode;
 import com.aptana.js.core.parsing.ast.JSStringNode;
@@ -164,6 +73,7 @@ import com.aptana.js.core.parsing.ast.JSTryNode;
 import com.aptana.js.core.parsing.ast.JSVarNode;
 import com.aptana.js.core.parsing.ast.JSWhileNode;
 import com.aptana.js.core.parsing.ast.JSWithNode;
+import com.aptana.js.core.parsing.ast.JSYieldNode;
 import com.aptana.parsing.ast.IParseNode;
 
 import beaver.Symbol;
@@ -676,6 +586,22 @@ public class JSASTWalker extends JSBaseListener
 		// FIXME If there's a trailing elision, add it to the ElementList, not this array
 		popNode();
 		super.exitArrayLiteral(ctx);
+	}
+
+	@Override
+	public void enterArrayBindingPattern(ArrayBindingPatternContext ctx)
+	{
+		JSArrayNode node = new JSArrayNode(toSymbol(ctx.getToken(JSParser.OpenBracket, 0)),
+				toSymbol(ctx.getToken(JSParser.CloseBracket, 0)));
+		addToParentAndPushNodeToStack(node);
+		super.enterArrayBindingPattern(ctx);
+	}
+
+	@Override
+	public void exitArrayBindingPattern(ArrayBindingPatternContext ctx)
+	{
+		popNode();
+		super.exitArrayBindingPattern(ctx);
 	}
 
 	@Override
@@ -1552,6 +1478,22 @@ public class JSASTWalker extends JSBaseListener
 	}
 
 	@Override
+	public void enterObjectBindingPattern(ObjectBindingPatternContext ctx)
+	{
+		Symbol l = toSymbol(ctx.getToken(JSParser.OpenBrace, 0));
+		Symbol r = toSymbol(ctx.getToken(JSParser.CloseBrace, 0));
+		addToParentAndPushNodeToStack(new JSObjectNode(l, r));
+		super.enterObjectBindingPattern(ctx);
+	}
+
+	@Override
+	public void exitObjectBindingPattern(ObjectBindingPatternContext ctx)
+	{
+		popNode();
+		super.exitObjectBindingPattern(ctx);
+	}
+
+	@Override
 	public void enterPropertyDefinition(PropertyDefinitionContext ctx)
 	{
 		PropertyNameContext pnc = ctx.propertyName();
@@ -1710,6 +1652,240 @@ public class JSASTWalker extends JSBaseListener
 	{
 		popNode();
 		super.exitBindingRestElement(ctx);
+	}
+
+	@Override
+	public void enterBindingProperty(BindingPropertyContext ctx)
+	{
+		if (ctx.propertyName() != null)
+		{
+			Symbol colon = toSymbol(ctx.getToken(JSParser.Colon, 0));
+			addToParentAndPushNodeToStack(new JSNameValuePairNode(colon));
+		}
+		super.enterBindingProperty(ctx);
+	}
+
+	@Override
+	public void exitBindingProperty(BindingPropertyContext ctx)
+	{
+		if (ctx.propertyName() != null)
+		{
+			popNode();
+		}
+		super.exitBindingProperty(ctx);
+	}
+
+	@Override
+	public void enterClassDeclaration(ClassDeclarationContext ctx)
+	{
+		BindingIdentifierContext bic = ctx.bindingIdentifier();
+		ClassHeritageContext chc = ctx.classTail().classHeritage();
+		addToParentAndPushNodeToStack(new JSClassNode(bic != null, chc != null));
+		super.enterClassDeclaration(ctx);
+	}
+
+	@Override
+	public void exitClassDeclaration(ClassDeclarationContext ctx)
+	{
+		// if no class body, add an empty statements node
+		if (ctx.classTail().classBody() == null)
+		{
+			addChildToParent(new JSStatementsNode());
+		}
+		popNode();
+		super.exitClassDeclaration(ctx);
+	}
+
+	@Override
+	public void enterClassBody(ClassBodyContext ctx)
+	{
+		addToParentAndPushNodeToStack(new JSStatementsNode());
+		super.enterClassBody(ctx);
+	}
+
+	@Override
+	public void exitClassBody(ClassBodyContext ctx)
+	{
+		popNode();
+		super.exitClassBody(ctx);
+	}
+
+	@Override
+	public void enterMethodDefinition(MethodDefinitionContext ctx)
+	{
+		// let enterGenerateMethod handle generater method definitions
+		GeneratorMethodContext gmc = ctx.generatorMethod();
+		if (gmc == null)
+		{
+			TerminalNode tn = ctx.Identifier();
+			if (tn != null)
+			{
+				if (tn.getText().equals("get")) //$NON-NLS-1$
+				{
+					addToParentAndPushNodeToStack(new JSGetterNode());
+				}
+				else
+				{
+					addToParentAndPushNodeToStack(new JSSetterNode());
+				}
+			}
+			else
+			{
+				// FIXME Use NameValuePairNode to wrap this? This is a method declared as a property of a class/object
+				addToParentAndPushNodeToStack(new JSFunctionNode());
+			}
+		}
+		super.enterMethodDefinition(ctx);
+	}
+
+	@Override
+	public void exitMethodDefinition(MethodDefinitionContext ctx)
+	{
+		// if preceded by 'static', mark the property as static
+		if (ctx.getParent() instanceof ClassElementContext)
+		{
+			ClassElementContext cec = (ClassElementContext) ctx.getParent();
+			TerminalNode stat = cec.Static();
+			if (stat != null)
+			{
+				IParseNode d = getCurrentNode();
+				if (d instanceof JSFunctionNode)
+				{
+					((JSFunctionNode) d).setStatic();
+				}
+				else if (d instanceof JSNameValuePairNode)
+				{
+					((JSNameValuePairNode) d).setStatic();
+				}
+			}
+		}
+		popNode();
+		super.exitMethodDefinition(ctx);
+	}
+
+	@Override
+	public void enterPropertySetParameterList(PropertySetParameterListContext ctx)
+	{
+		// this wraps the single argument for setter methods
+		addToParentAndPushNodeToStack(new JSParametersNode());
+		super.enterPropertySetParameterList(ctx);
+	}
+
+	@Override
+	public void exitPropertySetParameterList(PropertySetParameterListContext ctx)
+	{
+		popNode();
+		super.exitPropertySetParameterList(ctx);
+	}
+
+	@Override
+	public void enterGeneratorMethod(GeneratorMethodContext ctx)
+	{
+		addToParentAndPushNodeToStack(new JSGeneratorFunctionNode());
+		super.enterGeneratorMethod(ctx);
+	}
+
+	@Override
+	public void exitGeneratorMethod(GeneratorMethodContext ctx)
+	{
+		popNode();
+		super.exitGeneratorMethod(ctx);
+	}
+
+	@Override
+	public void enterGeneratorDeclaration(GeneratorDeclarationContext ctx)
+	{
+		addToParentAndPushNodeToStack(new JSGeneratorFunctionNode());
+		super.enterGeneratorDeclaration(ctx);
+	}
+
+	@Override
+	public void exitGeneratorDeclaration(GeneratorDeclarationContext ctx)
+	{
+		popNode();
+		super.exitGeneratorDeclaration(ctx);
+	}
+
+	@Override
+	public void enterGeneratorExpression(GeneratorExpressionContext ctx)
+	{
+		addToParentAndPushNodeToStack(new JSGeneratorFunctionNode());
+		// if no name, insert empty node for it
+		if (ctx.bindingIdentifier() == null)
+		{
+			addChildToParent(new JSEmptyNode(toSymbol(ctx.getToken(JSParser.Function, 0))));
+		}
+		super.enterGeneratorExpression(ctx);
+	}
+
+	@Override
+	public void exitGeneratorExpression(GeneratorExpressionContext ctx)
+	{
+		popNode();
+		super.exitGeneratorExpression(ctx);
+	}
+
+	@Override
+	public void enterYieldExpression(YieldExpressionContext ctx)
+	{
+		Symbol y = toSymbol(ctx.getToken(JSParser.Yield, 0));
+		addToParentAndPushNodeToStack(new JSYieldNode(y));
+		super.enterYieldExpression(ctx);
+	}
+
+	@Override
+	public void exitYieldExpression(YieldExpressionContext ctx)
+	{
+		popNode();
+		super.exitYieldExpression(ctx);
+	}
+
+	@Override
+	public void enterSuperMemberIndexExpression(SuperMemberIndexExpressionContext ctx)
+	{
+		Symbol lb = toSymbol(ctx.getToken(JSParser.OpenBracket, 0));
+		Symbol rb = toSymbol(ctx.getToken(JSParser.CloseBracket, 0));
+		addToParentAndPushNodeToStack(new JSGetElementNode(lb, rb));
+		addChildToParent(new JSIdentifierNode(toSymbol(ctx.getToken(JSParser.Super, 0))));
+		super.enterSuperMemberIndexExpression(ctx);
+	}
+
+	@Override
+	public void exitSuperMemberIndexExpression(SuperMemberIndexExpressionContext ctx)
+	{
+		popNode();
+		super.exitSuperMemberIndexExpression(ctx);
+	}
+
+	@Override
+	public void enterSuperMemberDotExpression(SuperMemberDotExpressionContext ctx)
+	{
+		Symbol o = toSymbol(ctx.getToken(JSParser.Dot, 0));
+		addToParentAndPushNodeToStack(new JSGetPropertyNode(o));
+		addChildToParent(new JSIdentifierNode(toSymbol(ctx.getToken(JSParser.Super, 0))));
+		super.enterSuperMemberDotExpression(ctx);
+	}
+
+	@Override
+	public void exitSuperMemberDotExpression(SuperMemberDotExpressionContext ctx)
+	{
+		popNode();
+		super.exitSuperMemberDotExpression(ctx);
+	}
+
+	@Override
+	public void enterSuperCallExpression(SuperCallExpressionContext ctx)
+	{
+		addToParentAndPushNodeToStack(new JSInvokeNode());
+		addChildToParent(new JSIdentifierNode(toSymbol(ctx.getToken(JSParser.Super, 0))));
+		super.enterSuperCallExpression(ctx);
+	}
+
+	@Override
+	public void exitSuperCallExpression(SuperCallExpressionContext ctx)
+	{
+		popNode();
+		super.exitSuperCallExpression(ctx);
 	}
 
 	private Symbol pickSymbol(ParserRuleContext ctx, int position, int... types)

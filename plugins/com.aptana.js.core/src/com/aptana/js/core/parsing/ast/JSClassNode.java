@@ -9,29 +9,39 @@ public class JSClassNode extends JSNode
 	public JSClassNode(JSIdentifierNode ident, JSNode heritage, JSStatementsNode body)
 	{
 		super(IJSNodeTypes.CLASS, ident, heritage, body);
-		_hasName = true;
-		_hasSuperclass = true;
+		this._hasName = true;
+		this._hasSuperclass = true;
 	}
 
 	public JSClassNode(JSNode heritage, JSStatementsNode body)
 	{
 		super(IJSNodeTypes.CLASS, heritage, body);
-		_hasName = false;
-		_hasSuperclass = true;
+		this._hasName = false;
+		this._hasSuperclass = true;
 	}
 
 	public JSClassNode(JSIdentifierNode ident, JSStatementsNode body)
 	{
 		super(IJSNodeTypes.CLASS, ident, body);
-		_hasName = true;
-		_hasSuperclass = false;
+		this._hasName = true;
+		this._hasSuperclass = false;
 	}
 
 	public JSClassNode(JSStatementsNode body)
 	{
 		super(IJSNodeTypes.CLASS, body);
-		_hasName = false;
-		_hasSuperclass = false;
+		this._hasName = false;
+		this._hasSuperclass = false;
+	}
+
+	/**
+	 * Used by ANTLR AST
+	 */
+	public JSClassNode(boolean hasName, boolean hasSuperClass)
+	{
+		super(IJSNodeTypes.CLASS);
+		this._hasName = hasName;
+		this._hasSuperclass = hasSuperClass;
 	}
 
 	/*
