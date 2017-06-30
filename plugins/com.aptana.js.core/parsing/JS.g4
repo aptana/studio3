@@ -439,23 +439,27 @@ ifStatement
 ///     for ( var ForBinding of AssignmentExpression ) Statement
 ///     for ( ForDeclaration of AssignmentExpression ) Statement
 iterationStatement
- : Do statement While '(' expressionSequence ')' eos                                                                            # DoWhileStatement
- | While '(' expressionSequence ')' statement                                                                                   # WhileStatement
+ : Do statement While '(' expressionSequence ')' eos                                                                                  # DoWhileStatement
+ | While '(' expressionSequence ')' statement                                                                                         # WhileStatement
  | For '(' {((_input.LA(1) == Let) ? _input.LA(2) != OpenBracket : true)}? expressionSequence? ';' expressionSequence? ';' expressionSequence? ')' statement # ForLoopStatement
- | For '(' variableDeclarationStatement ';' expressionSequence? ';' expressionSequence? ')' statement                            # ForVarLoopStatement
- | For '(' lexicalDeclaration expressionSequence? ';' expressionSequence? ')' statement                                         # ForLexicalLoopStatement
- | For '(' {((_input.LA(1) == Let) ? _input.LA(2) != OpenBracket : true)}? singleExpression In expressionSequence ')' statement # ForInStatement
- | For '(' Var forBinding In expressionSequence ')' statement                                                                   # ForVarInStatement
- | For '(' forDeclaration In expressionSequence ')' statement                                                                   # ForLexicalInStatement
- | For '(' {(_input.LA(1) != Let)}? singleExpression 'of' singleExpression ')' statement                                        # ForOfStatement
- | For '(' Var forBinding 'of' singleExpression ')' statement                                                                   # ForVarOfStatement
- | For '(' forDeclaration 'of' singleExpression ')' statement                                                                   # ForLexicalOfStatement
+ | For '(' variableDeclarationStatement ';' expressionSequence? ';' expressionSequence? ')' statement                                 # ForVarLoopStatement
+ | For '(' lexicalDeclaration expressionSequence? ';' expressionSequence? ')' statement                                               # ForLexicalLoopStatement
+ | For '(' {((_input.LA(1) == Let) ? _input.LA(2) != OpenBracket : true)}? singleExpression In expressionSequence ')' statement       # ForInStatement
+ | For '(' varForDeclaration In expressionSequence ')' statement                                                                      # ForVarInStatement
+ | For '(' forDeclaration In expressionSequence ')' statement                                                                         # ForLexicalInStatement
+ | For '(' {(_input.LA(1) != Let)}? singleExpression {_input.LT(1).getText().equals("of")}? Identifier singleExpression ')' statement # ForOfStatement
+ | For '(' varForDeclaration {_input.LT(1).getText().equals("of")}? Identifier singleExpression ')' statement                         # ForVarOfStatement
+ | For '(' forDeclaration {_input.LT(1).getText().equals("of")}? Identifier singleExpression ')' statement                            # ForLexicalOfStatement
  ;
 
 
 // I introduced this rule to combine VariableStatement and Var decls in a for loop
 variableDeclarationStatement
  : Var variableDeclarationList
+ ;
+ 
+varForDeclaration
+ : Var forBinding
  ;
 
 /// ForDeclaration :
@@ -685,8 +689,8 @@ conciseBody
 coverParenthesizedExpressionAndArrowParameterList
  : '(' expressionSequence ')'
  | '(' ')'
- | '(' '...' bindingIdentifier ')'
- | '(' expressionSequence ',' '...' bindingIdentifier
+ | '(' bindingRestElement ')'
+ | '(' expressionSequence ',' bindingRestElement ')'
  ;
 
 /// MethodDefinition :
@@ -888,7 +892,7 @@ arguments
 ///     ArgumentList , AssignmentExpression
 ///     ArgumentList , ... AssignmentExpression
 argumentList
- : '...'? singleExpression ( ',' '...'? singleExpression )*
+ : ( spreadElement | singleExpression) ( ',' ( spreadElement | singleExpression) )*
  ;
     
 /// Expression :
@@ -1415,6 +1419,7 @@ Arrow                      : '=>';
 Assign                     : '=';
 QuestionMark               : '?';
 Colon                      : ':';
+Ellipsis                   : '...';
 Dot                        : '.';
 PlusPlus                   : '++';
 MinusMinus                 : '--';

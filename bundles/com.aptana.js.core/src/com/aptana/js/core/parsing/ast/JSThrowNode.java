@@ -19,6 +19,14 @@ public class JSThrowNode extends JSPreUnaryOperatorNode
 		super(IJSNodeTypes.THROW, expression);
 	}
 
+	/**
+	 * USed by ANTLR AST
+	 */
+	public JSThrowNode()
+	{
+		super(IJSNodeTypes.THROW);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)

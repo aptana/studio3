@@ -7,9 +7,9 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSLabelledNode extends JSNode
 {
@@ -22,8 +22,19 @@ public class JSLabelledNode extends JSNode
 	 */
 	public JSLabelledNode(JSNode label, Symbol colon, JSNode block)
 	{
-		super(IJSNodeTypes.LABELLED, label, block);
+		this(label, colon);
+		addChild(block);
+	}
 
+	/**
+	 * Used by ANLTR AST. Block is added later via {@link #addChild(IParseNode)}
+	 * 
+	 * @param label
+	 * @param colon
+	 */
+	public JSLabelledNode(JSNode label, Symbol colon)
+	{
+		super(IJSNodeTypes.LABELLED, label);
 		this._colon = colon;
 	}
 

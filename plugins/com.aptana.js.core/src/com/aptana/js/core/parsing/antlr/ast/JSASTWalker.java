@@ -17,6 +17,7 @@ import com.aptana.js.core.parsing.antlr.JSParser.AssignmentOperatorExpressionCon
 import com.aptana.js.core.parsing.antlr.JSParser.BindingElementContext;
 import com.aptana.js.core.parsing.antlr.JSParser.BindingIdentifierContext;
 import com.aptana.js.core.parsing.antlr.JSParser.BindingPatternContext;
+import com.aptana.js.core.parsing.antlr.JSParser.BindingRestElementContext;
 import com.aptana.js.core.parsing.antlr.JSParser.BitAndExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.BitNotExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.BitOrExpressionContext;
@@ -34,18 +35,33 @@ import com.aptana.js.core.parsing.antlr.JSParser.ElementListContext;
 import com.aptana.js.core.parsing.antlr.JSParser.ElisionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.EmptyStatementContext;
 import com.aptana.js.core.parsing.antlr.JSParser.EqualityExpressionContext;
+import com.aptana.js.core.parsing.antlr.JSParser.ExportDeclarationContext;
+import com.aptana.js.core.parsing.antlr.JSParser.ExportSpecifierContext;
 import com.aptana.js.core.parsing.antlr.JSParser.ExpressionSequenceContext;
 import com.aptana.js.core.parsing.antlr.JSParser.ExpressionStatementContext;
 import com.aptana.js.core.parsing.antlr.JSParser.FinallyProductionContext;
+import com.aptana.js.core.parsing.antlr.JSParser.ForDeclarationContext;
+import com.aptana.js.core.parsing.antlr.JSParser.ForInStatementContext;
+import com.aptana.js.core.parsing.antlr.JSParser.ForLexicalLoopStatementContext;
+import com.aptana.js.core.parsing.antlr.JSParser.ForLexicalOfStatementContext;
 import com.aptana.js.core.parsing.antlr.JSParser.ForLoopStatementContext;
+import com.aptana.js.core.parsing.antlr.JSParser.ForOfStatementContext;
+import com.aptana.js.core.parsing.antlr.JSParser.ForVarInStatementContext;
 import com.aptana.js.core.parsing.antlr.JSParser.ForVarLoopStatementContext;
+import com.aptana.js.core.parsing.antlr.JSParser.ForVarOfStatementContext;
 import com.aptana.js.core.parsing.antlr.JSParser.FormalParametersContext;
+import com.aptana.js.core.parsing.antlr.JSParser.FromClauseContext;
 import com.aptana.js.core.parsing.antlr.JSParser.FunctionDeclarationContext;
 import com.aptana.js.core.parsing.antlr.JSParser.FunctionStatementListContext;
 import com.aptana.js.core.parsing.antlr.JSParser.IdentifierExpressionContext;
+import com.aptana.js.core.parsing.antlr.JSParser.IdentifierNameContext;
+import com.aptana.js.core.parsing.antlr.JSParser.IdentifierReferenceContext;
 import com.aptana.js.core.parsing.antlr.JSParser.IfStatementContext;
 import com.aptana.js.core.parsing.antlr.JSParser.ImportDeclarationContext;
+import com.aptana.js.core.parsing.antlr.JSParser.ImportSpecifierContext;
+import com.aptana.js.core.parsing.antlr.JSParser.InExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.InitializerContext;
+import com.aptana.js.core.parsing.antlr.JSParser.LabelledStatementContext;
 import com.aptana.js.core.parsing.antlr.JSParser.LexicalBindingContext;
 import com.aptana.js.core.parsing.antlr.JSParser.LexicalDeclarationContext;
 import com.aptana.js.core.parsing.antlr.JSParser.LiteralContext;
@@ -55,23 +71,33 @@ import com.aptana.js.core.parsing.antlr.JSParser.MemberDotExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.MemberIndexExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.ModuleSpecifierContext;
 import com.aptana.js.core.parsing.antlr.JSParser.MultiplicativeExpressionContext;
+import com.aptana.js.core.parsing.antlr.JSParser.NameSpaceImportContext;
+import com.aptana.js.core.parsing.antlr.JSParser.NamedImportsContext;
 import com.aptana.js.core.parsing.antlr.JSParser.NewExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.NotExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.NumericLiteralContext;
+import com.aptana.js.core.parsing.antlr.JSParser.ObjectLiteralContext;
+import com.aptana.js.core.parsing.antlr.JSParser.ParenthesizedExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.PostDecreaseExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.PostIncrementExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.PreDecreaseExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.PreIncrementExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.ProgramContext;
+import com.aptana.js.core.parsing.antlr.JSParser.PropertyDefinitionContext;
+import com.aptana.js.core.parsing.antlr.JSParser.PropertyNameContext;
 import com.aptana.js.core.parsing.antlr.JSParser.RegularExpressionLiteralExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.RelationalExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.ReturnStatementContext;
+import com.aptana.js.core.parsing.antlr.JSParser.SpreadElementContext;
 import com.aptana.js.core.parsing.antlr.JSParser.SwitchStatementContext;
+import com.aptana.js.core.parsing.antlr.JSParser.TernaryExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.ThisExpressionContext;
+import com.aptana.js.core.parsing.antlr.JSParser.ThrowStatementContext;
 import com.aptana.js.core.parsing.antlr.JSParser.TryStatementContext;
 import com.aptana.js.core.parsing.antlr.JSParser.TypeofExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.UnaryMinusExpressionContext;
 import com.aptana.js.core.parsing.antlr.JSParser.UnaryPlusExpressionContext;
+import com.aptana.js.core.parsing.antlr.JSParser.VarForDeclarationContext;
 import com.aptana.js.core.parsing.antlr.JSParser.VariableDeclarationContext;
 import com.aptana.js.core.parsing.antlr.JSParser.VariableDeclarationStatementContext;
 import com.aptana.js.core.parsing.antlr.JSParser.VariableStatementContext;
@@ -87,6 +113,7 @@ import com.aptana.js.core.parsing.ast.JSBreakNode;
 import com.aptana.js.core.parsing.ast.JSCaseNode;
 import com.aptana.js.core.parsing.ast.JSCatchNode;
 import com.aptana.js.core.parsing.ast.JSCommaNode;
+import com.aptana.js.core.parsing.ast.JSConditionalNode;
 import com.aptana.js.core.parsing.ast.JSConstructNode;
 import com.aptana.js.core.parsing.ast.JSContinueNode;
 import com.aptana.js.core.parsing.ast.JSDeclarationNode;
@@ -96,29 +123,42 @@ import com.aptana.js.core.parsing.ast.JSDoNode;
 import com.aptana.js.core.parsing.ast.JSElementsNode;
 import com.aptana.js.core.parsing.ast.JSElisionNode;
 import com.aptana.js.core.parsing.ast.JSEmptyNode;
+import com.aptana.js.core.parsing.ast.JSExportNode;
+import com.aptana.js.core.parsing.ast.JSExportSpecifierNode;
 import com.aptana.js.core.parsing.ast.JSFalseNode;
 import com.aptana.js.core.parsing.ast.JSFinallyNode;
+import com.aptana.js.core.parsing.ast.JSForInNode;
 import com.aptana.js.core.parsing.ast.JSForNode;
+import com.aptana.js.core.parsing.ast.JSForOfNode;
 import com.aptana.js.core.parsing.ast.JSFunctionNode;
 import com.aptana.js.core.parsing.ast.JSGetElementNode;
 import com.aptana.js.core.parsing.ast.JSGetPropertyNode;
+import com.aptana.js.core.parsing.ast.JSGroupNode;
 import com.aptana.js.core.parsing.ast.JSIdentifierNode;
 import com.aptana.js.core.parsing.ast.JSIfNode;
 import com.aptana.js.core.parsing.ast.JSImportNode;
+import com.aptana.js.core.parsing.ast.JSImportSpecifierNode;
 import com.aptana.js.core.parsing.ast.JSInvokeNode;
+import com.aptana.js.core.parsing.ast.JSLabelledNode;
+import com.aptana.js.core.parsing.ast.JSNameValuePairNode;
+import com.aptana.js.core.parsing.ast.JSNamedImportsNode;
 import com.aptana.js.core.parsing.ast.JSNode;
 import com.aptana.js.core.parsing.ast.JSNullNode;
 import com.aptana.js.core.parsing.ast.JSNumberNode;
+import com.aptana.js.core.parsing.ast.JSObjectNode;
 import com.aptana.js.core.parsing.ast.JSParametersNode;
 import com.aptana.js.core.parsing.ast.JSParseRootNode;
 import com.aptana.js.core.parsing.ast.JSPostUnaryOperatorNode;
 import com.aptana.js.core.parsing.ast.JSPreUnaryOperatorNode;
 import com.aptana.js.core.parsing.ast.JSRegexNode;
+import com.aptana.js.core.parsing.ast.JSRestElementNode;
 import com.aptana.js.core.parsing.ast.JSReturnNode;
+import com.aptana.js.core.parsing.ast.JSSpreadElementNode;
 import com.aptana.js.core.parsing.ast.JSStatementsNode;
 import com.aptana.js.core.parsing.ast.JSStringNode;
 import com.aptana.js.core.parsing.ast.JSSwitchNode;
 import com.aptana.js.core.parsing.ast.JSThisNode;
+import com.aptana.js.core.parsing.ast.JSThrowNode;
 import com.aptana.js.core.parsing.ast.JSTrueNode;
 import com.aptana.js.core.parsing.ast.JSTryNode;
 import com.aptana.js.core.parsing.ast.JSVarNode;
@@ -570,6 +610,48 @@ public class JSASTWalker extends JSBaseListener
 	}
 
 	@Override
+	public void enterImportSpecifier(ImportSpecifierContext ctx)
+	{
+		addToParentAndPushNodeToStack(new JSImportSpecifierNode());
+		super.enterImportSpecifier(ctx);
+	}
+
+	@Override
+	public void exitImportSpecifier(ImportSpecifierContext ctx)
+	{
+		popNode();
+		super.exitImportSpecifier(ctx);
+	}
+
+	@Override
+	public void enterNameSpaceImport(NameSpaceImportContext ctx)
+	{
+		addToParentAndPushNodeToStack(new JSImportSpecifierNode(toSymbol(ctx.getToken(JSParser.Multiply, 0))));
+		super.enterNameSpaceImport(ctx);
+	}
+
+	@Override
+	public void exitNameSpaceImport(NameSpaceImportContext ctx)
+	{
+		popNode();
+		super.exitNameSpaceImport(ctx);
+	}
+
+	@Override
+	public void enterNamedImports(NamedImportsContext ctx)
+	{
+		addToParentAndPushNodeToStack(new JSNamedImportsNode());
+		super.enterNamedImports(ctx);
+	}
+
+	@Override
+	public void exitNamedImports(NamedImportsContext ctx)
+	{
+		popNode();
+		super.exitNamedImports(ctx);
+	}
+
+	@Override
 	public void enterEmptyStatement(EmptyStatementContext ctx)
 	{
 		// leaf node
@@ -580,45 +662,18 @@ public class JSASTWalker extends JSBaseListener
 	}
 
 	@Override
-	public void enterNumericLiteral(NumericLiteralContext ctx)
-	{
-		// leaf node
-		addChildToParent(new JSNumberNode(ctx.getText()));
-		super.enterNumericLiteral(ctx);
-	}
-
-	@Override
 	public void enterArrayLiteral(ArrayLiteralContext ctx)
 	{
 		JSArrayNode node = new JSArrayNode(toSymbol(ctx.getToken(JSParser.OpenBracket, 0)),
 				toSymbol(ctx.getToken(JSParser.CloseBracket, 0)));
-
 		addToParentAndPushNodeToStack(node);
-		// {:
-		// if (e == null) {
-		// return new JSArrayNode(l, r);
-		// }
-		// return new JSArrayNode(l, r, e);
-		// :}
-		// | LBRACKET.l ElementList.e RBRACKET.r
-		// {:
-		// return new JSArrayNode(l, r, e);
-		// :}
-		// | LBRACKET.l ElementList.e COMMA Elision.n? RBRACKET.r
-		// {:
-		// if (n == null) {
-		// return new JSArrayNode(l, r, e);
-		// }
-		// e.addChild(n);
-		// return new JSArrayNode(l, r, e);
-		// :}
-
 		super.enterArrayLiteral(ctx);
 	}
 
 	@Override
 	public void exitArrayLiteral(ArrayLiteralContext ctx)
 	{
+		// FIXME If there's a trailing elision, add it to the ElementList, not this array
 		popNode();
 		super.exitArrayLiteral(ctx);
 	}
@@ -627,11 +682,6 @@ public class JSASTWalker extends JSBaseListener
 	public void enterElementList(ElementListContext ctx)
 	{
 		addToParentAndPushNodeToStack(new JSElementsNode());
-
-		// if (n == null) {
-		// return new JSElementsNode(e);
-		// }
-		// return new JSElementsNode(n, e);
 		super.enterElementList(ctx);
 	}
 
@@ -645,18 +695,13 @@ public class JSASTWalker extends JSBaseListener
 	@Override
 	public void enterElision(ElisionContext ctx)
 	{
-		// Elision.e COMMA
-		// {:
-		// e.addChild(new JSNullNode());
-		//
-		// return e;
-		// :}
-		// | COMMA
-		// {:
-		// return new JSElisionNode(new JSNullNode());
-		// :}
-		// TODO Add a JSNullNode for each comma!
-		addChildToParent(new JSElisionNode(new JSNullNode()));
+		// Add a JSNullNode for each comma!
+		JSElisionNode elisionNode = new JSElisionNode();
+		for (int i = 0; i < ctx.getChildCount(); i++)
+		{
+			elisionNode.addChild(new JSNullNode());
+		}
+		addChildToParent(elisionNode);
 		super.enterElision(ctx);
 	}
 
@@ -667,12 +712,6 @@ public class JSASTWalker extends JSBaseListener
 		Token t = ctx.getStart();
 		switch (t.getType())
 		{
-			case JSParser.DecimalLiteral:
-			case JSParser.HexIntegerLiteral:
-			case JSParser.OctalIntegerLiteral:
-			case JSParser.BinaryIntegerLiteral:
-				addChildToParent(new JSNumberNode(t.getText()));
-				break;
 			case JSParser.NullLiteral:
 				addChildToParent(new JSNullNode());
 				break;
@@ -691,9 +730,17 @@ public class JSASTWalker extends JSBaseListener
 				}
 				break;
 			default:
+				// numericLiteral is handled by #enterNumericLiteral
 				break;
 		}
 		super.enterLiteral(ctx);
+	}
+
+	@Override
+	public void enterNumericLiteral(NumericLiteralContext ctx)
+	{
+		addChildToParent(new JSNumberNode(ctx.getText()));
+		super.enterNumericLiteral(ctx);
 	}
 
 	@Override
@@ -790,7 +837,10 @@ public class JSASTWalker extends JSBaseListener
 	{
 		Symbol v = toSymbol(ctx.letOrConst().getStart());
 		JSNode node = new JSVarNode(v);
-		node.setSemicolonIncluded(true);
+		if (!(ctx.getParent() instanceof ForLexicalLoopStatementContext))
+		{
+			node.setSemicolonIncluded(true);
+		}
 		addToParentAndPushNodeToStack(node);
 		super.enterLexicalDeclaration(ctx);
 	}
@@ -1010,6 +1060,22 @@ public class JSASTWalker extends JSBaseListener
 	}
 
 	@Override
+	public void enterIdentifierName(IdentifierNameContext ctx)
+	{
+		// leaf node
+		addChildToParent(new JSIdentifierNode(toSymbol(ctx.Identifier())));
+		super.enterIdentifierName(ctx);
+	}
+
+	@Override
+	public void enterIdentifierReference(IdentifierReferenceContext ctx)
+	{
+		// leaf node
+		addChildToParent(new JSIdentifierNode(toSymbol(ctx.Identifier())));
+		super.enterIdentifierReference(ctx);
+	}
+
+	@Override
 	public void enterMemberIndexExpression(MemberIndexExpressionContext ctx)
 	{
 		Symbol lb = toSymbol(ctx.getToken(JSParser.OpenBracket, 0));
@@ -1023,6 +1089,22 @@ public class JSASTWalker extends JSBaseListener
 	{
 		popNode();
 		super.exitMemberIndexExpression(ctx);
+	}
+
+	@Override
+	public void enterThrowStatement(ThrowStatementContext ctx)
+	{
+		JSNode node = new JSThrowNode();
+		node.setSemicolonIncluded(true);
+		addToParentAndPushNodeToStack(node);
+		super.enterThrowStatement(ctx);
+	}
+
+	@Override
+	public void exitThrowStatement(ThrowStatementContext ctx)
+	{
+		popNode();
+		super.exitThrowStatement(ctx);
 	}
 
 	@Override
@@ -1275,6 +1357,359 @@ public class JSASTWalker extends JSBaseListener
 
 		popNode();
 		super.exitForVarLoopStatement(ctx);
+	}
+
+	@Override
+	public void enterForLexicalLoopStatement(ForLexicalLoopStatementContext ctx)
+	{
+		Symbol l = toSymbol(ctx.getToken(JSParser.OpenParen, 0));
+		Symbol r = toSymbol(ctx.getToken(JSParser.CloseParen, 0));
+		Symbol s1 = toSymbol(ctx.getToken(JSParser.SemiColon, 0));
+		// TODO Can we grab the semicolon from the lexical declaration to inject here?
+		JSNode forNode = new JSForNode(l, null, s1, r);
+		addToParentAndPushNodeToStack(forNode);
+		super.enterForLexicalLoopStatement(ctx);
+	}
+
+	@Override
+	public void exitForLexicalLoopStatement(ForLexicalLoopStatementContext ctx)
+	{
+		// Fill in missing expressions with JSEmptyNodes!
+		boolean missingFirstExpr = false;
+		boolean missingSecondExpr = false;
+		if (!(ctx.getChild(3) instanceof ExpressionSequenceContext))
+		{
+			// missing first expression sequence (after lexicalDecl)
+			missingFirstExpr = true;
+		}
+
+		if (!(ctx.getChild(ctx.getChildCount() - 3) instanceof ExpressionSequenceContext))
+		{
+			// missing second expression sequence (before ')' statement)
+			missingSecondExpr = true;
+		}
+
+		if (missingFirstExpr || missingSecondExpr)
+		{
+			JSForNode forNode = (JSForNode) getCurrentNode();
+			IParseNode[] children = forNode.getChildren();
+			IParseNode[] newChildren = new IParseNode[4];
+			newChildren[0] = children[0]; // we always have first var decl
+			if (missingFirstExpr)
+			{
+				Symbol s1 = toSymbol(ctx.lexicalDeclaration().getStop());
+				newChildren[1] = new JSEmptyNode(s1); // use end location of lexical declaration
+			}
+			else
+			{
+				newChildren[1] = children[1];
+			}
+			if (missingSecondExpr)
+			{
+				Symbol s1 = toSymbol(ctx.getToken(JSParser.SemiColon, 0));
+				newChildren[2] = new JSEmptyNode(s1); // use location of s1
+			}
+			else
+			{
+				newChildren[2] = children[children.length - 2];
+			}
+			newChildren[3] = children[children.length - 1]; // always have body
+			forNode.setChildren(newChildren);
+		}
+
+		popNode();
+		super.exitForLexicalLoopStatement(ctx);
+	}
+
+	@Override
+	public void enterForInStatement(ForInStatementContext ctx)
+	{
+		Symbol l = toSymbol(ctx.getToken(JSParser.OpenParen, 0));
+		Symbol in = toSymbol(ctx.getToken(JSParser.In, 0));
+		Symbol r = toSymbol(ctx.getToken(JSParser.CloseParen, 0));
+		addToParentAndPushNodeToStack(new JSForInNode(l, in, r));
+		super.enterForInStatement(ctx);
+	}
+
+	@Override
+	public void exitForInStatement(ForInStatementContext ctx)
+	{
+		popNode();
+		super.exitForInStatement(ctx);
+	}
+
+	@Override
+	public void enterForVarInStatement(ForVarInStatementContext ctx)
+	{
+		Symbol l = toSymbol(ctx.getToken(JSParser.OpenParen, 0));
+		Symbol in = toSymbol(ctx.getToken(JSParser.In, 0));
+		Symbol r = toSymbol(ctx.getToken(JSParser.CloseParen, 0));
+		addToParentAndPushNodeToStack(new JSForInNode(l, in, r));
+		super.enterForVarInStatement(ctx);
+	}
+
+	@Override
+	public void exitForVarInStatement(ForVarInStatementContext ctx)
+	{
+		popNode();
+		super.exitForVarInStatement(ctx);
+	}
+
+	@Override
+	public void enterForOfStatement(ForOfStatementContext ctx)
+	{
+		Symbol l = toSymbol(ctx.getToken(JSParser.OpenParen, 0));
+		Symbol r = toSymbol(ctx.getToken(JSParser.CloseParen, 0));
+		addToParentAndPushNodeToStack(new JSForOfNode(l, r));
+		super.enterForOfStatement(ctx);
+	}
+
+	@Override
+	public void exitForOfStatement(ForOfStatementContext ctx)
+	{
+		popNode();
+		super.exitForOfStatement(ctx);
+	}
+
+	@Override
+	public void enterForVarOfStatement(ForVarOfStatementContext ctx)
+	{
+		Symbol l = toSymbol(ctx.getToken(JSParser.OpenParen, 0));
+		Symbol r = toSymbol(ctx.getToken(JSParser.CloseParen, 0));
+		addToParentAndPushNodeToStack(new JSForOfNode(l, r));
+		super.enterForVarOfStatement(ctx);
+	}
+
+	@Override
+	public void exitForVarOfStatement(ForVarOfStatementContext ctx)
+	{
+		popNode();
+		super.exitForVarOfStatement(ctx);
+	}
+
+	@Override
+	public void enterForLexicalOfStatement(ForLexicalOfStatementContext ctx)
+	{
+		Symbol l = toSymbol(ctx.getToken(JSParser.OpenParen, 0));
+		Symbol r = toSymbol(ctx.getToken(JSParser.CloseParen, 0));
+		addToParentAndPushNodeToStack(new JSForOfNode(l, r));
+		super.enterForLexicalOfStatement(ctx);
+	}
+
+	@Override
+	public void exitForLexicalOfStatement(ForLexicalOfStatementContext ctx)
+	{
+		popNode();
+		super.exitForLexicalOfStatement(ctx);
+	}
+
+	@Override
+	public void enterForDeclaration(ForDeclarationContext ctx)
+	{
+		Symbol v = toSymbol(ctx.letOrConst().getStart());
+		JSNode node = new JSVarNode(v);
+		addToParentAndPushNodeToStack(node);
+		super.enterForDeclaration(ctx);
+	}
+
+	@Override
+	public void exitForDeclaration(ForDeclarationContext ctx)
+	{
+		popNode();
+		super.exitForDeclaration(ctx);
+	}
+
+	@Override
+	public void enterVarForDeclaration(VarForDeclarationContext ctx)
+	{
+		Symbol var = toSymbol(ctx.getToken(JSParser.Var, 0));
+		JSNode node = new JSVarNode(var);
+		addToParentAndPushNodeToStack(node);
+		super.enterVarForDeclaration(ctx);
+	}
+
+	@Override
+	public void exitVarForDeclaration(VarForDeclarationContext ctx)
+	{
+		popNode();
+		super.exitVarForDeclaration(ctx);
+	}
+
+	@Override
+	public void enterObjectLiteral(ObjectLiteralContext ctx)
+	{
+		Symbol l = toSymbol(ctx.getToken(JSParser.OpenBrace, 0));
+		Symbol r = toSymbol(ctx.getToken(JSParser.CloseBrace, 0));
+		addToParentAndPushNodeToStack(new JSObjectNode(l, r));
+		super.enterObjectLiteral(ctx);
+	}
+
+	@Override
+	public void exitObjectLiteral(ObjectLiteralContext ctx)
+	{
+		popNode();
+		super.exitObjectLiteral(ctx);
+	}
+
+	@Override
+	public void enterPropertyDefinition(PropertyDefinitionContext ctx)
+	{
+		PropertyNameContext pnc = ctx.propertyName();
+		if (pnc != null)
+		{
+			Symbol c = toSymbol(ctx.getToken(JSParser.Colon, 0));
+			addToParentAndPushNodeToStack(new JSNameValuePairNode(c));
+		}
+		super.enterPropertyDefinition(ctx);
+	}
+
+	@Override
+	public void exitPropertyDefinition(PropertyDefinitionContext ctx)
+	{
+		PropertyNameContext pnc = ctx.propertyName();
+		if (pnc != null)
+		{
+			popNode();
+		}
+		super.exitPropertyDefinition(ctx);
+	}
+
+	@Override
+	public void enterExportDeclaration(ExportDeclarationContext ctx)
+	{
+		TerminalNode d = ctx.getToken(JSParser.Default, 0);
+		boolean isDefault = (d != null);
+
+		FromClauseContext fcc = ctx.fromClause();
+		String from = null;
+		if (fcc != null)
+		{
+			from = fcc.moduleSpecifier().StringLiteral().getText();
+		}
+
+		TerminalNode s = ctx.getToken(JSParser.Multiply, 0);
+		Symbol star = null;
+		if (s != null)
+		{
+			star = toSymbol(s);
+		}
+
+		addToParentAndPushNodeToStack(new JSExportNode(isDefault, star, from));
+		super.enterExportDeclaration(ctx);
+	}
+
+	@Override
+	public void exitExportDeclaration(ExportDeclarationContext ctx)
+	{
+		popNode();
+		super.exitExportDeclaration(ctx);
+	}
+
+	@Override
+	public void enterExportSpecifier(ExportSpecifierContext ctx)
+	{
+		addToParentAndPushNodeToStack(new JSExportSpecifierNode());
+		super.enterExportSpecifier(ctx);
+	}
+
+	@Override
+	public void exitExportSpecifier(ExportSpecifierContext ctx)
+	{
+		popNode();
+		super.exitExportSpecifier(ctx);
+	}
+
+	@Override
+	public void enterParenthesizedExpression(ParenthesizedExpressionContext ctx)
+	{
+		Symbol l = toSymbol(ctx.getToken(JSParser.OpenParen, 0));
+		Symbol r = toSymbol(ctx.getToken(JSParser.CloseParen, 0));
+		addToParentAndPushNodeToStack(new JSGroupNode(l, r));
+		super.enterParenthesizedExpression(ctx);
+	}
+
+	@Override
+	public void exitParenthesizedExpression(ParenthesizedExpressionContext ctx)
+	{
+		popNode();
+		super.exitParenthesizedExpression(ctx);
+	}
+
+	@Override
+	public void enterInExpression(InExpressionContext ctx)
+	{
+		Symbol o = toSymbol(ctx.getToken(JSParser.In, 0));
+		addToParentAndPushNodeToStack(new JSBinaryBooleanOperatorNode(o));
+		super.enterInExpression(ctx);
+	}
+
+	@Override
+	public void exitInExpression(InExpressionContext ctx)
+	{
+		popNode();
+		super.exitInExpression(ctx);
+	}
+
+	@Override
+	public void enterTernaryExpression(TernaryExpressionContext ctx)
+	{
+		Symbol questionMark = toSymbol(ctx.getToken(JSParser.QuestionMark, 0));
+		Symbol colon = toSymbol(ctx.getToken(JSParser.Colon, 0));
+		addToParentAndPushNodeToStack(new JSConditionalNode(questionMark, colon));
+		super.enterTernaryExpression(ctx);
+	}
+
+	@Override
+	public void exitTernaryExpression(TernaryExpressionContext ctx)
+	{
+		popNode();
+		super.exitTernaryExpression(ctx);
+	}
+
+	@Override
+	public void enterLabelledStatement(LabelledStatementContext ctx)
+	{
+		JSNode id = new JSIdentifierNode(toSymbol(ctx.Identifier()));
+		Symbol colon = toSymbol(ctx.getToken(JSParser.Colon, 0));
+		addToParentAndPushNodeToStack(new JSLabelledNode(id, colon));
+		super.enterLabelledStatement(ctx);
+	}
+
+	@Override
+	public void exitLabelledStatement(LabelledStatementContext ctx)
+	{
+		popNode();
+		super.exitLabelledStatement(ctx);
+	}
+
+	@Override
+	public void enterSpreadElement(SpreadElementContext ctx)
+	{
+		Symbol d = toSymbol(ctx.getToken(JSParser.Ellipsis, 0));
+		addToParentAndPushNodeToStack(new JSSpreadElementNode(d));
+		super.enterSpreadElement(ctx);
+	}
+
+	@Override
+	public void exitSpreadElement(SpreadElementContext ctx)
+	{
+		popNode();
+		super.exitSpreadElement(ctx);
+	}
+
+	@Override
+	public void enterBindingRestElement(BindingRestElementContext ctx)
+	{
+		Symbol d = toSymbol(ctx.getToken(JSParser.Ellipsis, 0));
+		addToParentAndPushNodeToStack(new JSRestElementNode(d));
+		super.enterBindingRestElement(ctx);
+	}
+
+	@Override
+	public void exitBindingRestElement(BindingRestElementContext ctx)
+	{
+		popNode();
+		super.exitBindingRestElement(ctx);
 	}
 
 	private Symbol pickSymbol(ParserRuleContext ctx, int position, int... types)

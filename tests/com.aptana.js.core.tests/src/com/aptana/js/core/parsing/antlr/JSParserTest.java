@@ -1000,6 +1000,18 @@ public class JSParserTest
 	{
 		assertParseResult("for (var a = 0, b = a ? c : d; a < 10; a++) {a;}" + EOL); //$NON-NLS-1$
 	}
+	
+	@Test
+	public void testForLet() throws Exception
+	{
+		assertParseResult("for (let a = 0; a < 10; a++) {a;}" + EOL); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void testForConst() throws Exception
+	{
+		assertParseResult("for (const a = 0; a < 10; a++) {a;}" + EOL); //$NON-NLS-1$
+	}
 
 	@Test
 	public void testForIn() throws Exception
@@ -1118,7 +1130,7 @@ public class JSParserTest
 	@Test
 	public void testMissingPropertyValue() throws Exception
 	{
-		assertParseResult("var x = { t };", "var x = {t:t};" + EOL);
+		assertParseResult("var x = { t };", "var x = {t};" + EOL);
 		assertNoErrors();
 	}
 
@@ -1364,9 +1376,23 @@ public class JSParserTest
 	}
 
 	@Test
-	public void testForOf() throws Exception
+	public void testForLetOf() throws Exception
 	{
 		assertParseResult("for (let n of fibonacci) {console.log(n);}" + EOL);
+		assertNoErrors();
+	}
+	
+	@Test
+	public void testForConstOf() throws Exception
+	{
+		assertParseResult("for (const n of fibonacci) {console.log(n);}" + EOL);
+		assertNoErrors();
+	}
+	
+	@Test
+	public void testForVarOf() throws Exception
+	{
+		assertParseResult("for (var n of fibonacci) {console.log(n);}" + EOL);
 		assertNoErrors();
 	}
 

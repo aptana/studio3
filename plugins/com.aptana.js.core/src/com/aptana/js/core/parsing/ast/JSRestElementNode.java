@@ -14,10 +14,21 @@ public class JSRestElementNode extends JSNode
 
 	public JSRestElementNode(Symbol ellipsis, JSIdentifierNode ident)
 	{
-		super(IJSNodeTypes.REST_ELEMENT, ident);
+		this(ellipsis);
+		addChild(ident);
+	}
+
+	/**
+	 * USed by ANTLR AST
+	 * 
+	 * @param ellipsis
+	 */
+	public JSRestElementNode(Symbol ellipsis)
+	{
+		super(IJSNodeTypes.REST_ELEMENT);
 		this._ellipsis = ellipsis;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)

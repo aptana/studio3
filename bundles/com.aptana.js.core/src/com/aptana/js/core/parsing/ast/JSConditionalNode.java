@@ -7,9 +7,9 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSConditionalNode extends JSNode
 {
@@ -23,7 +23,19 @@ public class JSConditionalNode extends JSNode
 	 */
 	public JSConditionalNode(JSNode test, Symbol questionMark, JSNode trueCase, Symbol colon, JSNode falseCase)
 	{
-		super(IJSNodeTypes.CONDITIONAL, test, trueCase, falseCase);
+		this(questionMark, colon);
+		setChildren(new JSNode[] { test, trueCase, falseCase });
+	}
+
+	/**
+	 * USed by ANTLR AST
+	 * 
+	 * @param questionMark
+	 * @param colon
+	 */
+	public JSConditionalNode(Symbol questionMark, Symbol colon)
+	{
+		super(IJSNodeTypes.CONDITIONAL);
 
 		this._questionMark = questionMark;
 		this._colon = colon;

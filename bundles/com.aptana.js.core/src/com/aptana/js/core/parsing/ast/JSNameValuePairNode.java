@@ -20,9 +20,8 @@ public class JSNameValuePairNode extends JSNode
 	 */
 	public JSNameValuePairNode(JSNode name, Symbol colon, JSNode value)
 	{
-		super(IJSNodeTypes.NAME_VALUE_PAIR, name, value);
-
-		this._colon = colon;
+		this(colon);
+		setChildren(new JSNode[] {name, value});
 	}
 
 	/**
@@ -49,6 +48,16 @@ public class JSNameValuePairNode extends JSNode
 	public JSNameValuePairNode(JSNode name, JSParametersNode param, JSNode[] functionBody)
 	{
 		this(name, param, new JSStatementsNode(functionBody));
+	}
+
+	/**
+	 * Used by ANTLR AST
+	 * @param colon
+	 */
+	public JSNameValuePairNode(Symbol colon)
+	{
+		super(IJSNodeTypes.NAME_VALUE_PAIR);
+		this._colon = colon;
 	}
 
 	/*

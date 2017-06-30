@@ -27,6 +27,20 @@ public class JSImportSpecifierNode extends JSNode
 		this._star = null;
 	}
 
+	/**
+	 * Used by ANTLR AST
+	 */
+	public JSImportSpecifierNode()
+	{
+		this((Symbol) null);
+	}
+
+	public JSImportSpecifierNode(Symbol star)
+	{
+		super(IJSNodeTypes.IMPORT_SPECIFIER);
+		this._star = star;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
@@ -41,6 +55,8 @@ public class JSImportSpecifierNode extends JSNode
 	{
 		return this._star != null;
 	}
+
+	// TODO Use same method names/return types in JSExportSepcifierNode? Extract interface
 
 	public String getSpecifier()
 	{

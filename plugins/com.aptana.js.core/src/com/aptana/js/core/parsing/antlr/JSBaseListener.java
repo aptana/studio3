@@ -520,6 +520,18 @@ public class JSBaseListener implements JSListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterVarForDeclaration(JSParser.VarForDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitVarForDeclaration(JSParser.VarForDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterForDeclaration(JSParser.ForDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}

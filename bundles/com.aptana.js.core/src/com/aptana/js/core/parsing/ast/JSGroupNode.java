@@ -21,7 +21,19 @@ public class JSGroupNode extends JSPreUnaryOperatorNode
 	 */
 	public JSGroupNode(Symbol leftParenthesis, JSNode expression, Symbol rightParenthesis)
 	{
-		super(IJSNodeTypes.GROUP, expression);
+		this(leftParenthesis, rightParenthesis);
+		setChildren(new JSNode[] { expression });
+	}
+
+	/**
+	 * Used by ANTLR AST
+	 * 
+	 * @param leftParenthesis
+	 * @param rightParenthesis
+	 */
+	public JSGroupNode(Symbol leftParenthesis, Symbol rightParenthesis)
+	{
+		super(IJSNodeTypes.GROUP);
 
 		this._leftParenthesis = leftParenthesis;
 		this._rightParenthesis = rightParenthesis;

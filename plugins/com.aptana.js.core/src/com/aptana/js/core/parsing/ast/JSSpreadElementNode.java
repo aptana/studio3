@@ -8,7 +8,13 @@ public class JSSpreadElementNode extends JSNode
 
 	public JSSpreadElementNode(Symbol ellipsis, JSNode expression)
 	{
-		super(IJSNodeTypes.SPREAD_ELEMENT, expression);
+		this(ellipsis);
+		setChildren(new JSNode[] { expression });
+	}
+
+	public JSSpreadElementNode(Symbol ellipsis)
+	{
+		super(IJSNodeTypes.SPREAD_ELEMENT);
 		this._ellipsis = ellipsis;
 	}
 
@@ -21,7 +27,7 @@ public class JSSpreadElementNode extends JSNode
 	{
 		walker.visit(this);
 	}
-	
+
 	public Symbol getEllipsis()
 	{
 		return this._ellipsis;

@@ -1,5 +1,7 @@
 package com.aptana.js.core.parsing.ast;
 
+import com.aptana.parsing.ast.IParseNode;
+
 public class JSExportSpecifierNode extends JSNode
 {
 
@@ -13,6 +15,14 @@ public class JSExportSpecifierNode extends JSNode
 		super(IJSNodeTypes.EXPORT_SPECIFIER, name);
 	}
 
+	/**
+	 * Used by ANTLR AST
+	 */
+	public JSExportSpecifierNode()
+	{
+		super(IJSNodeTypes.EXPORT_SPECIFIER);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
@@ -23,4 +33,18 @@ public class JSExportSpecifierNode extends JSNode
 		walker.visit(this);
 	}
 
+	public boolean hasAlias()
+	{
+		return getChildCount() > 1;
+	}
+
+	/**
+	 * getName
+	 * 
+	 * @return
+	 */
+	public IParseNode getName()
+	{
+		return this.getChild(0);
+	}
 }

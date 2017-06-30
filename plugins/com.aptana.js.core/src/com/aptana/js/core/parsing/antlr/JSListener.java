@@ -450,6 +450,16 @@ public interface JSListener extends ParseTreeListener {
 	 */
 	void exitVariableDeclarationStatement(JSParser.VariableDeclarationStatementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link JSParser#varForDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void enterVarForDeclaration(JSParser.VarForDeclarationContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link JSParser#varForDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void exitVarForDeclaration(JSParser.VarForDeclarationContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link JSParser#forDeclaration}.
 	 * @param ctx the parse tree
 	 */

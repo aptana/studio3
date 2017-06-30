@@ -7,14 +7,13 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSForOfNode extends JSNode
 {
 	private Symbol _leftParenthesis;
-	private Symbol _of;
 	private Symbol _rightParenthesis;
 
 	/**
@@ -25,10 +24,21 @@ public class JSForOfNode extends JSNode
 	public JSForOfNode(Symbol leftParenthesis, JSNode initializer, Symbol of, JSNode expression,
 			Symbol rightParenthesis, JSNode body)
 	{
-		super(IJSNodeTypes.FOR_OF, initializer, expression, body);
+		this(leftParenthesis, rightParenthesis);
+		setChildren(new JSNode[] { initializer, expression, body });
+	}
+
+	/**
+	 * Used by ANTLR AST
+	 * 
+	 * @param leftParenthesis
+	 * @param rightParenthesis
+	 */
+	public JSForOfNode(Symbol leftParenthesis, Symbol rightParenthesis)
+	{
+		super(IJSNodeTypes.FOR_OF);
 
 		this._leftParenthesis = leftParenthesis;
-		this._of = of;
 		this._rightParenthesis = rightParenthesis;
 	}
 
@@ -60,16 +70,6 @@ public class JSForOfNode extends JSNode
 	public IParseNode getExpression()
 	{
 		return this.getChild(1);
-	}
-
-	/**
-	 * getIn
-	 * 
-	 * @return
-	 */
-	public Symbol getOf()
-	{
-		return this._of;
 	}
 
 	/**
