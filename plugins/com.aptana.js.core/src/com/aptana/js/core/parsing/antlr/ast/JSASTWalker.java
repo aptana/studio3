@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import com.aptana.js.core.parsing.antlr.JSBaseListener;
@@ -11,6 +12,7 @@ import com.aptana.js.core.parsing.antlr.JSParser;
 import com.aptana.js.core.parsing.antlr.JSParser.*;
 import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSArrayNode;
+import com.aptana.js.core.parsing.ast.JSArrowFunctionNode;
 import com.aptana.js.core.parsing.ast.JSAssignmentNode;
 import com.aptana.js.core.parsing.ast.JSBinaryArithmeticOperatorNode;
 import com.aptana.js.core.parsing.ast.JSBinaryBooleanOperatorNode;
@@ -19,6 +21,7 @@ import com.aptana.js.core.parsing.ast.JSCaseNode;
 import com.aptana.js.core.parsing.ast.JSCatchNode;
 import com.aptana.js.core.parsing.ast.JSClassNode;
 import com.aptana.js.core.parsing.ast.JSCommaNode;
+import com.aptana.js.core.parsing.ast.JSComputedPropertyNameNode;
 import com.aptana.js.core.parsing.ast.JSConditionalNode;
 import com.aptana.js.core.parsing.ast.JSConstructNode;
 import com.aptana.js.core.parsing.ast.JSContinueNode;
@@ -29,6 +32,7 @@ import com.aptana.js.core.parsing.ast.JSDoNode;
 import com.aptana.js.core.parsing.ast.JSElementsNode;
 import com.aptana.js.core.parsing.ast.JSElisionNode;
 import com.aptana.js.core.parsing.ast.JSEmptyNode;
+import com.aptana.js.core.parsing.ast.JSErrorNode;
 import com.aptana.js.core.parsing.ast.JSExportNode;
 import com.aptana.js.core.parsing.ast.JSExportSpecifierNode;
 import com.aptana.js.core.parsing.ast.JSFalseNode;
@@ -80,7 +84,6 @@ import beaver.Symbol;
 
 public class JSASTWalker extends JSBaseListener
 {
-	// TODO Construct the AST from the callbacks!
 	private JSParseRootNode fRootNode;
 	private Stack<IParseNode> fNodeStack = new Stack<IParseNode>();
 
@@ -382,6 +385,21 @@ public class JSASTWalker extends JSBaseListener
 	{
 		popNode();
 		super.exitMultiplicativeExpression(ctx);
+	}
+
+	@Override
+	public void enterInstanceofExpression(InstanceofExpressionContext ctx)
+	{
+		Symbol instance = toSymbol(ctx.getToken(JSParser.Instanceof, 0));
+		addToParentAndPushNodeToStack(new JSBinaryBooleanOperatorNode(instance));
+		super.enterInstanceofExpression(ctx);
+	}
+
+	@Override
+	public void exitInstanceofExpression(InstanceofExpressionContext ctx)
+	{
+		popNode();
+		super.exitInstanceofExpression(ctx);
 	}
 
 	@Override
@@ -820,9 +838,16 @@ public class JSASTWalker extends JSBaseListener
 	public void enterSwitchStatement(SwitchStatementContext ctx)
 	{
 		Symbol lp = toSymbol(ctx.getToken(JSParser.OpenParen, 0));
-		Symbol rp = toSymbol(ctx.getToken(JSParser.CloseParen, 0));
-		Symbol lb = toSymbol(ctx.caseBlock().getToken(JSParser.OpenBrace, 0));
-		Symbol rb = toSymbol(ctx.caseBlock().getToken(JSParser.CloseBrace, 0));
+		// If no expression is inside the parens, this may return null (it got assigned to the
+		// expressionSequenceContext)
+		Symbol rp = toSymbolOrNull(ctx.getToken(JSParser.CloseParen, 0));
+		Symbol lb = null;
+		Symbol rb = null;
+		if (ctx.caseBlock() != null)
+		{
+			lb = toSymbolOrNull(ctx.caseBlock().getToken(JSParser.OpenBrace, 0));
+			rb = toSymbolOrNull(ctx.caseBlock().getToken(JSParser.CloseBrace, 0));
+		}
 		addToParentAndPushNodeToStack(new JSSwitchNode(lp, rp, lb, rb));
 		super.enterSwitchStatement(ctx);
 	}
@@ -989,7 +1014,25 @@ public class JSASTWalker extends JSBaseListener
 	public void enterIdentifierName(IdentifierNameContext ctx)
 	{
 		// leaf node
-		addChildToParent(new JSIdentifierNode(toSymbol(ctx.Identifier())));
+		TerminalNode ident = ctx.Identifier();
+		if (ident == null)
+		{
+			// Could be a reservedWord!
+			ReservedWordContext rwc = ctx.reservedWord();
+			if (rwc != null)
+			{
+				addChildToParent(new JSIdentifierNode(toSymbol(ctx.reservedWord().getStart())));
+			}
+			else
+			{
+				// assume it was supposed to be an identifier name ehre, but was empty!
+				addChildToParent(new JSEmptyNode(ctx.getStart().getStartIndex()));
+			}
+		}
+		else
+		{
+			addChildToParent(new JSIdentifierNode(toSymbol(ident)));
+		}
 		super.enterIdentifierName(ctx);
 	}
 
@@ -1678,9 +1721,8 @@ public class JSASTWalker extends JSBaseListener
 	@Override
 	public void enterClassDeclaration(ClassDeclarationContext ctx)
 	{
-		BindingIdentifierContext bic = ctx.bindingIdentifier();
 		ClassHeritageContext chc = ctx.classTail().classHeritage();
-		addToParentAndPushNodeToStack(new JSClassNode(bic != null, chc != null));
+		addToParentAndPushNodeToStack(new JSClassNode(true, chc != null));
 		super.enterClassDeclaration(ctx);
 	}
 
@@ -1888,6 +1930,48 @@ public class JSASTWalker extends JSBaseListener
 		super.exitSuperCallExpression(ctx);
 	}
 
+	@Override
+	public void enterArrowFunction(ArrowFunctionContext ctx)
+	{
+		addToParentAndPushNodeToStack(new JSArrowFunctionNode());
+		super.enterArrowFunction(ctx);
+	}
+
+	@Override
+	public void exitArrowFunction(ArrowFunctionContext ctx)
+	{
+		popNode();
+		super.exitArrowFunction(ctx);
+	}
+
+	@Override
+	public void enterArrowParameters(ArrowParametersContext ctx)
+	{
+		addToParentAndPushNodeToStack(new JSParametersNode());
+		super.enterArrowParameters(ctx);
+	}
+
+	@Override
+	public void exitArrowParameters(ArrowParametersContext ctx)
+	{
+		popNode();
+		super.exitArrowParameters(ctx);
+	}
+
+	@Override
+	public void enterComputedPropertyName(ComputedPropertyNameContext ctx)
+	{
+		addToParentAndPushNodeToStack(new JSComputedPropertyNameNode());
+		super.enterComputedPropertyName(ctx);
+	}
+
+	@Override
+	public void exitComputedPropertyName(ComputedPropertyNameContext ctx)
+	{
+		popNode();
+		super.exitComputedPropertyName(ctx);
+	}
+
 	private Symbol pickSymbol(ParserRuleContext ctx, int position, int... types)
 	{
 		for (int i = 0; i < types.length; i++)
@@ -1922,6 +2006,24 @@ public class JSASTWalker extends JSBaseListener
 		fNodeStack.push(node);
 	}
 
+	private Symbol toSymbolOrNull(Token token)
+	{
+		if (token == null)
+		{
+			return null;
+		}
+		return toSymbol(token);
+	}
+
+	private Symbol toSymbolOrNull(TerminalNode terminal)
+	{
+		if (terminal == null)
+		{
+			return null;
+		}
+		return toSymbol(terminal);
+	}
+
 	private Symbol toSymbol(TerminalNode terminal)
 	{
 		return toSymbol(terminal.getSymbol());
@@ -1937,4 +2039,63 @@ public class JSASTWalker extends JSBaseListener
 		return fRootNode;
 	}
 
+	@Override
+	public void visitErrorNode(ErrorNode node)
+	{
+		addChildToParent(new JSErrorNode());
+		super.visitErrorNode(node);
+	}
+
+	@Override
+	public void enterForLexicalInStatement(ForLexicalInStatementContext ctx)
+	{
+		Symbol l = toSymbol(ctx.getToken(JSParser.OpenParen, 0));
+		Symbol in = toSymbol(ctx.getToken(JSParser.In, 0));
+		Symbol r = toSymbol(ctx.getToken(JSParser.CloseParen, 0));
+		addToParentAndPushNodeToStack(new JSForInNode(l, in, r));
+		super.enterForLexicalInStatement(ctx);
+	}
+
+	@Override
+	public void exitForLexicalInStatement(ForLexicalInStatementContext ctx)
+	{
+		popNode();
+		super.exitForLexicalInStatement(ctx);
+
+	}
+
+	@Override
+	public void enterClassExpression(ClassExpressionContext ctx)
+	{
+		BindingIdentifierContext bic = ctx.bindingIdentifier();
+		ClassHeritageContext chc = ctx.classTail().classHeritage();
+		addToParentAndPushNodeToStack(new JSClassNode(bic != null, chc != null));
+		super.enterClassExpression(ctx);
+	}
+
+	@Override
+	public void exitClassExpression(ClassExpressionContext ctx)
+	{
+		// if no class body, add an empty statements node
+		if (ctx.classTail().classBody() == null)
+		{
+			addChildToParent(new JSStatementsNode());
+		}
+		popNode();
+		super.exitClassExpression(ctx);
+	}
+
+	@Override
+	public void enterFunctionExpression(FunctionExpressionContext ctx)
+	{
+		addToParentAndPushNodeToStack(new JSFunctionNode());
+		super.enterFunctionExpression(ctx);
+	}
+
+	@Override
+	public void exitFunctionExpression(FunctionExpressionContext ctx)
+	{
+		popNode();
+		super.exitFunctionExpression(ctx);
+	}
 }

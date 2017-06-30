@@ -1926,26 +1926,6 @@ public interface JSListener extends ParseTreeListener {
 	 */
 	void exitFutureReservedWord(JSParser.FutureReservedWordContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link JSParser#getter}.
-	 * @param ctx the parse tree
-	 */
-	void enterGetter(JSParser.GetterContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link JSParser#getter}.
-	 * @param ctx the parse tree
-	 */
-	void exitGetter(JSParser.GetterContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link JSParser#setter}.
-	 * @param ctx the parse tree
-	 */
-	void enterSetter(JSParser.SetterContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link JSParser#setter}.
-	 * @param ctx the parse tree
-	 */
-	void exitSetter(JSParser.SetterContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link JSParser#eos}.
 	 * @param ctx the parse tree
 	 */

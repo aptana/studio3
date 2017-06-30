@@ -791,7 +791,10 @@ classElement
 ///     [ ElementList ]
 ///     [ ElementList , Elision? ]
 arrayLiteral
- : '[' elementList? ','? elision? ']'
+// : '[' elementList? ','? elision? ']'
+ : '[' elision? ']'
+ | '[' elementList ']'
+ | '[' elementList ',' elision? ']'
  ;
 
 
@@ -1351,14 +1354,6 @@ futureReservedWord
  | Interface
  | Package
  | Protected
- ;
-
-getter
- : {_input.LT(1).getText().equals("get")}? Identifier propertyName
- ;
-
-setter
- : {_input.LT(1).getText().equals("set")}? Identifier propertyName
  ;
 
 eos

@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
@@ -335,7 +336,7 @@ public class JSParserTest
 	@Test
 	public void testTypeof1() throws Exception
 	{
-		assertParseResult("a = typeof(object);" + EOL, "a = typeof (object);" + EOL); //$NON-NLS-1$
+		assertParseResult("a = typeof(object);" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -515,7 +516,7 @@ public class JSParserTest
 	@Test
 	public void testEmptyInIfElse() throws Exception
 	{
-		assertParseResult("if (true)  else true;" + EOL, "if (true) ; else true;" + EOL); //$NON-NLS-1$
+		assertParseResult("if (true)  else true;" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -1024,6 +1025,18 @@ public class JSParserTest
 	{
 		assertParseResult("for (var a in obj) {a;}" + EOL);
 	}
+	
+	@Test
+	public void testForLetIn() throws Exception
+	{
+		assertParseResult("for (let a in obj) {a;}" + EOL);
+	}
+	
+	@Test
+	public void testForConstIn() throws Exception
+	{
+		assertParseResult("for (const a in obj) {a;}" + EOL);
+	}
 
 	// @Test
 	// public void testSDocComment() throws Exception
@@ -1137,7 +1150,7 @@ public class JSParserTest
 	@Test
 	public void testMissingPropertyValue2() throws Exception
 	{
-		assertParseResult("var x = { t: };", "var x = {t: };" + EOL);
+		assertParseResult("var x = { t: };", "var x = {t: t};" + EOL);
 		assertParseErrors("mismatched input '}'");
 	}
 
@@ -1555,6 +1568,19 @@ public class JSParserTest
 		input.fill();
 		fParser = new JSParser(input);
 		fErrors = new ArrayList<IParseError>();
+		// TODO We had written some custom error recovery code for our JS parser before. Can we replicate that here?
+		// See JS.grammar#379-440
+		// - try inserting ";"
+		// - try inserting ");"
+		// - try inserting empty identifier and ";" after: '.', 'new', or '='
+		// - try inserting empty identifier after: '.', 'new', or '='
+		// - try inserting empty identifier after '('
+		// - try inserting empty identifier ':' after: '.'
+		// - try inserting "{}" after: ')'
+		// - seems to try and recover from trailing commas (inside parens)
+		// - try inserting empty identifier if current token is (i.e. before) '}'
+		// - try inserting ':' and empty identifier if current token is (i.e. before) '}'
+//		fParser.setErrorHandler(new DefaultErrorStrategy());
 		fParser.addErrorListener(new ANTLRErrorListener()
 		{
 

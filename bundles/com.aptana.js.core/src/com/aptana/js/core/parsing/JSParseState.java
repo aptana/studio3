@@ -9,6 +9,10 @@ package com.aptana.js.core.parsing;
 
 import java.util.Stack;
 
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CodePointCharStream;
+
 import com.aptana.core.logging.IdeLog;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.parsing.IParseStateCacheKey;
@@ -39,6 +43,7 @@ public class JSParseState extends ParseState
 	}
 
 	private Stack<CommentContext> commentContentStack;
+	private CodePointCharStream fStream;
 
 	/**
 	 * In this constructor, startingOffset is considered 0 and comments won't be attached nor collected.
@@ -139,6 +144,16 @@ public class JSParseState extends ParseState
 	{
 		IParseStateCacheKey cacheKey = super.getCacheKey(contentTypeId);
 		return new ParseStateCacheKeyWithComments(attachComments(), collectComments(), cacheKey);
+	}
+
+	public synchronized CharStream getCharStream()
+	{
+		if (fStream == null)
+		{
+			fStream = CharStreams.fromString(getSource());
+		}
+		fStream.seek(0);
+		return fStream;
 	}
 
 }

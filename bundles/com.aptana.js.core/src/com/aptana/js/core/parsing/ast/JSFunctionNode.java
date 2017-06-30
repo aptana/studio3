@@ -86,7 +86,7 @@ public class JSFunctionNode extends JSNode
 	 */
 	public IParseNode getBody()
 	{
-		return this.getChild(2);
+		return getLastChild();
 	}
 
 	/**

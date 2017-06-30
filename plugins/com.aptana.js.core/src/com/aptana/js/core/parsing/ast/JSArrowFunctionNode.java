@@ -8,6 +8,14 @@ public class JSArrowFunctionNode extends JSNode
 		super(IJSNodeTypes.ARROW_FUNCTION, params, body);
 	}
 
+	/**
+	 * Used by ANTLR AST
+	 */
+	public JSArrowFunctionNode()
+	{
+		super(IJSNodeTypes.ARROW_FUNCTION);
+	}
+
 	public JSParametersNode getParameters()
 	{
 		return (JSParametersNode) getChild(0);

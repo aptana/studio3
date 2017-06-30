@@ -5,30 +5,27 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.js.core.parsing;
+package com.aptana.js.core.parsing.antlr;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.Token;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.junit.experimental.categories.Category;
+import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 
-import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.IOUtil;
 import com.aptana.js.core.JSCorePlugin;
+import com.aptana.js.core.parsing.antlr.JSLexer;
 import com.aptana.js.core.tests.ITestFiles;
-import com.aptana.parsing.IParseState;
-import com.aptana.parsing.ParseState;
-import com.aptana.testing.categories.PerformanceTests;
 
-import beaver.Symbol;
-
-@Category({ PerformanceTests.class })
-public class JSFlexScannerPerformanceTest extends GlobalTimePerformanceTestCase
+public class JSANTLRScannerPerformanceTest extends GlobalTimePerformanceTestCase
 {
-	private JSFlexScanner fScanner;
+	private JSLexer fScanner;
 
 	/**
 	 * getSource
@@ -55,19 +52,6 @@ public class JSFlexScannerPerformanceTest extends GlobalTimePerformanceTestCase
 		InputStream stream = FileLocator.openStream(Platform.getBundle(JSCorePlugin.PLUGIN_ID), new Path(resourceName),
 				false);
 		return getSource(stream);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-
-		fScanner = new JSFlexScanner();
-		fScanner.setCollectComments(false);
 	}
 
 	/*
@@ -173,20 +157,24 @@ public class JSFlexScannerPerformanceTest extends GlobalTimePerformanceTestCase
 	 */
 	private void timeScan(String resourceName, String src, int numRuns) throws Exception
 	{
+		// re-use same charstream...
+		CharStream stream = CharStreams.fromString(src);
+
 		for (int i = 0; i < numRuns; i++)
 		{
 			startMeasuring();
 
-			fScanner.setSource(src);
+			fScanner = new JSLexer(stream);
 
-			Symbol symbol = fScanner.nextToken();
+			Token symbol = fScanner.nextToken();
 
-			while (symbol != null && symbol.getId() != 0)
+			while (symbol != null && symbol.getType() != Token.EOF)
 			{
 				symbol = fScanner.nextToken();
 			}
 
 			stopMeasuring();
 		}
+		stream.seek(0);
 	}
 }

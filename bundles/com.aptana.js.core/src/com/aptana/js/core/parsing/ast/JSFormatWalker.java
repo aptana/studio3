@@ -134,14 +134,17 @@ public class JSFormatWalker extends JSTreeWalker
 	 */
 	protected boolean isNotEmpty(IParseNode node)
 	{
-		boolean result = true;
+		if (node == null)
+		{
+			return false;
+		}
 
 		if (node instanceof JSNode)
 		{
-			result = !((JSNode) node).isEmpty();
+			return !((JSNode) node).isEmpty();
 		}
 
-		return result;
+		return true;
 	}
 
 	/*
