@@ -1,18 +1,14 @@
 package com.aptana.js.core.parsing.antlr;
 
-import java.util.BitSet;
-
-import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.atn.ParseInfo;
 import org.antlr.v4.runtime.atn.PredictionMode;
-import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.tree.IterativeParseTreeWalker;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
@@ -31,12 +27,13 @@ import com.aptana.parsing.ast.ParseError;
 public class JSWrappingParser implements IParser
 {
 
-	private final class ErrorListener implements ANTLRErrorListener
+	private final class ErrorListener extends DiagnosticErrorListener
 	{
 		private final WorkingParseResult working;
 
 		private ErrorListener(WorkingParseResult working)
 		{
+			super(false);
 			this.working = working;
 		}
 
@@ -44,27 +41,9 @@ public class JSWrappingParser implements IParser
 				String msg, RecognitionException e)
 		{
 			// FIXME Convert the arg1 object here into a Symbol?
+			System.out.println(msg);
 			working.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, null, msg, IProblem.Severity.WARNING));
-		}
-
-		public void reportContextSensitivity(Parser arg0, DFA arg1, int arg2, int arg3, int arg4, ATNConfigSet arg5)
-		{
-			// TODO Auto-generated method stub
-
-		}
-
-		public void reportAttemptingFullContext(Parser arg0, DFA arg1, int arg2, int arg3, BitSet arg4,
-				ATNConfigSet arg5)
-		{
-			// TODO Auto-generated method stub
-
-		}
-
-		public void reportAmbiguity(Parser arg0, DFA arg1, int arg2, int arg3, boolean arg4, BitSet arg5,
-				ATNConfigSet arg6)
-		{
-			// TODO Auto-generated method stub
-
+			// super.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
 		}
 	}
 
@@ -91,15 +70,17 @@ public class JSWrappingParser implements IParser
 			String source = parseState.getSource();
 			stream = CharStreams.fromString(source);
 		}
-		
+
 		// Can we re-use the lexer/token stream?
 		JSLexer lexer = new JSLexer(stream);
 		CommonTokenStream input = new CommonTokenStream(lexer);
 		if (fParser == null)
 		{
 			fParser = new JSParser(input);
+			fParser.setProfile(true);
 			fParser.addErrorListener(new ErrorListener(working));
-			// This is the fastest settings. We're supposed to fall back to DefaultErrorStrategy and LL if this fails! (i.e. a ParseCancellationException)
+			// This is the fastest settings. We're supposed to fall back to DefaultErrorStrategy and LL if this fails!
+			// (i.e. a ParseCancellationException)
 			fParser.getInterpreter().setPredictionMode(PredictionMode.SLL);
 			fParser.setErrorHandler(new BailErrorStrategy());
 		}
@@ -120,9 +101,18 @@ public class JSWrappingParser implements IParser
 		// - try inserting empty identifier if current token is (i.e. before) '}'
 		// - try inserting ':' and empty identifier if current token is (i.e. before) '}'
 		// fParser.setErrorHandler(new DefaultErrorStrategy());
-		
+
 		// FIXME This is still much slower than the beaver parser. How can we speed it up?
 		JSParseRootNode rootNode = convertAST(fParser.program());
+		ParseInfo pi = fParser.getParseInfo();
+		System.out.println("DFA size: " + pi.getDFASize());
+		System.out.println("ATN lookahead ops: " + pi.getTotalATNLookaheadOps());
+		System.out.println("LLATN lookahead ops: " + pi.getTotalLLATNLookaheadOps());
+		System.out.println("LL lookahead ops: " + pi.getTotalLLLookaheadOps());
+		System.out.println("SLLATN lookahead ops: " + pi.getTotalSLLATNLookaheadOps());
+		System.out.println("SLL lookahead ops: " + pi.getTotalSLLLookaheadOps());
+		System.out.println("Total time in prediction: " + pi.getTotalTimeInPrediction());
+		System.out.println("LL Decisions: " + pi.getLLDecisions());
 		working.setParseResult(rootNode);
 	}
 
