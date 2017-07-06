@@ -4,12 +4,13 @@ import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.atn.ParseInfo;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.IterativeParseTreeWalker;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
@@ -78,12 +79,7 @@ public class JSWrappingParser implements IParser
 		if (fParser == null)
 		{
 			fParser = new JSParser(input);
-			fParser.setProfile(true);
 			fParser.addErrorListener(new ErrorListener(working));
-			// This is the fastest settings. We're supposed to fall back to DefaultErrorStrategy and LL if this fails!
-			// (i.e. a ParseCancellationException)
-			fParser.getInterpreter().setPredictionMode(PredictionMode.SLL);
-			fParser.setErrorHandler(new BailErrorStrategy());
 		}
 		else
 		{
@@ -104,7 +100,24 @@ public class JSWrappingParser implements IParser
 		// fParser.setErrorHandler(new DefaultErrorStrategy());
 
 		// FIXME This is still much slower than the beaver parser. How can we speed it up?
-		JSParseRootNode rootNode = convertAST(fParser.program());
+		ProgramContext pc;
+		fParser.setProfile(true);
+		// This is the fastest settings. We're supposed to fall back to DefaultErrorStrategy and LL if this fails!
+		// (i.e. a ParseCancellationException)
+		fParser.getInterpreter().setPredictionMode(PredictionMode.SLL);
+		fParser.setErrorHandler(new BailErrorStrategy());
+		try
+		{
+			pc = fParser.program();
+		}
+		catch (ParseCancellationException e)
+		{
+			fParser.getInterpreter().setPredictionMode(PredictionMode.LL);
+			fParser.setErrorHandler(new DefaultErrorStrategy());
+			pc = fParser.program();
+		}
+
+		JSParseRootNode rootNode = convertAST(pc);
 		ParseInfo pi = fParser.getParseInfo();
 		System.out.println("DFA size: " + pi.getDFASize());
 		System.out.println("ATN lookahead ops: " + pi.getTotalATNLookaheadOps());

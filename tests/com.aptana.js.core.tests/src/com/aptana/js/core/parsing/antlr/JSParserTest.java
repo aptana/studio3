@@ -1537,6 +1537,167 @@ public class JSParserTest
 		assertNoErrors();
 	}
 
+	// https://www.ecma-international.org/ecma-262/6.0/#sec-rules-of-automatic-semicolon-insertion
+	/**
+	 * <p>
+	 * The source
+	 * 
+	 * <pre>
+	 * <code>{ 1 2 } 3</code>
+	 * </pre>
+	 * 
+	 * is not a valid sentence in the ECMAScript grammar, even with the automatic semicolon insertion rules.
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion1() throws Exception
+	{
+		// FIXME How do we enforce that no semicolon insertion happens here?
+		assertParseResult("{ 1 2 } 3" + EOL);
+		assertParseErrors("no viable alternative at input '2'");
+	}
+
+	/**
+	 * <p>
+	 * In contrast, the source
+	 * 
+	 * <pre>
+	 * <code>{ 1
+	 * 2 } 3</code>
+	 * </pre>
+	 * 
+	 * is also not a valid ECMAScript sentence, but is transformed by automatic semicolon insertion into the following:
+	 * 
+	 * <pre>
+	 * <code>{ 1 
+	 * ;2 ;} 3;</code>
+	 * </pre>
+	 * 
+	 * which is a valid ECMAScript sentence.
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion2() throws Exception
+	{
+		assertParseResult("{ 1" + EOL + "2 } 3" + EOL, "{1;2;}" + EOL + "3;" + EOL);
+		assertNoErrors();
+	}
+
+	/**
+	 * <p>
+	 * The source
+	 * 
+	 * <pre>
+	 * <code>for (a; b
+	 * )</code>
+	 * </pre>
+	 * 
+	 * is not a valid ECMAScript sentence and is not altered by automatic semicolon insertion because the semicolon is
+	 * needed for the header of a for statement. Automatic semicolon insertion never inserts one of the two semicolons
+	 * in the header of a for statement.
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion3() throws Exception
+	{
+		assertParseResult("for (a; b" + EOL + ")" + EOL,"for (a; b;) " + EOL);
+		assertParseErrors("missing ';' at ')'", "mismatched input '<EOF>'");
+	}
+
+	/**
+	 * <p>
+	 * The source
+	 * 
+	 * <pre>
+	 * <code>return
+	 * a + b</code>
+	 * </pre>
+	 * 
+	 * is transformed by automatic semicolon insertion into the following:
+	 * 
+	 * <pre>
+	 * <code>return;
+	 * a + b;</code>
+	 * </pre>
+	 * </p>
+	 * <p>
+	 * NOTE 1 The expression <code>a + b</code> is not treated as a value to be returned by the <code>return</code>
+	 * statement, because a LineTerminator separates it from the token return.
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion4() throws Exception
+	{
+		assertParseResult("return" + EOL + "a + b" + EOL, "return;" + EOL + "a + b;" + EOL);
+		assertNoErrors();
+	}
+
+	/**
+	 * <p>
+	 * The source
+	 * 
+	 * <pre>
+	 * <code>a = b
+	 * ++c</code>
+	 * </pre>
+	 * 
+	 * is transformed by automatic semicolon insertion into the following:
+	 * 
+	 * <pre>
+	 * <code>a = b;
+	 * ++c;</code>
+	 * </pre>
+	 * </p>
+	 * <p>
+	 * NOTE 2 The token <code>++</code> is not treated as a postfix operator applying to the variable <code>b</code>,
+	 * because a LineTerminator occurs between <code>b</code> and <code>++</code>.
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion5() throws Exception
+	{
+		assertParseResult("a = b" + EOL + "++c" + EOL, "a = b;" + EOL + "++c;" + EOL);
+		assertNoErrors();
+	}
+
+	/**
+	 * The source 'if (a > b) else c = d' is not a valid ECMAScript sentence and is not altered by automatic semicolon
+	 * insertion before the else token, even though no production of the grammar applies at that point, because an
+	 * automatically inserted semicolon would then be parsed as an empty statement.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion6() throws Exception
+	{
+		assertParseResult("if (a > b)" + EOL + "else c = d" + EOL, "if (a > b) else c = d;" + EOL);
+		assertParseErrors("extraneous input 'else'");
+	}
+
+	/**
+	 * The source a = b + c (d + e).print() is not transformed by automatic semicolon insertion, because the
+	 * parenthesized expression that begins the second line can be interpreted as an argument list for a function call:
+	 * a = b + c(d + e).print()
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion7() throws Exception
+	{
+		assertParseResult("a = b + c" + EOL + "(d + e).print()" + EOL, "a = b + c(d + e).print();" + EOL);
+		assertNoErrors();
+	}
+
 	// utility methods
 	protected void assertParseErrors(String... messages)
 	{

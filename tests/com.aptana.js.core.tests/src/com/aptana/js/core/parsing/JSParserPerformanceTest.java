@@ -266,7 +266,7 @@ public abstract class JSParserPerformanceTest extends GlobalTimePerformanceTestC
 			catch (Exception e)
 			{
 				e.printStackTrace();
-				fail(e.getMessage());
+				fail("Failed to parse '" + resourceName + "': " + e.getMessage());
 			}
 			stopMeasuring();
 		}
