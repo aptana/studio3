@@ -11,7 +11,6 @@ import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
@@ -1001,13 +1000,13 @@ public class JSParserTest
 	{
 		assertParseResult("for (var a = 0, b = a ? c : d; a < 10; a++) {a;}" + EOL); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void testForLet() throws Exception
 	{
 		assertParseResult("for (let a = 0; a < 10; a++) {a;}" + EOL); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void testForConst() throws Exception
 	{
@@ -1025,13 +1024,13 @@ public class JSParserTest
 	{
 		assertParseResult("for (var a in obj) {a;}" + EOL);
 	}
-	
+
 	@Test
 	public void testForLetIn() throws Exception
 	{
 		assertParseResult("for (let a in obj) {a;}" + EOL);
 	}
-	
+
 	@Test
 	public void testForConstIn() throws Exception
 	{
@@ -1103,7 +1102,7 @@ public class JSParserTest
 	@Test
 	public void testMissingClosingParenthesis() throws Exception
 	{
-		assertParseResult("testing(", "testing();" + EOL);
+		parse("testing(");
 		// assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
 		assertParseErrors("no viable alternative at input '('");
 	}
@@ -1111,7 +1110,7 @@ public class JSParserTest
 	@Test
 	public void testMissingIdentifier() throws Exception
 	{
-		assertParseResult("var x =", "var x = ;" + EOL);
+		parse("var x =");
 		// assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
 		assertParseErrors("mismatched input '<EOF>'");
 	}
@@ -1119,7 +1118,7 @@ public class JSParserTest
 	@Test
 	public void testMissingIdentifier2() throws Exception
 	{
-		assertParseResult("x.", "x.;" + EOL);
+		parse("x.");
 		// assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
 		assertParseErrors("mismatched input '<EOF>'");
 	}
@@ -1127,7 +1126,7 @@ public class JSParserTest
 	@Test
 	public void testMissingArg() throws Exception
 	{
-		assertParseResult("fun(a,);", "fun(a, );" + EOL);
+		parse("fun(a,);");
 		// assertParseErrors("Syntax Error: unexpected token \")\"");
 		assertParseErrors("no viable alternative at input '('");
 	}
@@ -1135,7 +1134,7 @@ public class JSParserTest
 	@Test
 	public void testMissingIdentifier3() throws Exception
 	{
-		assertParseResult("new", "new ;" + EOL);
+		parse("new");
 		// assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
 		assertParseErrors("no viable alternative at input 'new'");
 	}
@@ -1150,7 +1149,7 @@ public class JSParserTest
 	@Test
 	public void testMissingPropertyValue2() throws Exception
 	{
-		assertParseResult("var x = { t: };", "var x = {t: t};" + EOL);
+		parse("var x = { t: };");
 		assertParseErrors("mismatched input '}'");
 	}
 
@@ -1238,7 +1237,7 @@ public class JSParserTest
 	@Test
 	public void testUnclosedString() throws Exception
 	{
-		assertParseResult("var string = 'something", "var string = ;" + EOL);
+		parse("var string = 'something");
 		// assertParseErrors("Syntax Error: unexpected token \"'\"");
 		assertParseErrors("extraneous input ''' expecting");
 	}
@@ -1246,7 +1245,7 @@ public class JSParserTest
 	@Test
 	public void testUnclosedComment() throws Exception
 	{
-		assertParseResult("var thing; /* comment", "var thing;" + EOL + EOL);
+		parse("var thing; /* comment");
 		// assertParseErrors("Syntax Error: unexpected token \"/\"");
 		assertParseErrors("mismatched input '/' expecting <EOF>");
 	}
@@ -1254,7 +1253,7 @@ public class JSParserTest
 	@Test
 	public void testUnclosedRegexp() throws Exception
 	{
-		assertParseResult("var regexp = /;", EOL);
+		parse("var regexp = /;");
 		// assertParseErrors("Syntax Error: unexpected token \"/\"", "Syntax Error: unexpected token \";\"");
 		assertParseErrors("mismatched input '/'");
 	}
@@ -1394,14 +1393,14 @@ public class JSParserTest
 		assertParseResult("for (let n of fibonacci) {console.log(n);}" + EOL);
 		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testForConstOf() throws Exception
 	{
 		assertParseResult("for (const n of fibonacci) {console.log(n);}" + EOL);
 		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testForVarOf() throws Exception
 	{
@@ -1580,7 +1579,7 @@ public class JSParserTest
 		// - seems to try and recover from trailing commas (inside parens)
 		// - try inserting empty identifier if current token is (i.e. before) '}'
 		// - try inserting ':' and empty identifier if current token is (i.e. before) '}'
-//		fParser.setErrorHandler(new DefaultErrorStrategy());
+		// fParser.setErrorHandler(new DefaultErrorStrategy());
 		fParser.addErrorListener(new ANTLRErrorListener()
 		{
 

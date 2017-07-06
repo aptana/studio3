@@ -1098,18 +1098,6 @@ public interface JSListener extends ParseTreeListener {
 	 */
 	void exitObjectLiteralExpression(JSParser.ObjectLiteralExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code SuperMemberIndexExpression}
-	 * labeled alternative in {@link JSParser#singleExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterSuperMemberIndexExpression(JSParser.SuperMemberIndexExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code SuperMemberIndexExpression}
-	 * labeled alternative in {@link JSParser#singleExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitSuperMemberIndexExpression(JSParser.SuperMemberIndexExpressionContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code NewTargetExpression}
 	 * labeled alternative in {@link JSParser#singleExpression}.
 	 * @param ctx the parse tree
@@ -1146,18 +1134,6 @@ public interface JSListener extends ParseTreeListener {
 	 */
 	void exitLogicalOrExpression(JSParser.LogicalOrExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code NotExpression}
-	 * labeled alternative in {@link JSParser#singleExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterNotExpression(JSParser.NotExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code NotExpression}
-	 * labeled alternative in {@link JSParser#singleExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitNotExpression(JSParser.NotExpressionContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code GeneratorExpressionExpression}
 	 * labeled alternative in {@link JSParser#singleExpression}.
 	 * @param ctx the parse tree
@@ -1170,17 +1146,17 @@ public interface JSListener extends ParseTreeListener {
 	 */
 	void exitGeneratorExpressionExpression(JSParser.GeneratorExpressionExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code SuperMemberDotExpression}
+	 * Enter a parse tree produced by the {@code NotExpression}
 	 * labeled alternative in {@link JSParser#singleExpression}.
 	 * @param ctx the parse tree
 	 */
-	void enterSuperMemberDotExpression(JSParser.SuperMemberDotExpressionContext ctx);
+	void enterNotExpression(JSParser.NotExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code SuperMemberDotExpression}
+	 * Exit a parse tree produced by the {@code NotExpression}
 	 * labeled alternative in {@link JSParser#singleExpression}.
 	 * @param ctx the parse tree
 	 */
-	void exitSuperMemberDotExpression(JSParser.SuperMemberDotExpressionContext ctx);
+	void exitNotExpression(JSParser.NotExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code PreDecreaseExpression}
 	 * labeled alternative in {@link JSParser#singleExpression}.
@@ -1361,6 +1337,18 @@ public interface JSListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitBitXOrExpression(JSParser.BitXOrExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code SuperExpression}
+	 * labeled alternative in {@link JSParser#singleExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterSuperExpression(JSParser.SuperExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code SuperExpression}
+	 * labeled alternative in {@link JSParser#singleExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitSuperExpression(JSParser.SuperExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code MultiplicativeExpression}
 	 * labeled alternative in {@link JSParser#singleExpression}.
@@ -1578,18 +1566,6 @@ public interface JSListener extends ParseTreeListener {
 	 */
 	void exitAssignmentOperatorExpression(JSParser.AssignmentOperatorExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code SuperCallExpression}
-	 * labeled alternative in {@link JSParser#singleExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterSuperCallExpression(JSParser.SuperCallExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code SuperCallExpression}
-	 * labeled alternative in {@link JSParser#singleExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitSuperCallExpression(JSParser.SuperCallExpressionContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code VoidExpression}
 	 * labeled alternative in {@link JSParser#singleExpression}.
 	 * @param ctx the parse tree
@@ -1655,26 +1631,6 @@ public interface JSListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitModule(JSParser.ModuleContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link JSParser#moduleBody}.
-	 * @param ctx the parse tree
-	 */
-	void enterModuleBody(JSParser.ModuleBodyContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link JSParser#moduleBody}.
-	 * @param ctx the parse tree
-	 */
-	void exitModuleBody(JSParser.ModuleBodyContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link JSParser#moduleItemList}.
-	 * @param ctx the parse tree
-	 */
-	void enterModuleItemList(JSParser.ModuleItemListContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link JSParser#moduleItemList}.
-	 * @param ctx the parse tree
-	 */
-	void exitModuleItemList(JSParser.ModuleItemListContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link JSParser#moduleItem}.
 	 * @param ctx the parse tree

@@ -147,6 +147,15 @@ public class JSASTWalker extends JSBaseListener
 	}
 
 	@Override
+	public void enterSuperExpression(SuperExpressionContext ctx)
+	{
+		// leaf node, no need to push to stack or pop later
+		// TODO Introduce JSSuperNode?
+		addChildToParent(new JSIdentifierNode(toSymbol(ctx.getToken(JSParser.Super, 0))));
+		super.enterSuperExpression(ctx);
+	}
+
+	@Override
 	public void enterIdentifierExpression(IdentifierExpressionContext ctx)
 	{
 		// leaf node, no need to push to stack or pop later
@@ -1880,54 +1889,6 @@ public class JSASTWalker extends JSBaseListener
 	{
 		popNode();
 		super.exitYieldExpression(ctx);
-	}
-
-	@Override
-	public void enterSuperMemberIndexExpression(SuperMemberIndexExpressionContext ctx)
-	{
-		Symbol lb = toSymbol(ctx.getToken(JSParser.OpenBracket, 0));
-		Symbol rb = toSymbol(ctx.getToken(JSParser.CloseBracket, 0));
-		addToParentAndPushNodeToStack(new JSGetElementNode(lb, rb));
-		addChildToParent(new JSIdentifierNode(toSymbol(ctx.getToken(JSParser.Super, 0))));
-		super.enterSuperMemberIndexExpression(ctx);
-	}
-
-	@Override
-	public void exitSuperMemberIndexExpression(SuperMemberIndexExpressionContext ctx)
-	{
-		popNode();
-		super.exitSuperMemberIndexExpression(ctx);
-	}
-
-	@Override
-	public void enterSuperMemberDotExpression(SuperMemberDotExpressionContext ctx)
-	{
-		Symbol o = toSymbol(ctx.getToken(JSParser.Dot, 0));
-		addToParentAndPushNodeToStack(new JSGetPropertyNode(o));
-		addChildToParent(new JSIdentifierNode(toSymbol(ctx.getToken(JSParser.Super, 0))));
-		super.enterSuperMemberDotExpression(ctx);
-	}
-
-	@Override
-	public void exitSuperMemberDotExpression(SuperMemberDotExpressionContext ctx)
-	{
-		popNode();
-		super.exitSuperMemberDotExpression(ctx);
-	}
-
-	@Override
-	public void enterSuperCallExpression(SuperCallExpressionContext ctx)
-	{
-		addToParentAndPushNodeToStack(new JSInvokeNode());
-		addChildToParent(new JSIdentifierNode(toSymbol(ctx.getToken(JSParser.Super, 0))));
-		super.enterSuperCallExpression(ctx);
-	}
-
-	@Override
-	public void exitSuperCallExpression(SuperCallExpressionContext ctx)
-	{
-		popNode();
-		super.exitSuperCallExpression(ctx);
 	}
 
 	@Override

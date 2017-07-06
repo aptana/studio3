@@ -187,7 +187,7 @@ grammar JS;
 ///    Module
 ///    Script
 program
- : module EOF
+ : module
  ;
 
 /// Statement :
@@ -1025,15 +1025,14 @@ expressionSequence
 
 singleExpression
  : Function bindingIdentifier? '(' formalParameters ')' '{' functionBody '}' # FunctionExpression
+ | classExpression                                                           # ClassExpressionExpression
+ | generatorExpression                                                       # GeneratorExpressionExpression
+ | New '.' {_input.LT(1).getText().equals("target")}? Identifier             # NewTargetExpression
+ | New singleExpression arguments?                                           # NewExpression
  | singleExpression '[' expressionSequence ']'                               # MemberIndexExpression
  | singleExpression '.' identifierName                                       # MemberDotExpression
  | singleExpression templateLiteral                                          # CallTemplateLiteralExpression
- | Super '[' expressionSequence ']'                                          # SuperMemberIndexExpression
- | Super '.' identifierName                                                  # SuperMemberDotExpression
- | Super arguments                                                           # SuperCallExpression
  | singleExpression arguments                                                # ArgumentsExpression
- | New '.' {_input.LT(1).getText().equals("target")}? Identifier             # NewTargetExpression
- | New singleExpression arguments?                                           # NewExpression
  | singleExpression {!here(LineTerminator)}? '++'                            # PostIncrementExpression
  | singleExpression {!here(LineTerminator)}? '--'                            # PostDecreaseExpression
  | Delete singleExpression                                                   # DeleteExpression
@@ -1063,12 +1062,11 @@ singleExpression
  | singleExpression '=' singleExpression                                     # AssignmentExpression
  | singleExpression assignmentOperator singleExpression                      # AssignmentOperatorExpression
  | This                                                                      # ThisExpression
+ | Super                                                                     # SuperExpression
  | Identifier                                                                # IdentifierExpression
  | literal                                                                   # LiteralExpression
  | arrayLiteral                                                              # ArrayLiteralExpression
  | objectLiteral                                                             # ObjectLiteralExpression
- | classExpression                                                           # ClassExpressionExpression
- | generatorExpression                                                       # GeneratorExpressionExpression
  | RegularExpressionLiteral                                                  # RegularExpressionLiteralExpression
  | templateLiteral                                                           # TemplateLiteralExpression
 // | coverParenthesizedExpressionAndArrowParameterList                         # CoverParenthesizedExpressionAndArrowParameterListExpression
@@ -1093,21 +1091,21 @@ scriptBody
 /// Module :
 ///     ModuleBody?
 module
- : moduleBody?
+ : moduleItem* EOF
  ;
 
 /// ModuleBody :
 ///     ModuleItemList
-moduleBody
- : moduleItemList
- ;
+//moduleBody
+// : moduleItemList
+// ;
 
 /// ModuleItemList :
 ///     ModuleItem
 ///     ModuleItemList ModuleItem
-moduleItemList
- : moduleItem+
- ;
+//moduleItemList
+// : moduleItem+
+// ;
 
 /// ModuleItem :
 ///     ImportDeclaration

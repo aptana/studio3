@@ -1288,18 +1288,6 @@ public class JSBaseListener implements JSListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSuperMemberIndexExpression(JSParser.SuperMemberIndexExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSuperMemberIndexExpression(JSParser.SuperMemberIndexExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterNewTargetExpression(JSParser.NewTargetExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1336,18 +1324,6 @@ public class JSBaseListener implements JSListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNotExpression(JSParser.NotExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitNotExpression(JSParser.NotExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterGeneratorExpressionExpression(JSParser.GeneratorExpressionExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1360,13 +1336,13 @@ public class JSBaseListener implements JSListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSuperMemberDotExpression(JSParser.SuperMemberDotExpressionContext ctx) { }
+	@Override public void enterNotExpression(JSParser.NotExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSuperMemberDotExpression(JSParser.SuperMemberDotExpressionContext ctx) { }
+	@Override public void exitNotExpression(JSParser.NotExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -1547,6 +1523,18 @@ public class JSBaseListener implements JSListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitBitXOrExpression(JSParser.BitXOrExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSuperExpression(JSParser.SuperExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSuperExpression(JSParser.SuperExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -1768,18 +1756,6 @@ public class JSBaseListener implements JSListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSuperCallExpression(JSParser.SuperCallExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSuperCallExpression(JSParser.SuperCallExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterVoidExpression(JSParser.VoidExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1847,30 +1823,6 @@ public class JSBaseListener implements JSListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitModule(JSParser.ModuleContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterModuleBody(JSParser.ModuleBodyContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitModuleBody(JSParser.ModuleBodyContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterModuleItemList(JSParser.ModuleItemListContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitModuleItemList(JSParser.ModuleItemListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
