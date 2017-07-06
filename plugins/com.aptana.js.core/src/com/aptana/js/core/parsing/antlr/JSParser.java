@@ -125,7 +125,8 @@ public class JSParser extends Parser {
 		"'continue'", "'for'", "'switch'", "'while'", "'debugger'", "'function'", 
 		"'this'", "'with'", "'default'", "'if'", "'throw'", "'delete'", "'in'", 
 		"'try'", "'export'", "'class'", "'extends'", "'const'", "'super'", "'yield'", 
-		"'import'", "'static'", "'let'", "'enum'", "'await'"
+		"'import'", "'static'", "'let'", "'enum'", "'await'", "'implements'", 
+		"'private'", "'public'", "'interface'", "'package'", "'protected'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
 		null, null, null, "RegularExpressionLiteral", "LineTerminator", "OpenBracket", 

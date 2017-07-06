@@ -1528,12 +1528,12 @@ Await   : 'await';
 
 /// The following tokens are also considered to be FutureReservedWords 
 /// when parsing strict mode  
-Implements : {strictMode}? 'implements';
-Private    : {strictMode}? 'private';
-Public     : {strictMode}? 'public';
-Interface  : {strictMode}? 'interface';
-Package    : {strictMode}? 'package';
-Protected  : {strictMode}? 'protected';
+Implements : 'implements' {strictMode}?;
+Private    : 'private' {strictMode}?;
+Public     : 'public' {strictMode}?;
+Interface  : 'interface' {strictMode}?;
+Package    : 'package' {strictMode}?;
+Protected  : 'protected' {strictMode}?;
 
 
 
