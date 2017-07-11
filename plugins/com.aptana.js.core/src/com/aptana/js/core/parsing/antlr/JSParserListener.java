@@ -1,4 +1,4 @@
-// Generated from /Users/cwilliams/repos/studio3/plugins/com.aptana.js.core/parsing/JS.g4 by ANTLR 4.7
+// Generated from /Users/cwilliams/repos/studio3/plugins/com.aptana.js.core/parsing/JSParser.g4 by ANTLR 4.7
 package com.aptana.js.core.parsing.antlr;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  * This interface defines a complete listener for a parse tree produced by
  * {@link JSParser}.
  */
-public interface JSListener extends ParseTreeListener {
+public interface JSParserListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by {@link JSParser#program}.
 	 * @param ctx the parse tree
@@ -660,6 +660,16 @@ public interface JSListener extends ParseTreeListener {
 	 */
 	void exitFunctionDeclaration(JSParser.FunctionDeclarationContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link JSParser#functionExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunctionExpression(JSParser.FunctionExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link JSParser#functionExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunctionExpression(JSParser.FunctionExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link JSParser#strictFormalParameters}.
 	 * @param ctx the parse tree
 	 */
@@ -1206,18 +1216,6 @@ public interface JSListener extends ParseTreeListener {
 	 */
 	void exitRegularExpressionLiteralExpression(JSParser.RegularExpressionLiteralExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code FunctionExpression}
-	 * labeled alternative in {@link JSParser#singleExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterFunctionExpression(JSParser.FunctionExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code FunctionExpression}
-	 * labeled alternative in {@link JSParser#singleExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitFunctionExpression(JSParser.FunctionExpressionContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code UnaryMinusExpression}
 	 * labeled alternative in {@link JSParser#singleExpression}.
 	 * @param ctx the parse tree
@@ -1553,6 +1551,18 @@ public interface JSListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitBitOrExpression(JSParser.BitOrExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code FunctionExpressionExpression}
+	 * labeled alternative in {@link JSParser#singleExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunctionExpressionExpression(JSParser.FunctionExpressionExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code FunctionExpressionExpression}
+	 * labeled alternative in {@link JSParser#singleExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunctionExpressionExpression(JSParser.FunctionExpressionExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code AssignmentOperatorExpression}
 	 * labeled alternative in {@link JSParser#singleExpression}.

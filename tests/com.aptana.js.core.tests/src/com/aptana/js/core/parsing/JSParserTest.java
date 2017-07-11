@@ -25,6 +25,8 @@ import org.junit.Test;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.js.core.JSCorePlugin;
+import com.aptana.js.core.tests.ITestFiles;
+import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseError;
@@ -32,34 +34,20 @@ import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseNode;
 
-import beaver.Symbol;
-
-public class JSParserTest
+public abstract class JSParserTest
 {
 	private static final String EOL = FileUtil.NEW_LINE;
 
-	private JSParser fParser;
+	private IParser fParser;
 	private ParseResult fParseResult;
 
 	@Before
 	public void setUp() throws Exception
 	{
-		fParser = new JSParser();
+		fParser = createParser();
 	}
 
-	/**
-	 * getSource
-	 * 
-	 * @param resourceName
-	 * @return
-	 * @throws IOException
-	 */
-	private String getSource(String resourceName) throws IOException
-	{
-		InputStream stream = FileLocator.openStream(Platform.getBundle(JSCorePlugin.PLUGIN_ID), new Path(resourceName),
-				false);
-		return IOUtil.read(stream);
-	}
+	protected abstract IParser createParser();
 
 	@Test
 	public void testEmptyStatement() throws Exception
@@ -352,7 +340,7 @@ public class JSParserTest
 	@Test
 	public void testTypeof1() throws Exception
 	{
-		assertParseResult("a = typeof(object);" + EOL, "a = typeof (object);" + EOL); //$NON-NLS-1$
+		assertParseResult("a = typeof(object);" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -532,7 +520,7 @@ public class JSParserTest
 	@Test
 	public void testEmptyInIfElse() throws Exception
 	{
-		assertParseResult("if (true)  else true;" + EOL, "if (true) ; else true;" + EOL); //$NON-NLS-1$
+		assertParseResult("if (true)  else true;" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -659,6 +647,14 @@ public class JSParserTest
 	public void testEmptyFunction() throws Exception
 	{
 		assertParseResult("function abc () {}" + EOL); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void testFunctionWithNoSpaceBetweenNameAndParens() throws Exception
+	{
+		// FIXME This seems like it's generating a bad AST. Looks like it's treating the trailing semicolon as an empty statement?
+		assertParseResult("function Titanium_Facebook_LoginButton() {};" + EOL, "function Titanium_Facebook_LoginButton () {}" + EOL + ";" + EOL); //$NON-NLS-1$
+		assertNoErrors();
 	}
 
 	@Test
@@ -1019,6 +1015,18 @@ public class JSParserTest
 	}
 
 	@Test
+	public void testForLet() throws Exception
+	{
+		assertParseResult("for (let a = 0; a < 10; a++) {a;}" + EOL); //$NON-NLS-1$
+	}
+
+	@Test
+	public void testForConst() throws Exception
+	{
+		assertParseResult("for (const a = 0; a < 10; a++) {a;}" + EOL); //$NON-NLS-1$
+	}
+
+	@Test
 	public void testForIn() throws Exception
 	{
 		assertParseResult("for (a in obj) {a;}" + EOL);
@@ -1030,18 +1038,16 @@ public class JSParserTest
 		assertParseResult("for (var a in obj) {a;}" + EOL);
 	}
 
-	// bug and regression tests here
+	@Test
+	public void testForLetIn() throws Exception
+	{
+		assertParseResult("for (let a in obj) {a;}" + EOL);
+	}
 
 	@Test
-	public void testSDocComment() throws Exception
+	public void testForConstIn() throws Exception
 	{
-		JSFlexScanner scanner = new JSFlexScanner();
-		scanner.setSource("/**/");
-		fParser.parse(scanner);
-
-		List<Symbol> comments = scanner.getMultiLineComments();
-
-		assertEquals(1, comments.size());
+		assertParseResult("for (const a in obj) {a;}" + EOL);
 	}
 
 	@Test
@@ -1091,71 +1097,64 @@ public class JSParserTest
 	public void testMissingSemicolon() throws Exception
 	{
 		assertParseResult("abc", "abc;" + EOL);
-		assertParseErrors("Missing semicolon");
+		// assertParseErrors("Missing semicolon"); // FIXME This parser handles this fine
 	}
 
 	@Test
 	public void testMissingClosingParenthesis() throws Exception
 	{
-		assertParseResult("testing(", "testing();" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
+		parse("testing(");
+		assertBeaverParseErrors("Syntax Error: unexpected token \"end-of-file\"");
+		assertANTLRParseErrors("no viable alternative at input '('");
 	}
 
 	@Test
 	public void testMissingIdentifier() throws Exception
 	{
-		assertParseResult("var x =", "var x = ;" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
+		parse("var x =");
+		assertBeaverParseErrors("Syntax Error: unexpected token \"end-of-file\"");
+		assertANTLRParseErrors("mismatched input '<EOF>'");
 	}
 
 	@Test
 	public void testMissingIdentifier2() throws Exception
 	{
-		assertParseResult("x.", "x.;" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
+		parse("x.");
+		assertBeaverParseErrors("Syntax Error: unexpected token \"end-of-file\"");
+		assertANTLRParseErrors("mismatched input '<EOF>'");
 	}
 
 	@Test
 	public void testMissingArg() throws Exception
 	{
-		assertParseResult("fun(a,);", "fun(a, );" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \")\"");
+		parse("fun(a,);");
+		assertBeaverParseErrors("Syntax Error: unexpected token \")\"");
+		assertANTLRParseErrors("no viable alternative at input '('");
 	}
 
 	@Test
 	public void testMissingIdentifier3() throws Exception
 	{
-		assertParseResult("new", "new ;" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
+		parse("new");
+		assertBeaverParseErrors("Syntax Error: unexpected token \"end-of-file\"");
+		assertANTLRParseErrors("no viable alternative at input 'new'");
 	}
 
 	@Test
 	public void testMissingPropertyValue() throws Exception
 	{
-		assertParseResult("var x = { t };", "var x = {t: };" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"}\"");
+		assertParseResult("var x = { t };", "var x = {t};" + EOL);
+		assertNoErrors();
 	}
 
 	@Test
 	public void testMissingPropertyValue2() throws Exception
 	{
-		assertParseResult("var x = { t: };", "var x = {t: };" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"}\"");
+		parse("var x = { t: };");
+		assertParseErrors(mismatchedToken("}"));
 	}
 
-	@Test
-	public void testSingleLineComment() throws Exception
-	{
-		String source = "// this is a single-line comment";
-
-		IParseRootNode root = parse(source);
-		IParseNode[] comments = root.getCommentNodes();
-		assertNotNull(comments);
-		assertEquals(1, comments.length);
-		IParseNode comment = comments[0];
-		assertEquals(0, comment.getStartingOffset());
-		assertEquals(source.length() - 1, comment.getEndingOffset());
-	}
+	protected abstract String mismatchedToken(String token);
 
 	/**
 	 * Test fix for APSTUD-3214
@@ -1179,27 +1178,6 @@ public class JSParserTest
 	public void testFunctionWithoutBody() throws Exception
 	{
 		assertParseResult("function abc(s1, s2, s3)", "function abc (s1, s2, s3) {}" + EOL);
-	}
-
-	/**
-	 * Test APSTUD-4072
-	 * 
-	 * @throws IOException
-	 * @throws beaver.Parser.Exception
-	 */
-	@Test
-	public void testNodeOffsetsAtEOF() throws Exception
-	{
-		String source = "a.foo()\n// this is a comment";
-		IParseNode result = parse(source);
-
-		assertNotNull(result);
-		assertEquals(1, result.getChildCount());
-
-		IParseNode invokeNode = result.getFirstChild();
-		assertNotNull(invokeNode);
-		assertEquals(0, invokeNode.getStartingOffset());
-		assertEquals(6, invokeNode.getEndingOffset());
 	}
 
 	/**
@@ -1227,22 +1205,25 @@ public class JSParserTest
 	@Test
 	public void testUnclosedString() throws Exception
 	{
-		assertParseResult("var string = 'something", "var string = ;" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"'\"");
+		parse("var string = 'something");
+		assertParseErrors(unexpectedToken("'"));
 	}
 
 	@Test
 	public void testUnclosedComment() throws Exception
 	{
-		assertParseResult("var thing; /* comment", "var thing;" + EOL + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"/\"");
+		parse("var thing; /* comment");
+		assertParseErrors(unexpectedToken("/"));
 	}
+
+	protected abstract String unexpectedToken(String token);
 
 	@Test
 	public void testUnclosedRegexp() throws Exception
 	{
-		assertParseResult("var regexp = /;", EOL);
-		assertParseErrors("Syntax Error: unexpected token \"/\"", "Syntax Error: unexpected token \";\"");
+		parse("var regexp = /;");
+		assertBeaverParseErrors("Syntax Error: unexpected token \"/\"", "Syntax Error: unexpected token \";\"");
+		assertANTLRParseErrors("mismatched input '/'");
 	}
 
 	@Test
@@ -1270,7 +1251,8 @@ public class JSParserTest
 	public void testReservedWordAsFunctionName() throws Exception
 	{
 		parse("function import() {};" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"import\"");
+		assertBeaverParseErrors("Syntax Error: unexpected token \"import\"");
+		assertANTLRParseErrors("no viable alternative at input 'function import'", "missing '=>' at '{'");
 	}
 
 	@Test
@@ -1374,9 +1356,23 @@ public class JSParserTest
 	}
 
 	@Test
-	public void testForOf() throws Exception
+	public void testForLetOf() throws Exception
 	{
 		assertParseResult("for (let n of fibonacci) {console.log(n);}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testForConstOf() throws Exception
+	{
+		assertParseResult("for (const n of fibonacci) {console.log(n);}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testForVarOf() throws Exception
+	{
+		assertParseResult("for (var n of fibonacci) {console.log(n);}" + EOL);
 		assertNoErrors();
 	}
 
@@ -1466,15 +1462,6 @@ public class JSParserTest
 		assertNoErrors();
 	}
 
-	// TODO Add test cases for grammar I had to explicitly disable so we can eventually work on enabling it in some way!
-	// - Property Definitions with just an identifier "{property}"
-	// - Property Definitions with an identifier and initializer "{property = 1}"
-	// - class' method definition with string literal, numeric literal or computed property as method name
-
-	// TODO Add test for class extending expression: http://es6-features.org/#ClassInheritanceFromExpressions
-	// TODO Add test for generator function, iterator protocol:
-	// http://es6-features.org/#GeneratorFunctionIteratorProtocol
-
 	@Test
 	public void testGeneratorFunction() throws Exception
 	{
@@ -1510,12 +1497,229 @@ public class JSParserTest
 		assertParseResult("obj = {x, y};" + EOL);
 		assertNoErrors();
 	}
-	
+
 	@Test
 	public void testInitializedPropertyInObjectLiteral() throws Exception
 	{
 		assertParseResult("obj = {x: x};" + EOL);
 		assertNoErrors();
+	}
+
+	// https://www.ecma-international.org/ecma-262/6.0/#sec-rules-of-automatic-semicolon-insertion
+	/**
+	 * <p>
+	 * The source
+	 * 
+	 * <pre>
+	 * <code>{ 1 2 } 3</code>
+	 * </pre>
+	 * 
+	 * is not a valid sentence in the ECMAScript grammar, even with the automatic semicolon insertion rules.
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion1() throws Exception
+	{
+		// FIXME How do we enforce that no semicolon insertion happens here?
+		assertParseResult("{ 1 2 } 3" + EOL);
+		assertParseErrors("no viable alternative at input '2'");
+	}
+
+	/**
+	 * <p>
+	 * In contrast, the source
+	 * 
+	 * <pre>
+	 * <code>{ 1
+	 * 2 } 3</code>
+	 * </pre>
+	 * 
+	 * is also not a valid ECMAScript sentence, but is transformed by automatic semicolon insertion into the following:
+	 * 
+	 * <pre>
+	 * <code>{ 1 
+	 * ;2 ;} 3;</code>
+	 * </pre>
+	 * 
+	 * which is a valid ECMAScript sentence.
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion2() throws Exception
+	{
+		assertParseResult("{ 1" + EOL + "2 } 3" + EOL, "{1;2;}" + EOL + "3;" + EOL);
+		// assertNoErrors(); // FIXME Beaver reports the inserted semicolons as warnings!
+	}
+
+	/**
+	 * <p>
+	 * The source
+	 * 
+	 * <pre>
+	 * <code>for (a; b
+	 * )</code>
+	 * </pre>
+	 * 
+	 * is not a valid ECMAScript sentence and is not altered by automatic semicolon insertion because the semicolon is
+	 * needed for the header of a for statement. Automatic semicolon insertion never inserts one of the two semicolons
+	 * in the header of a for statement.
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion3() throws Exception
+	{
+		// FIXME Beaver fails here
+		assertParseResult("for (a; b" + EOL + ")" + EOL, "for (a; b;) " + EOL);
+		assertParseErrors("missing ';' at ')'", "mismatched input '<EOF>'");
+	}
+
+	/**
+	 * <p>
+	 * The source
+	 * 
+	 * <pre>
+	 * <code>return
+	 * a + b</code>
+	 * </pre>
+	 * 
+	 * is transformed by automatic semicolon insertion into the following:
+	 * 
+	 * <pre>
+	 * <code>return;
+	 * a + b;</code>
+	 * </pre>
+	 * </p>
+	 * <p>
+	 * NOTE 1 The expression <code>a + b</code> is not treated as a value to be returned by the <code>return</code>
+	 * statement, because a LineTerminator separates it from the token return.
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion4() throws Exception
+	{
+		// FIXME Beaver incorrectly joins this into "return a + b;"
+		assertParseResult("return" + EOL + "a + b" + EOL, "return;" + EOL + "a + b;" + EOL);
+		assertNoErrors();
+	}
+
+	/**
+	 * <p>
+	 * The source
+	 * 
+	 * <pre>
+	 * <code>a = b
+	 * ++c</code>
+	 * </pre>
+	 * 
+	 * is transformed by automatic semicolon insertion into the following:
+	 * 
+	 * <pre>
+	 * <code>a = b;
+	 * ++c;</code>
+	 * </pre>
+	 * </p>
+	 * <p>
+	 * NOTE 2 The token <code>++</code> is not treated as a postfix operator applying to the variable <code>b</code>,
+	 * because a LineTerminator occurs between <code>b</code> and <code>++</code>.
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion5() throws Exception
+	{
+		// FIXME Beaver incorrectly joins this into "a = b++; c;"
+		assertParseResult("a = b" + EOL + "++c" + EOL, "a = b;" + EOL + "++c;" + EOL);
+		assertNoErrors();
+	}
+
+	/**
+	 * The source 'if (a > b) else c = d' is not a valid ECMAScript sentence and is not altered by automatic semicolon
+	 * insertion before the else token, even though no production of the grammar applies at that point, because an
+	 * automatically inserted semicolon would then be parsed as an empty statement.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion6() throws Exception
+	{
+		// FIXME Beaver incorrectly inserts semicolon before else here
+		assertParseResult("if (a > b)" + EOL + "else c = d" + EOL, "if (a > b)  else c = d;" + EOL);
+		assertParseErrors("extraneous input 'else'");
+	}
+
+	/**
+	 * The source a = b + c (d + e).print() is not transformed by automatic semicolon insertion, because the
+	 * parenthesized expression that begins the second line can be interpreted as an argument list for a function call:
+	 * a = b + c(d + e).print()
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion7() throws Exception
+	{
+		assertParseResult("a = b + c" + EOL + "(d + e).print()" + EOL, "a = b + c(d + e).print();" + EOL);
+		assertNoErrors(); // FIXME Beaver reports injected semicolon as warning
+	}
+	
+	@Test
+	public void testDojo() throws Exception
+	{
+		for (String file : ITestFiles.DOJO_FILES)
+		{
+			parse(getSource(file));
+			assertNoErrors();
+		}
+	}
+
+	@Test
+	public void testTiMobile() throws Exception
+	{
+		for (String file : ITestFiles.TIMOBILE_FILES)
+		{
+			parse(getSource(file));
+			assertNoErrors();
+		}
+	}
+
+	@Test
+	public void testExtFiles() throws Exception
+	{
+		for (String file : ITestFiles.EXT_FILES)
+		{
+			System.out.println("Parsing file: " + file);
+			parse(getSource(file));
+			assertNoErrors();
+		}
+	}
+
+	@Test
+	public void testTinyMCEFiles() throws Exception
+	{
+		for (String file : ITestFiles.TINY_MCE_FILES)
+		{
+			parse(getSource(file));
+			assertNoErrors();
+		}
+	}
+
+	@Test
+	public void testJaxerFiles() throws Exception
+	{
+		for (String file : ITestFiles.JAXER_FILES)
+		{
+			System.out.println("Parsing file: " + file);
+			parse(getSource(file));
+			assertNoErrors();
+		}
 	}
 
 	private void assertNoErrors()
@@ -1547,7 +1751,7 @@ public class JSParserTest
 //		ASTUtil.showBeforeAndAfterTrim(parse(parseState));
 //	}
 
-	private IParseRootNode parse(String source) throws Exception
+	protected IParseRootNode parse(String source) throws Exception
 	{
 		return parse(new ParseState(source));
 	}
@@ -1559,6 +1763,24 @@ public class JSParserTest
 	}
 
 	// utility methods
+	protected void assertBeaverParseErrors(String... messages)
+	{
+		if (!isBeaver())
+			return;
+		assertParseErrors(messages);
+	}
+
+	protected void assertANTLRParseErrors(String... messages)
+	{
+		if (!isANTLR())
+			return;
+		assertParseErrors(messages);
+	}
+
+	protected abstract boolean isANTLR();
+
+	protected abstract boolean isBeaver();
+
 	protected void assertParseErrors(String... messages)
 	{
 		List<IParseError> errors = fParseResult.getErrors();
@@ -1567,7 +1789,12 @@ public class JSParserTest
 
 		for (int i = 0; i < messages.length; i++)
 		{
-			assertEquals(messages[i], errors.get(i).getMessage());
+			String msg = errors.get(i).getMessage();
+			// match prefix only. If no prefix match, give full diff in failure
+			if (!msg.startsWith(messages[i]))
+			{
+				assertEquals(messages[i], errors.get(i).getMessage());
+			}
 		}
 	}
 
@@ -1586,5 +1813,19 @@ public class JSParserTest
 			text.append(child).append(EOL);
 		}
 		assertEquals(expected, text.toString());
+	}
+
+	/**
+	 * getSource
+	 * 
+	 * @param resourceName
+	 * @return
+	 * @throws IOException
+	 */
+	private String getSource(String resourceName) throws IOException
+	{
+		InputStream stream = FileLocator.openStream(Platform.getBundle(JSCorePlugin.PLUGIN_ID), new Path(resourceName),
+				false);
+		return IOUtil.read(stream);
 	}
 }

@@ -7,9 +7,9 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import com.aptana.js.core.parsing.antlr.JSBaseListener;
 import com.aptana.js.core.parsing.antlr.JSParser;
 import com.aptana.js.core.parsing.antlr.JSParser.*;
+import com.aptana.js.core.parsing.antlr.JSParserBaseListener;
 import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSArrayNode;
 import com.aptana.js.core.parsing.ast.JSArrowFunctionNode;
@@ -82,7 +82,7 @@ import com.aptana.parsing.ast.IParseNode;
 
 import beaver.Symbol;
 
-public class JSASTWalker extends JSBaseListener
+public class JSASTWalker extends JSParserBaseListener
 {
 	private JSParseRootNode fRootNode;
 	private Stack<IParseNode> fNodeStack = new Stack<IParseNode>();
@@ -529,20 +529,25 @@ public class JSASTWalker extends JSBaseListener
 	@Override
 	public void enterImportDeclaration(ImportDeclarationContext ctx)
 	{
-		ModuleSpecifierContext msc = ctx.moduleSpecifier();
-		if (msc == null)
+		if (ctx.exception == null)
 		{
-			msc = ctx.fromClause().moduleSpecifier();
+			ModuleSpecifierContext msc = ctx.moduleSpecifier();
+			if (msc == null)
+			{
+				msc = ctx.fromClause().moduleSpecifier();
+			}
+			String s = msc.StringLiteral().getText();
+			addToParentAndPushNodeToStack(new JSImportNode(s));
 		}
-		String s = msc.StringLiteral().getText();
-		addToParentAndPushNodeToStack(new JSImportNode(s));
 		super.enterImportDeclaration(ctx);
 	}
 
 	@Override
 	public void exitImportDeclaration(ImportDeclarationContext ctx)
 	{
-		popNode();
+		if (ctx.exception == null) {
+			popNode();
+		}
 		super.exitImportDeclaration(ctx);
 	}
 
@@ -1948,7 +1953,10 @@ public class JSASTWalker extends JSBaseListener
 
 	private void addChildToParent(JSNode node)
 	{
-		getCurrentNode().addChild(node);
+		IParseNode parent = getCurrentNode();
+		if (parent != null) {
+			parent.addChild(node);
+		}
 	}
 
 	private void popNode()
@@ -1958,6 +1966,10 @@ public class JSASTWalker extends JSBaseListener
 
 	private IParseNode getCurrentNode()
 	{
+		if (fNodeStack.isEmpty())
+		{
+			return null;
+		}
 		return fNodeStack.peek();
 	}
 

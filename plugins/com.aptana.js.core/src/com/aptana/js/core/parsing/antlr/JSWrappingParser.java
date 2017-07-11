@@ -1,15 +1,11 @@
 package com.aptana.js.core.parsing.antlr;
 
-import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.DefaultErrorStrategy;
-import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.atn.ParseInfo;
-import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.IterativeParseTreeWalker;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -29,13 +25,13 @@ import com.aptana.parsing.ast.ParseError;
 public class JSWrappingParser implements IParser
 {
 
-	private final class ErrorListener extends DiagnosticErrorListener
+	private final class ErrorListener extends BaseErrorListener
 	{
 		private final WorkingParseResult working;
 
 		private ErrorListener(WorkingParseResult working)
 		{
-			super(false);
+			// super(false);
 			this.working = working;
 		}
 
@@ -99,34 +95,34 @@ public class JSWrappingParser implements IParser
 		// - try inserting ':' and empty identifier if current token is (i.e. before) '}'
 		// fParser.setErrorHandler(new DefaultErrorStrategy());
 
-		// FIXME This is still much slower than the beaver parser. How can we speed it up?
-		ProgramContext pc;
-		fParser.setProfile(true);
+		// FIXME This is still much slower than the beaver parser. How can we speed it up? For one, we should get the faster SLL mode working on all our unit tests!
+		ProgramContext pc = null;
+		// fParser.setProfile(true);
 		// This is the fastest settings. We're supposed to fall back to DefaultErrorStrategy and LL if this fails!
 		// (i.e. a ParseCancellationException)
-		fParser.getInterpreter().setPredictionMode(PredictionMode.SLL);
-		fParser.setErrorHandler(new BailErrorStrategy());
+		// fParser.getInterpreter().setPredictionMode(PredictionMode.SLL);
+		// fParser.setErrorHandler(new BailErrorStrategy());
 		try
 		{
 			pc = fParser.program();
 		}
 		catch (ParseCancellationException e)
 		{
-			fParser.getInterpreter().setPredictionMode(PredictionMode.LL);
-			fParser.setErrorHandler(new DefaultErrorStrategy());
-			pc = fParser.program();
+			// fParser.getInterpreter().setPredictionMode(PredictionMode.LL);
+			// fParser.setErrorHandler(new DefaultErrorStrategy());
+			// pc = fParser.program();
 		}
 
 		JSParseRootNode rootNode = convertAST(pc);
-		ParseInfo pi = fParser.getParseInfo();
-		System.out.println("DFA size: " + pi.getDFASize());
-		System.out.println("ATN lookahead ops: " + pi.getTotalATNLookaheadOps());
-		System.out.println("LLATN lookahead ops: " + pi.getTotalLLATNLookaheadOps());
-		System.out.println("LL lookahead ops: " + pi.getTotalLLLookaheadOps());
-		System.out.println("SLLATN lookahead ops: " + pi.getTotalSLLATNLookaheadOps());
-		System.out.println("SLL lookahead ops: " + pi.getTotalSLLLookaheadOps());
-		System.out.println("Total time in prediction: " + pi.getTotalTimeInPrediction());
-		System.out.println("LL Decisions: " + pi.getLLDecisions());
+		// ParseInfo pi = fParser.getParseInfo();
+		// System.out.println("DFA size: " + pi.getDFASize());
+		// System.out.println("ATN lookahead ops: " + pi.getTotalATNLookaheadOps());
+		// System.out.println("LLATN lookahead ops: " + pi.getTotalLLATNLookaheadOps());
+		// System.out.println("LL lookahead ops: " + pi.getTotalLLLookaheadOps());
+		// System.out.println("SLLATN lookahead ops: " + pi.getTotalSLLATNLookaheadOps());
+		// System.out.println("SLL lookahead ops: " + pi.getTotalSLLLookaheadOps());
+		// System.out.println("Total time in prediction: " + pi.getTotalTimeInPrediction());
+		// System.out.println("LL Decisions: " + pi.getLLDecisions());
 		working.setParseResult(rootNode);
 	}
 

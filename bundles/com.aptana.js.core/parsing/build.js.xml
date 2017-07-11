@@ -23,7 +23,19 @@
 			<arg value="${basedir}/../src/com/aptana/js/core/parsing/antlr"/>
 			<arg value="-package"/>
             <arg value="com.aptana.js.core.parsing.antlr"/>
-            <arg line="${basedir}/JS.g4"/>
+            <arg line="${basedir}/JSLexer.g4"/>
+            <classpath>
+                <pathelement location="${basedir}/../lib/antlr-4.7-complete.jar"/>
+                <pathelement location="${java.class.path}"/>
+            </classpath>
+        </java>
+		
+		<java classname="org.antlr.v4.Tool" fork="true" failonerror="true" dir="../src/com/aptana/js/core/parsing/antlr">
+			<arg value="-o"/>
+			<arg value="${basedir}/../src/com/aptana/js/core/parsing/antlr"/>
+			<arg value="-package"/>
+            <arg value="com.aptana.js.core.parsing.antlr"/>
+            <arg line="${basedir}/JSParser.g4"/>
             <classpath>
                 <pathelement location="${basedir}/../lib/antlr-4.7-complete.jar"/>
                 <pathelement location="${java.class.path}"/>

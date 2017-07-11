@@ -1,4 +1,4 @@
-// Generated from /Users/cwilliams/repos/studio3/plugins/com.aptana.js.core/parsing/JS.g4 by ANTLR 4.7
+// Generated from /Users/cwilliams/repos/studio3/plugins/com.aptana.js.core/parsing/JSParser.g4 by ANTLR 4.7
 package com.aptana.js.core.parsing.antlr;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -6,11 +6,11 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
- * This class provides an empty implementation of {@link JSListener},
+ * This class provides an empty implementation of {@link JSParserListener},
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
-public class JSBaseListener implements JSListener {
+public class JSParserBaseListener implements JSParserListener {
 	/**
 	 * {@inheritDoc}
 	 *
@@ -772,6 +772,18 @@ public class JSBaseListener implements JSListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterFunctionExpression(JSParser.FunctionExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFunctionExpression(JSParser.FunctionExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterStrictFormalParameters(JSParser.StrictFormalParametersContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1396,18 +1408,6 @@ public class JSBaseListener implements JSListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFunctionExpression(JSParser.FunctionExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitFunctionExpression(JSParser.FunctionExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterUnaryMinusExpression(JSParser.UnaryMinusExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1739,6 +1739,18 @@ public class JSBaseListener implements JSListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitBitOrExpression(JSParser.BitOrExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFunctionExpressionExpression(JSParser.FunctionExpressionExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFunctionExpressionExpression(JSParser.FunctionExpressionExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
