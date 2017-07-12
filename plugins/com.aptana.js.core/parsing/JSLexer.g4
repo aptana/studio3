@@ -161,7 +161,7 @@ InputElementTemplateTail
 /// RegularExpressionLiteral ::
 ///     / RegularExpressionBody / RegularExpressionFlags
 RegularExpressionLiteral
- : {isRegexPossible()}? '/' RegularExpressionBody '/' RegularExpressionFlags
+ : '/' {isRegexPossible()}? RegularExpressionBody '/' RegularExpressionFlags
  ;
 
 /// 7.3 Line Terminators
@@ -318,7 +318,7 @@ StringLiteral
  ;
 
 WhiteSpaces
- : [\t\u000B\u000C\u0020\u00A0]+ -> channel(HIDDEN)
+ : [\t\u000B\u000C\u0020\u00A0]+ -> skip
  ;
 
 /// 7.4 Comments
