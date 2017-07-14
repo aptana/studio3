@@ -38,18 +38,18 @@
  * ***** END LICENSE BLOCK ***** */
 
 /* notice that these valuse are octal. */
-const PERM_IRWXU = 00700;  /* read, write, execute/search by owner */
-const PERM_IRUSR = 00400;  /* read permission, owner */
-const PERM_IWUSR = 00200;  /* write permission, owner */
-const PERM_IXUSR = 00100;  /* execute/search permission, owner */
-const PERM_IRWXG = 00070;  /* read, write, execute/search by group */
-const PERM_IRGRP = 00040;  /* read permission, group */
-const PERM_IWGRP = 00020;  /* write permission, group */
-const PERM_IXGRP = 00010;  /* execute/search permission, group */
-const PERM_IRWXO = 00007;  /* read, write, execute/search by others */
-const PERM_IROTH = 00004;  /* read permission, others */
-const PERM_IWOTH = 00002;  /* write permission, others */
-const PERM_IXOTH = 00001;  /* execute/search permission, others */
+const PERM_IRWXU = 0o700;  /* read, write, execute/search by owner */
+const PERM_IRUSR = 0o400;  /* read permission, owner */
+const PERM_IWUSR = 0o200;  /* write permission, owner */
+const PERM_IXUSR = 0o100;  /* execute/search permission, owner */
+const PERM_IRWXG = 0o070;  /* read, write, execute/search by group */
+const PERM_IRGRP = 0o040;  /* read permission, group */
+const PERM_IWGRP = 0o020;  /* write permission, group */
+const PERM_IXGRP = 0o010;  /* execute/search permission, group */
+const PERM_IRWXO = 0o007;  /* read, write, execute/search by others */
+const PERM_IROTH = 0o004;  /* read permission, others */
+const PERM_IWOTH = 0o002;  /* write permission, others */
+const PERM_IXOTH = 0o001;  /* execute/search permission, others */
 
 const MODE_RDONLY   = 0x01;
 const MODE_WRONLY   = 0x02;
@@ -253,7 +253,7 @@ function LocalFile(file, mode, perms, tmp)
     const nsIScriptableInputStream = interfaces.nsIScriptableInputStream;
     
     if (typeof perms == "undefined")
-        perms = 0666 & ~futils.umask;
+        perms = 0o666 & ~futils.umask;
 
     if (typeof mode == "string")
     {

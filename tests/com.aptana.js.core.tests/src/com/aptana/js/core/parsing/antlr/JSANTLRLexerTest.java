@@ -1,5 +1,7 @@
 package com.aptana.js.core.parsing.antlr;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -167,6 +169,18 @@ public class JSANTLRLexerTest extends JSLexerTest
 				JSTokenType.IDENTIFIER, JSTokenType.LPAREN, JSTokenType.RPAREN, JSTokenType.LCURLY,
 				JSTokenType.MULTILINE_COMMENT, JSTokenType.THIS, JSTokenType.DOT, JSTokenType.IDENTIFIER,
 				JSTokenType.EQUAL, JSTokenType.LCURLY, JSTokenType.RCURLY);
+	}
+
+	@Test
+	public void testLotsOfFunctionInvocations() throws IOException
+	{
+		// Hmm, so this works, but is very slow! If we run as part of test that does all the jaxer files, this causes GC overhead limit exceeded error
+		// This takes 7.5s to lex, why?
+		String src = getSource("performance/jaxer/regress-155081-2.js");
+		CharStream input = CharStreams.fromString(src);
+		JSLexer lexer = new JSLexer(input);
+		List<? extends Token> tokens = lexer.getAllTokens();
+		assertEquals(true, true);
 	}
 
 }

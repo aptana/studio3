@@ -1403,7 +1403,7 @@ function maybeAddHeaders(file, metadata, response)
     return;
 
   const PR_RDONLY = 0x01;
-  var fis = new FileInputStream(headerFile, PR_RDONLY, 0444,
+  var fis = new FileInputStream(headerFile, PR_RDONLY, 0o444,
                                 Ci.nsIFileInputStream.CLOSE_ON_EOF);
 
   var lis = new ConverterInputStream(fis, "UTF-8", 1024, 0x0);
@@ -1824,7 +1824,7 @@ ServerHandler.prototype =
     {
       try
       {
-        var fis = new FileInputStream(file, PR_RDONLY, 0444,
+        var fis = new FileInputStream(file, PR_RDONLY, 0o444,
                                       Ci.nsIFileInputStream.CLOSE_ON_EOF);
         var sis = new ScriptableInputStream(fis);
         var s = Cu.Sandbox(gGlobalObject);
@@ -1849,7 +1849,7 @@ ServerHandler.prototype =
 
       response.setHeader("Content-Type", type, false);
   
-      var fis = new FileInputStream(file, PR_RDONLY, 0444,
+      var fis = new FileInputStream(file, PR_RDONLY, 0o444,
                                     Ci.nsIFileInputStream.CLOSE_ON_EOF);
       response.bodyOutputStream.writeFrom(fis, file.fileSize);
       fis.close();

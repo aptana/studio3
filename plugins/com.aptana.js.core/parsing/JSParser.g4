@@ -44,10 +44,12 @@ options {tokenVocab = JSLexer;}
      * {@code HIDDEN} channel.
      */
     private boolean here(final int type) {
-
-        // Get the token ahead of the current index.
-        int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 1;
-        Token ahead = _input.get(possibleIndexEosToken);
+        // This assumes use of a token stream with a buffer that does filtering (CommonTokenStream, but not UnbufferedTokenStream)
+    	int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 1;
+    	if (possibleIndexEosToken < 0) {
+    		return false;
+    	}
+    	Token ahead = _input.get(possibleIndexEosToken);
 
         // Check if the token resides on the HIDDEN channel and if it's of the
         // provided type.
@@ -67,12 +69,12 @@ options {tokenVocab = JSLexer;}
      */
     private boolean lineTerminatorAhead() {
 
-        // Get the token ahead of the current index.
-        int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 1;
-        if (possibleIndexEosToken < 0) {
-            return false;
-        }
-        Token ahead = _input.get(possibleIndexEosToken);
+        // This assumes use of a token stream with a buffer that does filtering (CommonTokenStream, but not UnbufferedTokenStream)
+    	int possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 1;
+    	if (possibleIndexEosToken < 0) {
+    		return false;
+    	}
+    	Token ahead = _input.get(possibleIndexEosToken);
 
         if (ahead.getChannel() != Lexer.HIDDEN) {
             // We're only interested in tokens on the HIDDEN channel.
@@ -87,6 +89,9 @@ options {tokenVocab = JSLexer;}
         if (ahead.getType() == WhiteSpaces) {
             // Get the token ahead of the current whitespaces.
             possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 2;
+            if (possibleIndexEosToken < 0) {
+    			return false;
+    		}
             ahead = _input.get(possibleIndexEosToken);
         }
 
@@ -1122,14 +1127,14 @@ importedBinding
 ///     export default ClassDeclaration[Default]
 ///     export default [lookahead ∉ {function, class}] AssignmentExpression[In] ;
 exportDeclaration
- : Export '*' fromClause ';'
- | Export exportClause fromClause ';'
- | Export exportClause ';'
+ : Export '*' fromClause eos
+ | Export exportClause fromClause eos
+ | Export exportClause eos
  | Export variableStatement
  | Export declaration
  | Export Default hoistableDeclaration
  | Export Default classDeclaration
- | Export Default {(_input.LA(1) != Function) && (_input.LA(1) != Class)}? singleExpression ';'
+ | Export Default {(_input.LA(1) != Function) && (_input.LA(1) != Class)}? singleExpression eos
  ;
 
 /// ExportClause :
