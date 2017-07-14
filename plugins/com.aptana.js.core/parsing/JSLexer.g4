@@ -323,26 +323,28 @@ WhiteSpaces
 
 /// 7.4 Comments
 MultiLineComment
- : '/*' MultiLineCommentChars? '*/' -> channel(HIDDEN)
+// NOTE the actual spec uses MultiLineCommentChars, but to cheat I am re-using the existing .*? matcher from ECMAScript grammar example. It's MUCH faster
+// : '/*' MultiLineCommentChars? '*/' -> channel(HIDDEN)
+ : '/*' .*? '*/' -> channel(HIDDEN)
  ;
 
-fragment MultiLineCommentChars
- : MultiLineNotAsteriskChar MultiLineCommentChars?
- | '*' PostAsteriskCommentChars?
- ;
+//fragment MultiLineCommentChars
+// : MultiLineNotAsteriskChar MultiLineCommentChars?
+// | '*' PostAsteriskCommentChars?
+// ;
 
-fragment PostAsteriskCommentChars
- : MultiLineNotForwardSlashOrAsteriskChar MultiLineCommentChars?
- | '*' PostAsteriskCommentChars?
- ;
+//fragment PostAsteriskCommentChars
+// : MultiLineNotForwardSlashOrAsteriskChar MultiLineCommentChars?
+// | '*' PostAsteriskCommentChars?
+// ;
 
-fragment MultiLineNotAsteriskChar
- : ~'*'
- ;
+//fragment MultiLineNotAsteriskChar
+// : ~'*'
+// ;
 
-fragment MultiLineNotForwardSlashOrAsteriskChar
- : ~[/*]
- ;
+//fragment MultiLineNotForwardSlashOrAsteriskChar
+// : ~[/*]
+// ;
 
 SingleLineComment
  : '//' ~[\r\n\u2028\u2029]* -> channel(HIDDEN)

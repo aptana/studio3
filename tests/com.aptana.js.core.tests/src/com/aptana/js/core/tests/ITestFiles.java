@@ -60,7 +60,7 @@ public interface ITestFiles
 		"performance/jaxer/jquery-1.2.1.js",
 		"performance/jaxer/jquery-1.2.6.min.js",
 		"performance/jaxer/jquery-stable.js",
-//		"performance/jaxer/jquery.js", // FIXME This chokes the ANTLR parser badly!
+		"performance/jaxer/jquery.js",
 		"performance/jaxer/lexical-008.js",
 		"performance/jaxer/messages.js",
 		"performance/jaxer/narcissus-exec.js",
@@ -72,7 +72,7 @@ public interface ITestFiles
 		"performance/jaxer/prototype.js",
 		"performance/jaxer/publishprefs.js",
 		"performance/jaxer/regress-100199.js",
-//		"performance/jaxer/regress-111557.js", // FIXME Causes GC overhead limit exceeded error!
+		"performance/jaxer/regress-111557.js",
 		"performance/jaxer/regress-155081-2.js",
 		"performance/jaxer/regress-192226.js",
 		"performance/jaxer/regress-244470.js",
