@@ -19,14 +19,14 @@ public interface ITestFiles
 
 	// @formatter:off
 	static final String[] EXT_FILES = new String[] {
-		"performance/ext/ext-all-debug-w-comments.js",
+		"performance/ext/ext-core.js",
+		"performance/ext/ext.js",
+		"performance/ext/ext-dev.js",
+		"performance/ext/ext-debug.js",
+		"performance/ext/ext-all.js",
 		"performance/ext/ext-all-debug.js",
 		"performance/ext/ext-all-dev.js",
-		"performance/ext/ext-all.js",
-		"performance/ext/ext-core.js",
-		"performance/ext/ext-debug.js",
-		"performance/ext/ext-dev.js",
-		"performance/ext/ext.js"
+		"performance/ext/ext-all-debug-w-comments.js",
 	};
 	// @formatter:on
 

@@ -1822,6 +1822,16 @@ public interface JSParserListener extends ParseTreeListener {
 	 */
 	void exitNumericLiteral(JSParser.NumericLiteralContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link JSParser#identifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterIdentifier(JSParser.IdentifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link JSParser#identifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitIdentifier(JSParser.IdentifierContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link JSParser#identifierName}.
 	 * @param ctx the parse tree
 	 */

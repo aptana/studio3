@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,13 +39,12 @@ public abstract class JSParserTest
 {
 	private static final String EOL = FileUtil.NEW_LINE;
 
-	private IParser fParser;
 	private ParseResult fParseResult;
-
-	@Before
-	public void setUp() throws Exception
+	
+	@After
+	public void teardown() throws Exception
 	{
-		fParser = createParser();
+		fParseResult = null;
 	}
 
 	protected abstract IParser createParser();
@@ -1764,7 +1764,9 @@ public abstract class JSParserTest
 
 	private IParseRootNode parse(ParseState parseState) throws Exception
 	{
-		fParseResult = fParser.parse(parseState);
+		IParser parser = createParser();
+		fParseResult = parser.parse(parseState);
+		parser = null; // null out parser now
 		return fParseResult.getRootNode();
 	}
 

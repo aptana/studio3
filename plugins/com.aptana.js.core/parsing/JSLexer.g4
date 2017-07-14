@@ -285,9 +285,7 @@ Const      : 'const';
 Super      : 'super';
 Yield      : 'yield';
 Import     : 'import';
-// NOTE Static and let are not marked in spec as keywords, but are special words we need to recognize!
-Static     : 'static';
-Let        : 'let';
+
 
 
 /// 11.6.2.2 Future Reserved Words
@@ -304,7 +302,15 @@ Interface  : 'interface' {strictMode}?;
 Package    : 'package' {strictMode}?;
 Protected  : 'protected' {strictMode}?;
 
-
+/// These are not reserved words or technically defined as keywords, but act like keywords in some contexts and identifiers everywhere else
+Static     : 'static';
+Let        : 'let';
+From       : 'from';
+Get        : 'get';
+Set        : 'set';
+As         : 'as';
+Of         : 'of';
+Target     : 'target';
 
 /// 7.6 Identifier Names and Identifiers
 Identifier

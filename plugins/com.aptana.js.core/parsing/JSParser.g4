@@ -369,9 +369,9 @@ iterationStatement
  | For '(' {((_input.LA(1) == Let) ? _input.LA(2) != OpenBracket : true)}? singleExpression In expressionSequence ')' statement       # ForInStatement
  | For '(' varForDeclaration In expressionSequence ')' statement                                                                      # ForVarInStatement
  | For '(' forDeclaration In expressionSequence ')' statement                                                                         # ForLexicalInStatement
- | For '(' {(_input.LA(1) != Let)}? singleExpression {_input.LT(1).getText().equals("of")}? Identifier singleExpression ')' statement # ForOfStatement
- | For '(' varForDeclaration {_input.LT(1).getText().equals("of")}? Identifier singleExpression ')' statement                         # ForVarOfStatement
- | For '(' forDeclaration {_input.LT(1).getText().equals("of")}? Identifier singleExpression ')' statement                            # ForLexicalOfStatement
+ | For '(' {(_input.LA(1) != Let)}? singleExpression 'of' singleExpression ')' statement # ForOfStatement
+ | For '(' varForDeclaration 'of' singleExpression ')' statement                         # ForVarOfStatement
+ | For '(' forDeclaration 'of' singleExpression ')' statement                            # ForLexicalOfStatement
  ;
 
 
@@ -402,14 +402,14 @@ forBinding
 ///     continue ;
 ///     continue [no LineTerminator here] Identifier ;
 continueStatement
- : Continue ({!here(LineTerminator)}? Identifier)? eos
+ : Continue ({!here(LineTerminator)}? identifier)? eos
  ;
 
 /// BreakStatement :
 ///     break ;
 ///     break [no LineTerminator here] Identifier ;
 breakStatement
- : Break ({!here(LineTerminator)}? Identifier)? eos
+ : Break ({!here(LineTerminator)}? identifier)? eos
  ;
 
 /// ReturnStatement :
@@ -460,7 +460,7 @@ defaultClause
 /// LabelledStatement :
 ///     Identifier ':' Statement
 labelledStatement
- : Identifier ':' labelledItem
+ : identifier ':' labelledItem
  ;
 
 /// LabelledItem :
@@ -624,8 +624,8 @@ coverParenthesizedExpressionAndArrowParameterList
 methodDefinition
  : propertyName '(' strictFormalParameters ')' '{' functionBody '}'
  | generatorMethod
- | {_input.LT(1).getText().equals("get")}? Identifier propertyName '(' ')' '{' functionBody '}'
- | {_input.LT(1).getText().equals("set")}? Identifier propertyName '(' propertySetParameterList ')' '{' functionBody '}'
+ | 'get' propertyName '(' ')' '{' functionBody '}'
+ | 'set' propertyName '(' propertySetParameterList ')' '{' functionBody '}'
 ;
 
 /// PropertySetParameterList :
@@ -950,7 +950,7 @@ singleExpression
  : functionExpression                                                        # FunctionExpressionExpression
  | classExpression                                                           # ClassExpressionExpression
  | generatorExpression                                                       # GeneratorExpressionExpression
- | New '.' {_input.LT(1).getText().equals("target")}? Identifier             # NewTargetExpression
+ | New '.' 'target'             # NewTargetExpression
  | New singleExpression arguments?                                           # NewExpression
  | singleExpression '[' expressionSequence ']'                               # MemberIndexExpression
  | singleExpression '.' identifierName                                       # MemberDotExpression
@@ -986,7 +986,7 @@ singleExpression
  | singleExpression assignmentOperator singleExpression                      # AssignmentOperatorExpression
  | This                                                                      # ThisExpression
  | Super                                                                     # SuperExpression
- | Identifier                                                                # IdentifierExpression
+ | identifier                                                                # IdentifierExpression
  | literal                                                                   # LiteralExpression
  | arrayLiteral                                                              # ArrayLiteralExpression
  | objectLiteral                                                             # ObjectLiteralExpression
@@ -1071,7 +1071,7 @@ importedDefaultBinding
 /// NameSpaceImport :
 ///     * as ImportedBinding
 nameSpaceImport
- : '*' {_input.LT(1).getText().equals("as")}? Identifier importedBinding
+ : '*' 'as' importedBinding
  ;
 
 /// NamedImports :
@@ -1087,7 +1087,7 @@ namedImports
 /// FromClause :
 ///     from ModuleSpecifier
 fromClause
- : {_input.LT(1).getText().equals("from")}? Identifier moduleSpecifier
+ : 'from' moduleSpecifier
  ;
 
 /// ImportsList :
@@ -1102,7 +1102,7 @@ importsList
 ///     IdentifierName as ImportedBinding
 importSpecifier
  : importedBinding
- | identifierName {_input.LT(1).getText().equals("as")}? Identifier importedBinding
+ | identifierName 'as' importedBinding
  ;
 
 /// ModuleSpecifier :
@@ -1158,7 +1158,7 @@ exportsList
 ///     IdentifierName
 ///     IdentifierName as IdentifierName
 exportSpecifier
- : identifierName ( {_input.LT(1).getText().equals("as")}? Identifier identifierName )?
+ : identifierName ( 'as' identifierName )?
  ;
 
 /// AssignmentOperator : one of
@@ -1192,8 +1192,21 @@ numericLiteral
  | BinaryIntegerLiteral
  ;
 
-identifierName
+/// NOTE This combines normal identifiers with "keywords" that technically aren't defined as keywords/reserved in the spec
+identifier
  : Identifier
+ | As
+ | From
+ | Get
+ | Set
+ | Of
+ | Static
+ | Let
+ | Target
+ ;
+
+identifierName
+ : identifier
  | reservedWord
  ;
 
@@ -1201,21 +1214,21 @@ identifierName
 ///     Identifier
 ///     [~Yield] yield
 identifierReference
- : Identifier
+ : identifier
  ;
 
 /// BindingIdentifier :
 ///     Identifier
 ///     [~Yield] yield
 bindingIdentifier
- : Identifier
+ : identifier
  ;
 
 /// LabelIdentifier :
 ///     Identifier
 ///     [~Yield] yield
 labelIdentifier
- : Identifier
+ : identifier
  ;
 
 reservedWord

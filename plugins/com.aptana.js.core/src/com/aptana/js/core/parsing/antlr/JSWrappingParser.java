@@ -18,7 +18,6 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import com.aptana.core.build.IProblem;
 import com.aptana.js.core.IJSConstants;
-import com.aptana.js.core.parsing.JSParseState;
 import com.aptana.js.core.parsing.antlr.JSParser.ProgramContext;
 import com.aptana.js.core.parsing.antlr.ast.JSASTWalker;
 import com.aptana.js.core.parsing.ast.JSParseRootNode;
@@ -41,33 +40,14 @@ public class JSWrappingParser implements IParser
 		return working.getImmutableResult();
 	}
 
-	// private Token recoverMissingSemicolon(Parser recognizer) throws RecognitionException
-	// {
-	// IntervalSet whatevs = recognizer.getExpectedTokensWithinCurrentRule();
-	// if (whatevs.size() == 1 && whatevs.contains(JSParser.SemiColon))
-	// {
-	// Token lastToken = recognizer.getTokenStream().LT(-1);
-	// return recognizer.getTokenFactory()
-	// .create(new Pair<TokenSource, CharStream>(lastToken.getTokenSource(),
-	// lastToken.getTokenSource().getInputStream()), JSParser.SemiColon, ";",
-	// Token.DEFAULT_CHANNEL, -1, -1, lastToken.getLine(), lastToken.getCharPositionInLine());
-	// }
-	// return null;
-	// }
-
 	private void parse(IParseState parseState, final WorkingParseResult working)
 	{
-		// re-use the same CharStream object per-parse state
-		CharStream stream;
-		if (parseState instanceof JSParseState)
-		{
-			stream = ((JSParseState) parseState).getCharStream();
-		}
-		else
-		{
-			String source = parseState.getSource();
-			stream = CharStreams.fromString(source);
-		}
+
+		String source = parseState.getSource();
+		CharStream stream = CharStreams.fromString(source);
+		// FIXME We cannot use an unbuffered char stream, because Token.getText() is called too often to be able to replace this.
+		// This means we basically have two copies of the source in memory now, which is BADDDDDDD!
+		// stream = new UnbufferedCharStream(new StringReader(source));
 
 		JSLexer lexer = new JSLexer(stream);
 		lexer.setTokenFactory(new PoolingTokenFactory());
@@ -76,11 +56,13 @@ public class JSWrappingParser implements IParser
 		parser.addErrorListener(new ErrorListener(working));
 		parser.setTrimParseTree(true);
 
-		// TODO We can attach our AST conversion listener to fire during parse here, and then we may be able to get away with using an unbuffered CharStream since the token text values should be in the current interval
-		// BUT, right now the way it's written, it assumes we run post-parse so that future tokens would be available, i.e. the assignment operator in an AssignmentExpression
+		// TODO We can attach our AST conversion listener to fire during parse here, and then we may be able to get away
+		// with using an unbuffered CharStream since the token text values should be in the current interval
+		// BUT, right now the way it's written, it assumes we run post-parse so that future tokens would be available,
+		// i.e. the assignment operator in an AssignmentExpression
 		// we'd have to modify it to create the node empty and set the tokens in exit
-//		JSASTWalker astWalker = new JSASTWalker();
-//		parser.addParseListener(astWalker);
+		// JSASTWalker astWalker = new JSASTWalker();
+		// parser.addParseListener(astWalker);
 
 		// FIXME This is still much slower than the beaver parser. How can we speed it up? For one, we should get the
 		// faster SLL mode working on all our unit tests!
@@ -132,7 +114,7 @@ public class JSWrappingParser implements IParser
 		}
 
 		// Call when we can do listener during parse rather than post-parse!
-//		JSParseRootNode rootNode = astWalker.getRootNode();
+		// JSParseRootNode rootNode = astWalker.getRootNode();
 		JSParseRootNode rootNode = convertAST(pc);
 		if (PROFILE)
 		{

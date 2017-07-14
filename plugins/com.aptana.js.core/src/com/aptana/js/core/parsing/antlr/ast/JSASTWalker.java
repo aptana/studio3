@@ -7,7 +7,6 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import com.aptana.js.core.JSLanguageConstants;
 import com.aptana.js.core.parsing.JSTokenType;
 import com.aptana.js.core.parsing.antlr.JSParser;
 import com.aptana.js.core.parsing.antlr.JSParser.*;
@@ -300,7 +299,7 @@ public class JSASTWalker extends JSParserBaseListener
 	{
 		// start is available during parse, so use in preference to getToken.
 		// start should always be the operator in preUnary
-		addToParentAndPushNodeToStack(new JSPreUnaryOperatorNode(toSymbolWithText(ctx.start)));
+		addToParentAndPushNodeToStack(new JSPreUnaryOperatorNode(toSymbol(ctx.start)));
 		// addToParentAndPushNodeToStack(new JSPreUnaryOperatorNode(toSymbol(ctx.getToken(type, 0))));
 	}
 
@@ -335,7 +334,7 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterAssignmentOperatorExpression(AssignmentOperatorExpressionContext ctx)
 	{
-		Symbol o = toSymbolWithText(ctx.assignmentOperator().getStart());
+		Symbol o = toSymbol(ctx.assignmentOperator().getStart());
 
 		addToParentAndPushNodeToStack(new JSAssignmentNode(o));
 		super.enterAssignmentOperatorExpression(ctx);
@@ -818,7 +817,7 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterLexicalDeclaration(LexicalDeclarationContext ctx)
 	{
-		Symbol v = toSymbolWithText(ctx.letOrConst().getStart());
+		Symbol v = toSymbol(ctx.letOrConst().getStart());
 		JSNode node = new JSVarNode(v);
 		if (!(ctx.getParent() instanceof ForLexicalLoopStatementContext))
 		{
@@ -1055,14 +1054,14 @@ public class JSASTWalker extends JSParserBaseListener
 	public void enterIdentifierName(IdentifierNameContext ctx)
 	{
 		// leaf node
-		TerminalNode ident = ctx.Identifier();
+		IdentifierContext ident = ctx.identifier();
 		if (ident == null)
 		{
 			// Could be a reservedWord!
 			ReservedWordContext rwc = ctx.reservedWord();
 			if (rwc != null)
 			{
-				addChildToParent(new JSIdentifierNode(toSymbolWithText(ctx.reservedWord().getStart())));
+				addChildToParent(new JSIdentifierNode(toSymbol(ctx.reservedWord().getStart())));
 			}
 			else
 			{
@@ -1072,7 +1071,7 @@ public class JSASTWalker extends JSParserBaseListener
 		}
 		else
 		{
-			addChildToParent(new JSIdentifierNode(toSymbolWithText(ident)));
+			addChildToParent(new JSIdentifierNode(toSymbolWithText(ident.start)));
 		}
 		super.enterIdentifierName(ctx);
 	}
@@ -1699,7 +1698,7 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterLabelledStatement(LabelledStatementContext ctx)
 	{
-		JSNode id = new JSIdentifierNode(toSymbolWithText(ctx.Identifier()));
+		JSNode id = new JSIdentifierNode(toSymbolWithText(ctx.identifier().start));
 		Symbol colon = toSymbol(ctx.getToken(JSParser.Colon, 0));
 		addToParentAndPushNodeToStack(new JSLabelledNode(id, colon));
 		super.enterLabelledStatement(ctx);
@@ -1808,22 +1807,24 @@ public class JSASTWalker extends JSParserBaseListener
 		GeneratorMethodContext gmc = ctx.generatorMethod();
 		if (gmc == null)
 		{
-			TerminalNode tn = ctx.Identifier();
-			if (tn != null)
+			TerminalNode get = ctx.getToken(JSParser.Get, 0);
+			if (get != null)
 			{
-				if (tn.getText().equals("get")) //$NON-NLS-1$
-				{
-					addToParentAndPushNodeToStack(new JSGetterNode());
-				}
-				else
-				{
-					addToParentAndPushNodeToStack(new JSSetterNode());
-				}
+				addToParentAndPushNodeToStack(new JSGetterNode());
 			}
 			else
 			{
-				// FIXME Use NameValuePairNode to wrap this? This is a method declared as a property of a class/object
-				addToParentAndPushNodeToStack(new JSFunctionNode());
+				TerminalNode set = ctx.getToken(JSParser.Set, 0);
+				if (set != null)
+				{
+					addToParentAndPushNodeToStack(new JSSetterNode());
+				}
+				else
+				{
+					// FIXME Use NameValuePairNode to wrap this? This is a method declared as a property of a
+					// class/object
+					addToParentAndPushNodeToStack(new JSFunctionNode());
+				}
 			}
 		}
 		super.enterMethodDefinition(ctx);

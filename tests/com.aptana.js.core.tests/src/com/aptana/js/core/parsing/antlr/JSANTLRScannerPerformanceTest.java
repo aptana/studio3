@@ -9,10 +9,12 @@ package com.aptana.js.core.parsing.antlr;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.UnbufferedCharStream;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -158,10 +160,12 @@ public class JSANTLRScannerPerformanceTest extends GlobalTimePerformanceTestCase
 	private void timeScan(String resourceName, String src, int numRuns) throws Exception
 	{
 		// re-use same charstream...
-		CharStream stream = CharStreams.fromString(src);
+//		CharStream stream = CharStreams.fromString(src);
+//		CharStream stream = new UnbufferedCharStream(new StringReader(src));
 
 		for (int i = 0; i < numRuns; i++)
 		{
+			CharStream stream = new UnbufferedCharStream(new StringReader(src));
 			startMeasuring();
 
 			fScanner = new JSLexer(stream);
@@ -175,6 +179,6 @@ public class JSANTLRScannerPerformanceTest extends GlobalTimePerformanceTestCase
 
 			stopMeasuring();
 		}
-		stream.seek(0);
+//		stream.seek(0);
 	}
 }
