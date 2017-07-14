@@ -69,12 +69,18 @@ public class JSWrappingParser implements IParser
 			stream = CharStreams.fromString(source);
 		}
 
-		// Can we re-use the lexer/token stream?
 		JSLexer lexer = new JSLexer(stream);
+		lexer.setTokenFactory(new PoolingTokenFactory());
 		TokenStream input = new FilteringMaxCapacityTokenStream(lexer);
-		// TokenStream input = new CommonTokenStream(lexer);
 		JSParser parser = new JSParser(input);
 		parser.addErrorListener(new ErrorListener(working));
+		parser.setTrimParseTree(true);
+
+		// TODO We can attach our AST conversion listener to fire during parse here, and then we may be able to get away with using an unbuffered CharStream since the token text values should be in the current interval
+		// BUT, right now the way it's written, it assumes we run post-parse so that future tokens would be available, i.e. the assignment operator in an AssignmentExpression
+		// we'd have to modify it to create the node empty and set the tokens in exit
+//		JSASTWalker astWalker = new JSASTWalker();
+//		parser.addParseListener(astWalker);
 
 		// FIXME This is still much slower than the beaver parser. How can we speed it up? For one, we should get the
 		// faster SLL mode working on all our unit tests!
@@ -113,7 +119,6 @@ public class JSWrappingParser implements IParser
 		}
 		try
 		{
-
 			pc = parser.program();
 		}
 		catch (ParseCancellationException e)
@@ -126,6 +131,8 @@ public class JSWrappingParser implements IParser
 			}
 		}
 
+		// Call when we can do listener during parse rather than post-parse!
+//		JSParseRootNode rootNode = astWalker.getRootNode();
 		JSParseRootNode rootNode = convertAST(pc);
 		if (PROFILE)
 		{

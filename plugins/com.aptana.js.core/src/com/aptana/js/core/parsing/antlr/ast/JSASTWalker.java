@@ -7,6 +7,8 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import com.aptana.js.core.JSLanguageConstants;
+import com.aptana.js.core.parsing.JSTokenType;
 import com.aptana.js.core.parsing.antlr.JSParser;
 import com.aptana.js.core.parsing.antlr.JSParser.*;
 import com.aptana.js.core.parsing.antlr.JSParserBaseListener;
@@ -126,6 +128,7 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterAssignmentExpression(AssignmentExpressionContext ctx)
 	{
+		// FIXME If we attempt to use this walker as a parse listener, the assign token won't be here yet!
 		Symbol o = toSymbol(ctx.getToken(JSParser.Assign, 0));
 		addToParentAndPushNodeToStack(new JSAssignmentNode(o));
 		super.enterAssignmentExpression(ctx);
@@ -151,7 +154,9 @@ public class JSASTWalker extends JSParserBaseListener
 	{
 		// leaf node, no need to push to stack or pop later
 		// TODO Introduce JSSuperNode?
-		addChildToParent(new JSIdentifierNode(toSymbol(ctx.getToken(JSParser.Super, 0))));
+		// use start in preference to getToken()
+		addChildToParent(new JSIdentifierNode(toSymbolWithText(ctx.start)));
+		// addChildToParent(new JSIdentifierNode(toSymbol(ctx.getToken(JSParser.Super, 0))));
 		super.enterSuperExpression(ctx);
 	}
 
@@ -159,7 +164,9 @@ public class JSASTWalker extends JSParserBaseListener
 	public void enterIdentifierExpression(IdentifierExpressionContext ctx)
 	{
 		// leaf node, no need to push to stack or pop later
-		addChildToParent(new JSIdentifierNode(toSymbol(ctx.Identifier())));
+		// start is available during parse, use in preference to calling for sub-context
+		addChildToParent(new JSIdentifierNode(toSymbolWithText(ctx.start)));
+		// addChildToParent(new JSIdentifierNode(toSymbol(ctx.Identifier())));
 		super.enterIdentifierExpression(ctx);
 	}
 
@@ -291,7 +298,10 @@ public class JSASTWalker extends JSParserBaseListener
 
 	private void handlePreUnaryOperator(ParserRuleContext ctx, int type)
 	{
-		addToParentAndPushNodeToStack(new JSPreUnaryOperatorNode(toSymbol(ctx.getToken(type, 0))));
+		// start is available during parse, so use in preference to getToken.
+		// start should always be the operator in preUnary
+		addToParentAndPushNodeToStack(new JSPreUnaryOperatorNode(toSymbolWithText(ctx.start)));
+		// addToParentAndPushNodeToStack(new JSPreUnaryOperatorNode(toSymbol(ctx.getToken(type, 0))));
 	}
 
 	@Override
@@ -325,7 +335,7 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterAssignmentOperatorExpression(AssignmentOperatorExpressionContext ctx)
 	{
-		Symbol o = toSymbol(ctx.assignmentOperator().getStart());
+		Symbol o = toSymbolWithText(ctx.assignmentOperator().getStart());
 
 		addToParentAndPushNodeToStack(new JSAssignmentNode(o));
 		super.enterAssignmentOperatorExpression(ctx);
@@ -545,7 +555,8 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void exitImportDeclaration(ImportDeclarationContext ctx)
 	{
-		if (ctx.exception == null) {
+		if (ctx.exception == null)
+		{
 			popNode();
 		}
 		super.exitImportDeclaration(ctx);
@@ -568,7 +579,9 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterNameSpaceImport(NameSpaceImportContext ctx)
 	{
-		addToParentAndPushNodeToStack(new JSImportSpecifierNode(toSymbol(ctx.getToken(JSParser.Multiply, 0))));
+		// Use start in preference to getToken()
+		addToParentAndPushNodeToStack(new JSImportSpecifierNode(toSymbol(ctx.start)));
+		// addToParentAndPushNodeToStack(new JSImportSpecifierNode(toSymbol(ctx.getToken(JSParser.Multiply, 0))));
 		super.enterNameSpaceImport(ctx);
 	}
 
@@ -597,7 +610,9 @@ public class JSASTWalker extends JSParserBaseListener
 	public void enterEmptyStatement(EmptyStatementContext ctx)
 	{
 		// leaf node
-		JSNode node = new JSEmptyNode(toSymbol(ctx.SemiColon()));
+		// use start in preference to getToken, should always just be a semicolon token
+		JSNode node = new JSEmptyNode(toSymbol(ctx.start));
+		// JSNode node = new JSEmptyNode(toSymbol(ctx.SemiColon()));
 		node.setSemicolonIncluded(true);
 		addChildToParent(node);
 		super.enterEmptyStatement(ctx);
@@ -606,8 +621,10 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterArrayLiteral(ArrayLiteralContext ctx)
 	{
-		JSArrayNode node = new JSArrayNode(toSymbol(ctx.getToken(JSParser.OpenBracket, 0)),
-				toSymbol(ctx.getToken(JSParser.CloseBracket, 0)));
+		// Use start in preference to getToken for open bracket
+		// faster, and shoudl always be the first token for this rule
+		// JSArrayNode node = new JSArrayNode(toSymbol(ctx.getToken(JSParser.OpenBracket, 0)),
+		JSArrayNode node = new JSArrayNode(toSymbol(ctx.start), toSymbol(ctx.getToken(JSParser.CloseBracket, 0)));
 		addToParentAndPushNodeToStack(node);
 		super.enterArrayLiteral(ctx);
 	}
@@ -623,7 +640,9 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterArrayBindingPattern(ArrayBindingPatternContext ctx)
 	{
-		JSArrayNode node = new JSArrayNode(toSymbol(ctx.getToken(JSParser.OpenBracket, 0)),
+		// Use start in preference to getToken()
+		JSArrayNode node = new JSArrayNode(toSymbol(ctx.start),
+				// JSArrayNode node = new JSArrayNode(toSymbol(ctx.getToken(JSParser.OpenBracket, 0)),
 				toSymbol(ctx.getToken(JSParser.CloseBracket, 0)));
 		addToParentAndPushNodeToStack(node);
 		super.enterArrayBindingPattern(ctx);
@@ -704,7 +723,10 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterVariableDeclarationStatement(VariableDeclarationStatementContext ctx)
 	{
-		Symbol var = toSymbol(ctx.getToken(JSParser.Var, 0));
+		Symbol var = toSymbol(ctx.start);
+		// start is available in post-parse or during parse, use that in preference to getToken(), which only works when
+		// used as post-parse walker
+		// Symbol var = toSymbol(ctx.getToken(JSParser.Var, 0));
 		JSNode node = new JSVarNode(var);
 		if (ctx.parent instanceof VariableStatementContext)
 		{
@@ -785,7 +807,10 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterBindingIdentifier(BindingIdentifierContext ctx)
 	{
-		Symbol i = toSymbol(ctx.Identifier());
+		Symbol i = toSymbolWithText(ctx.start);
+		// start is available in post-parse or during parse, use that in preference to getToken(), which only works when
+		// used as post-parse walker
+		// Symbol i = toSymbol(ctx.Identifier());
 		addChildToParent(new JSIdentifierNode(i));
 		super.enterBindingIdentifier(ctx);
 	}
@@ -793,7 +818,7 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterLexicalDeclaration(LexicalDeclarationContext ctx)
 	{
-		Symbol v = toSymbol(ctx.letOrConst().getStart());
+		Symbol v = toSymbolWithText(ctx.letOrConst().getStart());
 		JSNode node = new JSVarNode(v);
 		if (!(ctx.getParent() instanceof ForLexicalLoopStatementContext))
 		{
@@ -918,7 +943,9 @@ public class JSASTWalker extends JSParserBaseListener
 		// If there's no child to return node, add JSEmptyNode!
 		if (getCurrentNode().getChildCount() == 0)
 		{
-			Symbol r = toSymbol(ctx.getToken(JSParser.Return, 0));
+			// Use start because it's faster, should always be return keyword
+			Symbol r = toSymbol(ctx.start);
+			// Symbol r = toSymbol(ctx.getToken(JSParser.Return, 0));
 			addChildToParent(new JSEmptyNode(r));
 		}
 		popNode();
@@ -1035,17 +1062,17 @@ public class JSASTWalker extends JSParserBaseListener
 			ReservedWordContext rwc = ctx.reservedWord();
 			if (rwc != null)
 			{
-				addChildToParent(new JSIdentifierNode(toSymbol(ctx.reservedWord().getStart())));
+				addChildToParent(new JSIdentifierNode(toSymbolWithText(ctx.reservedWord().getStart())));
 			}
 			else
 			{
-				// assume it was supposed to be an identifier name ehre, but was empty!
+				// assume it was supposed to be an identifier name here, but was empty!
 				addChildToParent(new JSEmptyNode(ctx.getStart().getStartIndex()));
 			}
 		}
 		else
 		{
-			addChildToParent(new JSIdentifierNode(toSymbol(ident)));
+			addChildToParent(new JSIdentifierNode(toSymbolWithText(ident)));
 		}
 		super.enterIdentifierName(ctx);
 	}
@@ -1054,7 +1081,9 @@ public class JSASTWalker extends JSParserBaseListener
 	public void enterIdentifierReference(IdentifierReferenceContext ctx)
 	{
 		// leaf node
-		addChildToParent(new JSIdentifierNode(toSymbol(ctx.Identifier())));
+		// Use start in preference to getting sub-content
+		addChildToParent(new JSIdentifierNode(toSymbolWithText(ctx.start)));
+		// addChildToParent(new JSIdentifierNode(toSymbol(ctx.Identifier())));
 		super.enterIdentifierReference(ctx);
 	}
 
@@ -1505,7 +1534,9 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterVarForDeclaration(VarForDeclarationContext ctx)
 	{
-		Symbol var = toSymbol(ctx.getToken(JSParser.Var, 0));
+		// Use start because it's available during parse, is faster than getToken, should always be var keyword
+		Symbol var = toSymbol(ctx.start);
+		// Symbol var = toSymbol(ctx.getToken(JSParser.Var, 0));
 		JSNode node = new JSVarNode(var);
 		addToParentAndPushNodeToStack(node);
 		super.enterVarForDeclaration(ctx);
@@ -1668,7 +1699,7 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterLabelledStatement(LabelledStatementContext ctx)
 	{
-		JSNode id = new JSIdentifierNode(toSymbol(ctx.Identifier()));
+		JSNode id = new JSIdentifierNode(toSymbolWithText(ctx.Identifier()));
 		Symbol colon = toSymbol(ctx.getToken(JSParser.Colon, 0));
 		addToParentAndPushNodeToStack(new JSLabelledNode(id, colon));
 		super.enterLabelledStatement(ctx);
@@ -1684,7 +1715,9 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterSpreadElement(SpreadElementContext ctx)
 	{
-		Symbol d = toSymbol(ctx.getToken(JSParser.Ellipsis, 0));
+		// Use start in preference to getToken()
+		Symbol d = toSymbol(ctx.start);
+		// Symbol d = toSymbol(ctx.getToken(JSParser.Ellipsis, 0));
 		addToParentAndPushNodeToStack(new JSSpreadElementNode(d));
 		super.enterSpreadElement(ctx);
 	}
@@ -1699,7 +1732,9 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterBindingRestElement(BindingRestElementContext ctx)
 	{
-		Symbol d = toSymbol(ctx.getToken(JSParser.Ellipsis, 0));
+		// Use start in preference to getToken()
+		Symbol d = toSymbol(ctx.start);
+		// Symbol d = toSymbol(ctx.getToken(JSParser.Ellipsis, 0));
 		addToParentAndPushNodeToStack(new JSRestElementNode(d));
 		super.enterBindingRestElement(ctx);
 	}
@@ -1884,7 +1919,9 @@ public class JSASTWalker extends JSParserBaseListener
 	@Override
 	public void enterYieldExpression(YieldExpressionContext ctx)
 	{
-		Symbol y = toSymbol(ctx.getToken(JSParser.Yield, 0));
+		// Use start in preference to getToken: faster, available during parse, yield should always be first token
+		Symbol y = toSymbol(ctx.start);
+		// Symbol y = toSymbol(ctx.getToken(JSParser.Yield, 0));
 		addToParentAndPushNodeToStack(new JSYieldNode(y));
 		super.enterYieldExpression(ctx);
 	}
@@ -1954,7 +1991,8 @@ public class JSASTWalker extends JSParserBaseListener
 	private void addChildToParent(JSNode node)
 	{
 		IParseNode parent = getCurrentNode();
-		if (parent != null) {
+		if (parent != null)
+		{
 			parent.addChild(node);
 		}
 	}
@@ -1979,15 +2017,6 @@ public class JSASTWalker extends JSParserBaseListener
 		fNodeStack.push(node);
 	}
 
-	private Symbol toSymbolOrNull(Token token)
-	{
-		if (token == null)
-		{
-			return null;
-		}
-		return toSymbol(token);
-	}
-
 	private Symbol toSymbolOrNull(TerminalNode terminal)
 	{
 		if (terminal == null)
@@ -1999,12 +2028,30 @@ public class JSASTWalker extends JSParserBaseListener
 
 	private Symbol toSymbol(TerminalNode terminal)
 	{
+		// TODO Most terminal nodes have essentially hard-coded string values baed on type
+		// Can we just point to the pre-defined strings for these?
 		return toSymbol(terminal.getSymbol());
+	}
+
+	private Symbol toSymbolWithText(TerminalNode terminal)
+	{
+		return toSymbolWithText(terminal.getSymbol());
 	}
 
 	private Symbol toSymbol(Token token)
 	{
-		return new Symbol((short) token.getType(), token.getStartIndex(), token.getStopIndex(), token.getText());
+		JSTokenType t = JSTokenType.getFromANTLRType(token.getType());
+		return toSymbol(token, t.getName());
+	}
+
+	private Symbol toSymbolWithText(Token token)
+	{
+		return toSymbol(token, token.getText());
+	}
+
+	private Symbol toSymbol(Token token, String text)
+	{
+		return new Symbol((short) token.getType(), token.getStartIndex(), token.getStopIndex(), text);
 	}
 
 	public JSParseRootNode getRootNode()
