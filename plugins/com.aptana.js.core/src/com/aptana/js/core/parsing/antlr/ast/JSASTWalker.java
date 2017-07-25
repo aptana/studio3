@@ -86,12 +86,13 @@ import beaver.Symbol;
 public class JSASTWalker extends JSParserBaseListener
 {
 	private JSParseRootNode fRootNode;
-	private Stack<IParseNode> fNodeStack = new Stack<IParseNode>();
+	private Stack<IParseNode> fNodeStack;
 
 	@Override
 	public void enterProgram(ProgramContext ctx)
 	{
 		fRootNode = new JSParseRootNode();
+		fNodeStack = new Stack<IParseNode>();
 		fNodeStack.push(fRootNode);
 		super.enterProgram(ctx);
 	}

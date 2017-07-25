@@ -455,7 +455,10 @@ public class JSNode extends ParseNode
 	 */
 	public void setSemicolonIncluded(boolean included)
 	{
-		typeFlags |= (included ? 0x1 : 0x0);
+		boolean wasIncluded = getSemicolonIncluded();
+		if (wasIncluded == included) return; // no change
+
+		typeFlags ^= 0x1; // toggle first bit
 		fHash = -1;
 	}
 

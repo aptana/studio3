@@ -1814,6 +1814,9 @@ public abstract class JSParserTest
 	protected void assertParseResult(String source, String expected) throws Exception
 	{
 		IParseNode result = parse(source);
+		if (result == null) {
+			assertNoErrors(); // spit out the errors
+		}
 		StringBuilder text = new StringBuilder();
 		IParseNode[] children = result.getChildren();
 		for (IParseNode child : children)

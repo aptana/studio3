@@ -85,6 +85,9 @@ public abstract class ParseNode extends Node implements IParseNode
 	 */
 	public void addChild(IParseNode child)
 	{
+		if (child == null) {
+			throw new IllegalStateException();
+		}
 		// makes sure our private buffer is large enough
 		int currentLength = fChildren.length;
 		int size = fChildrenCount + 1;
@@ -192,7 +195,8 @@ public abstract class ParseNode extends Node implements IParseNode
 		{
 			return fChildren[index];
 		}
-		return null;
+		throw new ArrayIndexOutOfBoundsException(index);
+//		return null;
 	}
 
 	/*
