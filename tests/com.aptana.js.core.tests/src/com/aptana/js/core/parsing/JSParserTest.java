@@ -352,7 +352,7 @@ public abstract class JSParserTest
 	@Test
 	public void testVoid() throws Exception
 	{
-		assertParseResult("void (true);" + EOL); //$NON-NLS-1$
+		assertParseResult("void (true);" + EOL, "void true;" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -640,7 +640,7 @@ public abstract class JSParserTest
 	@Test
 	public void testConditional() throws Exception
 	{
-		assertParseResult("(abc) ? true : false;" + EOL); //$NON-NLS-1$
+		assertParseResult("(abc) ? true : false;" + EOL, "abc ? true : false;" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -879,7 +879,7 @@ public abstract class JSParserTest
 	@Test
 	public void testDo() throws Exception
 	{
-		assertParseResult("do {a++;} while (a < 10);" + EOL); //$NON-NLS-1$
+		assertParseResult("do {a++;} while (a < 10);" + EOL, "do {a++;} while (a < 10)" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -1062,9 +1062,9 @@ public abstract class JSParserTest
 	@Test
 	public void testPlusPositiveNumber() throws Exception
 	{
-		assertParseResult("var x = 5 + +3;" + EOL);
+		assertParseResult("var x = 5 + +3;" + EOL, "var x = 5 + (+3);" + EOL);
 		// Due to semicolon insertion recovery, the expected result will be terminated with a semicolon
-		assertParseResult("var x = 5+ +3" + EOL, "var x = 5 + +3;" + EOL);
+		assertParseResult("var x = 5+ +3" + EOL, "var x = 5 + (+3);" + EOL);
 
 		// NOTE: The following commented tests are currently failing
 		// parseTest("var x = 5 ++3" + EOL, "var x = 5 + +3" + EOL);
@@ -1074,8 +1074,8 @@ public abstract class JSParserTest
 	@Test
 	public void testMinusNegativeNumber() throws Exception
 	{
-		assertParseResult("var x = 5 - -3;" + EOL);
-		assertParseResult("var x = 5- -3" + EOL, "var x = 5 - -3;" + EOL);
+		assertParseResult("var x = 5 - -3;" + EOL, "var x = 5 - (-3);" + EOL);
+		assertParseResult("var x = 5- -3" + EOL, "var x = 5 - (-3);" + EOL);
 
 		// NOTE: The following commented tests are currently failing
 		// parseTest("var x = 5 --3" + EOL, "var x = 5 - -3" + EOL);
@@ -1085,10 +1085,10 @@ public abstract class JSParserTest
 	@Test
 	public void testMinusPositiveNumber() throws Exception
 	{
-		assertParseResult("var x = 5 - +3;" + EOL);
-		assertParseResult("var x = 5- +3" + EOL, "var x = 5 - +3;" + EOL);
-		assertParseResult("var x = 5 -+3" + EOL, "var x = 5 - +3;" + EOL);
-		assertParseResult("var x = 5-+3" + EOL, "var x = 5 - +3;" + EOL);
+		assertParseResult("var x = 5 - +3;" + EOL, "var x = 5 - (+3);" + EOL);
+		assertParseResult("var x = 5- +3" + EOL, "var x = 5 - (+3);" + EOL);
+		assertParseResult("var x = 5 -+3" + EOL, "var x = 5 - (+3);" + EOL);
+		assertParseResult("var x = 5-+3" + EOL, "var x = 5 - (+3);" + EOL);
 	}
 
 	// begin recovery strategy tests

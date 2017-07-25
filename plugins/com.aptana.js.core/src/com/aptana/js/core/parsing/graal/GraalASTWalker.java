@@ -1,6 +1,7 @@
 package com.aptana.js.core.parsing.graal;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -15,11 +16,15 @@ import com.aptana.js.core.parsing.ast.JSCaseNode;
 import com.aptana.js.core.parsing.ast.JSCatchNode;
 import com.aptana.js.core.parsing.ast.JSClassNode;
 import com.aptana.js.core.parsing.ast.JSCommaNode;
+import com.aptana.js.core.parsing.ast.JSConditionalNode;
 import com.aptana.js.core.parsing.ast.JSConstructNode;
 import com.aptana.js.core.parsing.ast.JSDeclarationNode;
 import com.aptana.js.core.parsing.ast.JSDefaultNode;
+import com.aptana.js.core.parsing.ast.JSDoNode;
 import com.aptana.js.core.parsing.ast.JSEmptyNode;
+import com.aptana.js.core.parsing.ast.JSExportNode;
 import com.aptana.js.core.parsing.ast.JSFalseNode;
+import com.aptana.js.core.parsing.ast.JSFinallyNode;
 import com.aptana.js.core.parsing.ast.JSForInNode;
 import com.aptana.js.core.parsing.ast.JSForNode;
 import com.aptana.js.core.parsing.ast.JSForOfNode;
@@ -70,11 +75,14 @@ import com.oracle.js.parser.ir.IfNode;
 import com.oracle.js.parser.ir.IndexNode;
 import com.oracle.js.parser.ir.LexicalContext;
 import com.oracle.js.parser.ir.LiteralNode;
+import com.oracle.js.parser.ir.Module;
+import com.oracle.js.parser.ir.Module.ExportEntry;
 import com.oracle.js.parser.ir.Node;
 import com.oracle.js.parser.ir.ObjectNode;
 import com.oracle.js.parser.ir.PropertyNode;
 import com.oracle.js.parser.ir.ReturnNode;
 import com.oracle.js.parser.ir.SwitchNode;
+import com.oracle.js.parser.ir.TernaryNode;
 import com.oracle.js.parser.ir.TryNode;
 import com.oracle.js.parser.ir.UnaryNode;
 import com.oracle.js.parser.ir.VarNode;
@@ -91,6 +99,8 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	private boolean wipeNextIdent;
 	private Map<Expression, JSNode> pushOnLeave;
 	private final String source;
+
+	private Module module;
 
 	public GraalASTWalker(String source, LexicalContext lc)
 	{
@@ -293,14 +303,39 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		if (!functionNode.isProgram())
 		{
-			addToParentAndPushNodeToStack(new JSFunctionNode());
-			// Visit the name
 			IdentNode ident = functionNode.getIdent();
+			boolean isExported = false;
+			boolean isDefault = false;
+			List<ExportEntry> exports = module.getLocalExportEntries();
+			for (ExportEntry entry : exports)
+			{
+				if (entry.getLocalName().equals(ident.getName()))
+				{
+					isExported = true;
+					isDefault = entry.getExportName().equals(Module.DEFAULT_NAME);
+					break;
+				}
+			}
+			JSFunctionNode funcNode = new JSFunctionNode();
+			if (isExported)
+			{
+				addToParentAndPushNodeToStack(new JSExportNode(isDefault, funcNode));
+				fNodeStack.push(funcNode); // make function node top of stack
+			}
+			else
+			{
+				addToParentAndPushNodeToStack(funcNode);
+			}
+			// Visit the name
 			addChildToParent(new JSIdentifierNode(toSymbol(ident)));
 			// Need to explicitly visit the params
 			addToParentAndPushNodeToStack(new JSParametersNode());
 			functionNode.visitParameters(this);
 			popNode();
+		}
+		else
+		{
+			module = functionNode.getModule();
 		}
 		return super.enterFunctionNode(functionNode);
 	}
@@ -312,6 +347,9 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 		{
 
 			popNode();
+			if (getCurrentNode() instanceof JSExportNode) {
+				popNode();
+			}
 			// when the function node is the "init" of a parent VarNode, we need to avoid hitting the "name" IdentNode.
 			if (!functionNode.isAnonymous())
 			{
@@ -353,8 +391,8 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 				type = JSTokenType.TILDE;
 				theNode = new JSPreUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
 				break;
-			case ELLIPSIS:
-				break;
+			// case ELLIPSIS:
+			// break;
 			case DELETE:
 				type = JSTokenType.DELETE;
 				theNode = new JSPreUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
@@ -371,6 +409,17 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 				type = JSTokenType.VOID;
 				theNode = new JSPreUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
 				break;
+			case ADD:
+				type = JSTokenType.PLUS;
+				theNode = new JSPreUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				break;
+			case SUB:
+				type = JSTokenType.MINUS;
+				theNode = new JSPreUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				break;
+
+			default:
+				throw new IllegalStateException("Reached unhandled unary node type! " + unaryNode);
 		}
 		addToParentAndPushNodeToStack(theNode);
 		return super.enterUnaryNode(unaryNode);
@@ -673,7 +722,7 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 			statements.setChildren(newCHildren);
 
 			// convert statements node (block) into the initializer of the for loop
-			if (fN.getInit() == null)
+			if (children.length > 1 || fN.getInit() == null)
 			{
 				JSNode combinedVarDecls = combineVarDeclarations(statements.getStartingOffset(),
 						statements.getChildren());
@@ -764,7 +813,7 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	public Node leaveForNode(ForNode forNode)
 	{
 		IParseNode theNode = getCurrentNode();
-		if (theNode.getChildCount() != 4)
+		if (!forNode.isForInOrOf() && theNode.getChildCount() != 4)
 		{
 			// Inject empty nodes for missing test/increment expressions!
 			IParseNode[] newChildren = new IParseNode[4];
@@ -821,12 +870,43 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	public boolean enterTryNode(TryNode tryNode)
 	{
 		addToParentAndPushNodeToStack(new JSTryNode());
+		// if finally block is empty, push empty node for it. We rely on the fact that finally block would typically be
+		// first visited child here. see leave for more
+		if (tryNode.getFinallyBody() == null)
+		{
+			addChildToParent(new JSEmptyNode(tryNode.getBody().getFinish()));
+		}
 		return super.enterTryNode(tryNode);
 	}
 
 	@Override
 	public Node leaveTryNode(TryNode tryNode)
 	{
+		// Add empty catch
+		if (tryNode.getCatches().isEmpty())
+		{
+			addChildToParent(new JSEmptyNode(tryNode.getBody().getFinish()));
+		}
+
+		// Fix the ordering of the children!
+		// this visits in order:
+		// - finally body
+		// - body
+		// - catch blocks FIXME Do these get added as multiple children?
+		JSTryNode ourTryNode = (JSTryNode) getCurrentNode();
+		IParseNode[] children = ourTryNode.getChildren();
+		IParseNode[] orderedChildren = new IParseNode[children.length];
+		orderedChildren[0] = children[1];
+		orderedChildren[1] = children[2];
+		JSNode firstChild = (JSNode) children[0];
+		// if finally block is not empty, wrap in JSFinallyNode
+		if (!(firstChild instanceof JSEmptyNode))
+		{
+			firstChild = new JSFinallyNode(firstChild);
+		}
+		orderedChildren[2] = firstChild;
+		ourTryNode.setChildren(orderedChildren);
+
 		popNode();
 		return super.leaveTryNode(tryNode);
 	}
@@ -885,7 +965,14 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterWhileNode(WhileNode whileNode)
 	{
-		addToParentAndPushNodeToStack(new JSWhileNode(null, null));
+		if (whileNode.isDoWhile())
+		{
+			addToParentAndPushNodeToStack(new JSDoNode(null, null));
+		}
+		else
+		{
+			addToParentAndPushNodeToStack(new JSWhileNode(null, null));
+		}
 		return super.enterWhileNode(whileNode);
 	}
 
@@ -943,6 +1030,7 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	protected Node leaveDefault(Node node)
 	{
+		System.out.println("Leaving node: " + node.getClass().getName() + ": " + node);
 		if (pushOnLeave.containsKey(node))
 		{
 			JSNode toPush = pushOnLeave.remove(node);
@@ -992,17 +1080,31 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	}
 
 	@Override
-	protected boolean enterDefault(Node node)
-	{
-		System.out.println("Entering node: " + node.getClass().getName() + ": " + node);
-		return super.enterDefault(node);
-	}
-
-	@Override
 	public Node leaveIndexNode(IndexNode indexNode)
 	{
 		popNode();
 		return super.leaveIndexNode(indexNode);
+	}
+
+	@Override
+	public boolean enterTernaryNode(TernaryNode ternaryNode)
+	{
+		addToParentAndPushNodeToStack(new JSConditionalNode(null, null));
+		return super.enterTernaryNode(ternaryNode);
+	}
+
+	@Override
+	public Node leaveTernaryNode(TernaryNode ternaryNode)
+	{
+		popNode();
+		return super.leaveTernaryNode(ternaryNode);
+	}
+
+	@Override
+	protected boolean enterDefault(Node node)
+	{
+		System.out.println("Entering node: " + node.getClass().getName() + ": " + node);
+		return super.enterDefault(node);
 	}
 
 	public IParseRootNode getRootNode()
