@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import org.eclipse.core.internal.utils.StringPool;
+
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.JSLanguageConstants;
 import com.aptana.js.core.parsing.JSTokenType;
@@ -121,6 +123,8 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	private Map<Expression, JSNode> pushOnLeave;
 	private final String source;
 
+	private StringPool pool; // not sure right now if pooling helps our RAM usage mcuh (or maybe even makes it worse!)
+
 	private Module module;
 
 	public GraalASTWalker(String source, LexicalContext lc)
@@ -131,6 +135,7 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 		fNodeStack.push(fRootNode);
 		wipeNextIdent = false;
 		pushOnLeave = new HashMap<Expression, JSNode>();
+		pool = new StringPool();
 	}
 
 	@Override
@@ -147,11 +152,12 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		if (literalNode.isNumeric())
 		{
-			addChildToParent(new JSNumberNode(toSymbol(literalNode)));
+			addChildToParent(
+					new JSNumberNode(toSymbol(JSTokenType.NUMBER, literalNode, pool.add(literalNode.toString()))));
 		}
 		else if (literalNode.isNull())
 		{
-			addChildToParent(new JSNullNode(toSymbol(literalNode)));
+			addChildToParent(new JSNullNode(toSymbol(JSTokenType.NULL, literalNode)));
 		}
 		else if (literalNode.isString())
 		{
@@ -161,17 +167,17 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 			String value = literalNode.getString();
 			char c = source.charAt(start);
 			value = c + value + c;
-			addChildToParent(new JSStringNode(toSymbol(JSTokenType.STRING, start, finish, value)));
+			addChildToParent(new JSStringNode(toSymbol(JSTokenType.STRING, start, finish, pool.add(value))));
 		}
 		else if (literalNode.isBoolean())
 		{
 			if (literalNode.getBoolean())
 			{
-				addChildToParent(new JSTrueNode(toSymbol(literalNode)));
+				addChildToParent(new JSTrueNode(toSymbol(JSTokenType.TRUE, literalNode)));
 			}
 			else
 			{
-				addChildToParent(new JSFalseNode(toSymbol(literalNode)));
+				addChildToParent(new JSFalseNode(toSymbol(JSTokenType.FALSE, literalNode)));
 			}
 		}
 		else if (literalNode.isArray())
@@ -256,11 +262,11 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 		{
 			if (identNode.isRestParameter())
 			{
-				addChildToParent(new JSRestElementNode(null, new JSIdentifierNode(toSymbol(identNode))));
+				addChildToParent(new JSRestElementNode(null, new JSIdentifierNode(identifierSymbol(identNode))));
 			}
 			else if (identNode.isDefaultParameter())
 			{
-				JSIdentifierNode ident = new JSIdentifierNode(toSymbol(identNode));
+				JSIdentifierNode ident = new JSIdentifierNode(identifierSymbol(identNode));
 				// find first expression statement, holding a binary node, whose lhs has an identNode matching this.
 				// rhs is ternarynode whose trueExpr is the default value!
 				BinaryNode matchingInitializer = matchingInitializer(identNode);
@@ -281,7 +287,7 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 			}
 			else
 			{
-				addChildToParent(new JSIdentifierNode(toSymbol(identNode)));
+				addChildToParent(new JSIdentifierNode(identifierSymbol(identNode)));
 			}
 		}
 		return super.enterIdentNode(identNode);
@@ -319,9 +325,34 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 		return new Symbol((short) 0, ident.getStart(), ident.getFinish() - 1, ident.toString());
 	}
 
+	private Symbol identifierSymbol(Node ident)
+	{
+		return identifierSymbol(ident, ident.toString());
+	}
+
+	private Symbol identifierSymbol(Node ident, String value)
+	{
+		return identifierSymbol(ident.getStart(), ident.getFinish() - 1, value);
+	}
+
+	private Symbol identifierSymbol(int start, int finish, String value)
+	{
+		return toSymbol(JSTokenType.IDENTIFIER, start, finish, pool.add(value));
+	}
+
+	private Symbol identifierSymbol(String value)
+	{
+		return identifierSymbol(-1, -1, value);
+	}
+
 	private Symbol toSymbol(JSTokenType type, Node ident)
 	{
 		return toSymbol(type, ident.getStart(), ident.getFinish() - 1);
+	}
+
+	private Symbol toSymbol(JSTokenType type, Node ident, Object value)
+	{
+		return toSymbol(type, ident.getStart(), ident.getFinish() - 1, value);
 	}
 
 	private Symbol toSymbol(JSTokenType type, int start, int finish)
@@ -455,7 +486,7 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 				addToParentAndPushNodeToStack(funcNode);
 			}
 			// Visit the name
-			addChildToParent(new JSIdentifierNode(toSymbol(ident)));
+			addChildToParent(new JSIdentifierNode(identifierSymbol(ident)));
 			// Need to explicitly visit the params
 			addToParentAndPushNodeToStack(new JSParametersNode());
 			functionNode.visitParameters(this);
@@ -495,7 +526,7 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 			JSIdentifierNode alias = null;
 			if (!StringUtil.isEmpty(as))
 			{
-				alias = new JSIdentifierNode(toSymbol(JSTokenType.IDENTIFIER, -1, -1, as));
+				alias = new JSIdentifierNode(identifierSymbol(as));
 			}
 
 			if (Module.STAR_NAME.equals(name))
@@ -504,7 +535,7 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 			}
 			else
 			{
-				JSIdentifierNode importedName = new JSIdentifierNode(toSymbol(JSTokenType.IDENTIFIER, -1, -1, name));
+				JSIdentifierNode importedName = new JSIdentifierNode(identifierSymbol(name));
 				if (alias == null)
 				{
 					node = new JSImportSpecifierNode(importedName);
@@ -552,6 +583,10 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 		else
 		{
 			module = null;
+			pool = null;
+			pushOnLeave = null;
+			// FIXME If nodestack is not empty, spit out an error message
+			fNodeStack = null;
 		}
 		return super.leaveFunctionNode(functionNode);
 	}
@@ -1117,17 +1152,20 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 		if (!forNode.isForInOrOf() && theNode.getChildCount() != 4)
 		{
 			// if the body is empty, we need to add an empty JSStatementsNode as body!
-			if (forNode.getBody().getStatementCount() == 0) {
+			if (forNode.getBody().getStatementCount() == 0)
+			{
 				theNode.addChild(new JSStatementsNode());
 			}
 
 			// we may have added the 4th child now...
-			if (theNode.getChildCount() != 4) {
+			if (theNode.getChildCount() != 4)
+			{
 				// Inject empty nodes for missing test/increment expressions!
 				IParseNode[] newChildren = new IParseNode[4];
-				newChildren[0] = theNode.getFirstChild(); // we always inject an empty node if necessary for init expression
+				newChildren[0] = theNode.getFirstChild(); // we always inject an empty node if necessary for init
+															// expression
 				newChildren[3] = theNode.getLastChild(); // body is always last and should be non-null/empty
-	
+
 				// if we didn't already inject an empty test node...
 				if (forNode.getTest() == null && forNode.getInit() != null)
 				{
@@ -1150,7 +1188,9 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 					// init is good, test is good, body is good.
 					newChildren[1] = theNode.getChild(1);
 					newChildren[2] = new JSEmptyNode(newChildren[1].getEndingOffset());
-				} else {
+				}
+				else
+				{
 					throw new IllegalStateException("Failed to set second and thrid children on for loop node!");
 				}
 				((JSNode) theNode).setChildren(newChildren);
@@ -1399,7 +1439,7 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	protected Node leaveDefault(Node node)
 	{
-//		System.out.println("Leaving node: " + node.getClass().getName() + ": " + node);
+		// System.out.println("Leaving node: " + node.getClass().getName() + ": " + node);
 		if (pushOnLeave.containsKey(node))
 		{
 			JSNode toPush = pushOnLeave.remove(node);
@@ -1443,7 +1483,7 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 		int finish = accessNode.getFinish();
 		String propertyName = accessNode.getProperty();
 		int start = finish - propertyName.length();
-		addChildToParent(new JSIdentifierNode(toSymbol(JSTokenType.IDENTIFIER, start, finish, propertyName)));
+		addChildToParent(new JSIdentifierNode(identifierSymbol(start, finish, propertyName)));
 		popNode();
 		return super.leaveAccessNode(accessNode);
 	}
@@ -1518,8 +1558,8 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterLabelNode(LabelNode labelNode)
 	{
-		addToParentAndPushNodeToStack(new JSLabelledNode(new JSIdentifierNode(toSymbol(JSTokenType.IDENTIFIER,
-				labelNode.getStart(), labelNode.getFinish(), labelNode.getLabelName())), null));
+		addToParentAndPushNodeToStack(
+				new JSLabelledNode(new JSIdentifierNode(identifierSymbol(labelNode, labelNode.getLabelName())), null));
 		return super.enterLabelNode(labelNode);
 	}
 
@@ -1530,12 +1570,12 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 		return super.leaveLabelNode(labelNode);
 	}
 
-//	@Override
-//	protected boolean enterDefault(Node node)
-//	{
-//		System.out.println("Entering node: " + node.getClass().getName() + ": " + node);
-//		return super.enterDefault(node);
-//	}
+	// @Override
+	// protected boolean enterDefault(Node node)
+	// {
+	// System.out.println("Entering node: " + node.getClass().getName() + ": " + node);
+	// return super.enterDefault(node);
+	// }
 
 	public IParseRootNode getRootNode()
 	{
