@@ -31,6 +31,8 @@ public class ParseState implements IParseState
 	 */
 	private ImmutableTupleN fCacheKey;
 
+	private String filename;
+
 	public ParseState(String source)
 	{
 		this(source, 0);
@@ -47,6 +49,12 @@ public class ParseState implements IParseState
 		fStartingOffset = startingOffset;
 		fSkippedRanges = ranges;
 		fCacheKey = calculateCacheKey();
+	}
+
+	public ParseState(String source, String filename)
+	{
+		this(source);
+		this.filename = filename;
 	}
 
 	/**
@@ -135,6 +143,11 @@ public class ParseState implements IParseState
 	public IParseStateCacheKey getCacheKey(String contentTypeId)
 	{
 		return new ParseStateCacheKey(contentTypeId, fCacheKey);
+	}
+
+	public String getFilename()
+	{
+		return this.filename;
 	}
 
 }

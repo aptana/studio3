@@ -13,10 +13,9 @@ public class GraalJSParserTest extends JSParserTest
 	}
 
 	@Override
-	protected String mismatchedToken(String token)
+	protected String mismatchedToken(int line, int offset, String token)
 	{
-		// TODO Auto-generated method stub
-		return token;
+		return "filename.js:" + line + ":" + offset + " Expected an operand but found " + token;
 	}
 
 	@Override

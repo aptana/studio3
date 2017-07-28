@@ -1,5 +1,8 @@
 package com.aptana.js.core.parsing.graal;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
+
 import com.aptana.core.build.IProblem.Severity;
 import com.aptana.js.core.IJSConstants;
 import com.aptana.parsing.IParseState;
@@ -28,7 +31,11 @@ public class GraalJSParser implements IParser
 	private void parse(IParseState parseState, final WorkingParseResult working)
 	{
 		String source = parseState.getSource();
-		Source src = Source.sourceFor("filename.js", source);
+		String filename = parseState.getFilename();
+		if (filename == null) {
+			filename = "filename.js";
+		}
+		Source src = Source.sourceFor(filename, source);
 
 		ScriptEnvironment env = ScriptEnvironment.builder().es6(true).build();
 		ErrorManager errorManager = new ErrorManager()
@@ -41,7 +48,22 @@ public class GraalJSParser implements IParser
 		};
 		Parser p = new Parser(env, src, errorManager);
 
-		FunctionNode result = p.parseModule("");
+		// We try to parse as 'script' first, since that's much more common
+		// FIXME Based on file extensions, choose module goal explicitly for *.mjs files!
+		FunctionNode result = p.parse();
+		if (result == null || errorManager.getParserException() != null) {
+			// FIXME I assume if we get no result or had a parser exception we should retry as module. Sniff the exception for import/export?
+			// Reset errors on working result
+			working.getErrors().clear();
+			env = ScriptEnvironment.builder().es6(true).build();
+			p = new Parser(env, src, errorManager);
+
+			// parse as module
+			result = p.parseModule("modulename");
+		}
+		
+//		FunctionNode result = p.parseModule("modulename");
+		
 		if (result != null)
 		{
 			try
@@ -52,9 +74,11 @@ public class GraalJSParser implements IParser
 			}
 			catch (Exception e)
 			{
-				// FIXME Sprint the stack traces to a string!
-				e.printStackTrace();
-				working.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, -1, -1, e.getMessage(), Severity.ERROR));
+				// print the stack traces to a string!
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				PrintWriter pw = new PrintWriter(out);
+				e.printStackTrace(pw);
+				working.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, -1, -1, e.getMessage() + "\n" + out.toString(), Severity.ERROR));
 			}
 		}
 	}

@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.aptana.core.util.FileUtil;
@@ -40,7 +39,7 @@ public abstract class JSParserTest
 	private static final String EOL = FileUtil.NEW_LINE;
 
 	private ParseResult fParseResult;
-	
+
 	@After
 	public void teardown() throws Exception
 	{
@@ -340,7 +339,7 @@ public abstract class JSParserTest
 	@Test
 	public void testTypeof1() throws Exception
 	{
-		assertParseResult("a = typeof(object);" + EOL); //$NON-NLS-1$
+		assertParseResult("a = typeof(object);" + EOL, "a = typeof object;" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -478,6 +477,8 @@ public abstract class JSParserTest
 	@Test
 	public void testWithInIfElse() throws Exception
 	{
+		// FIXME With not allowed in strict mode, which modules always are....
+		// see https://www.ecma-international.org/ecma-262/7.0/#sec-with-statement-static-semantics-early-errors
 		assertParseResult("if (true) with (abc) a++; else true;" + EOL); //$NON-NLS-1$
 	}
 
@@ -520,7 +521,8 @@ public abstract class JSParserTest
 	@Test
 	public void testEmptyInIfElse() throws Exception
 	{
-		assertParseResult("if (true)  else true;" + EOL); //$NON-NLS-1$
+		parse("if (true)  else true;" + EOL); //$NON-NLS-1$
+		assertParseErrors(mismatchedToken(1, 11, "else"));
 	}
 
 	@Test
@@ -648,12 +650,12 @@ public abstract class JSParserTest
 	{
 		assertParseResult("function abc () {}" + EOL); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void testFunctionWithNoSpaceBetweenNameAndParens() throws Exception
 	{
-		// FIXME This seems like it's generating a bad AST. Looks like it's treating the trailing semicolon as an empty statement?
-		assertParseResult("function Titanium_Facebook_LoginButton() {};" + EOL, "function Titanium_Facebook_LoginButton () {}" + EOL + ";" + EOL); //$NON-NLS-1$
+		assertParseResult("function Titanium_Facebook_LoginButton() {};" + EOL, //$NON-NLS-1$
+				"function Titanium_Facebook_LoginButton () {}" + EOL);
 		assertNoErrors();
 	}
 
@@ -1053,10 +1055,10 @@ public abstract class JSParserTest
 	@Test
 	public void testPlusNegativeNumber() throws Exception
 	{
-		assertParseResult("var x = 5 + -3;" + EOL);
-		assertParseResult("var x = 5+ -3" + EOL, "var x = 5 + -3;" + EOL);
-		assertParseResult("var x = 5 +-3" + EOL, "var x = 5 + -3;" + EOL);
-		assertParseResult("var x = 5+-3" + EOL, "var x = 5 + -3;" + EOL);
+		assertParseResult("var x = 5 + -3;" + EOL, "var x = 5 + (-3);" + EOL);
+		assertParseResult("var x = 5+ -3" + EOL, "var x = 5 + (-3);" + EOL);
+		assertParseResult("var x = 5 +-3" + EOL, "var x = 5 + (-3);" + EOL);
+		assertParseResult("var x = 5+-3" + EOL, "var x = 5 + (-3);" + EOL);
 	}
 
 	@Test
@@ -1143,7 +1145,7 @@ public abstract class JSParserTest
 	@Test
 	public void testMissingPropertyValue() throws Exception
 	{
-		assertParseResult("var x = { t };", "var x = {t};" + EOL);
+		assertParseResult("var x = { t };", "var x = {t: t};" + EOL);
 		assertNoErrors();
 	}
 
@@ -1151,10 +1153,10 @@ public abstract class JSParserTest
 	public void testMissingPropertyValue2() throws Exception
 	{
 		parse("var x = { t: };");
-		assertParseErrors(mismatchedToken("}"));
+		assertParseErrors(mismatchedToken(1, 13, "}"));
 	}
 
-	protected abstract String mismatchedToken(String token);
+	protected abstract String mismatchedToken(int line, int offset, String token);
 
 	/**
 	 * Test fix for APSTUD-3214
@@ -1412,6 +1414,13 @@ public abstract class JSParserTest
 	}
 
 	@Test
+	public void testClassExpression() throws Exception
+	{
+		assertParseResult("export default class {}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
 	public void testClassDeclarationWithNoProperties() throws Exception
 	{
 		assertParseResult("class Shape {}" + EOL);
@@ -1494,7 +1503,7 @@ public abstract class JSParserTest
 	@Test
 	public void testPropertyShorthandInObjectLiteral() throws Exception
 	{
-		assertParseResult("obj = {x, y};" + EOL);
+		assertParseResult("obj = {x: x, y: y};" + EOL);
 		assertNoErrors();
 	}
 
@@ -1669,13 +1678,13 @@ public abstract class JSParserTest
 		assertParseResult("a = b + c" + EOL + "(d + e).print()" + EOL, "a = b + c(d + e).print();" + EOL);
 		assertNoErrors(); // FIXME Beaver reports injected semicolon as warning
 	}
-	
+
 	@Test
 	public void testDojo() throws Exception
 	{
 		for (String file : ITestFiles.DOJO_FILES)
 		{
-			parse(getSource(file));
+			parseFile(file);
 			assertNoErrors();
 		}
 	}
@@ -1685,7 +1694,7 @@ public abstract class JSParserTest
 	{
 		for (String file : ITestFiles.TIMOBILE_FILES)
 		{
-			parse(getSource(file));
+			parseFile(file);
 			assertNoErrors();
 		}
 	}
@@ -1695,8 +1704,7 @@ public abstract class JSParserTest
 	{
 		for (String file : ITestFiles.EXT_FILES)
 		{
-			System.out.println("Parsing file: " + file);
-			parse(getSource(file));
+			parseFile(file);
 			assertNoErrors();
 		}
 	}
@@ -1706,14 +1714,15 @@ public abstract class JSParserTest
 	{
 		for (String file : ITestFiles.TINY_MCE_FILES)
 		{
-			parse(getSource(file));
+			parseFile(file);
 			assertNoErrors();
 		}
 	}
-	
+
 	@Test
-	public void testLotsofFunctionInvocations() throws IOException, Exception {
-		parse(getSource("performance/jaxer/regress-155081-2.js"));
+	public void testLotsofFunctionInvocations() throws IOException, Exception
+	{
+		parseFile("performance/jaxer/regress-155081-2.js");
 		assertNoErrors();
 	}
 
@@ -1722,8 +1731,7 @@ public abstract class JSParserTest
 	{
 		for (String file : ITestFiles.JAXER_FILES)
 		{
-			System.out.println("Parsing file: " + file);
-			parse(getSource(file));
+			parseFile(file);
 			assertNoErrors();
 		}
 	}
@@ -1814,7 +1822,8 @@ public abstract class JSParserTest
 	protected void assertParseResult(String source, String expected) throws Exception
 	{
 		IParseNode result = parse(source);
-		if (result == null) {
+		if (result == null)
+		{
 			assertNoErrors(); // spit out the errors
 		}
 		StringBuilder text = new StringBuilder();
@@ -1838,5 +1847,11 @@ public abstract class JSParserTest
 		InputStream stream = FileLocator.openStream(Platform.getBundle(JSCorePlugin.PLUGIN_ID), new Path(resourceName),
 				false);
 		return IOUtil.read(stream);
+	}
+
+	protected IParseRootNode parseFile(String resourceName) throws Exception
+	{
+		String src = getSource(resourceName);
+		return parse(new ParseState(src, resourceName));
 	}
 }

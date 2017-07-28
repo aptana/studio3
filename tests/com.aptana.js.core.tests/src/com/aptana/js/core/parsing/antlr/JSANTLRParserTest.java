@@ -38,7 +38,7 @@ public class JSANTLRParserTest extends JSParserTest
 	}
 
 	@Override
-	protected String mismatchedToken(String token)
+	protected String mismatchedToken(int line, int offset, String token)
 	{
 		return "mismatched input '" + token + "'";
 	}

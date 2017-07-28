@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import com.aptana.core.util.StringUtil;
+import com.aptana.js.core.JSLanguageConstants;
 import com.aptana.js.core.parsing.JSTokenType;
 import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSArrayNode;
@@ -16,11 +18,14 @@ import com.aptana.js.core.parsing.ast.JSCaseNode;
 import com.aptana.js.core.parsing.ast.JSCatchNode;
 import com.aptana.js.core.parsing.ast.JSClassNode;
 import com.aptana.js.core.parsing.ast.JSCommaNode;
+import com.aptana.js.core.parsing.ast.JSComputedPropertyNameNode;
 import com.aptana.js.core.parsing.ast.JSConditionalNode;
 import com.aptana.js.core.parsing.ast.JSConstructNode;
+import com.aptana.js.core.parsing.ast.JSContinueNode;
 import com.aptana.js.core.parsing.ast.JSDeclarationNode;
 import com.aptana.js.core.parsing.ast.JSDefaultNode;
 import com.aptana.js.core.parsing.ast.JSDoNode;
+import com.aptana.js.core.parsing.ast.JSElisionNode;
 import com.aptana.js.core.parsing.ast.JSEmptyNode;
 import com.aptana.js.core.parsing.ast.JSExportNode;
 import com.aptana.js.core.parsing.ast.JSFalseNode;
@@ -29,12 +34,17 @@ import com.aptana.js.core.parsing.ast.JSForInNode;
 import com.aptana.js.core.parsing.ast.JSForNode;
 import com.aptana.js.core.parsing.ast.JSForOfNode;
 import com.aptana.js.core.parsing.ast.JSFunctionNode;
+import com.aptana.js.core.parsing.ast.JSGeneratorFunctionNode;
 import com.aptana.js.core.parsing.ast.JSGetElementNode;
 import com.aptana.js.core.parsing.ast.JSGetPropertyNode;
+import com.aptana.js.core.parsing.ast.JSGetterNode;
 import com.aptana.js.core.parsing.ast.JSGroupNode;
 import com.aptana.js.core.parsing.ast.JSIdentifierNode;
 import com.aptana.js.core.parsing.ast.JSIfNode;
+import com.aptana.js.core.parsing.ast.JSImportNode;
+import com.aptana.js.core.parsing.ast.JSImportSpecifierNode;
 import com.aptana.js.core.parsing.ast.JSInvokeNode;
+import com.aptana.js.core.parsing.ast.JSLabelledNode;
 import com.aptana.js.core.parsing.ast.JSNameValuePairNode;
 import com.aptana.js.core.parsing.ast.JSNode;
 import com.aptana.js.core.parsing.ast.JSNullNode;
@@ -45,14 +55,19 @@ import com.aptana.js.core.parsing.ast.JSParseRootNode;
 import com.aptana.js.core.parsing.ast.JSPostUnaryOperatorNode;
 import com.aptana.js.core.parsing.ast.JSPreUnaryOperatorNode;
 import com.aptana.js.core.parsing.ast.JSRegexNode;
+import com.aptana.js.core.parsing.ast.JSRestElementNode;
 import com.aptana.js.core.parsing.ast.JSReturnNode;
+import com.aptana.js.core.parsing.ast.JSSetterNode;
+import com.aptana.js.core.parsing.ast.JSSpreadElementNode;
 import com.aptana.js.core.parsing.ast.JSStatementsNode;
 import com.aptana.js.core.parsing.ast.JSStringNode;
 import com.aptana.js.core.parsing.ast.JSSwitchNode;
+import com.aptana.js.core.parsing.ast.JSThrowNode;
 import com.aptana.js.core.parsing.ast.JSTrueNode;
 import com.aptana.js.core.parsing.ast.JSTryNode;
 import com.aptana.js.core.parsing.ast.JSVarNode;
 import com.aptana.js.core.parsing.ast.JSWhileNode;
+import com.aptana.js.core.parsing.ast.JSYieldNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseNode;
@@ -65,6 +80,7 @@ import com.oracle.js.parser.ir.CallNode;
 import com.oracle.js.parser.ir.CaseNode;
 import com.oracle.js.parser.ir.CatchNode;
 import com.oracle.js.parser.ir.ClassNode;
+import com.oracle.js.parser.ir.ContinueNode;
 import com.oracle.js.parser.ir.EmptyNode;
 import com.oracle.js.parser.ir.Expression;
 import com.oracle.js.parser.ir.ExpressionStatement;
@@ -73,16 +89,21 @@ import com.oracle.js.parser.ir.FunctionNode;
 import com.oracle.js.parser.ir.IdentNode;
 import com.oracle.js.parser.ir.IfNode;
 import com.oracle.js.parser.ir.IndexNode;
+import com.oracle.js.parser.ir.LabelNode;
 import com.oracle.js.parser.ir.LexicalContext;
 import com.oracle.js.parser.ir.LiteralNode;
+import com.oracle.js.parser.ir.LiteralNode.ArrayLiteralNode;
 import com.oracle.js.parser.ir.Module;
 import com.oracle.js.parser.ir.Module.ExportEntry;
+import com.oracle.js.parser.ir.Module.ImportEntry;
 import com.oracle.js.parser.ir.Node;
 import com.oracle.js.parser.ir.ObjectNode;
 import com.oracle.js.parser.ir.PropertyNode;
 import com.oracle.js.parser.ir.ReturnNode;
+import com.oracle.js.parser.ir.Statement;
 import com.oracle.js.parser.ir.SwitchNode;
 import com.oracle.js.parser.ir.TernaryNode;
+import com.oracle.js.parser.ir.ThrowNode;
 import com.oracle.js.parser.ir.TryNode;
 import com.oracle.js.parser.ir.UnaryNode;
 import com.oracle.js.parser.ir.VarNode;
@@ -169,6 +190,34 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		if (literalNode.isArray())
 		{
+			JSArrayNode arrayNode = (JSArrayNode) getCurrentNode();
+
+			IParseNode[] nonElidedChildren = arrayNode.getChildren();
+
+			ArrayLiteralNode aln = (ArrayLiteralNode) literalNode;
+			final List<Expression> oldValue = aln.getElementExpressions();
+			int childCount = oldValue.size();
+
+			if (nonElidedChildren.length != childCount)
+			{
+				// Re-insert empty nodes for elided elements!
+				IParseNode[] elidedChildren = new IParseNode[childCount];
+				int j = 0;
+				for (int i = 0; i < childCount; i++)
+				{
+					Expression e = oldValue.get(i);
+					if (e == null)
+					{
+						elidedChildren[i] = new JSElisionNode(new JSNullNode());
+					}
+					else
+					{
+						elidedChildren[i] = nonElidedChildren[j];
+						j++;
+					}
+				}
+				arrayNode.setChildren(elidedChildren);
+			}
 			popNode();
 		}
 		return super.leaveLiteralNode(literalNode);
@@ -205,9 +254,64 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 		}
 		else
 		{
-			addChildToParent(new JSIdentifierNode(toSymbol(identNode)));
+			if (identNode.isRestParameter())
+			{
+				addChildToParent(new JSRestElementNode(null, new JSIdentifierNode(toSymbol(identNode))));
+			}
+			else if (identNode.isDefaultParameter())
+			{
+				JSIdentifierNode ident = new JSIdentifierNode(toSymbol(identNode));
+				// find first expression statement, holding a binary node, whose lhs has an identNode matching this.
+				// rhs is ternarynode whose trueExpr is the default value!
+				BinaryNode matchingInitializer = matchingInitializer(identNode);
+				if (matchingInitializer != null)
+				{
+					TernaryNode tn = (TernaryNode) matchingInitializer.rhs();
+
+					JSDeclarationNode declNode = new JSDeclarationNode(null);
+					addToParentAndPushNodeToStack(declNode);
+					addChildToParent(ident);
+					tn.getTrueExpression().accept(this);
+					popNode();
+				}
+				else
+				{
+					addChildToParent(ident);
+				}
+			}
+			else
+			{
+				addChildToParent(new JSIdentifierNode(toSymbol(identNode)));
+			}
 		}
 		return super.enterIdentNode(identNode);
+	}
+
+	private BinaryNode matchingInitializer(IdentNode identNode)
+	{
+		Block funcBody = lc.getCurrentFunction().getBody();
+		List<Statement> statements = funcBody.getStatements();
+		for (Statement stmt : statements)
+		{
+			if (stmt instanceof ExpressionStatement)
+			{
+				ExpressionStatement es = (ExpressionStatement) stmt;
+				Expression e = es.getExpression();
+				if (e instanceof BinaryNode)
+				{
+					BinaryNode possible = (BinaryNode) e;
+					if (possible.lhs() instanceof IdentNode)
+					{
+						IdentNode lhs = (IdentNode) possible.lhs();
+						if (lhs.getName().equals(identNode.getName()))
+						{
+							return possible;
+						}
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	private Symbol toSymbol(Node ident)
@@ -245,9 +349,20 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 				type = JSTokenType.LET;
 			}
 			Symbol var = toSymbol(type, varNode);
+
+			ExportedStatus exportStatus = getExportStatus(varNode.getName());
 			JSNode node = new JSVarNode(var);
 			node.setSemicolonIncluded(true);
-			addToParentAndPushNodeToStack(node);
+			if (exportStatus.isExported)
+			{
+				// push export node
+				addToParentAndPushNodeToStack(new JSExportNode(exportStatus.isDefault, node));
+				fNodeStack.push(node); // now push var node to top of stack (it's already hooked as child)
+			}
+			else
+			{
+				addToParentAndPushNodeToStack(node);
+			}
 			addToParentAndPushNodeToStack(new JSDeclarationNode(null));
 		}
 		else if (varNode.getInit() instanceof ClassNode)
@@ -282,15 +397,30 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 			}
 			popNode(); // decl node
 			popNode(); // var node
+
+			ExportedStatus exportStatus = getExportStatus(varNode.getName());
+			if (exportStatus.isExported)
+			{
+				popNode(); // export node
+			}
 		}
 		else if (varNode.getInit() instanceof ClassNode)
 		{
 			// Swap order of body and name
-			// FIXME handle when there's a superclass! Should be "middle" child
+			// FIXME What if no name?!
 			IParseNode node = getCurrentNode();
-			IParseNode body = node.getChild(0);
-			IParseNode name = node.getChild(1);
-			((JSNode) node).setChildren(new IParseNode[] { name, body });
+			int childCount = node.getChildCount(); // optional first child is superclass/heritage
+			IParseNode body = node.getChild(childCount - 2); // second-last child should be class body
+			IParseNode name = node.getChild(childCount - 1); // last child should be the class name
+			if (childCount == 2)
+			{
+				((JSNode) node).setChildren(new IParseNode[] { name, body });
+			}
+			else
+			{
+				IParseNode heritage = node.getFirstChild();
+				((JSNode) node).setChildren(new IParseNode[] { name, heritage, body });
+			}
 
 			popNode(); // class node
 		}
@@ -303,23 +433,21 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		if (!functionNode.isProgram())
 		{
-			IdentNode ident = functionNode.getIdent();
-			boolean isExported = false;
-			boolean isDefault = false;
-			List<ExportEntry> exports = module.getLocalExportEntries();
-			for (ExportEntry entry : exports)
+			JSFunctionNode funcNode;
+			if (functionNode.getKind() == FunctionNode.Kind.GENERATOR)
 			{
-				if (entry.getLocalName().equals(ident.getName()))
-				{
-					isExported = true;
-					isDefault = entry.getExportName().equals(Module.DEFAULT_NAME);
-					break;
-				}
+				funcNode = new JSGeneratorFunctionNode();
 			}
-			JSFunctionNode funcNode = new JSFunctionNode();
-			if (isExported)
+			else
 			{
-				addToParentAndPushNodeToStack(new JSExportNode(isDefault, funcNode));
+				funcNode = new JSFunctionNode();
+			}
+
+			IdentNode ident = functionNode.getIdent();
+			ExportedStatus exportStatus = getExportStatus(ident);
+			if (exportStatus.isExported)
+			{
+				addToParentAndPushNodeToStack(new JSExportNode(exportStatus.isDefault, funcNode));
 				fNodeStack.push(funcNode); // make function node top of stack
 			}
 			else
@@ -331,13 +459,76 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 			// Need to explicitly visit the params
 			addToParentAndPushNodeToStack(new JSParametersNode());
 			functionNode.visitParameters(this);
-			popNode();
+			popNode(); // parameters
 		}
 		else
 		{
 			module = functionNode.getModule();
+			if (module != null)
+			{
+				handleImportsAndExports();
+			}
 		}
 		return super.enterFunctionNode(functionNode);
+	}
+
+	private void handleImportsAndExports()
+	{
+		handleImports();
+		handleExports();
+	}
+
+	protected void handleImports()
+	{
+		List<ImportEntry> imports = module.getImportEntries();
+		for (ImportEntry entry : imports)
+		{
+			String from = entry.getModuleRequest(); // FIXME If we have multiple from same module, need to make
+													// them
+													// JSNamedImportsNode!
+			String as = entry.getLocalName();
+			String name = entry.getImportName();
+
+			JSImportNode importNode = new JSImportNode("'" + from + "'");
+
+			JSImportSpecifierNode node;
+			JSIdentifierNode alias = null;
+			if (!StringUtil.isEmpty(as))
+			{
+				alias = new JSIdentifierNode(toSymbol(JSTokenType.IDENTIFIER, -1, -1, as));
+			}
+
+			if (Module.STAR_NAME.equals(name))
+			{
+				node = new JSImportSpecifierNode(new Symbol(JSLanguageConstants.STAR), alias);
+			}
+			else
+			{
+				JSIdentifierNode importedName = new JSIdentifierNode(toSymbol(JSTokenType.IDENTIFIER, -1, -1, name));
+				if (alias == null)
+				{
+					node = new JSImportSpecifierNode(importedName);
+				}
+				else
+				{
+					node = new JSImportSpecifierNode(importedName, alias);
+				}
+			}
+			if (node != null)
+			{
+				importNode.addChild(node);
+			}
+			addChildToParent(importNode);
+		}
+	}
+
+	protected void handleExports()
+	{
+		List<ExportEntry> starExports = module.getStarExportEntries();
+		for (ExportEntry entry : starExports)
+		{
+			addChildToParent(new JSExportNode(false, (Symbol) null, "'" + entry.getModuleRequest() + "'"));
+		}
 	}
 
 	@Override
@@ -346,15 +537,21 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 		if (!functionNode.isProgram())
 		{
 
-			popNode();
-			if (getCurrentNode() instanceof JSExportNode) {
-				popNode();
+			popNode(); // func node
+			ExportedStatus exportStatus = getExportStatus(functionNode.getIdent());
+			if (exportStatus.isExported)
+			{
+				popNode(); // export node
 			}
 			// when the function node is the "init" of a parent VarNode, we need to avoid hitting the "name" IdentNode.
-			if (!functionNode.isAnonymous())
+			if (!functionNode.isAnonymous() && !functionNode.isMethod())
 			{
 				wipeNextIdent = true;
 			}
+		}
+		else
+		{
+			module = null;
 		}
 		return super.leaveFunctionNode(functionNode);
 	}
@@ -418,6 +615,21 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 				theNode = new JSPreUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
 				break;
 
+			case YIELD:
+				type = JSTokenType.YIELD;
+				theNode = new JSYieldNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				break;
+
+			case SPREAD_ARRAY:
+				type = JSTokenType.DOT_DOT_DOT;
+				theNode = new JSSpreadElementNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				break;
+
+			case SPREAD_ARGUMENT:
+				type = JSTokenType.DOT_DOT_DOT;
+				theNode = new JSSpreadElementNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				break;
+
 			default:
 				throw new IllegalStateException("Reached unhandled unary node type! " + unaryNode);
 		}
@@ -428,6 +640,22 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public Node leaveUnaryNode(UnaryNode unaryNode)
 	{
+		TokenType tokenType = unaryNode.tokenType();
+		if (tokenType == TokenType.NEW)
+		{
+			JSConstructNode cn = (JSConstructNode) getCurrentNode();
+			// FIXME If this is a construct node and it's child is an invoke node:
+			// Grab the first child of invoke node and make that the construct first child
+			// grab the second child of invoke node (args) and make that construct second child (or empty node)
+			JSNode firstChild = (JSNode) cn.getFirstChild();
+			if (firstChild instanceof JSInvokeNode)
+			{
+				JSNode expression = (JSNode) firstChild.getChild(0);
+				JSNode arguments = (JSNode) firstChild.getChild(1);
+				IParseNode[] newChildren = new IParseNode[] { expression, arguments };
+				cn.setChildren(newChildren);
+			}
+		}
 		popNode();
 		return super.leaveUnaryNode(unaryNode);
 	}
@@ -591,10 +819,12 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 			// theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
 			// break;
 			//
-			default:
-				type = JSTokenType.UNDEFINED;
-				theNode = new JSBinaryBooleanOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+			case COMMARIGHT:
+				type = JSTokenType.COMMA;
+				theNode = new JSCommaNode();
 				break;
+			default:
+				throw new IllegalStateException("Reached unhandled binary node type! " + binaryNode);
 		}
 		// push operator node to stack
 		addToParentAndPushNodeToStack(theNode);
@@ -684,8 +914,17 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterBlock(Block block)
 	{
-
-		if (!block.isSynthetic())
+		if (block.isParameterBlock())
+		{
+			// when we have default parameters, the parser generates a special "parameter block"
+			// that is filled with generated expressions to initialize argument values
+			// The last statement is a block statement holding the real function body/block.
+			super.enterBlock(block); // print our current node
+			// don't create a statements node. We basically need to ignore until last BlockStatement and go into that
+			block.getLastStatement().accept(this);
+			return false; // don't go into this fake node. We already manaully went into the real function body
+		}
+		else if (!block.isSynthetic())
 		{
 			addToParentAndPushNodeToStack(new JSStatementsNode());
 		}
@@ -769,8 +1008,70 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterClassNode(ClassNode classNode)
 	{
-		addToParentAndPushNodeToStack(new JSStatementsNode()); // push statements node for body
+		// if we extend something, visit that first
+		Expression heritage = classNode.getClassHeritage();
+		if (heritage != null)
+		{
+			heritage.accept(this);
+		}
+		// then wrap body in a statements node
+		addToParentAndPushNodeToStack(new JSStatementsNode());
+		// manually walk constructor
+		PropertyNode constructorNode = classNode.getConstructor();
+		if (constructorNode != null)
+		{
+			boolean visitConstructor = !isSyntheticConstructor(classNode, constructorNode);
+
+			if (visitConstructor)
+			{
+				constructorNode.accept(this);
+			}
+		}
+		// manually walk the properties
+		List<PropertyNode> classElements = classNode.getClassElements();
+		for (PropertyNode prop : classElements)
+		{
+			prop.accept(this);
+		}
 		return super.enterClassNode(classNode);
+	}
+
+	private boolean isSyntheticConstructor(ClassNode classNode, PropertyNode constructorNode)
+	{
+		// constructor may be synthetic from parser
+		Expression value = constructorNode.getValue();
+		if (!(value instanceof FunctionNode))
+		{
+			return false;
+		}
+
+		String keyName = constructorNode.getKeyName();
+		IdentNode nameNode = classNode.getIdent();
+		String constructorName = "constructor"; //$NON-NLS-1$
+		if (nameNode != null)
+		{
+			constructorName = nameNode.getName();
+		}
+		if (!constructorName.equals(keyName))
+		{
+			return false;
+		}
+
+		FunctionNode constructorFunction = (FunctionNode) value;
+		Block body = constructorFunction.getBody();
+		int numParams = constructorFunction.getNumOfParams();
+		boolean isSubclass = (classNode.getClassHeritage() != null);
+
+		// not a subclass
+		if (!isSubclass)
+		{
+			return numParams == 0 && body.getStatementCount() == 0;
+		}
+
+		// TODO do we need to check the statement is an ExpressionStatement holding a CallNode with function "super" and
+		// single "args" argument?
+		return numParams == 1 && constructorFunction.hasDirectSuper()
+				&& constructorFunction.getParameter(0).isRestParameter() && body.getStatementCount() == 1;
 	}
 
 	@Override
@@ -815,35 +1116,45 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 		IParseNode theNode = getCurrentNode();
 		if (!forNode.isForInOrOf() && theNode.getChildCount() != 4)
 		{
-			// Inject empty nodes for missing test/increment expressions!
-			IParseNode[] newChildren = new IParseNode[4];
-			newChildren[0] = theNode.getFirstChild(); // we always inject an empty node if necessary for init expression
-			newChildren[3] = theNode.getLastChild(); // body is always last and should be non-null/empty
+			// if the body is empty, we need to add an empty JSStatementsNode as body!
+			if (forNode.getBody().getStatementCount() == 0) {
+				theNode.addChild(new JSStatementsNode());
+			}
 
-			// if we didn't already inject an empty test node...
-			if (forNode.getTest() == null && forNode.getInit() != null)
-			{
-				// inject empty node for "test" expression
-				newChildren[1] = new JSEmptyNode(newChildren[0].getEndingOffset());
-				if (forNode.getModify() == null)
+			// we may have added the 4th child now...
+			if (theNode.getChildCount() != 4) {
+				// Inject empty nodes for missing test/increment expressions!
+				IParseNode[] newChildren = new IParseNode[4];
+				newChildren[0] = theNode.getFirstChild(); // we always inject an empty node if necessary for init expression
+				newChildren[3] = theNode.getLastChild(); // body is always last and should be non-null/empty
+	
+				// if we didn't already inject an empty test node...
+				if (forNode.getTest() == null && forNode.getInit() != null)
 				{
-					// if modify expression is null too, add empty node
-					newChildren[2] = new JSEmptyNode(newChildren[0].getEndingOffset());
+					// inject empty node for "test" expression
+					newChildren[1] = new JSEmptyNode(newChildren[0].getEndingOffset());
+					if (forNode.getModify() == null)
+					{
+						// if modify expression is null too, add empty node
+						newChildren[2] = new JSEmptyNode(newChildren[0].getEndingOffset());
+					}
+					else
+					{
+						// copy over modify expression to right place
+						newChildren[2] = theNode.getChild(1);
+					}
 				}
-				else
+				// init and test expressions are set, just need to inject empty node for modify
+				else if (forNode.getModify() == null)
 				{
-					// copy over modify expression to right place
-					newChildren[2] = theNode.getChild(1);
+					// init is good, test is good, body is good.
+					newChildren[1] = theNode.getChild(1);
+					newChildren[2] = new JSEmptyNode(newChildren[1].getEndingOffset());
+				} else {
+					throw new IllegalStateException("Failed to set second and thrid children on for loop node!");
 				}
+				((JSNode) theNode).setChildren(newChildren);
 			}
-			// init and test expressions are set, just need to inject empty node for modify
-			else if (forNode.getModify() == null)
-			{
-				// init is good, test is good, body is good.
-				newChildren[1] = theNode.getChild(1);
-				newChildren[2] = new JSEmptyNode(newChildren[1].getEndingOffset());
-			}
-			((JSNode) theNode).setChildren(newChildren);
 		}
 		popNode();
 		return super.leaveForNode(forNode);
@@ -853,15 +1164,73 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterPropertyNode(PropertyNode propertyNode)
 	{
-		int offset = propertyNode.getKey().getFinish() + 2;
-		Symbol colon = toSymbol(JSTokenType.COLON, offset, offset + 1);
-		addToParentAndPushNodeToStack(new JSNameValuePairNode(colon));
+		if (propertyNode.getGetter() != null)
+		{
+			addToParentAndPushNodeToStack(new JSGetterNode());
+		}
+		else if (propertyNode.getSetter() != null)
+		{
+			addToParentAndPushNodeToStack(new JSSetterNode());
+		}
+		else if (propertyNode.getValue() instanceof FunctionNode)
+		{
+			addToParentAndPushNodeToStack(new JSNameValuePairNode());
+		}
+		else
+		{
+			Expression key = propertyNode.getKey();
+			int offset = key.getFinish() + 2;
+			Symbol colon = toSymbol(JSTokenType.COLON, offset, offset + 1);
+			addToParentAndPushNodeToStack(new JSNameValuePairNode(colon));
+			// if the property name is computed, manually traverse
+			if (!(key instanceof LiteralNode) && !(key instanceof IdentNode))
+			{
+				addToParentAndPushNodeToStack(new JSComputedPropertyNameNode());
+				propertyNode.getKey().accept(this);
+				popNode(); // computed property name node
+				propertyNode.getValue().accept(this);
+				popNode(); // name value pair node
+				return false;
+			}
+		}
 		return super.enterPropertyNode(propertyNode);
 	}
 
 	@Override
 	public Node leavePropertyNode(PropertyNode propertyNode)
 	{
+		if (propertyNode.getGetter() != null)
+		{
+			// if getter, grab "value", which should be a function node
+			// Grab function node's body. Replace our value with that body
+			JSGetterNode getterNode = (JSGetterNode) getCurrentNode();
+			JSFunctionNode funcValue = (JSFunctionNode) getterNode.getValue();
+			JSStatementsNode bodyNode = (JSStatementsNode) funcValue.getBody();
+			getterNode.replaceChild(1, bodyNode);
+		}
+		else if (propertyNode.getSetter() != null)
+		{
+			JSSetterNode setterNode = (JSSetterNode) getCurrentNode();
+			JSFunctionNode funcValue = (JSFunctionNode) setterNode.getValue();
+			JSStatementsNode bodyNode = (JSStatementsNode) funcValue.getBody();
+			JSParametersNode paramsNode = (JSParametersNode) funcValue.getParameters();
+			setterNode.replaceChild(1, paramsNode);
+			setterNode.addChild(bodyNode);
+		}
+		// FIXME If value is a function, drop the name value pair node and just add the function to the parent
+		// JSObjectNode or JSStatementsNode?
+		else if (propertyNode.getValue() instanceof FunctionNode)
+		{
+			JSNameValuePairNode pairNode = (JSNameValuePairNode) getCurrentNode();
+			JSFunctionNode funcValue = (JSFunctionNode) pairNode.getValue();
+			if (propertyNode.isStatic())
+			{
+				funcValue.setStatic();
+			}
+			IParseNode parent = pairNode.getParent();
+			int numChildren = parent.getChildCount();
+			parent.replaceChild(numChildren - 1, funcValue);
+		}
 		popNode();
 		return super.leavePropertyNode(propertyNode);
 	}
@@ -1030,7 +1399,7 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	protected Node leaveDefault(Node node)
 	{
-		System.out.println("Leaving node: " + node.getClass().getName() + ": " + node);
+//		System.out.println("Leaving node: " + node.getClass().getName() + ": " + node);
 		if (pushOnLeave.containsKey(node))
 		{
 			JSNode toPush = pushOnLeave.remove(node);
@@ -1049,6 +1418,13 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public Node leaveIfNode(IfNode ifNode)
 	{
+		Block elseBlock = ifNode.getFail();
+		if (elseBlock == null)
+		{
+			JSIfNode jsIfNode = (JSIfNode) getCurrentNode();
+			int offset = jsIfNode.getTrueBlock().getEndingOffset();
+			jsIfNode.addChild(new JSEmptyNode(offset));
+		}
 		popNode();
 		return super.leaveIfNode(ifNode);
 	}
@@ -1101,11 +1477,65 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	}
 
 	@Override
-	protected boolean enterDefault(Node node)
+	public boolean enterContinueNode(ContinueNode continueNode)
 	{
-		System.out.println("Entering node: " + node.getClass().getName() + ": " + node);
-		return super.enterDefault(node);
+		JSContinueNode cn = new JSContinueNode();
+		String label = continueNode.getLabelName();
+		if (label != null)
+		{
+			int start = continueNode.getFinish();
+			int finish = start + label.length();
+			cn = new JSContinueNode(toSymbol(JSTokenType.IDENTIFIER, start, finish, label));
+		}
+		cn.setSemicolonIncluded(true);
+		addToParentAndPushNodeToStack(cn);
+		return super.enterContinueNode(continueNode);
 	}
+
+	@Override
+	public Node leaveContinueNode(ContinueNode continueNode)
+	{
+		popNode();
+		return super.leaveContinueNode(continueNode);
+	}
+
+	@Override
+	public boolean enterThrowNode(ThrowNode throwNode)
+	{
+		JSNode tn = new JSThrowNode();
+		tn.setSemicolonIncluded(true);
+		addToParentAndPushNodeToStack(tn);
+		return super.enterThrowNode(throwNode);
+	}
+
+	@Override
+	public Node leaveThrowNode(ThrowNode throwNode)
+	{
+		popNode();
+		return super.leaveThrowNode(throwNode);
+	}
+
+	@Override
+	public boolean enterLabelNode(LabelNode labelNode)
+	{
+		addToParentAndPushNodeToStack(new JSLabelledNode(new JSIdentifierNode(toSymbol(JSTokenType.IDENTIFIER,
+				labelNode.getStart(), labelNode.getFinish(), labelNode.getLabelName())), null));
+		return super.enterLabelNode(labelNode);
+	}
+
+	@Override
+	public Node leaveLabelNode(LabelNode labelNode)
+	{
+		popNode();
+		return super.leaveLabelNode(labelNode);
+	}
+
+//	@Override
+//	protected boolean enterDefault(Node node)
+//	{
+//		System.out.println("Entering node: " + node.getClass().getName() + ": " + node);
+//		return super.enterDefault(node);
+//	}
 
 	public IParseRootNode getRootNode()
 	{
@@ -1141,4 +1571,31 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 		fNodeStack.push(node);
 	}
 
+	private ExportedStatus getExportStatus(IdentNode ident)
+	{
+		if (module != null)
+		{
+			List<ExportEntry> exports = module.getLocalExportEntries();
+			for (ExportEntry entry : exports)
+			{
+				if (entry.getLocalName().equals(ident.getName()))
+				{
+					return new ExportedStatus(true, entry.getExportName().equals(Module.DEFAULT_NAME));
+				}
+			}
+		}
+		return new ExportedStatus(false, false);
+	}
+
+	private static class ExportedStatus
+	{
+		final boolean isExported;
+		final boolean isDefault;
+
+		public ExportedStatus(boolean isExported, boolean isDefault)
+		{
+			this.isExported = isExported;
+			this.isDefault = isDefault;
+		}
+	}
 }
