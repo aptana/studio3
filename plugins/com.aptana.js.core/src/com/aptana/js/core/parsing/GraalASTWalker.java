@@ -1,4 +1,4 @@
-package com.aptana.js.core.parsing.graal;
+package com.aptana.js.core.parsing;
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +9,6 @@ import org.eclipse.core.internal.utils.StringPool;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.JSLanguageConstants;
-import com.aptana.js.core.parsing.JSTokenType;
 import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSArrayNode;
 import com.aptana.js.core.parsing.ast.JSAssignmentNode;
@@ -114,7 +113,7 @@ import com.oracle.js.parser.ir.visitor.NodeVisitor;
 
 import beaver.Symbol;
 
-public class GraalASTWalker extends NodeVisitor<LexicalContext>
+class GraalASTWalker extends NodeVisitor<LexicalContext>
 {
 
 	private IParseRootNode fRootNode;
@@ -917,18 +916,10 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	}
 
 	@Override
-	public boolean enterExpressionStatement(ExpressionStatement expressionStatement)
-	{
-		JSNode node = new JSCommaNode();
-		node.setSemicolonIncluded(true);
-		addToParentAndPushNodeToStack(node);
-		return super.enterExpressionStatement(expressionStatement);
-	}
-
-	@Override
 	public Node leaveExpressionStatement(ExpressionStatement expressionStatement)
 	{
-		popNode();
+		JSNode node = (JSNode) getLastNode();
+		node.setSemicolonIncluded(true);
 		return super.leaveExpressionStatement(expressionStatement);
 	}
 
@@ -1440,7 +1431,7 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	protected Node leaveDefault(Node node)
 	{
 		// System.out.println("Leaving node: " + node.getClass().getName() + ": " + node);
-		if (pushOnLeave.containsKey(node))
+		if (pushOnLeave != null && pushOnLeave.containsKey(node))
 		{
 			JSNode toPush = pushOnLeave.remove(node);
 			addToParentAndPushNodeToStack(toPush);
@@ -1594,6 +1585,16 @@ public class GraalASTWalker extends NodeVisitor<LexicalContext>
 	private void popNode()
 	{
 		fNodeStack.pop();
+	}
+
+	private IParseNode getLastNode()
+	{
+		IParseNode currentNode = getCurrentNode();
+		if (currentNode == null)
+		{
+			return null;
+		}
+		return currentNode.getLastChild();
 	}
 
 	private IParseNode getCurrentNode()

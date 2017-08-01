@@ -1,4 +1,4 @@
-package com.aptana.js.core.parsing.graal;
+package com.aptana.js.core.parsing;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;

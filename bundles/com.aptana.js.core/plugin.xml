@@ -67,7 +67,7 @@
    <extension
          point="com.aptana.parsing.parser">
       <parser
-            class="com.aptana.js.core.parsing.graal.GraalJSParser"
+            class="com.aptana.js.core.parsing.GraalJSParser"
             content-type="com.aptana.contenttype.js">
       </parser>
    </extension>

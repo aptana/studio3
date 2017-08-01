@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ JSFlexScannerTest.class, JSParserTest.class, SDocNodeAttachmentTest.class, })
+@SuiteClasses({ JSFlexScannerTest.class, GraalJSParserTest.class, SDocNodeAttachmentTest.class, })
 public class CoreParsingTests
 {
 }

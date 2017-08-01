@@ -26,7 +26,7 @@ import org.junit.Test;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
-import com.aptana.js.core.parsing.JSParser;
+import com.aptana.js.core.parsing.GraalJSParser;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -175,8 +175,8 @@ public class JSFoldingComputerTest
 				"};"; //
 
 		// Turn on initially folding objects
-		InstanceScope.INSTANCE.getNode(JSPlugin.PLUGIN_ID)
-				.putBoolean(IPreferenceConstants.INITIALLY_FOLD_OBJECTS, true);
+		InstanceScope.INSTANCE.getNode(JSPlugin.PLUGIN_ID).putBoolean(IPreferenceConstants.INITIALLY_FOLD_OBJECTS,
+				true);
 
 		Map<ProjectionAnnotation, Position> annotations = emitFoldingRegions(true, src);
 		assertTrue(annotations.keySet().iterator().next().isCollapsed());
@@ -200,6 +200,6 @@ public class JSFoldingComputerTest
 
 	private IParseRootNode parse(IParseState parseState) throws Exception
 	{
-		return new JSParser().parse(parseState).getRootNode();
+		return new GraalJSParser().parse(parseState).getRootNode();
 	}
 }
