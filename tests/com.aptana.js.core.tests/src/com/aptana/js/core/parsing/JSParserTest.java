@@ -113,7 +113,7 @@ public abstract class JSParserTest
 	{
 		assertParseResult("a *= 10;" + EOL); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void testExponentAndAssign() throws Exception
 	{
@@ -257,7 +257,7 @@ public abstract class JSParserTest
 	{
 		assertParseResult("abc * 5;" + EOL); //$NON-NLS-1$
 	}
-	
+
 	@Test
 	public void testExponent() throws Exception
 	{
@@ -667,7 +667,7 @@ public abstract class JSParserTest
 	public void testFunctionWithNoSpaceBetweenNameAndParens() throws Exception
 	{
 		assertParseResult("function Titanium_Facebook_LoginButton() {};" + EOL, //$NON-NLS-1$
-				"function Titanium_Facebook_LoginButton () {}" + EOL);
+				"function Titanium_Facebook_LoginButton () {}" + EOL + ";" + EOL);
 		assertNoErrors();
 	}
 
@@ -1118,40 +1118,35 @@ public abstract class JSParserTest
 	public void testMissingClosingParenthesis() throws Exception
 	{
 		parse("testing(");
-		assertBeaverParseErrors("Syntax Error: unexpected token \"end-of-file\"");
-		assertANTLRParseErrors("no viable alternative at input '('");
+		assertParseErrors("filename.js:1:8 Expected an operand but found eof\n" + "testing(\n" + "        ^");
 	}
 
 	@Test
 	public void testMissingIdentifier() throws Exception
 	{
 		parse("var x =");
-		assertBeaverParseErrors("Syntax Error: unexpected token \"end-of-file\"");
-		assertANTLRParseErrors("mismatched input '<EOF>'");
+		assertParseErrors("filename.js:1:7 Expected an operand but found eof\n" + "var x =\n" + "       ^");
 	}
 
 	@Test
 	public void testMissingIdentifier2() throws Exception
 	{
 		parse("x.");
-		assertBeaverParseErrors("Syntax Error: unexpected token \"end-of-file\"");
-		assertANTLRParseErrors("mismatched input '<EOF>'");
+		assertParseErrors("filename.js:1:2 Expected ident but found eof\n" + "x.\n" + "  ^");
 	}
 
 	@Test
 	public void testMissingArg() throws Exception
 	{
 		parse("fun(a,);");
-		assertBeaverParseErrors("Syntax Error: unexpected token \")\"");
-		assertANTLRParseErrors("no viable alternative at input '('");
+		assertParseErrors("filename.js:1:6 Expected an operand but found )\n" + "fun(a,);\n" + "      ^");
 	}
 
 	@Test
 	public void testMissingIdentifier3() throws Exception
 	{
 		parse("new");
-		assertBeaverParseErrors("Syntax Error: unexpected token \"end-of-file\"");
-		assertANTLRParseErrors("no viable alternative at input 'new'");
+		assertParseErrors("filename.js:1:3 Expected an operand but found eof\n" + "new\n" + "   ^");
 	}
 
 	@Test
@@ -1220,14 +1215,16 @@ public abstract class JSParserTest
 	public void testUnclosedString() throws Exception
 	{
 		parse("var string = 'something");
-		assertParseErrors(unexpectedToken("'"));
+		assertParseErrors(
+				"filename.js:1:23 Missing close quote\n" + "var string = 'something\n" + "                       ^");
 	}
 
 	@Test
 	public void testUnclosedComment() throws Exception
 	{
 		parse("var thing; /* comment");
-		assertParseErrors(unexpectedToken("/"));
+		assertParseErrors(
+				"filename.js:1:11 Expected an operand but found error\n" + "var thing; /* comment\n" + "           ^");
 	}
 
 	protected abstract String unexpectedToken(String token);
@@ -1236,8 +1233,8 @@ public abstract class JSParserTest
 	public void testUnclosedRegexp() throws Exception
 	{
 		parse("var regexp = /;");
-		assertBeaverParseErrors("Syntax Error: unexpected token \"/\"", "Syntax Error: unexpected token \";\"");
-		assertANTLRParseErrors("mismatched input '/'");
+		assertParseErrors(
+				"filename.js:1:13 Expected an operand but found /\n" + "var regexp = /;\n" + "             ^");
 	}
 
 	@Test
@@ -1265,8 +1262,7 @@ public abstract class JSParserTest
 	public void testReservedWordAsFunctionName() throws Exception
 	{
 		parse("function import() {};" + EOL);
-		assertBeaverParseErrors("Syntax Error: unexpected token \"import\"");
-		assertANTLRParseErrors("no viable alternative at input 'function import'", "missing '=>' at '{'");
+		assertParseErrors("filename.js:1:9 Expected ( but found import\n" + "function import() {};\n" + "         ^");
 	}
 
 	@Test
@@ -1543,9 +1539,8 @@ public abstract class JSParserTest
 	@Test
 	public void testSemicolonInsertion1() throws Exception
 	{
-		// FIXME How do we enforce that no semicolon insertion happens here?
-		assertParseResult("{ 1 2 } 3" + EOL);
-		assertParseErrors("no viable alternative at input '2'");
+		parse("{ 1 2 } 3" + EOL);
+		assertParseErrors("filename.js:1:4 Expected ; but found 2\n" + "{ 1 2 } 3\n" + "    ^");
 	}
 
 	/**
@@ -1573,7 +1568,7 @@ public abstract class JSParserTest
 	public void testSemicolonInsertion2() throws Exception
 	{
 		assertParseResult("{ 1" + EOL + "2 } 3" + EOL, "{1;2;}" + EOL + "3;" + EOL);
-		// assertNoErrors(); // FIXME Beaver reports the inserted semicolons as warnings!
+		assertNoErrors();
 	}
 
 	/**
@@ -1595,9 +1590,8 @@ public abstract class JSParserTest
 	@Test
 	public void testSemicolonInsertion3() throws Exception
 	{
-		// FIXME Beaver fails here
-		assertParseResult("for (a; b" + EOL + ")" + EOL, "for (a; b;) " + EOL);
-		assertParseErrors("missing ';' at ')'", "mismatched input '<EOF>'");
+		parse("for (a; b" + EOL + ")" + EOL);
+		assertParseErrors("filename.js:2:0 Expected ; but found )\n" + ")\n" + "^");
 	}
 
 	/**
@@ -1626,7 +1620,6 @@ public abstract class JSParserTest
 	@Test
 	public void testSemicolonInsertion4() throws Exception
 	{
-		// FIXME Beaver incorrectly joins this into "return a + b;"
 		assertParseResult("return" + EOL + "a + b" + EOL, "return;" + EOL + "a + b;" + EOL);
 		assertNoErrors();
 	}
@@ -1657,7 +1650,6 @@ public abstract class JSParserTest
 	@Test
 	public void testSemicolonInsertion5() throws Exception
 	{
-		// FIXME Beaver incorrectly joins this into "a = b++; c;"
 		assertParseResult("a = b" + EOL + "++c" + EOL, "a = b;" + EOL + "++c;" + EOL);
 		assertNoErrors();
 	}
@@ -1672,9 +1664,8 @@ public abstract class JSParserTest
 	@Test
 	public void testSemicolonInsertion6() throws Exception
 	{
-		// FIXME Beaver incorrectly inserts semicolon before else here
-		assertParseResult("if (a > b)" + EOL + "else c = d" + EOL, "if (a > b)  else c = d;" + EOL);
-		assertParseErrors("extraneous input 'else'");
+		parse("if (a > b)" + EOL + "else c = d" + EOL);
+		assertParseErrors("filename.js:2:0 Expected an operand but found else\n" + "else c = d\n" + "^");
 	}
 
 	/**
@@ -1688,7 +1679,7 @@ public abstract class JSParserTest
 	public void testSemicolonInsertion7() throws Exception
 	{
 		assertParseResult("a = b + c" + EOL + "(d + e).print()" + EOL, "a = b + c(d + e).print();" + EOL);
-		assertNoErrors(); // FIXME Beaver reports injected semicolon as warning
+		assertNoErrors();
 	}
 
 	@Test
@@ -1791,24 +1782,6 @@ public abstract class JSParserTest
 	}
 
 	// utility methods
-	protected void assertBeaverParseErrors(String... messages)
-	{
-		if (!isBeaver())
-			return;
-		assertParseErrors(messages);
-	}
-
-	protected void assertANTLRParseErrors(String... messages)
-	{
-		if (!isANTLR())
-			return;
-		assertParseErrors(messages);
-	}
-
-	protected abstract boolean isANTLR();
-
-	protected abstract boolean isBeaver();
-
 	protected void assertParseErrors(String... messages)
 	{
 		List<IParseError> errors = fParseResult.getErrors();
@@ -1819,9 +1792,9 @@ public abstract class JSParserTest
 		{
 			String msg = errors.get(i).getMessage();
 			// match prefix only. If no prefix match, give full diff in failure
-			if (!msg.startsWith(messages[i]))
+			if (msg == null || !msg.startsWith(messages[i]))
 			{
-				assertEquals(messages[i], errors.get(i).getMessage());
+				assertEquals(messages[i], msg);
 			}
 		}
 	}
@@ -1834,10 +1807,6 @@ public abstract class JSParserTest
 	protected void assertParseResult(String source, String expected) throws Exception
 	{
 		IParseNode result = parse(source);
-		if (result == null)
-		{
-			assertNoErrors(); // spit out the errors
-		}
 		StringBuilder text = new StringBuilder();
 		IParseNode[] children = result.getChildren();
 		for (IParseNode child : children)

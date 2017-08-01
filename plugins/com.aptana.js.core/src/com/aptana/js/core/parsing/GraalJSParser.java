@@ -71,7 +71,7 @@ public class GraalJSParser implements IParser
 	{
 		Source src = Source.sourceFor(filename, source);
 
-		ScriptEnvironment env = ScriptEnvironment.builder().es6(true).build();
+		ScriptEnvironment env = ScriptEnvironment.builder().es6(true).emptyStatements(true).build();
 		ErrorManager errorManager = new ErrorManager()
 		{
 			@Override
@@ -95,7 +95,7 @@ public class GraalJSParser implements IParser
 			p = new Parser(env, src, errorManager);
 
 			// parse as module
-			result = p.parseModule("modulename");
+			result = p.parseModule(filename);
 		}
 		return result;
 	}

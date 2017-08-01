@@ -21,21 +21,7 @@ public class GraalJSParserTest extends JSParserTest
 	protected String unexpectedToken(String token)
 	{
 		// TODO token-generated method stub
-		return null;
-	}
-
-	@Override
-	protected boolean isANTLR()
-	{
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	protected boolean isBeaver()
-	{
-		// TODO Auto-generated method stub
-		return false;
+		return token;
 	}
 
 }

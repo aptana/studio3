@@ -68,6 +68,7 @@ import com.aptana.js.core.parsing.ast.JSTrueNode;
 import com.aptana.js.core.parsing.ast.JSTryNode;
 import com.aptana.js.core.parsing.ast.JSVarNode;
 import com.aptana.js.core.parsing.ast.JSWhileNode;
+import com.aptana.js.core.parsing.ast.JSWithNode;
 import com.aptana.js.core.parsing.ast.JSYieldNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -109,6 +110,7 @@ import com.oracle.js.parser.ir.TryNode;
 import com.oracle.js.parser.ir.UnaryNode;
 import com.oracle.js.parser.ir.VarNode;
 import com.oracle.js.parser.ir.WhileNode;
+import com.oracle.js.parser.ir.WithNode;
 import com.oracle.js.parser.ir.visitor.NodeVisitor;
 
 import beaver.Symbol;
@@ -400,7 +402,17 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			// class decl
 			IdentNode name = varNode.getName();
 			ClassNode classNode = (ClassNode) varNode.getInit();
-			addToParentAndPushNodeToStack(new JSClassNode(name != null, classNode.getClassHeritage() != null));
+			if (name != null && name.getName().equals(Module.DEFAULT_EXPORT_BINDING_NAME))
+			{
+				JSClassNode jsClassNode = new JSClassNode(false, classNode.getClassHeritage() != null);
+				addChildToParent(new JSExportNode(true, jsClassNode));
+				fNodeStack.push(jsClassNode);
+			}
+			else
+			{
+				addToParentAndPushNodeToStack(new JSClassNode(name != null, classNode.getClassHeritage() != null));
+			}
+
 		}
 		return super.enterVarNode(varNode);
 	}
@@ -1572,6 +1584,20 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	// System.out.println("Entering node: " + node.getClass().getName() + ": " + node);
 	// return super.enterDefault(node);
 	// }
+
+	@Override
+	public boolean enterWithNode(WithNode withNode)
+	{
+		addToParentAndPushNodeToStack(new JSWithNode(null, null));
+		return super.enterWithNode(withNode);
+	}
+
+	@Override
+	public Node leaveWithNode(WithNode withNode)
+	{
+		popNode();
+		return super.leaveWithNode(withNode);
+	}
 
 	public IParseRootNode getRootNode()
 	{
