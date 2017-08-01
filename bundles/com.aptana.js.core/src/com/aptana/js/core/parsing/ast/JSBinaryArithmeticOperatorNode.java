@@ -67,6 +67,10 @@ public class JSBinaryArithmeticOperatorNode extends JSBinaryOperatorNode
 				type = IJSNodeTypes.MULTIPLY;
 				break;
 
+			case STAR_STAR:
+				type = IJSNodeTypes.EXPONENT;
+				break;
+
 			case FORWARD_SLASH:
 				type = IJSNodeTypes.DIVIDE;
 				break;

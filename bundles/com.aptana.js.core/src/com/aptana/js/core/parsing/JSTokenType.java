@@ -100,6 +100,8 @@ public enum JSTokenType implements ITypePredicate
 	CARET_EQUAL(JSLanguageConstants.CARET_EQUAL, Terminals.CARET_EQUAL),
 	PIPE_EQUAL(JSLanguageConstants.PIPE_EQUAL, Terminals.PIPE_EQUAL),
 	STAR(JSLanguageConstants.STAR, Terminals.STAR),
+	STAR_STAR(JSLanguageConstants.STAR_STAR, Terminals.STAR_STAR),
+	STAR_STAR_EQUAL(JSLanguageConstants.STAR_STAR_EQUAL, Terminals.STAR_STAR_EQUAL),
 	FORWARD_SLASH(JSLanguageConstants.FORWARD_SLASH, Terminals.FORWARD_SLASH),
 	PERCENT(JSLanguageConstants.PERCENT, Terminals.PERCENT),
 	QUESTION(JSLanguageConstants.QUESTION, Terminals.QUESTION),

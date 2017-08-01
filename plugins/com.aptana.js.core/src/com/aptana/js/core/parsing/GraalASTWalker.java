@@ -798,6 +798,10 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				type = JSTokenType.PERCENT;
 				theNode = new JSBinaryArithmeticOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
 				break;
+			case EXP:
+				type = JSTokenType.STAR_STAR;
+				theNode = new JSBinaryArithmeticOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				break;
 
 			// Assignment
 			case ASSIGN:
@@ -848,11 +852,12 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				type = JSTokenType.MINUS_EQUAL;
 				theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
 				break;
-			// case ASSIGN_EXP:
-			// type = JSTokenType.STAR_STAR_EQUAL;
-			// theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
-			// break;
-			//
+			case ASSIGN_EXP:
+				type = JSTokenType.STAR_STAR_EQUAL;
+				theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				break;
+
+			// comma...
 			case COMMARIGHT:
 				type = JSTokenType.COMMA;
 				theNode = new JSCommaNode();

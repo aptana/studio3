@@ -98,6 +98,8 @@ public class JSLanguageConstants
 	public static final String BREAK = "break"; //$NON-NLS-1$
 	public static final String LESS_LESS = "<<"; //$NON-NLS-1$
 	public static final String STAR = "*"; //$NON-NLS-1$
+	public static final String STAR_STAR = "**"; //$NON-NLS-1$
+	public static final String STAR_STAR_EQUAL = "**="; //$NON-NLS-1$
 	public static final String MINUS_EQUAL = "-="; //$NON-NLS-1$
 	public static final String RPAREN = ")"; //$NON-NLS-1$
 	public static final String GREATER_GREATER = ">>"; //$NON-NLS-1$

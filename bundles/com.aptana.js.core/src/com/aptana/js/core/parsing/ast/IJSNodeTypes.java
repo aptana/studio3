@@ -118,4 +118,6 @@ public interface IJSNodeTypes
 	public static final short CLASS = 105;
 	public static final short YIELD = 106;
 	public static final short COMPUTED_PROPERTY = 107;
+	public static final short EXPONENT = 108;
+	public static final short EXPONENT_AND_ASSIGN = 109;
 }

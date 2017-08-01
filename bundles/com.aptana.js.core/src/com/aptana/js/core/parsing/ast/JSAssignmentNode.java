@@ -66,6 +66,9 @@ public class JSAssignmentNode extends JSNode
 			case MINUS_EQUAL:
 				type = IJSNodeTypes.SUBTRACT_AND_ASSIGN;
 				break;
+			case STAR_STAR_EQUAL:
+				type = IJSNodeTypes.EXPONENT_AND_ASSIGN;
+				break;
 		}
 
 		this.setNodeType(type);

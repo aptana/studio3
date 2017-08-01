@@ -45,9 +45,6 @@ public abstract class JSLexerTest
 
 	protected IJSScanner _scanner;
 
-	// FIXME Looks like both JFlex and ANTLR lexers are fucking up templates (specifically if we see `` inside multiline
-	// comments)
-
 	@Before
 	public void setUp() throws java.lang.Exception
 	{
@@ -620,6 +617,18 @@ public abstract class JSLexerTest
 	public void testExclusiveOrAssign()
 	{
 		assertTokenTypes("^=", JSTokenType.CARET_EQUAL);
+	}
+	
+	@Test
+	public void testExponent()
+	{
+		assertTokenTypes("**", JSTokenType.STAR_STAR);
+	}
+	
+	@Test
+	public void testExponentAssign()
+	{
+		assertTokenTypes("**=", JSTokenType.STAR_STAR_EQUAL);
 	}
 
 	@Test

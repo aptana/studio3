@@ -116,4 +116,6 @@ public class Terminals {
 	static public final short PIPE_EQUAL = 108;
 	static public final short TEMPLATE_MIDDLE = 109;
 	static public final short TEMPLATE_TAIL = 110;
+	static public final short STAR_STAR = 111;
+	static public final short STAR_STAR_EQUAL = 112;
 }

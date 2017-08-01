@@ -261,6 +261,9 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 "|="            { return newToken(JSTokenType.PIPE_EQUAL, StringUtil.EMPTY); }
 "|"             { return newToken(JSTokenType.PIPE, StringUtil.EMPTY); }
 
+"**="			{ return newToken(JSTokenType.STAR_STAR_EQUAL, StringUtil.EMPTY); }
+"**"			{ return newToken(JSTokenType.STAR_STAR, StringUtil.EMPTY); }
+
 "*="            { return newToken(JSTokenType.STAR_EQUAL, StringUtil.EMPTY); }
 "*"             { return newToken(JSTokenType.STAR, StringUtil.EMPTY); }
 

@@ -353,6 +353,9 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 "|="			{ return newToken(JSTokenType.PIPE_EQUAL); }
 "|"				{ return newToken(JSTokenType.PIPE); }
 
+"**="			{ return newToken(JSTokenType.STAR_STAR_EQUAL); }
+"**"			{ return newToken(JSTokenType.STAR_STAR); }
+
 "*="			{ return newToken(JSTokenType.STAR_EQUAL); }
 "*"				{ return newToken(JSTokenType.STAR); }
 

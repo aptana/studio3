@@ -113,6 +113,12 @@ public abstract class JSParserTest
 	{
 		assertParseResult("a *= 10;" + EOL); //$NON-NLS-1$
 	}
+	
+	@Test
+	public void testExponentAndAssign() throws Exception
+	{
+		assertParseResult("a **= 10;" + EOL); //$NON-NLS-1$
+	}
 
 	@Test
 	public void testShiftLeftAndAssign() throws Exception
@@ -250,6 +256,12 @@ public abstract class JSParserTest
 	public void testMultiply() throws Exception
 	{
 		assertParseResult("abc * 5;" + EOL); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void testExponent() throws Exception
+	{
+		assertParseResult("abc ** 5;" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
