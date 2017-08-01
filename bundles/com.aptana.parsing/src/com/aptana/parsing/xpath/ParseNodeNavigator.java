@@ -122,7 +122,7 @@ public class ParseNodeNavigator extends DefaultNavigator
 			{
 				protected IParseNode getFirstNode(IParseNode node)
 				{
-					return node.getChild(0);
+					return node.getFirstChild();
 				}
 
 				protected IParseNode getNextNode(IParseNode node)

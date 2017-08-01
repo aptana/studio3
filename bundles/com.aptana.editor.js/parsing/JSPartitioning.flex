@@ -155,131 +155,149 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
 
 //Note: tried creating more lexer states for multiline-comments and this made the parser MUCH slower
 //so, reverted that change.
-%state DIVISION, REGEX
+%state DIVISION, REGEX, TEMPLATE
 
 %%
 
 {Whitespace}+   { /* ignore */ }
 
+// ---- comments
+
+//Note: we want to add the \r\n as being in this context too...
+"//" [^\r\n]*(\r?\n?)       {  return newToken(JSTokenType.SINGLELINE_COMMENT, StringUtil.EMPTY);  }
+//Note: SDOC must be declared before multiline.
+"/**" ~"*/"         {  return newToken(JSTokenType.SDOC, StringUtil.EMPTY);  }
+"/*" ~"*/"          {  return newToken(JSTokenType.MULTILINE_COMMENT, StringUtil.EMPTY);  }
+
+// ---- numbers
+{Number}        { return newToken(JSTokenType.NUMBER, StringUtil.EMPTY); }
+
+// strings
+'([^\\'\r\n]|\\[^])*'       { return newToken(JSTokenType.STRING_SINGLE, StringUtil.EMPTY); }
+'([^\\'\r\n]|\\[^])*$       { return newToken(JSTokenType.STRING_SINGLE, StringUtil.EMPTY); }
+
+\"([^\\\"\r\n]|\\[^])*\"    { return newToken(JSTokenType.STRING_DOUBLE, StringUtil.EMPTY); }
+\"([^\\\"\r\n]|\\[^])*$     { return newToken(JSTokenType.STRING_DOUBLE, StringUtil.EMPTY); }
+
+// keywords
+"break"			{ return newToken(JSTokenType.BREAK, StringUtil.EMPTY); }
+"case"			{ return newToken(JSTokenType.CASE, StringUtil.EMPTY); }
+"catch"			{ return newToken(JSTokenType.CATCH, StringUtil.EMPTY); }
+"continue"		{ return newToken(JSTokenType.CONTINUE, StringUtil.EMPTY); }
+"default"		{ return newToken(JSTokenType.DEFAULT, StringUtil.EMPTY); }
+"delete"		{ return newToken(JSTokenType.DELETE, StringUtil.EMPTY); }
+"do"			{ return newToken(JSTokenType.DO, StringUtil.EMPTY); }
+"else"			{ return newToken(JSTokenType.ELSE, StringUtil.EMPTY); }
+"false"			{ return newToken(JSTokenType.FALSE, StringUtil.EMPTY); }
+"finally"		{ return newToken(JSTokenType.FINALLY, StringUtil.EMPTY); }
+"for"			{ return newToken(JSTokenType.FOR, StringUtil.EMPTY); }
+"function"		{ return newToken(JSTokenType.FUNCTION, StringUtil.EMPTY); }
+"if"			{ return newToken(JSTokenType.IF, StringUtil.EMPTY); }
+"instanceof"	{ return newToken(JSTokenType.INSTANCEOF, StringUtil.EMPTY); }
+"in"			{ return newToken(JSTokenType.IN, StringUtil.EMPTY); }
+"new"			{ return newToken(JSTokenType.NEW, StringUtil.EMPTY); }
+"null"			{ return newToken(JSTokenType.NULL, StringUtil.EMPTY); }
+"return"		{ return newToken(JSTokenType.RETURN, StringUtil.EMPTY); }
+"switch"		{ return newToken(JSTokenType.SWITCH, StringUtil.EMPTY); }
+"this"			{ return newToken(JSTokenType.THIS, StringUtil.EMPTY); }
+"throw"			{ return newToken(JSTokenType.THROW, StringUtil.EMPTY); }
+"true"			{ return newToken(JSTokenType.TRUE, StringUtil.EMPTY); }
+"try"			{ return newToken(JSTokenType.TRY, StringUtil.EMPTY); }
+"typeof"		{ return newToken(JSTokenType.TYPEOF, StringUtil.EMPTY); }
+"var"			{ return newToken(JSTokenType.VAR, StringUtil.EMPTY); }
+"void"			{ return newToken(JSTokenType.VOID, StringUtil.EMPTY); }
+"while"			{ return newToken(JSTokenType.WHILE, StringUtil.EMPTY); }
+"with"			{ return newToken(JSTokenType.WITH, StringUtil.EMPTY); }
+"get"			{ return newToken(JSTokenType.GET, StringUtil.EMPTY); }
+"set"			{ return newToken(JSTokenType.SET, StringUtil.EMPTY); }
+	
+// ES6
+"class"			{ return newToken(JSTokenType.CLASS, StringUtil.EMPTY); }
+"const"			{ return newToken(JSTokenType.CONST, StringUtil.EMPTY); }
+"export"		{ return newToken(JSTokenType.EXPORT, StringUtil.EMPTY); }
+"extends"		{ return newToken(JSTokenType.EXTENDS, StringUtil.EMPTY); }
+"import"		{ return newToken(JSTokenType.IMPORT, StringUtil.EMPTY); }
+"let"			{ return newToken(JSTokenType.LET, StringUtil.EMPTY); }
+"of"			{ return newToken(JSTokenType.OF, StringUtil.EMPTY); }
+"static"		{ return newToken(JSTokenType.STATIC, StringUtil.EMPTY); }
+"super"			{ return newToken(JSTokenType.SUPER, StringUtil.EMPTY); }
+"target"		{ return newToken(JSTokenType.TARGET, StringUtil.EMPTY); }
+"yield"			{ return newToken(JSTokenType.YIELD, StringUtil.EMPTY); }
+	
+// Future Use Reserved Words
+"await"			{ return newToken(JSTokenType.AWAIT, StringUtil.EMPTY); }
+
+
+// identifiers
+{Identifier}    { return newToken(JSTokenType.IDENTIFIER, StringUtil.EMPTY); }
+
+// operators
+">>>="          { return newToken(JSTokenType.GREATER_GREATER_GREATER_EQUAL, StringUtil.EMPTY); }
+">>>"           { return newToken(JSTokenType.GREATER_GREATER_GREATER, StringUtil.EMPTY); }
+
+"<<="           { return newToken(JSTokenType.LESS_LESS_EQUAL, StringUtil.EMPTY); }
+"<<"            { return newToken(JSTokenType.LESS_LESS, StringUtil.EMPTY); }
+"<="            { return newToken(JSTokenType.LESS_EQUAL, StringUtil.EMPTY); }
+"<"             { return newToken(JSTokenType.LESS, StringUtil.EMPTY); }
+
+">>="           { return newToken(JSTokenType.GREATER_GREATER_EQUAL, StringUtil.EMPTY); }
+">>"            { return newToken(JSTokenType.GREATER_GREATER, StringUtil.EMPTY); }
+">="            { return newToken(JSTokenType.GREATER_EQUAL, StringUtil.EMPTY); }
+">"             { return newToken(JSTokenType.GREATER, StringUtil.EMPTY); }
+
+"==="           { return newToken(JSTokenType.EQUAL_EQUAL_EQUAL, StringUtil.EMPTY); }
+"=="            { return newToken(JSTokenType.EQUAL_EQUAL, StringUtil.EMPTY); }
+"="             { return newToken(JSTokenType.EQUAL, StringUtil.EMPTY); }
+
+"!=="           { return newToken(JSTokenType.EXCLAMATION_EQUAL_EQUAL, StringUtil.EMPTY); }
+"!="            { return newToken(JSTokenType.EXCLAMATION_EQUAL, StringUtil.EMPTY); }
+"!"             { return newToken(JSTokenType.EXCLAMATION, StringUtil.EMPTY); }
+
+"&&"            { return newToken(JSTokenType.AMPERSAND_AMPERSAND, StringUtil.EMPTY); }
+"&="            { return newToken(JSTokenType.AMPERSAND_EQUAL, StringUtil.EMPTY); }
+"&"             { return newToken(JSTokenType.AMPERSAND, StringUtil.EMPTY); }
+
+"||"            { return newToken(JSTokenType.PIPE_PIPE, StringUtil.EMPTY); }
+"|="            { return newToken(JSTokenType.PIPE_EQUAL, StringUtil.EMPTY); }
+"|"             { return newToken(JSTokenType.PIPE, StringUtil.EMPTY); }
+
+"*="            { return newToken(JSTokenType.STAR_EQUAL, StringUtil.EMPTY); }
+"*"             { return newToken(JSTokenType.STAR, StringUtil.EMPTY); }
+
+"%="            { return newToken(JSTokenType.PERCENT_EQUAL, StringUtil.EMPTY); }
+"%"             { return newToken(JSTokenType.PERCENT, StringUtil.EMPTY); }
+
+"--"            { return newToken(JSTokenType.MINUS_MINUS, StringUtil.EMPTY); }
+"-="            { return newToken(JSTokenType.MINUS_EQUAL, StringUtil.EMPTY); }
+"-"             { return newToken(JSTokenType.MINUS, StringUtil.EMPTY); }
+
+"++"            { return newToken(JSTokenType.PLUS_PLUS, StringUtil.EMPTY); }
+"+="            { return newToken(JSTokenType.PLUS_EQUAL, StringUtil.EMPTY); }
+"+"             { return newToken(JSTokenType.PLUS, StringUtil.EMPTY); }
+
+"^="            { return newToken(JSTokenType.CARET_EQUAL, StringUtil.EMPTY); }
+"^"             { return newToken(JSTokenType.CARET, StringUtil.EMPTY); }
+ 
+"?"             { return newToken(JSTokenType.QUESTION, StringUtil.EMPTY); }
+"~"             { return newToken(JSTokenType.TILDE, StringUtil.EMPTY); }
+";"             { return newToken(JSTokenType.SEMICOLON, StringUtil.EMPTY); }
+"("             { return newToken(JSTokenType.LPAREN, StringUtil.EMPTY); }
+")"             { return newToken(JSTokenType.RPAREN, StringUtil.EMPTY); }
+"["             { return newToken(JSTokenType.LBRACKET, StringUtil.EMPTY); }
+"]"             { return newToken(JSTokenType.RBRACKET, StringUtil.EMPTY); }
+"{"             { return newToken(JSTokenType.LCURLY, StringUtil.EMPTY); }
+"}"             { return newToken(JSTokenType.RCURLY, StringUtil.EMPTY); }
+","             { return newToken(JSTokenType.COMMA, StringUtil.EMPTY); }
+":"             { return newToken(JSTokenType.COLON, StringUtil.EMPTY); }
+"."             { return newToken(JSTokenType.DOT, StringUtil.EMPTY); }
+
+
 <YYINITIAL> {
-    // ---- comments
-    
-    
-    //Note: we want to add the \r\n as being in this context too...
-    "//" [^\r\n]*(\r?\n?)       {  return newToken(JSTokenType.SINGLELINE_COMMENT, StringUtil.EMPTY);  }
-                        
-    //Note: SDOC must be declared before multiline.
-    
-    "/**" ~"*/"         {  return newToken(JSTokenType.SDOC, StringUtil.EMPTY);  }
-                        
-    "/*" ~"*/"          {  return newToken(JSTokenType.MULTILINE_COMMENT, StringUtil.EMPTY);  }
-                        
-                        
-                        
-
-    // ---- numbers
-    {Number}        { return newToken(JSTokenType.NUMBER, StringUtil.EMPTY); }
-
-    // strings
-    '([^\\'\r\n]|\\[^])*'       { return newToken(JSTokenType.STRING_SINGLE, StringUtil.EMPTY); }
-    '([^\\'\r\n]|\\[^])*$       { return newToken(JSTokenType.STRING_SINGLE, StringUtil.EMPTY); }
-
-    
-    \"([^\\\"\r\n]|\\[^])*\"    { return newToken(JSTokenType.STRING_DOUBLE, StringUtil.EMPTY); }
-    \"([^\\\"\r\n]|\\[^])*$     { return newToken(JSTokenType.STRING_DOUBLE, StringUtil.EMPTY); }
-
-	// keywords
-	"break"			{ return newToken(JSTokenType.BREAK, StringUtil.EMPTY); }
-	"case"			{ return newToken(JSTokenType.CASE, StringUtil.EMPTY); }
-	"catch"			{ return newToken(JSTokenType.CATCH, StringUtil.EMPTY); }
-	"continue"		{ return newToken(JSTokenType.CONTINUE, StringUtil.EMPTY); }
-	"default"		{ return newToken(JSTokenType.DEFAULT, StringUtil.EMPTY); }
-	"delete"		{ return newToken(JSTokenType.DELETE, StringUtil.EMPTY); }
-	"do"			{ return newToken(JSTokenType.DO, StringUtil.EMPTY); }
-	"else"			{ return newToken(JSTokenType.ELSE, StringUtil.EMPTY); }
-	"false"			{ return newToken(JSTokenType.FALSE, StringUtil.EMPTY); }
-	"finally"		{ return newToken(JSTokenType.FINALLY, StringUtil.EMPTY); }
-	"for"			{ return newToken(JSTokenType.FOR, StringUtil.EMPTY); }
-	"function"		{ return newToken(JSTokenType.FUNCTION, StringUtil.EMPTY); }
-	"if"			{ return newToken(JSTokenType.IF, StringUtil.EMPTY); }
-	"instanceof"	{ return newToken(JSTokenType.INSTANCEOF, StringUtil.EMPTY); }
-	"in"			{ return newToken(JSTokenType.IN, StringUtil.EMPTY); }
-	"new"			{ return newToken(JSTokenType.NEW, StringUtil.EMPTY); }
-	"null"			{ return newToken(JSTokenType.NULL, StringUtil.EMPTY); }
-	"return"		{ return newToken(JSTokenType.RETURN, StringUtil.EMPTY); }
-	"switch"		{ return newToken(JSTokenType.SWITCH, StringUtil.EMPTY); }
-	"this"			{ return newToken(JSTokenType.THIS, StringUtil.EMPTY); }
-	"throw"			{ return newToken(JSTokenType.THROW, StringUtil.EMPTY); }
-	"true"			{ return newToken(JSTokenType.TRUE, StringUtil.EMPTY); }
-	"try"			{ return newToken(JSTokenType.TRY, StringUtil.EMPTY); }
-	"typeof"		{ return newToken(JSTokenType.TYPEOF, StringUtil.EMPTY); }
-	"var"			{ return newToken(JSTokenType.VAR, StringUtil.EMPTY); }
-	"void"			{ return newToken(JSTokenType.VOID, StringUtil.EMPTY); }
-	"while"			{ return newToken(JSTokenType.WHILE, StringUtil.EMPTY); }
-	"with"			{ return newToken(JSTokenType.WITH, StringUtil.EMPTY); }
-	"get"			{ return newToken(JSTokenType.GET, StringUtil.EMPTY); }
-	"set"			{ return newToken(JSTokenType.SET, StringUtil.EMPTY); }
-	
-	// ES6
-	"class"			{ return newToken(JSTokenType.CLASS, StringUtil.EMPTY); }
-	"const"			{ return newToken(JSTokenType.CONST, StringUtil.EMPTY); }
-	"export"		{ return newToken(JSTokenType.EXPORT, StringUtil.EMPTY); }
-	"extends"		{ return newToken(JSTokenType.EXTENDS, StringUtil.EMPTY); }
-	"import"		{ return newToken(JSTokenType.IMPORT, StringUtil.EMPTY); }
-	"let"			{ return newToken(JSTokenType.LET, StringUtil.EMPTY); }
-	"of"			{ return newToken(JSTokenType.OF, StringUtil.EMPTY); }
-	"static"		{ return newToken(JSTokenType.STATIC, StringUtil.EMPTY); }
-	"super"			{ return newToken(JSTokenType.SUPER, StringUtil.EMPTY); }
-	"target"		{ return newToken(JSTokenType.TARGET, StringUtil.EMPTY); }
-	"yield"			{ return newToken(JSTokenType.YIELD, StringUtil.EMPTY); }
-	
-	// Future Use Reserved Words
-	"await"			{ return newToken(JSTokenType.AWAIT, StringUtil.EMPTY); }
-	
 	// ES6 Templates
-	{TemplateHead}				{ return newToken(JSTokenType.TEMPLATE_HEAD, StringUtil.EMPTY); }
-	// FIXME The lexer prefers longest sequence, so will grab _all_ of the template literal together in preference to the head/middle/tail!
+	{TemplateHead}				{ yybegin(TEMPLATE); return newToken(JSTokenType.TEMPLATE_HEAD, StringUtil.EMPTY); }
 	{NoSubstitutionTemplate}	{ return newToken(JSTokenType.NO_SUB_TEMPLATE, StringUtil.EMPTY); }
-	{TemplateMiddle}			{ return newToken(JSTokenType.TEMPLATE_MIDDLE, StringUtil.EMPTY); }
-	{TemplateTail}				{ return newToken(JSTokenType.TEMPLATE_TAIL, StringUtil.EMPTY); }
-
-    // identifiers
-    {Identifier}    { return newToken(JSTokenType.IDENTIFIER, StringUtil.EMPTY); }
-
-    // operators
-    ">>>="          { return newToken(JSTokenType.GREATER_GREATER_GREATER_EQUAL, StringUtil.EMPTY); }
-    ">>>"           { return newToken(JSTokenType.GREATER_GREATER_GREATER, StringUtil.EMPTY); }
-
-    "<<="           { return newToken(JSTokenType.LESS_LESS_EQUAL, StringUtil.EMPTY); }
-    "<<"            { return newToken(JSTokenType.LESS_LESS, StringUtil.EMPTY); }
-    "<="            { return newToken(JSTokenType.LESS_EQUAL, StringUtil.EMPTY); }
-    "<"             { return newToken(JSTokenType.LESS, StringUtil.EMPTY); }
-
-    ">>="           { return newToken(JSTokenType.GREATER_GREATER_EQUAL, StringUtil.EMPTY); }
-    ">>"            { return newToken(JSTokenType.GREATER_GREATER, StringUtil.EMPTY); }
-    ">="            { return newToken(JSTokenType.GREATER_EQUAL, StringUtil.EMPTY); }
-    ">"             { return newToken(JSTokenType.GREATER, StringUtil.EMPTY); }
-
-    "==="           { return newToken(JSTokenType.EQUAL_EQUAL_EQUAL, StringUtil.EMPTY); }
-    "=="            { return newToken(JSTokenType.EQUAL_EQUAL, StringUtil.EMPTY); }
-    "="             { return newToken(JSTokenType.EQUAL, StringUtil.EMPTY); }
-
-    "!=="           { return newToken(JSTokenType.EXCLAMATION_EQUAL_EQUAL, StringUtil.EMPTY); }
-    "!="            { return newToken(JSTokenType.EXCLAMATION_EQUAL, StringUtil.EMPTY); }
-    "!"             { return newToken(JSTokenType.EXCLAMATION, StringUtil.EMPTY); }
-
-    "&&"            { return newToken(JSTokenType.AMPERSAND_AMPERSAND, StringUtil.EMPTY); }
-    "&="            { return newToken(JSTokenType.AMPERSAND_EQUAL, StringUtil.EMPTY); }
-    "&"             { return newToken(JSTokenType.AMPERSAND, StringUtil.EMPTY); }
-
-    "||"            { return newToken(JSTokenType.PIPE_PIPE, StringUtil.EMPTY); }
-    "|="            { return newToken(JSTokenType.PIPE_EQUAL, StringUtil.EMPTY); }
-    "|"             { return newToken(JSTokenType.PIPE, StringUtil.EMPTY); }
-
-    "*="            { return newToken(JSTokenType.STAR_EQUAL, StringUtil.EMPTY); }
-    "*"             { return newToken(JSTokenType.STAR, StringUtil.EMPTY); }
-
-    "/"             {
+	
+	"/"             {
                         
                         char c = '\0';
                         char c2 = '\0';
@@ -316,33 +334,11 @@ Regex = "/" ({CharClass}|{Character})+ "/" [a-z]*
                         }
                         
                     }
+}
 
-    "%="            { return newToken(JSTokenType.PERCENT_EQUAL, StringUtil.EMPTY); }
-    "%"             { return newToken(JSTokenType.PERCENT, StringUtil.EMPTY); }
-
-    "--"            { return newToken(JSTokenType.MINUS_MINUS, StringUtil.EMPTY); }
-    "-="            { return newToken(JSTokenType.MINUS_EQUAL, StringUtil.EMPTY); }
-    "-"             { return newToken(JSTokenType.MINUS, StringUtil.EMPTY); }
-
-    "++"            { return newToken(JSTokenType.PLUS_PLUS, StringUtil.EMPTY); }
-    "+="            { return newToken(JSTokenType.PLUS_EQUAL, StringUtil.EMPTY); }
-    "+"             { return newToken(JSTokenType.PLUS, StringUtil.EMPTY); }
-
-    "^="            { return newToken(JSTokenType.CARET_EQUAL, StringUtil.EMPTY); }
-    "^"             { return newToken(JSTokenType.CARET, StringUtil.EMPTY); }
- 
-    "?"             { return newToken(JSTokenType.QUESTION, StringUtil.EMPTY); }
-    "~"             { return newToken(JSTokenType.TILDE, StringUtil.EMPTY); }
-    ";"             { return newToken(JSTokenType.SEMICOLON, StringUtil.EMPTY); }
-    "("             { return newToken(JSTokenType.LPAREN, StringUtil.EMPTY); }
-    ")"             { return newToken(JSTokenType.RPAREN, StringUtil.EMPTY); }
-    "["             { return newToken(JSTokenType.LBRACKET, StringUtil.EMPTY); }
-    "]"             { return newToken(JSTokenType.RBRACKET, StringUtil.EMPTY); }
-    "{"             { return newToken(JSTokenType.LCURLY, StringUtil.EMPTY); }
-    "}"             { return newToken(JSTokenType.RCURLY, StringUtil.EMPTY); }
-    ","             { return newToken(JSTokenType.COMMA, StringUtil.EMPTY); }
-    ":"             { return newToken(JSTokenType.COLON, StringUtil.EMPTY); }
-    "."             { return newToken(JSTokenType.DOT, StringUtil.EMPTY); }
+<TEMPLATE> {
+	{TemplateMiddle}			{ return newToken(JSTokenType.TEMPLATE_MIDDLE, StringUtil.EMPTY); }
+	{TemplateTail}				{ yybegin(YYINITIAL); return newToken(JSTokenType.TEMPLATE_TAIL, StringUtil.EMPTY); }
 }
 
 <DIVISION> {

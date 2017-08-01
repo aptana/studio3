@@ -208,21 +208,25 @@ public abstract class JSLexerTest
 	@Test
 	public void testBackticksInsideMultilineComments()
 	{
-		assertTokenTypes("/*`string`*/", JSTokenType.MULTILINE_COMMENT, JSTokenType.EOF);
+		// We don't return comments in normal token flow, so we just get EOF here
+		assertTokenTypes("/*`string`*/", JSTokenType.EOF);
+		assertEquals(1, _scanner.getMultiLineComments().size());
 	}
 
 	@Test
 	public void testBackticksAcrossMultipleMultilineComments()
 	{
-		assertTokenTypes("/*`string`*/\r\n/* This is `some text` whatever */", JSTokenType.MULTILINE_COMMENT,
-				JSTokenType.MULTILINE_COMMENT, JSTokenType.EOF);
+		// We don't return comments in normal token flow, so we just get EOF here
+		assertTokenTypes("/*`string`*/\r\n/* This is `some text` whatever */", JSTokenType.EOF);
+		assertEquals(2, _scanner.getMultiLineComments().size());
 	}
 
 	@Test
 	public void testBacktickInsideMultilineComments()
 	{
-		assertTokenTypes("/*`string`\r\n*\r\n*//* This is\r\n `some text` \r\nwhatever */",
-				JSTokenType.MULTILINE_COMMENT, JSTokenType.MULTILINE_COMMENT, JSTokenType.EOF);
+		// We don't return comments in normal token flow, so we just get EOF here
+		assertTokenTypes("/*`string`\r\n*\r\n*//* This is\r\n `some text` \r\nwhatever */", JSTokenType.EOF);
+		assertEquals(2, _scanner.getMultiLineComments().size());
 	}
 
 	@Test
@@ -771,7 +775,9 @@ public abstract class JSLexerTest
 	@Test
 	public void testNotRegex()
 	{
-		assertTokenTypes("/* squelch */", JSTokenType.MULTILINE_COMMENT);
+		// We don't return comments in normal token flow, so we just get EOF
+		assertTokenTypes("/* squelch */", JSTokenType.EOF);
+		assertEquals(1, _scanner.getMultiLineComments().size());
 	}
 
 	@Test
@@ -879,10 +885,13 @@ public abstract class JSLexerTest
 	@Test
 	public void testTiMobile() throws IOException
 	{
-		// This is catching the close brace of an object literal and a way later backtick inside a multiline comment as a "TemplateTail" incorrectly
-		assertTokenTypes(getSource(ITestFiles.TIMOBILE_FILES[0]), JSTokenType.MULTILINE_COMMENT, JSTokenType.FUNCTION,
-				JSTokenType.IDENTIFIER, JSTokenType.LPAREN, JSTokenType.RPAREN, JSTokenType.LCURLY,
-				JSTokenType.MULTILINE_COMMENT, JSTokenType.THIS, JSTokenType.DOT, JSTokenType.IDENTIFIER, JSTokenType.EQUAL, JSTokenType.LCURLY, JSTokenType.RCURLY);
+		// This is catching the close brace of an object literal and a way later backtick inside a multiline comment as
+		// a "TemplateTail" incorrectly
+		assertTokenTypes(getSource(ITestFiles.TIMOBILE_FILES[0]),
+				/* JSTokenType.MULTILINE_COMMENT, */ JSTokenType.FUNCTION, JSTokenType.IDENTIFIER, JSTokenType.LPAREN,
+				JSTokenType.RPAREN, JSTokenType.LCURLY, /* JSTokenType.MULTILINE_COMMENT, */ JSTokenType.THIS,
+				JSTokenType.DOT, JSTokenType.IDENTIFIER, JSTokenType.EQUAL, JSTokenType.LCURLY, JSTokenType.RCURLY);
+		assertEquals(2, _scanner.getSDocComments().size());
 	}
 
 	protected String getSource(String resourceName) throws IOException

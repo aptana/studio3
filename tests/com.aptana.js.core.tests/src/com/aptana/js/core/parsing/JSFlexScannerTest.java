@@ -18,6 +18,7 @@ public class JSFlexScannerTest extends JSLexerTest
 	protected IJSScanner createScanner()
 	{
 		final JSFlexScanner scanner = new JSFlexScanner();
+		scanner.setCollectComments(true);
 		return new IJSScanner()
 		{
 

@@ -16,32 +16,6 @@
     </taskdef>
 
     <taskdef name="beaver" classname="beaver.comp.run.AntTask" classpath="../../beaver/bin"/>
-
-	<target name="antlr">
-		<java classname="org.antlr.v4.Tool" fork="true" failonerror="true" dir="../src/com/aptana/js/core/parsing/antlr">
-			<arg value="-o"/>
-			<arg value="${basedir}/../src/com/aptana/js/core/parsing/antlr"/>
-			<arg value="-package"/>
-            <arg value="com.aptana.js.core.parsing.antlr"/>
-            <arg line="${basedir}/JSLexer.g4"/>
-            <classpath>
-                <pathelement location="${basedir}/../lib/antlr-4.7-complete.jar"/>
-                <pathelement location="${java.class.path}"/>
-            </classpath>
-        </java>
-		
-		<java classname="org.antlr.v4.Tool" fork="true" failonerror="true" dir="../src/com/aptana/js/core/parsing/antlr">
-			<arg value="-o"/>
-			<arg value="${basedir}/../src/com/aptana/js/core/parsing/antlr"/>
-			<arg value="-package"/>
-            <arg value="com.aptana.js.core.parsing.antlr"/>
-            <arg line="${basedir}/JSParser.g4"/>
-            <classpath>
-                <pathelement location="${basedir}/../lib/antlr-4.7-complete.jar"/>
-                <pathelement location="${java.class.path}"/>
-            </classpath>
-        </java>
-	</target>
 	
     <target name="build">
         <jflex 
@@ -53,12 +27,6 @@
             file="SDoc.flex" 
             outdir="../src/com/aptana/js/internal/core/parsing/sdoc" 
             nobak="on"/>
-        
-        <beaver 
-            file             = "JS.grammar"
-            destdir          = "../src"
-            exportTerminals  = "yes"
-            useSwitch        = "yes"/>
         
         <beaver 
             file             = "SDoc.grammar"
