@@ -480,6 +480,7 @@ public class JSFormatWalker extends JSTreeWalker
 		{
 			this._printer.print("default "); //$NON-NLS-1$
 		}
+
 		IParseNode[] children = node.getChildren();
 		if (children == null || children.length == 0)
 		{
@@ -487,7 +488,18 @@ public class JSFormatWalker extends JSTreeWalker
 		}
 		else
 		{
+			// Need to temporarily turn off semicolon or we'll end up with one added here and then again below after
+			// from clause.
+			boolean hadSemicolon = node.getSemicolonIncluded();
+			if (hadSemicolon)
+			{
+				node.setSemicolonIncluded(false);
+			}
 			formatNaryNode(node, StringUtil.EMPTY, StringUtil.EMPTY, StringUtil.EMPTY);
+			if (hadSemicolon)
+			{
+				node.setSemicolonIncluded(hadSemicolon);
+			}
 		}
 		String from = node.getFrom();
 		if (!StringUtil.isEmpty(from))

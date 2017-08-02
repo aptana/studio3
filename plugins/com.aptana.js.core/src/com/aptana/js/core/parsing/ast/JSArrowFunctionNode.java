@@ -1,19 +1,20 @@
 package com.aptana.js.core.parsing.ast;
 
-public class JSArrowFunctionNode extends JSNode
+import com.aptana.parsing.ast.IParseNode;
+
+public class JSArrowFunctionNode extends JSFunctionNode
 {
 
-	public JSArrowFunctionNode(JSParametersNode params, JSNode body)
-	{
-		super(IJSNodeTypes.ARROW_FUNCTION, params, body);
-	}
-
-	/**
-	 * Used by ANTLR AST
-	 */
 	public JSArrowFunctionNode()
 	{
-		super(IJSNodeTypes.ARROW_FUNCTION);
+		super();
+		setNodeType(IJSNodeTypes.ARROW_FUNCTION);
+	}
+
+	@Override
+	public IParseNode getName()
+	{
+		return new JSEmptyNode(getStartingOffset());
 	}
 
 	public JSParametersNode getParameters()

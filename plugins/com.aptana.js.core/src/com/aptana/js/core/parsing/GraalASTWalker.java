@@ -11,6 +11,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.JSLanguageConstants;
 import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSArrayNode;
+import com.aptana.js.core.parsing.ast.JSArrowFunctionNode;
 import com.aptana.js.core.parsing.ast.JSAssignmentNode;
 import com.aptana.js.core.parsing.ast.JSBinaryArithmeticOperatorNode;
 import com.aptana.js.core.parsing.ast.JSBinaryBooleanOperatorNode;
@@ -233,22 +234,30 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterReturnNode(ReturnNode returnNode)
 	{
-		JSNode node = new JSReturnNode();
-		node.setSemicolonIncluded(true);
-		addToParentAndPushNodeToStack(node);
+		// may be a "generated" return from a single expression arrow function body with no braces!
+		if (returnNode.isTokenType(TokenType.RETURN))
+		{
+			JSNode node = new JSReturnNode();
+			node.setSemicolonIncluded(true);
+			addToParentAndPushNodeToStack(node);
+		}
 		return super.enterReturnNode(returnNode);
 	}
 
 	@Override
 	public Node leaveReturnNode(ReturnNode returnNode)
 	{
-		// If there's no child to return node, add JSEmptyNode!
-		if (!returnNode.hasExpression())
+		// may be a "generated" return from a single expression arrow function body with no braces!
+		if (returnNode.isTokenType(TokenType.RETURN))
 		{
-			Symbol r = toSymbol(JSTokenType.RETURN, returnNode);
-			addChildToParent(new JSEmptyNode(r));
+			// If there's no child to return node, add JSEmptyNode!
+			if (!returnNode.hasExpression())
+			{
+				Symbol r = toSymbol(JSTokenType.RETURN, returnNode);
+				addChildToParent(new JSEmptyNode(r));
+			}
+			popNode();
 		}
-		popNode();
 		return super.leaveReturnNode(returnNode);
 	}
 
@@ -384,15 +393,17 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 
 			ExportedStatus exportStatus = getExportStatus(varNode.getName());
 			JSNode node = new JSVarNode(var);
-			node.setSemicolonIncluded(true);
 			if (exportStatus.isExported)
 			{
 				// push export node
-				addToParentAndPushNodeToStack(new JSExportNode(exportStatus.isDefault, node));
+				JSExportNode exportNode = new JSExportNode(exportStatus.isDefault, node);
+				exportNode.setSemicolonIncluded(true);
+				addToParentAndPushNodeToStack(exportNode);
 				fNodeStack.push(node); // now push var node to top of stack (it's already hooked as child)
 			}
 			else
 			{
+				node.setSemicolonIncluded(true);
 				addToParentAndPushNodeToStack(node);
 			}
 			addToParentAndPushNodeToStack(new JSDeclarationNode(null));
@@ -414,15 +425,17 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			}
 
 		}
+
 		return super.enterVarNode(varNode);
 	}
 
 	@Override
 	public Node leaveVarNode(VarNode varNode)
 	{
+		Expression init = varNode.getInit();
 		// assignment is right associative, so we end up visiting the value before the name. We have to invert the
 		// children
-		if (!varNode.isFunctionDeclaration() && !(varNode.getInit() instanceof ClassNode))
+		if (!varNode.isFunctionDeclaration() && !(init instanceof ClassNode))
 		{
 			// Invert the two children of the declaration!
 			IParseNode node = getCurrentNode();
@@ -437,16 +450,24 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				// If we only have name, add an empty node for value
 				node.addChild(new JSEmptyNode(node.getEndingOffset()));
 			}
-			popNode(); // decl node
+			JSDeclarationNode declNode = (JSDeclarationNode) popNode(); // decl node
 			popNode(); // var node
 
-			ExportedStatus exportStatus = getExportStatus(varNode.getName());
+			IdentNode nameNode = varNode.getName();
+			ExportedStatus exportStatus = getExportStatus(nameNode);
 			if (exportStatus.isExported)
 			{
-				popNode(); // export node
+				JSExportNode exportNode = (JSExportNode) popNode(); // export node
+				// Handle when we're exporting default function!
+				if (init instanceof FunctionNode && Module.DEFAULT_EXPORT_BINDING_NAME.equals(nameNode.getName()))
+				{
+					// hoist the function up to be child of export itself
+					JSFunctionNode funcNode = (JSFunctionNode) declNode.getValue();
+					exportNode.setChildren(new IParseNode[] { funcNode });
+				}
 			}
 		}
-		else if (varNode.getInit() instanceof ClassNode)
+		else if (init instanceof ClassNode)
 		{
 			// Swap order of body and name
 			// FIXME What if no name?!
@@ -476,15 +497,18 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		if (!functionNode.isProgram())
 		{
 			JSFunctionNode funcNode;
-			if (functionNode.getKind() == FunctionNode.Kind.GENERATOR)
+			switch (functionNode.getKind())
 			{
-				funcNode = new JSGeneratorFunctionNode();
+				case ARROW:
+					funcNode = new JSArrowFunctionNode();
+					break;
+				case GENERATOR:
+					funcNode = new JSGeneratorFunctionNode();
+					break;
+				default:
+					funcNode = new JSFunctionNode();
+					break;
 			}
-			else
-			{
-				funcNode = new JSFunctionNode();
-			}
-
 			IdentNode ident = functionNode.getIdent();
 			ExportedStatus exportStatus = getExportStatus(ident);
 			if (exportStatus.isExported)
@@ -497,7 +521,15 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				addToParentAndPushNodeToStack(funcNode);
 			}
 			// Visit the name
-			addChildToParent(new JSIdentifierNode(identifierSymbol(ident)));
+			if (!functionNode.isAnonymous())
+			{
+				addChildToParent(new JSIdentifierNode(identifierSymbol(ident)));
+			}
+			else if (!(funcNode instanceof JSArrowFunctionNode))
+			{
+				// use empty node for anonymous functions (but arrow functions have no name always)
+				addChildToParent(new JSEmptyNode(toSymbol(ident)));
+			}
 			// Need to explicitly visit the params
 			addToParentAndPushNodeToStack(new JSParametersNode());
 			functionNode.visitParameters(this);
@@ -1613,9 +1645,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		}
 	}
 
-	private void popNode()
+	private IParseNode popNode()
 	{
-		fNodeStack.pop();
+		return fNodeStack.pop();
 	}
 
 	private IParseNode getLastNode()

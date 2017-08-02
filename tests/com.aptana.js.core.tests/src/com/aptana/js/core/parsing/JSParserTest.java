@@ -728,6 +728,35 @@ public abstract class JSParserTest
 	}
 
 	@Test
+	public void testArrowFunctionSingleParameterWithNoParens() throws Exception
+	{
+		assertParseResult("phrase => { phrase.split(''); }" + EOL, "(phrase) => {phrase.split('');};" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testArrowFunctionNoParameters() throws Exception
+	{
+		assertParseResult("() => { phrase.split(''); }" + EOL, "() => {phrase.split('');};" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testArrowFunctionMultipleParametersNoBraces() throws Exception
+	{
+		assertParseResult("(phrase, other) => phrase.split('');" + EOL, "(phrase, other) => {phrase.split('')};" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testArrowFunctionMultipleParametersNoBracesExplicitReturn() throws Exception
+	{
+		assertParseResult("(phrase, other) => { return phrase.split(''); }" + EOL,
+				"(phrase, other) => {return phrase.split('');};" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
 	public void testGroup() throws Exception
 	{
 		assertParseResult("a = (3 + 4) * 5;" + EOL); //$NON-NLS-1$
@@ -1345,8 +1374,7 @@ public abstract class JSParserTest
 	@Test
 	public void testExportDefault() throws Exception
 	{
-		// FIXME Not sure why the semicolon doesn't get printed out...
-		assertParseResult("export default (x) => Math.exp(x);" + EOL, "export default (x) => Math.exp(x)" + EOL);
+		assertParseResult("export default (x) => Math.exp(x);" + EOL, "export default (x) => {Math.exp(x)};" + EOL);
 		assertNoErrors();
 	}
 
@@ -1807,6 +1835,7 @@ public abstract class JSParserTest
 	protected void assertParseResult(String source, String expected) throws Exception
 	{
 		IParseNode result = parse(source);
+		assertNotNull("Received no root parse node from parsing: " + source, result);
 		StringBuilder text = new StringBuilder();
 		IParseNode[] children = result.getChildren();
 		for (IParseNode child : children)
