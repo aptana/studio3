@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Core
+Bundle-SymbolicName: com.aptana.portal.ui.extended
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.aptana.portal.ui.extended.Activator
+Bundle-Vendor: APTANA
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Export-Package: com.aptana.portal.ui.dispatch.configurationProcessors,
+ com.aptana.portal.ui.dispatch.configurationProcessors.installer
