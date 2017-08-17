@@ -19,57 +19,6 @@
       </startup>
    </extension>
    <extension
-         point="com.aptana.configurations.configurationProcessors">
-      <processor
-            category="configurations"
-            class="com.aptana.portal.ui.dispatch.configurationProcessors.RubyInstallProcessor"
-            id="com.aptana.portal.ruby.installer.processor"
-            name="Ruby Installer">
-      </processor>
-      <processor
-            category="configurations"
-            class="com.aptana.portal.ui.dispatch.configurationProcessors.XAMPPInstallProcessor"
-            id="com.aptana.portal.xampp.installer.processor"
-            name="XAMPP Installer">
-      </processor>
-      <processor
-            category="configurations"
-            class="com.aptana.portal.ui.dispatch.configurationProcessors.VersionsConfigurationProcessor"
-            id="com.aptana.portal.versions.processor"
-            name="Program Version Configurations">
-      </processor>
-      <delegate
-            class="com.aptana.portal.ui.dispatch.processorDelegates.RailsVersionProcessor"
-            id="com.aptana.portal.versions.processor.rails"
-            name="Rails Version Processor Delegate"
-            targetID="com.aptana.portal.versions.processor">
-      </delegate>
-      <delegate
-            class="com.aptana.portal.ui.dispatch.processorDelegates.SQLiteVersionProcessor"
-            id="com.aptana.portal.versions.processor.sqlite"
-            name="SQLite Version Processor Delegate"
-            targetID="com.aptana.portal.versions.processor">
-      </delegate>
-      <delegate
-            class="com.aptana.portal.ui.dispatch.processorDelegates.RubyVersionProcessor"
-            id="com.aptana.portal.versions.processor.ruby"
-            name="Ruby Version Processor Delegate"
-            targetID="com.aptana.portal.versions.processor">
-      </delegate>
-      <processor
-            category="configurations"
-            class="com.aptana.portal.ui.dispatch.configurationProcessors.JavaScriptLibraryInstallProcessor"
-            id="com.aptana.portal.jsLibrary.installer.processor"
-            name="JS Library Installer">
-      </processor>
-      <processor
-            category="configurations"
-            class="com.aptana.portal.ui.dispatch.configurationProcessors.PythonInstallProcessor"
-            id="com.aptana.portal.python.installer.processor"
-            name="Python Installer">
-      </processor>
-   </extension>
-   <extension
          point="com.aptana.portal.ui.browserInteractions">
       <actionController
             class="com.aptana.portal.ui.dispatch.actionControllers.SystemActionController"
@@ -127,11 +76,6 @@
             name="Recent Files Actions">
       </actionController>
       <actionController
-            class="com.aptana.portal.ui.dispatch.actionControllers.TemplateActionController"
-            id="portal.project.templates"
-            name="Project Template Actions">
-      </actionController>
-      <actionController
             class="com.aptana.portal.ui.dispatch.actionControllers.ThemeActionController"
             id="portal.themes"
             name="Theme Actions">
@@ -161,12 +105,6 @@
             class="com.aptana.portal.ui.dispatch.browserNotifications.ProjectCreationBrowserNotification"
             id="com.aptana.portal.ui.projectCreateNotification"
             name="Project Create Notifier"
-            notificationTarget="*">
-      </browserNotification>
-      <browserNotification
-            class="com.aptana.portal.ui.dispatch.browserNotifications.TemplatesNotification"
-            id="com.aptana.portal.ui.templatesNotification"
-            name="Templates Notifier"
             notificationTarget="*">
       </browserNotification>
    </extension>

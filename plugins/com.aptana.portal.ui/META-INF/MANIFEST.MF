@@ -6,19 +6,16 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.portal.ui.PortalUIPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: com.aptana.jetty.util.epl,
- com.aptana.core,
- com.aptana.core.io,
  org.eclipse.ui.browser,
  org.eclipse.ui.console,
  org.eclipse.debug.ui,
- com.aptana.ui,
  com.aptana.configurations,
- com.aptana.usage;bundle-version="4.0.0",
- com.aptana.theme,
- com.aptana.explorer,
  com.aptana.browser;visibility:=reexport,
- com.aptana.projects,
- org.eclipse.e4.ui.workbench;resolution:=optional
+ org.eclipse.e4.ui.workbench;resolution:=optional,
+ org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.expressions,
+ com.aptana.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.portal.ui,
@@ -27,8 +24,6 @@ Export-Package: com.aptana.portal.ui,
  com.aptana.portal.ui.dispatch.actionControllers,
  com.aptana.portal.ui.dispatch.browserFunctions,
  com.aptana.portal.ui.dispatch.browserNotifications,
- com.aptana.portal.ui.dispatch.configurationProcessors,
- com.aptana.portal.ui.dispatch.configurationProcessors.installer,
  com.aptana.portal.ui.dispatch.processorDelegates,
  com.aptana.portal.ui.internal;x-internal:=true,
  com.aptana.portal.ui.internal.command;x-internal:=true,

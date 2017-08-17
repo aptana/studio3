@@ -45,9 +45,6 @@ import com.aptana.portal.ui.internal.BrowserFunctionWrapper;
 import com.aptana.portal.ui.internal.BrowserViewerWrapper;
 import com.aptana.portal.ui.internal.BrowserWrapper;
 import com.aptana.portal.ui.internal.startpage.IStartPageUISystemProperties;
-import com.aptana.ui.dialogs.HyperlinkMessageDialog;
-import com.aptana.ui.util.UIUtils;
-import com.aptana.ui.util.WorkbenchBrowserUtil;
 
 /**
  * A portal browser editor.

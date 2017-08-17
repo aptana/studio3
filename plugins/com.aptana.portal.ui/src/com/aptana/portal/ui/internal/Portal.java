@@ -26,10 +26,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -51,10 +49,7 @@ import com.aptana.core.util.URLUtil;
 import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.browser.AbstractPortalBrowserEditor;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
-import com.aptana.ui.util.UIUtils;
-import com.aptana.usage.UsagePlugin;
+import com.aptana.portal.ui.browser.UIUtils;
 
 /**
  * The portal class is a singleton that controls the portal browser and allows interacting with it.
@@ -160,12 +155,12 @@ public class Portal
 				URL localURL = FileLocator.toFileURL(Portal.class.getResource(BASE_LOCAL_URL));
 				url = URLUtil.appendParameters(localURL, new String[] { "url", url.toString() }); //$NON-NLS-1$
 			}
-			Map<String, String> parameters = getURLParametersForProject(PortalUIPlugin.getActiveProject());
-			if (additionalParameters != null)
-			{
-				parameters.putAll(additionalParameters);
-			}
-			url = URLUtil.appendParameters(url, parameters, false);
+//			Map<String, String> parameters = getURLParametersForProject(PortalUIPlugin.getActiveProject());
+//			if (additionalParameters != null)
+//			{
+//				parameters.putAll(additionalParameters);
+//			}
+			url = URLUtil.appendParameters(url, new HashMap<String, String>(), false);
 		}
 		catch (IOException e)
 		{
@@ -287,6 +282,7 @@ public class Portal
 		return getDefaultURL(new URL(BASE_REMOTE_URL), Portal.class.getResource(BASE_LOCAL_URL));
 	}
 
+	
 	/**
 	 * Returns the default URL for the portal.<br>
 	 * In case we have a live Internet connection, return the remote content. Otherwise, return the local content.
@@ -359,56 +355,56 @@ public class Portal
 		return con;
 	}
 
-	/**
-	 * Build the URL GET parameters that will be appended to the original portal path.
-	 *
-	 * @param activeProject
-	 * @return The GET parameters string
-	 */
-	@SuppressWarnings("nls")
-	protected Map<String, String> getURLParametersForProject(final IProject activeProject)
-	{
-		final Map<String, String> builder = new HashMap<String, String>();
-		builder.putAll(URLUtil.getDefaultParameters());
-
-		builder.put("bg", toHex(getThemeManager().getCurrentTheme().getBackground()));
-		builder.put("fg", toHex(getThemeManager().getCurrentTheme().getForeground()));
-
-		// "chrome"
-		UIUtils.getDisplay().syncExec(new Runnable()
-		{
-			public void run()
-			{
-				Color color = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-				builder.put("ch", toHex(color.getRGB()));// FIXME Grab one of the actual parent widgets and grab it's
-															// bg?
-			}
-		});
-
-		// project type
-		builder.put("p", String.valueOf(getProjectType(activeProject)));
-
-		// version control
-		// builder.append("&vc=");
-		// builder.append(getVersionControl());
-
-		// github
-		// builder.append("&gh=");
-		// builder.append(hasGithubRemote() ? '1' : '0');
-
-		// timestamp to force updates to server (bypass browser cache)
-		builder.put("ts", String.valueOf(System.currentTimeMillis()));
-
-		// guid that relates to a single install of the IDE
-		builder.put("id", getGUID());
-
-		// deploy info
-		builder.putAll(getDeployParam(activeProject));
-
-		// for debugging output
-		// builder.append("&debug=1");
-		return builder;
-	}
+//	/**
+//	 * Build the URL GET parameters that will be appended to the original portal path.
+//	 *
+//	 * @param activeProject
+//	 * @return The GET parameters string
+//	 */
+//	@SuppressWarnings("nls")
+//	protected Map<String, String> getURLParametersForProject(final IProject activeProject)
+//	{
+//		final Map<String, String> builder = new HashMap<String, String>();
+//		builder.putAll(URLUtil.getDefaultParameters());
+//
+//		builder.put("bg", toHex(getThemeManager().getCurrentTheme().getBackground()));
+//		builder.put("fg", toHex(getThemeManager().getCurrentTheme().getForeground()));
+//
+//		// "chrome"
+//		UIUtils.getDisplay().syncExec(new Runnable()
+//		{
+//			public void run()
+//			{
+//				Color color = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+//				builder.put("ch", toHex(color.getRGB()));// FIXME Grab one of the actual parent widgets and grab it's
+//															// bg?
+//			}
+//		});
+//
+//		// project type
+//		builder.put("p", String.valueOf(getProjectType(activeProject)));
+//
+//		// version control
+//		// builder.append("&vc=");
+//		// builder.append(getVersionControl());
+//
+//		// github
+//		// builder.append("&gh=");
+//		// builder.append(hasGithubRemote() ? '1' : '0');
+//
+//		// timestamp to force updates to server (bypass browser cache)
+//		builder.put("ts", String.valueOf(System.currentTimeMillis()));
+//
+//		// guid that relates to a single install of the IDE
+////		builder.put("id", getGUID());
+//
+//		// deploy info
+//		builder.putAll(getDeployParam(activeProject));
+//
+//		// for debugging output
+//		// builder.append("&debug=1");
+//		return builder;
+//	}
 
 	@SuppressWarnings("nls")
 	protected Map<String, String> getDeployParam(IProject selectedProject)
@@ -438,21 +434,6 @@ public class Portal
 			}
 		}
 		return builder;
-	}
-
-	/**
-	 * Get the theme manager.
-	 *
-	 * @return
-	 */
-	protected IThemeManager getThemeManager()
-	{
-		return ThemePlugin.getDefault().getThemeManager();
-	}
-
-	protected String getGUID()
-	{
-		return UsagePlugin.getApplicationId();
 	}
 
 	protected char getProjectType(IProject selectedProject)
