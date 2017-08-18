@@ -42,6 +42,7 @@ import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.configurationProcessors.Messages;
+import com.aptana.portal.ui.extended.PortaUIExtended;
 
 /**
  * An import dialog that appears right after we download a JavaScript library through the developer-toolbox. <br>
@@ -93,7 +94,7 @@ public class JavaScriptImporterOptionsDialog extends InstallerOptionsDialog
 	@Override
 	protected void setAttributes()
 	{
-		attributes.put(ACTIVE_PROJECT_ATTR, PortalUIPlugin.getActiveProject());
+		attributes.put(ACTIVE_PROJECT_ATTR, PortaUIExtended.getActiveProject());
 	}
 
 	/**
@@ -211,7 +212,7 @@ public class JavaScriptImporterOptionsDialog extends InstallerOptionsDialog
 		{
 			return;
 		}
-		IProject activeProject = PortalUIPlugin.getActiveProject();
+		IProject activeProject = PortaUIExtended.getActiveProject();
 		String activeProjectName = (activeProject != null) ? activeProject.getName() : null;
 		if (activeProject != null && activeProject.isAccessible())
 		{
