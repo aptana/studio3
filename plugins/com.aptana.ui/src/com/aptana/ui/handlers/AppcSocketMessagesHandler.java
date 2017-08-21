@@ -7,6 +7,7 @@
  */
 package com.aptana.ui.handlers;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
@@ -35,8 +36,10 @@ public class AppcSocketMessagesHandler extends SocketMessagesHandler
 	private static final String ERROR = "error"; //$NON-NLS-1$
 	private static final String QUESTION = "question"; //$NON-NLS-1$
 	private static final String TYPE = "type"; //$NON-NLS-1$
+	private static final String RESTART = "restart"; //$NON-NLS-1$
 	private final String actionName;
 	private String description;
+	protected ReturnStatus returnStatus;
 
 	public AppcSocketMessagesHandler()
 	{
@@ -64,6 +67,45 @@ public class AppcSocketMessagesHandler extends SocketMessagesHandler
 			{
 				return handleQuestion(request);
 			}
+		}
+		else if (RESTART.equals(type.asText()))
+		{
+			return handleRestart(request);
+		}
+		return null;
+	}
+
+	public enum ReturnStatus
+	{
+		CANCELLED, OK_PRESSED
+	};
+
+	private JsonNode handleRestart(JsonNode request) throws RequestCancelledException
+	{
+		UIUtils.getDisplay().syncExec(new Runnable()
+		{
+			public void run()
+			{
+				boolean result = MessageDialog.openConfirm(UIUtils.getActiveShell(),
+						Messages.AppcSocketMessagesHandler_SessionInvalidTitle,
+						Messages.AppcSocketMessagesHandler_SessionInvalidDescription);
+
+				if (result)
+				{
+					returnStatus = ReturnStatus.OK_PRESSED;
+					PlatformUI.getWorkbench().restart();
+				}
+				else
+				{
+					returnStatus = ReturnStatus.CANCELLED;
+				}
+			}
+		});
+
+		if (returnStatus.equals(ReturnStatus.CANCELLED))
+		{
+			// Cancel Pressed
+			throw new RequestCancelledException();
 		}
 		return null;
 	}
@@ -109,7 +151,7 @@ public class AppcSocketMessagesHandler extends SocketMessagesHandler
 			}
 		});
 
-		if (response[0] == null && isWorkbenchLaunched()) //To control dialog prompt cancel behaviour until we launch a studio.
+		if (response[0] == null && !isWorkbenchLaunched()) //To control dialog prompt cancel behaviour until we launch a studio.
 		{
 			throw new RequestCancelledException();
 		}
@@ -117,12 +159,13 @@ public class AppcSocketMessagesHandler extends SocketMessagesHandler
 		return response[0];
 	}
 
-	private boolean isWorkbenchLaunched()
+	@Override
+	public boolean isWorkbenchLaunched()
 	{
 		IWorkbench workbench = PlatformUI.getWorkbench();
 		if (workbench != null)
 		{
-			return workbench.getWorkbenchWindowCount() == 0;
+			return workbench.getWorkbenchWindowCount() > 0;
 		}
 		return false;
 	}

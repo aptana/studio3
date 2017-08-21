@@ -28,4 +28,11 @@ public interface ISocketMessagesHandler extends ISocketMessagesHandlerNotifier
 	 */
 	public JsonNode handleRequest(JsonNode request) throws RequestCancelledException;
 
+	/**
+	 * Checks and returns workbench launch status.
+	 * 
+	 * @return <code>true</code> if workbench has been launched, <code>false</code> otherwise.
+	 */
+	public boolean isWorkbenchLaunched();
+
 }
