@@ -281,6 +281,18 @@ public class ResourceUtilTest
 		assertEquals(1, desc.getBuildSpec().length);
 		assertEquals(UnifiedBuilder_ID, desc.getBuildSpec()[0].getBuilderName());
 	}
+	
+	@Test
+	public void testIsAccisible()
+	{
+		assertFalse(ResourceUtil.isAccessible(null));
+	}
+	
+	@Test
+	public void testShouldIgnore()
+	{
+		assertTrue(ResourceUtil.shouldIgnore(null));
+	}
 
 	/**
 	 * Creates a project for testing
@@ -304,6 +316,7 @@ public class ResourceUtilTest
 		IProject project = workspace.getRoot().getProject(projectName);
 		project.create(description, null);
 		project.open(null);
+		ResourceUtil.isAccessible(project);
 
 		return project;
 	}
