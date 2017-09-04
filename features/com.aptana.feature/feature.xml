@@ -2,7 +2,7 @@
 <feature
       id="com.aptana.feature"
       label="%featureName"
-      version="4.9.1.qualifier"
+      version="4.10.0.qualifier"
       provider-name="%providerName"
       plugin="com.aptana.branding">
 
