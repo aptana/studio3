@@ -94,7 +94,10 @@ public class CommonJSResolver implements IRequireResolver
 						for (IParseNode joinArg : joinArgs)
 						{
 							String arg = getStringValue(joinArg);
-							items.add(arg);
+							if (arg != null)
+							{
+								items.add(arg);
+							}
 						}
 						return StringUtil.join("/", items); //$NON-NLS-1$
 					}
