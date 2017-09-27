@@ -11,6 +11,7 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -22,6 +23,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.team.core.RepositoryProviderType;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
 
 public class GitRepositoryProviderType extends RepositoryProviderType
@@ -34,7 +36,7 @@ public class GitRepositoryProviderType extends RepositoryProviderType
 		if (getGitRepositoryManager().getAttached(project) != null)
 			return;
 
-		if (autoAttachGitRepos())
+		if (autoAttachGitRepos() && hasGitDir(project))
 		{
 			final IProject toConnect = project;
 			Job job = new Job(Messages.GitRepositoryProviderType_AutoShareJob_Title)
@@ -63,6 +65,16 @@ public class GitRepositoryProviderType extends RepositoryProviderType
 			EclipseUtil.setSystemForJob(job);
 			job.schedule();
 		}
+	}
+
+	protected boolean hasGitDir(IProject project)
+	{
+		final IResource dotGit = project.findMember(GitRepository.GIT_DIR);
+		if (dotGit != null && dotGit.exists())
+		{
+			return true;
+		}
+		return false;
 	}
 
 	private boolean autoAttachGitRepos()
