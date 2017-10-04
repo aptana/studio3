@@ -256,7 +256,7 @@ public final class VersionUtil
 			{
 				return Version.parseVersion(version);
 			}
-			catch (IllegalArgumentException iae)
+			catch (Exception iae)
 			{
 				// Should never happen, since the matcher found it. But just in case.
 				IdeLog.logError(CorePlugin.getDefault(), "Error parsing the version string - " + version, iae); //$NON-NLS-1$
