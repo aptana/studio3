@@ -12,7 +12,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ GitMoveDeleteIntegrationTest.class, GitMoveDeleteHookTest.class })
+@SuiteClasses({ GitMoveDeleteIntegrationTest.class, GitMoveDeleteHookTest.class, GitRepositoryProviderTest.class })
 public class GitCoreTests
 {
 

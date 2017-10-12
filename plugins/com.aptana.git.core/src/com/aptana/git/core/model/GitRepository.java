@@ -393,7 +393,7 @@ public class GitRepository
 									}
 									catch (JNotifyException e)
 									{
-										IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
+										IdeLog.logWarning(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 									}
 
 									if (remoteDirCreationWatchId == -1)
@@ -412,7 +412,7 @@ public class GitRepository
 											}
 											catch (JNotifyException e)
 											{
-												IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
+												IdeLog.logWarning(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 											}
 											return Status.OK_STATUS;
 										}
@@ -504,7 +504,7 @@ public class GitRepository
 		}
 		catch (JNotifyException e)
 		{
-			IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
+			IdeLog.logWarning(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 		}
 	}
 
@@ -1708,7 +1708,7 @@ public class GitRepository
 				}
 				catch (JNotifyException e)
 				{
-					IdeLog.logError(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
+					IdeLog.logWarning(GitPlugin.getDefault(), e, IDebugScopes.DEBUG);
 				}
 			}
 		}
