@@ -152,11 +152,5 @@
             id="portal.samples"
             name="Samples Actions">
       </actionController>
-      <browserNotification
-            class="com.aptana.samples.ui.portal.actionController.SamplesNotification"
-            id="com.aptana.samples.ui.samplesNotification"
-            name="Samples Notifier"
-            notificationTarget="*">
-      </browserNotification>
    </extension>
 </plugin>
