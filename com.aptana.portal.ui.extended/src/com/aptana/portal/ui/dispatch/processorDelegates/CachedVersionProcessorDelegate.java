@@ -26,6 +26,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
+import com.aptana.portal.ui.extended.PortaUIExtended;
 
 /**
  * A configuration processor delegate that use the preferences as a cache mechanism for the installed apps versions.
@@ -76,7 +77,7 @@ public class CachedVersionProcessorDelegate extends BaseVersionProcessor
 
 		IPreferencesService service = Platform.getPreferencesService();
 		IScopeContext[] contexts;
-		IProject project = PortalUIPlugin.getActiveProject();
+		IProject project = PortaUIExtended.getActiveProject();
 		if (project != null)
 		{
 			contexts = new IScopeContext[] { new ProjectScope(project), DefaultScope.INSTANCE };

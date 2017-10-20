@@ -7,7 +7,6 @@
  */
 package com.aptana.portal.ui.dispatch.browserFunctions;
 
-import java.text.MessageFormat;
 import java.util.Map;
 
 import com.aptana.core.logging.IdeLog;
@@ -18,9 +17,6 @@ import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IActionController;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 import com.aptana.portal.ui.internal.IBrowserFunctionHandler;
-import com.aptana.usage.FeatureEvent;
-import com.aptana.usage.IStudioAnalytics;
-import com.aptana.usage.UsagePlugin;
 
 /**
  * This class is the main functions dispatcher for all the registered IActionControllers.
@@ -120,25 +116,8 @@ public class DispatcherBrowserFunction implements IBrowserFunctionHandler
 			return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR_WRONG_ARGUMENTS,
 					e.getMessage());
 		}
-		// Send an Analytics ping
-		sendEvent(new FeatureEvent(MessageFormat.format("{0}.{1}", controllerID, action), null)); //$NON-NLS-1$
 		// OK... Done with the checks. Now dispatch.
 		return dispatch(controller, action, args);
-	}
-
-	private void sendEvent(FeatureEvent featureEvent)
-	{
-		UsagePlugin plugin = UsagePlugin.getDefault();
-		if (plugin == null)
-		{
-			return;
-		}
-		IStudioAnalytics analytics = plugin.getStudioAnalytics();
-		if (analytics == null)
-		{
-			return;
-		}
-		analytics.sendEvent(featureEvent);
 	}
 
 	/**

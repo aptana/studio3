@@ -192,14 +192,6 @@
    </menuContribution>
 	</extension>
    <extension
-         point="com.aptana.samples.samplespath">
-      <category
-            icon="icons/new_web_project.png"
-            id="com.aptana.projects.samples.web.category"
-            name="%category.sample.web.name">
-      </category>
-   </extension>
-   <extension
          point="org.eclipse.debug.core.statusHandlers">
       <statusHandler
             class="com.aptana.projects.templates.ConflictStatusHandler"
