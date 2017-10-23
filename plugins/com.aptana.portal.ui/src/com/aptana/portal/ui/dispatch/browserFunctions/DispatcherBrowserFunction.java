@@ -11,6 +11,7 @@ import java.text.MessageFormat;
 import java.util.Map;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.util.StringUtil;
 import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserInteractionRegistry;
@@ -86,6 +87,10 @@ public class DispatcherBrowserFunction implements IBrowserFunctionHandler
 		{
 			if (args != null)
 			{
+				if (!isSupportedPlatform(args))
+				{
+					return StringUtil.EMPTY;
+				}
 				if (!(args instanceof Map))
 				{
 					// parse it only if it's a plain String
@@ -124,6 +129,21 @@ public class DispatcherBrowserFunction implements IBrowserFunctionHandler
 		sendEvent(new FeatureEvent(MessageFormat.format("{0}.{1}", controllerID, action), null)); //$NON-NLS-1$
 		// OK... Done with the checks. Now dispatch.
 		return dispatch(controller, action, args);
+	}
+
+	protected boolean isSupportedPlatform(Object browserArgs)
+	{
+		if (browserArgs instanceof String) 
+		{
+			String mobileweb = "MobileWeb"; //$NON-NLS-1$
+			String format1 = MessageFormat.format("\"{0}\"", mobileweb);
+			String format2 = MessageFormat.format("[\"{0}\"]", mobileweb);
+			if (browserArgs.equals(format1) || browserArgs.equals(format2))
+			{
+				return false; //not supported from Studio 5.0. No version check required as this code goes only into studio 5.0
+			}
+		}
+		return true;
 	}
 
 	private void sendEvent(FeatureEvent featureEvent)
