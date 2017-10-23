@@ -39,7 +39,7 @@ public class SourcePrinter
 		this._currentIndent = StringUtil.EMPTY;
 		this._newLine = DEFAULT_NEWLINE;
 	}
-	
+
 	/**
 	 * Decrease the current line indent count
 	 * 

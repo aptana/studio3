@@ -11,8 +11,8 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * Messages class for internationalization
+ * 
  * @author Ingo Muschenetz
- *
  */
 public final class Messages extends NLS
 {
@@ -27,7 +27,7 @@ public final class Messages extends NLS
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
-	
+
 	public static String IdeLog_ERROR;
 
 	public static String IdeLog_File_Written_To;

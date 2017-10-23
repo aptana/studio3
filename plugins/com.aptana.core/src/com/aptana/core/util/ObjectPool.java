@@ -38,22 +38,26 @@ public abstract class ObjectPool<T> implements IObjectPool<T>
 		this(DEFAULT_EXPIRATION);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.util.IObjectPool#create()
 	 */
 	public abstract T create();
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.util.IObjectPool#validate(T)
 	 */
 	public abstract boolean validate(T o);
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.util.IObjectPool#expire(T)
 	 */
 	public abstract void expire(T o);
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.util.IObjectPool#checkOut()
 	 */
 	public synchronized T checkOut()
@@ -98,7 +102,8 @@ public abstract class ObjectPool<T> implements IObjectPool<T>
 		return t;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.util.IObjectPool#checkIn(T)
 	 */
 	public synchronized void checkIn(T t)
@@ -107,7 +112,8 @@ public abstract class ObjectPool<T> implements IObjectPool<T>
 		unlocked.put(t, System.currentTimeMillis());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.core.util.IObjectPool#cleanup()
 	 */
 	public synchronized void dispose()

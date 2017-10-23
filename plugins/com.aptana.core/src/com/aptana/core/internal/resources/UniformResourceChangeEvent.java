@@ -17,13 +17,13 @@ import com.aptana.core.resources.IUniformResourceChangeEvent;
 
 /**
  * @author Max Stepanov
- *
  */
-public class UniformResourceChangeEvent extends EventObject implements IUniformResourceChangeEvent {
+public class UniformResourceChangeEvent extends EventObject implements IUniformResourceChangeEvent
+{
 
 	private static final IMarkerDelta[] NO_MARKER_DELTAS = new IMarkerDelta[0];
 	private static final long serialVersionUID = 1L;
-	
+
 	private transient IUniformResource resource;
 	private transient IMarkerDelta[] deltas;
 
@@ -34,7 +34,8 @@ public class UniformResourceChangeEvent extends EventObject implements IUniformR
 	 * @param resource
 	 * @param deltas
 	 */
-	public UniformResourceChangeEvent(Object source, IUniformResource resource, IMarkerDelta[] deltas) {
+	public UniformResourceChangeEvent(Object source, IUniformResource resource, IMarkerDelta[] deltas)
+	{
 		super(source);
 		this.resource = resource;
 		this.deltas = deltas;
@@ -43,17 +44,19 @@ public class UniformResourceChangeEvent extends EventObject implements IUniformR
 	/**
 	 * @see com.aptana.ide.core.resources.IUniformResourceChangeEvent#findMarkerDeltas(java.lang.String, boolean)
 	 */
-	public IMarkerDelta[] findMarkerDeltas(String type, boolean includeSubtypes) {
+	public IMarkerDelta[] findMarkerDeltas(String type, boolean includeSubtypes)
+	{
 		ArrayList<IMarkerDelta> matching = new ArrayList<IMarkerDelta>();
 		IMarkerDelta[] deltas = getMarkerDeltas();
-		for( int i = 0; i < deltas.length; ++i ) {
+		for (int i = 0; i < deltas.length; ++i)
+		{
 			IMarkerDelta markerDelta = deltas[i];
 			if (type == null || (includeSubtypes ? markerDelta.isSubtypeOf(type) : markerDelta.getType().equals(type)))
 			{
 				matching.add(markerDelta);
 			}
 		}
-		if ( matching.size() == 0 )
+		if (matching.size() == 0)
 		{
 			return NO_MARKER_DELTAS;
 		}
@@ -63,15 +66,17 @@ public class UniformResourceChangeEvent extends EventObject implements IUniformR
 	/**
 	 * @see com.aptana.ide.core.resources.IUniformResourceChangeEvent#getResource()
 	 */
-	public IUniformResource getResource() {
+	public IUniformResource getResource()
+	{
 		return resource;
 	}
 
 	/**
 	 * @see com.aptana.ide.core.resources.IUniformResourceChangeEvent#getMarkerDeltas()
 	 */
-	public IMarkerDelta[] getMarkerDeltas() {
-		if ( deltas == null )
+	public IMarkerDelta[] getMarkerDeltas()
+	{
+		if (deltas == null)
 		{
 			return NO_MARKER_DELTAS;
 		}

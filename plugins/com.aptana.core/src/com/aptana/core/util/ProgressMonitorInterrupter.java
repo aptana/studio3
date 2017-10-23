@@ -23,9 +23,11 @@ import org.eclipse.core.runtime.NullProgressMonitor;
  * 
  * @author Max Stepanov
  */
-public class ProgressMonitorInterrupter {
+public class ProgressMonitorInterrupter
+{
 
-	public interface InterruptDelegate {
+	public interface InterruptDelegate
+	{
 		public void interrupt();
 	}
 
@@ -35,61 +37,81 @@ public class ProgressMonitorInterrupter {
 	private final Thread thread;
 	private final MonitorThread monitorThread;
 
-	private static Map<Thread, InterruptDelegate> delegates = Collections.synchronizedMap(new WeakHashMap<Thread, ProgressMonitorInterrupter.InterruptDelegate>());
+	private static Map<Thread, InterruptDelegate> delegates = Collections
+			.synchronizedMap(new WeakHashMap<Thread, ProgressMonitorInterrupter.InterruptDelegate>());
 
 	/**
 	 * 
 	 */
-	public ProgressMonitorInterrupter(IProgressMonitor monitor) {
+	public ProgressMonitorInterrupter(IProgressMonitor monitor)
+	{
 		this.monitor = monitor != null ? monitor : new NullProgressMonitor();
 		this.thread = Thread.currentThread();
 		monitorThread = new MonitorThread();
 		monitorThread.start();
 	}
 
-	public void dispose() {
+	public void dispose()
+	{
 		monitorThread.interrupt();
 	}
 
 	/**
 	 * Sets interrupt delegate for the current thread
+	 * 
 	 * @param delegate
 	 */
-	public static void setCurrentThreadInterruptDelegate(InterruptDelegate delegate) {
-		if (delegate != null) {
+	public static void setCurrentThreadInterruptDelegate(InterruptDelegate delegate)
+	{
+		if (delegate != null)
+		{
 			delegates.put(Thread.currentThread(), delegate);
-		} else {
+		}
+		else
+		{
 			delegates.remove(Thread.currentThread());
 		}
 	}
 
-	private static void interruptThread(Thread thread) {
+	private static void interruptThread(Thread thread)
+	{
 		InterruptDelegate delegate = delegates.get(thread);
-		if (delegate != null) {
+		if (delegate != null)
+		{
 			delegate.interrupt();
-		} else {
+		}
+		else
+		{
 			thread.interrupt();
 		}
 	}
 
-	private class MonitorThread extends Thread {
+	private class MonitorThread extends Thread
+	{
 
-		public MonitorThread() {
+		public MonitorThread()
+		{
 			super("Progress Monitor Thread"); //$NON-NLS-1$
 			setDaemon(true);
 		}
 
 		@Override
-		public void run() {
-			try {
-				while (!interrupted()) {
-					if (monitor.isCanceled()) {
+		public void run()
+		{
+			try
+			{
+				while (!interrupted())
+				{
+					if (monitor.isCanceled())
+					{
 						interruptThread(thread);
 						break;
 					}
 					sleep(CHECK_INTERVAL);
 				}
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e)
+			{
 				Thread.currentThread().interrupt();
 			}
 		}

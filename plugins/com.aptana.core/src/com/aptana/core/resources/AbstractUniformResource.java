@@ -11,28 +11,31 @@ import org.eclipse.core.runtime.PlatformObject;
 
 /**
  * @author Max Stepanov
- *
  */
-public abstract class AbstractUniformResource extends PlatformObject implements IUniformResource {
+public abstract class AbstractUniformResource extends PlatformObject implements IUniformResource
+{
 
 	/**
 	 * 
 	 */
-	protected AbstractUniformResource() {
+	protected AbstractUniformResource()
+	{
 		super();
 	}
 
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean equals(Object obj) {
-		return obj instanceof IUniformResource && getURI().equals(((IUniformResource)obj).getURI());
+	public boolean equals(Object obj)
+	{
+		return obj instanceof IUniformResource && getURI().equals(((IUniformResource) obj).getURI());
 	}
 
 	/**
 	 * @see java.lang.Object#hashCode()
 	 */
-	public int hashCode() {
+	public int hashCode()
+	{
 		return getURI().hashCode();
 	}
 

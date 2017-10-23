@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * The interface to implement the handlers for addressing the requests/messages from the underlying CLI and return back
  * with the responses.
- *
+ * 
  * @author pinnamuri
  */
 public interface ISocketMessagesHandler extends ISocketMessagesHandlerNotifier
@@ -21,7 +21,7 @@ public interface ISocketMessagesHandler extends ISocketMessagesHandlerNotifier
 	/**
 	 * Addresses the request either by prompting a UI to the user, or just computes a JSON object from existing answers,
 	 * and will return back a response.
-	 *
+	 * 
 	 * @param request
 	 * @return
 	 * @throws RequestCancelledException

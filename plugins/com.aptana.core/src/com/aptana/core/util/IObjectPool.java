@@ -7,7 +7,8 @@
  */
 package com.aptana.core.util;
 
-public interface IObjectPool<T> {
+public interface IObjectPool<T>
+{
 
 	/**
 	 * Create a new instance of a managed object in the pool.

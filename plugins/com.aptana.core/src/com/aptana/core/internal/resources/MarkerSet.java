@@ -13,7 +13,8 @@ import org.eclipse.core.internal.resources.IMarkerSetElement;
  *
  */
 @SuppressWarnings("restriction")
-/*package*/ class MarkerSet extends org.eclipse.core.internal.resources.MarkerSet {
+/* package */class MarkerSet extends org.eclipse.core.internal.resources.MarkerSet
+{
 	/**
 	 * 
 	 */
@@ -33,18 +34,21 @@ import org.eclipse.core.internal.resources.IMarkerSetElement;
 	/**
 	 * @see java.lang.Object#clone()
 	 */
-	protected Object clone() {
+	protected Object clone()
+	{
 		return super.clone();
 	}
 
 	/**
 	 * copyInto
-	 *
+	 * 
 	 * @param array
 	 */
-	public void copyInto(Object[] array) {
+	public void copyInto(Object[] array)
+	{
 		int j = 0;
-		for (int i = 0; i < elements.length; i++) {
+		for (int i = 0; i < elements.length; i++)
+		{
 			IMarkerSetElement element = elements[i];
 			if (element != null)
 			{

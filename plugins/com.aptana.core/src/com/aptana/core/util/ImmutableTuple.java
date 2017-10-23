@@ -85,7 +85,8 @@ public final class ImmutableTuple<X, Y> implements Serializable
 	@Override
 	public String toString()
 	{
-		return StringUtil.concat("Tuple [", first != null ? first.toString() : "null", " -- ", second != null ? second.toString() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				: "null", "]"); //$NON-NLS-1$//$NON-NLS-2$
+		return StringUtil.concat(
+				"Tuple [", first != null ? first.toString() : "null", " -- ", second != null ? second.toString() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						: "null", "]"); //$NON-NLS-1$//$NON-NLS-2$
 	}
 }

@@ -11,13 +11,13 @@ import java.util.EventListener;
 
 /**
  * @author Max Stepanov
- *
  */
-public interface IUniformResourceChangeListener extends EventListener {
+public interface IUniformResourceChangeListener extends EventListener
+{
 
 	/**
 	 * resourceChanged
-	 *
+	 * 
 	 * @param event
 	 */
 	void resourceChanged(IUniformResourceChangeEvent event);

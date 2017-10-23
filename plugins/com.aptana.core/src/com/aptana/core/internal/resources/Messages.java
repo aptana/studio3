@@ -10,9 +10,7 @@ package com.aptana.core.internal.resources;
 import org.eclipse.osgi.util.NLS;
 
 /**
- * 
  * @author Ingo Muschenetz
- *
  */
 public final class Messages extends NLS
 {
@@ -27,12 +25,12 @@ public final class Messages extends NLS
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
-	
+
 	/**
 	 * MarkerManager_MarkerIDIsDefined
 	 */
 	public static String MarkerManager_MarkerIDIsDefined;
-	
+
 	/**
 	 * UniformResourceMarker_UniformResourceMarketInfoNull
 	 */
