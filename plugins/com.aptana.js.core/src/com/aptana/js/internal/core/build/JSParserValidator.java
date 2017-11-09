@@ -79,8 +79,6 @@ public class JSParserValidator extends AbstractBuildParticipant
 
 		// Set our temp fields up
 		this.fContext = context;
-		this.fLocation = context.getURI();
-		this.fPath = fLocation.toString();
 		this.fProblems = new ArrayList<IProblem>();
 
 		try
@@ -89,6 +87,9 @@ public class JSParserValidator extends AbstractBuildParticipant
 			Collection<IParseError> parseErrors = context.getParseErrors();
 			if (!CollectionsUtil.isEmpty(parseErrors))
 			{
+				fLocation = context.getURI();
+				fPath = fLocation.toString();
+
 				fProblems.addAll(CollectionsUtil.map(parseErrors, new IMap<IParseError, IProblem>()
 				{
 
