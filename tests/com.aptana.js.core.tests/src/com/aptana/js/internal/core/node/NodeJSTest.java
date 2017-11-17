@@ -267,7 +267,7 @@ public class NodeJSTest
 				will(returnValue("/path/to/node"));
 
 				oneOf(runner).runInBackground("/path/to/node", "-v"); //$NON-NLS-1$
-				will(returnValue(new ProcessStatus(0, "v4.2.0", "")));
+				will(returnValue(new ProcessStatus(0, "v8.0", "")));
 			}
 		});
 		IStatus status = node.validate();
