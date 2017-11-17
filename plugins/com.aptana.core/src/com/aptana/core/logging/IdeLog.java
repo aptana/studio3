@@ -339,6 +339,11 @@ public final class IdeLog
 	{
 		logWarning(plugin, th.getMessage(), th);
 	}
+	
+	public static void logWarning(Plugin plugin, Throwable th, String scope)
+	{
+		logWarning(plugin, th.getMessage(), th, scope);
+	}
 
 	public static void logWarning(Plugin plugin, String message, Throwable th)
 	{
