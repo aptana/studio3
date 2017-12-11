@@ -9,10 +9,11 @@ Bundle-Vendor: Eclipse.org
 Export-Package: org.eclipse.core.tests.harness,
  org.eclipse.core.tests.session,
  org.eclipse.core.tests.session.samples
-Require-Bundle: org.eclipse.core.runtime.compatibility,
- org.junit,
+Require-Bundle: org.junit,
  org.eclipse.pde.junit.runtime,
- org.eclipse.test.performance;resolution:=optional
+ org.eclipse.test.performance;resolution:=optional,
+ org.eclipse.osgi,
+ org.eclipse.core.runtime
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.4,
  CDC-1.1/Foundation-1.1
