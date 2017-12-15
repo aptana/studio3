@@ -679,13 +679,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.apache.commons.codec"
-         download-size="0"
-         install-size="0"
-         version="1.6.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.editor.html.core"
          download-size="0"
          install-size="0"
