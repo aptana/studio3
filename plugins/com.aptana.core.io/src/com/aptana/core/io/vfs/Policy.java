@@ -9,6 +9,7 @@
 
 package com.aptana.core.io.vfs;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -18,11 +19,9 @@ import org.eclipse.core.runtime.SubProgressMonitor;
  * @author Max Stepanov
  *
  */
-/* package */ final class Policy {
+public final class Policy {
 
-	/**
-	 * 
-	 */
+	
 	private Policy() {
 	}
 		
@@ -42,6 +41,5 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 		if (monitor.isCanceled())
 			throw new OperationCanceledException();
 	}
-
 
 }

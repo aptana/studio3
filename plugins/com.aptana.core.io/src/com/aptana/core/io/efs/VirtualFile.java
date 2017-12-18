@@ -22,7 +22,6 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.IFileTree;
 import org.eclipse.core.filesystem.provider.FileStore;
-import org.eclipse.core.internal.filesystem.Policy;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -30,6 +29,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import com.aptana.core.io.vfs.IConnectionFileManager;
 import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.io.vfs.IFileTreeVisitor;
+import com.aptana.core.io.vfs.Policy;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.ide.core.io.InfiniteProgressMonitor;
 

@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFileState;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -36,7 +37,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.internal.core.history.LocalFileRevision;
-import org.eclipse.team.internal.ui.Utils;
 import org.eclipse.team.internal.ui.history.FileRevisionTypedElement;
 import org.eclipse.team.internal.ui.synchronize.LocalResourceTypedElement;
 import org.eclipse.team.ui.synchronize.SaveableCompareEditorInput;
@@ -399,12 +399,12 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 				try
 				{
 					IStorage storage = ((LocalFileRevision) fileObject).getStorage(new NullProgressMonitor());
-					if (Utils.getAdapter(storage, IFileState.class) != null)
+					if (Adapters.adapt(storage, IFileState.class) != null)
 					{
 						// local revision
 						return Messages.GitCompareFileRevisionEditorInput_0;
 					}
-					else if (Utils.getAdapter(storage, IFile.class) != null)
+					else if (Adapters.adapt(storage, IFile.class) != null)
 					{
 						// current revision
 						return Messages.GitCompareFileRevisionEditorInput_1;
