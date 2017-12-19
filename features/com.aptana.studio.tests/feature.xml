@@ -74,7 +74,6 @@
       <import plugin="org.eclipse.swt"/>
       <import plugin="org.eclipse.test.performance" version="3.6.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.runtime.compatibility"/>
       <import plugin="org.eclipse.pde.junit.runtime"/>
       <import plugin="com.aptana.editor.css.formatter" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.formatter.epl"/>
