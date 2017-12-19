@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- ====================================================================== 
-     April 20, 2009 2:43:07 PM                                                        
+<!-- ======================================================================
+     April 20, 2009 2:43:07 PM
 
      Studio Tests
      Tests the Studio core feature
-  
-     cwilliams                                                                
+
+     cwilliams
      ====================================================================== -->
 <project name="Studio" default="test" xmlns:jacoco="antlib:org.jacoco.ant">
 	<description>
@@ -48,8 +48,8 @@
 		</dirset>
 	</path>
 
-	<!-- ================================= 
-          target: build              
+	<!-- =================================
+          target: build
          ================================= -->
 	<target name="build" description="Builds the Studio Tests feature" depends="generate.build.properties,generate.base">
 		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
@@ -57,8 +57,8 @@
 		</java>
 	</target>
 
-	<!-- ================================= 
-          target: generate.build.properties              
+	<!-- =================================
+          target: generate.build.properties
          ================================= -->
 	<target name="generate.build.properties" description="Takes in properties from build_local.properties and the command line overrides and generates a combined build.properties to use for the build">
 		<exec executable="hostname" outputproperty="computer.hostname" />
@@ -73,17 +73,17 @@
 		</echoproperties>
 	</target>
 
-	<!-- ================================= 
+	<!-- =================================
 	      target: clean
 	     ================================= -->
 	<target name="clean" depends="generate.build.properties" description="Clean up temp and build files">
 		<delete dir="${buildDirectory}" failonerror="false" />
 		<delete file="${basedir}/build.properties" failonerror="false" />
-		<delete dir="${basedir}/eclipse-test-framework-4.3.1" failonerror="false" />
+		<delete dir="${basedir}/eclipse-test-framework-4.7.1a" failonerror="false" />
 	</target>
 
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: generate.base                      
+	<!-- - - - - - - - - - - - - - - - - -
+          target: generate.base
          - - - - - - - - - - - - - - - - - -->
 	<target name="generate.base" depends="copy.base.windows,copy.base">
 		<!-- Copy test fragments into plugins dir -->
@@ -106,7 +106,7 @@
 		</copy>
 	</target>
 
-	<!-- - - - - - - - - - - - - - - - - - 
+	<!-- - - - - - - - - - - - - - - - - -
           target: copy.base
           On non-Windows machines, copy eclipse and plugins/features directories to buildDirectory to set up for build
          - - - - - - - - - - - - - - - - - -->
@@ -120,8 +120,8 @@
 		</exec>
 	</target>
 
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: copy.base.windows                      
+	<!-- - - - - - - - - - - - - - - - - -
+          target: copy.base.windows
          - - - - - - - - - - - - - - - - - -->
 	<target name="copy.base.windows" if="is.windows">
 		<mkdir dir="${buildDirectory}" />
@@ -131,8 +131,8 @@
 		</copy>
 	</target>
 
-	<!-- - - - - - - - - - - - - - - - - - 
-		  target: run.director                      
+	<!-- - - - - - - - - - - - - - - - - -
+		  target: run.director
 		 - - - - - - - - - - - - - - - - - -->
 	<target name="run.director" description="Runs the p2 director installs">
 		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="true" dir="${baseLocation}" timeout="900000" error="${buildlogs}/error.txt" output="${buildlogs}/output.txt">
@@ -146,8 +146,8 @@
 
 	<target name="-pre-test" description="Install test features and do pre-test setup.">
 		<!-- Unzip the eclipse test framework zipfile -->
-		<property name="eclipse.tests.p2.repo.dir" location="${basedir}/eclipse-test-framework-4.3.1" />
-		<unzip src="${basedir}/eclipse-test-framework-4.3.1.zip" dest="${eclipse.tests.p2.repo.dir}" />
+		<property name="eclipse.tests.p2.repo.dir" location="${basedir}/eclipse-test-framework-4.7.1a" />
+		<unzip src="${basedir}/eclipse-test-framework-4.7.1a.zip" dest="${eclipse.tests.p2.repo.dir}" />
 		<property name="eclipse.tests.p2.repo" value="file:${eclipse.tests.p2.repo.dir}" />
 		<!-- Install the test feature we just built along with eclipse test framework -->
 		<antcall target="run.director">
@@ -183,7 +183,7 @@
 			</else>
 		</if>
 
-		<!-- Run the tests. Skip suite if none specified, or overridden to be empty. 
+		<!-- Run the tests. Skip suite if none specified, or overridden to be empty.
 		This can handle comma-delimited lists of suites to run for core and ui, and will execute them in sequence.-->
 		<if>
 			<and>
@@ -305,7 +305,7 @@
 	<target name="generatePerformanceResults" description="Generate performance charts">
 		<mkdir dir="${buildDirectory}/${studio.version}/performance" />
 		<mkdir dir="${postingDirectory}/${studio.version}/performance" />
-		<!--TODO run the generated performance results through the template to get better and consistent presentation of data.  
+		<!--TODO run the generated performance results through the template to get better and consistent presentation of data.
 		<taskdef name="performanceResults" classname="org.eclipse.releng.performance.PerformanceResultHtmlGenerator" /-->
 		<condition property="configArgs" value="-ws gtk -arch ppc">
 			<equals arg1="${os.arch}" arg2="ppc64" />
@@ -330,7 +330,7 @@
 						-baseline ${eclipse.perf.ref}
 						-baseline.prefix R-3.4_200806172000
 			-->
-			<!-- add this argument to list above when there are milestone builds to highlight 
+			<!-- add this argument to list above when there are milestone builds to highlight
 			-highlight.latest 3.3M1_
 			-->
 			<env key="LD_LIBRARY_PATH" value="${baseLocation}/plugins/org.apache.derby_10.6.1/" />

@@ -19,17 +19,28 @@ timestamps() {
 
 		def librariesComRepo = "file://${env.WORKSPACE}/libraries-com/dist/"
 		def studio3Repo = "file://${env.WORKSPACE}/dist/"
+		def eclipseHome = '/usr/local/eclipse-4.7.1a'
+		def launcherPlugin = 'org.eclipse.equinox.launcher_1.4.0.v20161219-1356'
+		def builderPlugin = 'org.eclipse.pde.build_3.9.300.v20170515-0912'
 
 		buildPlugin {
 			dependencies = ['libraries-com': '../libraries_com']
 			builder = 'com.aptana.feature.build'
-			properties = ['libraries-com.p2.repo': librariesComRepo]
+			properties = [
+				'libraries-com.p2.repo': librariesComRepo,
+				'vanilla.eclipse': eclipseHome,
+				'launcher.plugin': launcherPlugin,
+				'builder.plugin': builderPlugin,
+			]
 		}
 
 		testPlugin {
 			builder = 'com.aptana.studio.tests.build'
 			properties = [
 				'studio3.p2.repo': studio3Repo,
+				'vanilla.eclipse': eclipseHome,
+				'launcher.plugin': launcherPlugin,
+				'builder.plugin': builderPlugin,
 				'libraries-com.p2.repo': librariesComRepo,
 				's3.accessKey': '${S3_ACCESS_KEY}',
 				's3.secretAccessKey': '${S3_SECRET_ACCESS_KEY}',
