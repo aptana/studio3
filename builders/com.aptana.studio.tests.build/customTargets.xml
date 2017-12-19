@@ -13,8 +13,10 @@
 		<p2.mirror destination="file:${repoBaseLocation}/mirrored">
 			<source location="${libraries-com.p2.repo}" />
 			<source location="${studio3.p2.repo}" />
+			<source location="file://${basedir}/eclipse-test-framework-4.7.1a.zip" />
 			<iu id="com.aptana.ide.feature.libraries.subscription.feature.group" />
 			<iu id="com.aptana.feature.feature.group" />
+			<iu id="org.eclipse.test.feature.group" />
 		</p2.mirror>
 	</target>
 
