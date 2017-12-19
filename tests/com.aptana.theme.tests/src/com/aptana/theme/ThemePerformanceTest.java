@@ -16,9 +16,9 @@ import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 
 import com.aptana.core.epl.util.LRUCache;
+import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;

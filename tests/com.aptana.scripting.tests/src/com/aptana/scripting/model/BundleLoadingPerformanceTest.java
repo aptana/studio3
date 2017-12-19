@@ -1,6 +1,6 @@
 package com.aptana.scripting.model;
 
-import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
+import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 
 public class BundleLoadingPerformanceTest extends GlobalTimePerformanceTestCase
 {

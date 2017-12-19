@@ -13,9 +13,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 
 import com.aptana.core.build.AbstractBuildParticipant;
+import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.tests.TestProject;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.epl.tests.EditorTestHelper;

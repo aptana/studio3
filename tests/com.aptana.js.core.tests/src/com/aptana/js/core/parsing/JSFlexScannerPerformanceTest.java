@@ -13,15 +13,15 @@ import java.io.InputStream;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 
-import beaver.Symbol;
-
+import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.IOUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.tests.ITestFiles;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
+
+import beaver.Symbol;
 
 public class JSFlexScannerPerformanceTest extends GlobalTimePerformanceTestCase
 {

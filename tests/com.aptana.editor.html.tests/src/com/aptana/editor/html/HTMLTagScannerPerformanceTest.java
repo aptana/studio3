@@ -16,8 +16,8 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
-import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 
+import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.IOUtil;
 
 public class HTMLTagScannerPerformanceTest extends GlobalTimePerformanceTestCase

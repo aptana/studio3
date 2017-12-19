@@ -6,7 +6,11 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package org.eclipse.test.performance;
+package com.aptana.core.tests;
+
+import org.eclipse.test.performance.Dimension;
+import org.eclipse.test.performance.Performance;
+import org.eclipse.test.performance.PerformanceTestCase;
 
 /**
  * All performance test cases extending this class will get tagged for participating in the global summary of elapsed
