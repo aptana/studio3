@@ -11,8 +11,11 @@
  *******************************************************************************/
 package com.aptana.editor.common.internal.peer;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,7 +30,6 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ICharacterPairMatcher;
 
-import com.aptana.core.util.ArrayUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.scope.IScopeSelector;
@@ -228,7 +230,7 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		int stack = 0;
 		ITypedRegion[] partitions = computePartitioning(doc, 0, searchStartPosition + 1);
 		// reverse the partitions
-		partitions = ArrayUtil.reverse(partitions);
+		partitions = reverse(partitions);
 		for (ITypedRegion p : partitions)
 		{
 			// skip other partitions that don't match our source partition
@@ -265,6 +267,14 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		return -1;
 	}
 
+	private ITypedRegion[] reverse(ITypedRegion[] array)
+	{
+		List<ITypedRegion> list = Arrays.asList(array);
+		Collections.reverse(list);
+		return list.toArray(new ITypedRegion[list.size()]);
+	}
+	
+	
 	protected ITypedRegion[] computePartitioning(IDocument doc, int offset, int length) throws BadLocationException
 	{
 		return doc.computePartitioning(offset, length);
