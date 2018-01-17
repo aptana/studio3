@@ -91,7 +91,7 @@
   		<wizard
           category="org.eclipse.ui.Basic"
           class="com.aptana.projects.internal.wizards.PromoteToProjectWizard"
-          icon="platform:/plugin/org.eclipse.ui.ide/icons/full/etool16/newprj_wiz.gif"
+          icon="platform:/plugin/org.eclipse.ui.ide/icons/full/etool16/newprj_wiz.png"
           id="com.aptana.projects.internal.wizards.PromoteToProjectWizard"
           name="%ImportWizards.ExternalFolder">
      	<description>
