@@ -7,6 +7,7 @@
  */
 package com.aptana.explorer.internal.ui;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -36,7 +37,10 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.FileTextSearchScope;
@@ -508,7 +512,13 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			{
 				ISelection sel = super.getSelection();
 				if (sel.isEmpty() && selectedProject != null)
-					return new StructuredSelection(selectedProject);
+				{
+					List<IProject> selectedProjectList = new ArrayList<IProject>();
+					selectedProjectList.add(selectedProject);
+					TreePath treePath = new TreePath(selectedProjectList.toArray());
+					ITreeSelection treeSelection = new TreeSelection(treePath);
+					return treeSelection;
+				}
 				return sel;
 			}
 		};
