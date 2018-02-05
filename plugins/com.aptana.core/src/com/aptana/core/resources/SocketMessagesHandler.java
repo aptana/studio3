@@ -37,4 +37,9 @@ public abstract class SocketMessagesHandler implements ISocketMessagesHandler
 	{
 		listeners.remove(listener);
 	}
+	
+	public boolean isWorkbenchLaunched()
+	{
+		return false;
+	}
 }

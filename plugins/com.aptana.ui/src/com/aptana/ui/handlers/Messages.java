@@ -6,6 +6,8 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.ui.handlers.messages"; //$NON-NLS-1$
 	public static String AppcSocketMessagesHandler_Description;
+	public static String AppcSocketMessagesHandler_SessionInvalidDescription;
+	public static String AppcSocketMessagesHandler_SessionInvalidTitle;
 	public static String AppcSocketMessagesHandler_title;
 	static
 	{
