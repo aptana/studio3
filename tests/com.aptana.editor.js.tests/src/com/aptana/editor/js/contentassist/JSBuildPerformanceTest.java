@@ -21,13 +21,16 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.junit.experimental.categories.Category;
 
 import com.aptana.core.build.UnifiedBuilder;
 import com.aptana.core.tests.GlobalTimePerformanceTestCase;
-import com.aptana.core.tests.TestProject;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.js.core.JSCorePlugin;
+import com.aptana.testing.categories.PerformanceTests;
+import com.aptana.testing.utils.TestProject;
 
+@Category({ PerformanceTests.class })
 public class JSBuildPerformanceTest extends GlobalTimePerformanceTestCase
 {
 

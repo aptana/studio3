@@ -10,28 +10,38 @@
  *******************************************************************************/
 package org.eclipse.tm.internal.terminal.model;
 
-import junit.framework.TestCase;
-
 import org.eclipse.tm.terminal.model.ITerminalTextData;
 import org.eclipse.tm.terminal.model.ITerminalTextDataSnapshot;
 import org.eclipse.tm.terminal.model.Style;
 import org.eclipse.tm.terminal.model.StyleColor;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
-public class TerminalTextDataPerformanceTest extends TestCase {
+import com.aptana.testing.categories.PerformanceTests;
+
+@Category({ PerformanceTests.class })
+public class TerminalTextDataPerformanceTest {
 	long TIME=100;
+	
 	private void initPerformance(ITerminalTextData term) {
 		term.setDimensions(300,200);
 	}
+	
+	@Test
 	public void testPerformance0() {
 		ITerminalTextData term=new TerminalTextData();
 		method0(term,"0 ");
 	}
+	
+	@Test
 	public void testPerformance0a() {
 		ITerminalTextData term=new TerminalTextData();
 		ITerminalTextDataSnapshot snapshot=term.makeSnapshot();
 		method0(term,"0a");
 		snapshot.updateSnapshot(true);
 	}
+	
+	@Test
 	public void testPerformance0b() {
 		ITerminalTextData term=new TerminalTextData();
 		ITerminalTextDataSnapshot snapshot=term.makeSnapshot();
@@ -63,16 +73,22 @@ public class TerminalTextDataPerformanceTest extends TestCase {
 			}
 		}
 	}
+	
+	@Test
 	public void testPerformance1() {
 		ITerminalTextData term=new TerminalTextData();
 		method1(term, "1 ");
 	}
+	
+	@Test
 	public void testPerformance1a() {
 		ITerminalTextData term=new TerminalTextData();
 		ITerminalTextDataSnapshot snapshot=term.makeSnapshot();
 		method1(term, "1a");
 		snapshot.updateSnapshot(true);
 	}
+	
+	@Test
 	public void testPerformance1b() {
 		ITerminalTextData term=new TerminalTextData();
 		ITerminalTextDataSnapshot snapshot=term.makeSnapshot();
@@ -105,6 +121,8 @@ public class TerminalTextDataPerformanceTest extends TestCase {
 			}
 		}
 	}
+	
+	@Test
 	public void testPerformance2() {
 		TerminalTextData term=new TerminalTextData();
 		Style style=Style.getStyle(StyleColor.getStyleColor("fg"), StyleColor.getStyleColor("bg"), false, false, false, false);
@@ -131,6 +149,8 @@ public class TerminalTextDataPerformanceTest extends TestCase {
 			}
 		}
 	}
+	
+	@Test
 	public void testPerformance2a() {
 		TerminalTextData term=new TerminalTextData();
 		ITerminalTextDataSnapshot snapshot=term.makeSnapshot();
@@ -160,6 +180,8 @@ public class TerminalTextDataPerformanceTest extends TestCase {
 		snapshot.updateSnapshot(true);
 	}
 	int N=0;
+	
+	@Test
 	public void testPerformance2b() {
 		TerminalTextData term=new TerminalTextData();
 		ITerminalTextDataSnapshot snapshot=term.makeSnapshot();
@@ -193,6 +215,8 @@ public class TerminalTextDataPerformanceTest extends TestCase {
 		}
 		snapshot.updateSnapshot(true);
 	}
+	
+	@Test
 	public void testPerformance3() {
 		TerminalTextData term=new TerminalTextData();
 		Style style=Style.getStyle(StyleColor.getStyleColor("fg"), StyleColor.getStyleColor("bg"), false, false, false, false);

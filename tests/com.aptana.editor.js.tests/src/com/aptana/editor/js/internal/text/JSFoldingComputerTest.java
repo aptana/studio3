@@ -36,12 +36,10 @@ public class JSFoldingComputerTest
 
 	private IFoldingComputer folder;
 
-	// @Override
 	@After
 	public void tearDown() throws Exception
 	{
 		folder = null;
-		// super.tearDown();
 	}
 
 	@Test

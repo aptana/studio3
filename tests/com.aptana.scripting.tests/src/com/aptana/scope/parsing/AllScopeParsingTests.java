@@ -7,37 +7,16 @@
  */
 package com.aptana.scope.parsing;
 
-import org.junit.runners.Suite.SuiteClasses;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * AllScopeParsingTests
  */
 @RunWith(Suite.class)
-@SuiteClasses({ScopeLexerTests.class, })
+@SuiteClasses({ ScopeLexerTests.class, })
 public class AllScopeParsingTests
 {
 
-//	public static Test suite()
-//	{
-//		TestSuite suite = new TestSuite(AllScopeParsingTests.class.getName())
-//		{
-//			@Override
-//			public void runTest(Test test, TestResult result)
-//			{
-//				System.err.println("Running test: " + test.toString());
-//				super.runTest(test, result);
-//			}
-//		};
-//		//$JUnit-BEGIN$
-//		suite.addTestSuite(ScopeLexerTests.class);
-//		//$JUnit-END$
-//		return suite;
-//	}
-//
 }

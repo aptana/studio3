@@ -7,10 +7,8 @@
  */
 package com.aptana.core.util;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,7 +18,9 @@ import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * If tests fail, it may be because the default charset is non-UTF-8. You can simulate this in your env by setting a
@@ -32,29 +32,17 @@ public class WriterOutputStreamTest
 {
 	private File testFile;
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
 		testFile = new File(FileUtil.getTempDirectory().toOSString(), "resources/test.txt");
 		testFile.getParentFile().mkdirs();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{
 		testFile.delete();
-//		super.tearDown();
 	}
 
 	@Test

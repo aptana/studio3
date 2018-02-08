@@ -15,7 +15,6 @@ import com.aptana.editor.css.CSSCodeScannerFlexTest;
 import com.aptana.editor.css.CSSCodeScannerTest;
 import com.aptana.editor.css.CSSEditorTest;
 import com.aptana.editor.css.CSSSourcePartitionScannerFlexTest;
-import com.aptana.editor.css.CSSSourcePartitionScannerTest;
 import com.aptana.editor.css.internal.text.CSSFoldingComputerTest;
 
 @RunWith(Suite.class)
@@ -25,7 +24,6 @@ import com.aptana.editor.css.internal.text.CSSFoldingComputerTest;
 	CSSCodeScannerFlexTest.class,
 	CSSEditorTest.class,
 	CSSFoldingComputerTest.class,
-	CSSSourcePartitionScannerTest.class,
 	CSSSourcePartitionScannerFlexTest.class,
 	com.aptana.editor.css.outline.AllTests.class,
 	com.aptana.editor.css.contentassist.AllTests.class

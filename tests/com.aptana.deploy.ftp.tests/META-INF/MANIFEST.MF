@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.aptana.deploy.ftp.tests
-Bundle-Version: 3.0.0.qualifier
+Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: %Bundle-Vendor
 Fragment-Host: com.aptana.deploy.ftp
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

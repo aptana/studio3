@@ -15,7 +15,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.css.core.ICSSConstants;
 import com.aptana.css.core.parsing.ast.ICSSNodeTypes;
 import com.aptana.editor.common.outline.CommonOutlineItem;

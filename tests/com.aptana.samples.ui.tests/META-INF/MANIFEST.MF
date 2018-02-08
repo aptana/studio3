@@ -12,5 +12,5 @@ Import-Package: com.aptana.samples,
 Export-Package: com.aptana.samples.ui.tests
 Require-Bundle: com.aptana.portal.ui,
  com.aptana.samples.ui,
- com.aptana.samples
- 
+ com.aptana.samples 
+Fragment-Host: com.aptana.samples.ui

@@ -7,17 +7,19 @@
  */
 package com.aptana.core.util;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.CorePlugin;
 
@@ -43,11 +45,6 @@ public class StatusCollectorTest
 		}
 	};
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
@@ -56,17 +53,11 @@ public class StatusCollectorTest
 		statusCollector.addListener(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{
 		statusCollector = null;
 		notification = null;
-//		super.tearDown();
 	}
 
 	@Test

@@ -7,18 +7,20 @@
  */
 package com.aptana.core.epl.util;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 public class LRUCacheWithSoftPrunedValuesTest
 {
+	private static final int ONE_MB = 1024 * 1024; // 1 MB
 
 	class SizedEntry implements ILRUCacheable
 	{
@@ -124,7 +126,7 @@ public class LRUCacheWithSoftPrunedValuesTest
 		{
 			for (int i = 0; i < Integer.MAX_VALUE; i++)
 			{
-				cache.put(i, new SizedEntry(1, new byte[1024 * 1024])); // 1 MB
+				cache.put(i, new SizedEntry(1, new byte[ONE_MB]));
 				assertEquals(3, cache.getCurrentSpace()); // Space is always the same
 				int previousSize = softHashMap.size();
 				softHashMap.removeStaleEntries();

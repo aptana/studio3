@@ -7,35 +7,13 @@
  */
 package com.aptana.scope;
 
-import org.junit.runners.Suite.SuiteClasses;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ScopeSelectorTests.class, AndSelectorTests.class, NameSelectorTests.class, OrSelectorTests.class, NegativeLookaheadTests.class, })
+@SuiteClasses({ ScopeSelectorTests.class, AndSelectorTests.class, NameSelectorTests.class, OrSelectorTests.class,
+		NegativeLookaheadTests.class, })
 public class AllTests
 {
-//	public static Test suite()
-//	{
-//		TestSuite suite = new TestSuite("Tests for com.aptana.scope")
-//		{
-//			@Override
-//			public void runTest(Test test, TestResult result)
-//			{
-//				System.err.println("Running test: " + test.toString());
-//				super.runTest(test, result);
-//			}
-//		};
-//		// $JUnit-BEGIN$
-//		suite.addTestSuite(ScopeSelectorTests.class);
-//		suite.addTestSuite(AndSelectorTests.class);
-//		suite.addTestSuite(NameSelectorTests.class);
-//		suite.addTestSuite(OrSelectorTests.class);
-//		suite.addTestSuite(NegativeLookaheadTests.class);
-//		// $JUnit-END$
-//		return suite;
-//	}
 }

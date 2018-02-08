@@ -7,16 +7,16 @@
  */
 package com.aptana.css.core.index;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 import com.aptana.css.core.CSSCorePlugin;
 import com.aptana.css.core.internal.index.CSSMetadataReader;

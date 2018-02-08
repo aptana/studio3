@@ -45,9 +45,6 @@ import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
 import com.aptana.js.internal.core.index.JSIndexReader;
 
-/**
- * JSCAIndexingTests
- */
 public class JSCAIndexingTest extends JSEditorBasedTestCase
 {
 

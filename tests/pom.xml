@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.aptana.studio</groupId>
+	<artifactId>com.aptana.studio.tests</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<parent>
+		<groupId>com.aptana.studio</groupId>
+		<artifactId>com.aptana.studio.root</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
+	<modules>
+		<module>com.aptana.browser.tests</module>
+		<module>com.aptana.buildpath.core.tests</module>
+		<module>com.aptana.console.tests</module>
+		<module>com.aptana.core.epl.tests</module>
+		<module>com.aptana.core.io.tests</module>
+		<module>com.aptana.core.tests</module>
+		<module>com.aptana.css.core.tests</module>
+		<module>com.aptana.deploy.ftp.tests</module>
+		<module>com.aptana.dtd.core.tests</module>
+		<module>com.aptana.editor.common.tests</module>
+		<module>com.aptana.editor.css.formatter.tests</module>
+		<module>com.aptana.editor.css.tests</module>
+		<module>com.aptana.editor.dtd.tests</module>
+		<module>com.aptana.editor.html.formatter.tests</module>
+		<module>com.aptana.editor.html.tests</module>
+		<module>com.aptana.editor.js.formatter.tests</module>
+		<module>com.aptana.editor.js.tests</module>
+		<module>com.aptana.editor.json.tests</module>
+		<module>com.aptana.editor.xml.formatter.tests</module>
+		<module>com.aptana.editor.xml.tests</module>
+		<module>com.aptana.filesystem.ftp.tests</module>
+		<module>com.aptana.filesystem.http.tests</module>
+		<module>com.aptana.filesystem.secureftp.tests</module>
+		<module>com.aptana.git.core.tests</module>
+		<module>com.aptana.git.ui.tests</module>
+		<module>com.aptana.index.core.tests</module>
+		<module>com.aptana.jira.core.tests</module>
+		<module>com.aptana.js.core.tests</module>
+		<module>com.aptana.js.debug.core.tests</module>
+		<module>com.aptana.parsing.tests</module>
+		<module>com.aptana.portal.ui.tests</module>
+		<module>com.aptana.projects.tests</module>
+		<module>com.aptana.samples.tests</module>
+		<module>com.aptana.samples.ui.tests</module>
+		<module>com.aptana.scripting.tests</module>
+		<module>com.aptana.syncing.core.tests</module>
+		<module>com.aptana.syncing.ui.tests</module>
+		<module>com.aptana.testing.libraries</module>
+		<module>com.aptana.testing.mocks</module>
+		<module>com.aptana.testing.utils</module>
+		<module>com.aptana.theme.tests</module>
+		<module>com.aptana.ui.tests</module>
+		<module>com.aptana.usage.tests</module>
+		<module>com.aptana.webserver.core.tests</module>
+		<module>com.aptana.xml.core.tests</module>
+		<module>org.eclipse.tm.terminal.test</module>
+	</modules>
+
+	<!-- Hack so we start on first thread any UI tests on macOS -->
+	<properties>
+		<ui.test.args></ui.test.args>
+	</properties>
+	<profiles>
+		<profile>
+			<id>macosx</id>
+			<activation>
+				<os>
+					<family>mac</family>
+					<name>mac os x</name>
+				</os>
+			</activation>
+			<properties>
+				<ui.test.args>-XstartOnFirstThread</ui.test.args>
+			</properties>
+		</profile>
+	</profiles>
+
+</project>

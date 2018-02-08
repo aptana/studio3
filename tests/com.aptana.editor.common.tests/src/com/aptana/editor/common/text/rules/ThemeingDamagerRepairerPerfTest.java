@@ -9,13 +9,16 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.ide.IDE;
+import org.junit.experimental.categories.Category;
 
 import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.epl.tests.EditorTestHelper;
+import com.aptana.testing.categories.PerformanceTests;
 import com.aptana.ui.util.UIUtils;
 
+@Category({ PerformanceTests.class })
 public class ThemeingDamagerRepairerPerfTest extends GlobalTimePerformanceTestCase
 {
 	private AbstractThemeableEditor editor;

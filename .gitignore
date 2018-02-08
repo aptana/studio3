@@ -30,3 +30,7 @@ plugins/com.aptana.scripting/bundles/**/
 builders/com.aptana.studio.tests.build/build.properties
 builders/com.aptana.studio.tests.build/eclipse-test-framework-4.3.1/**/*
 npm-debug.log
+target/
+.polyglot.build.properties
+bundles/com.aptana.scripting/bundles/*.ruble/
+bundles/com.aptana.scripting/bundle_timestamps.txt

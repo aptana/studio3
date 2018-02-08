@@ -57,7 +57,7 @@ public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 		File file = FileUtil.createTempFile("snippet", "rb");
 		final CommandElement se = createSnippet(file.getAbsolutePath(), "FunctionTemplate", snippetTrigger, "", "text");
 
-		IFileStore fileStore = createFileStore("proposal_tests", "txt", documentSource);
+		IFileStore fileStore = createFileStore("proposal_tests", "test", documentSource);
 		this.setupTestContext(fileStore);
 
 		ITextViewer viewer = (ITextViewer) editor.getAdapter(ITextOperationTarget.class);
@@ -102,6 +102,6 @@ public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
 	protected String getEditorId()
 	{
 		// straight text editor
-		return "com.aptana.editor.text";
+		return "com.aptana.editor.test";
 	}
 }

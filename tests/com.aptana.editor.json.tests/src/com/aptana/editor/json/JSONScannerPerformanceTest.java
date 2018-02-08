@@ -15,13 +15,16 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.Token;
+import org.junit.experimental.categories.Category;
 
 import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.IOUtil;
+import com.aptana.testing.categories.PerformanceTests;
 
 /**
  * JSONScannerPerformanceTest
  */
+@Category({ PerformanceTests.class })
 public class JSONScannerPerformanceTest extends GlobalTimePerformanceTestCase
 {
 	private JSONSourceScanner fScanner;

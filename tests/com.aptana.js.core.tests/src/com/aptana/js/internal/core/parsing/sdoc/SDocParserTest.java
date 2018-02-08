@@ -7,8 +7,10 @@
  */
 package com.aptana.js.internal.core.parsing.sdoc;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -16,18 +18,17 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-
-import beaver.Symbol;
+import org.junit.Test;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.internal.core.parsing.sdoc.model.DocumentationBlock;
+
+import beaver.Symbol;
 
 public class SDocParserTest
 {

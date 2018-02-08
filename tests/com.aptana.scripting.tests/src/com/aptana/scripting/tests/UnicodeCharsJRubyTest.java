@@ -7,17 +7,17 @@
  */
 package com.aptana.scripting.tests;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import java.io.File;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import junit.framework.TestCase;
+import java.io.File;
 
 import org.jruby.Ruby;
 import org.jruby.RubyFile;
 import org.jruby.RubyInstanceConfig;
 import org.jruby.RubyString;
 import org.jruby.util.JRubyFile;
+import org.junit.Test;
 
 /**
  * @author Fabio

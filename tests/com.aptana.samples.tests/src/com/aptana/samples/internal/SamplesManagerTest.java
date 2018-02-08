@@ -7,13 +7,16 @@
  */
 package com.aptana.samples.internal;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
@@ -26,20 +29,16 @@ public class SamplesManagerTest
 
 	private ISamplesManager samplesManager;
 
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
 		samplesManager = SamplesPlugin.getDefault().getSamplesManager();
 	}
 
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{
 		samplesManager = null;
-//		super.tearDown();
 	}
 
 	@Test

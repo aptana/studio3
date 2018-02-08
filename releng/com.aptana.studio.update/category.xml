@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/com.aptana.feature_5.1.0.qualifier.jar" id="com.aptana.feature" version="5.1.0.qualifier">
+      <category name="com.aptana.studio"/>
+   </feature>
+   <category-def name="com.aptana.studio" label="Aptana Studio"/>
+</site>

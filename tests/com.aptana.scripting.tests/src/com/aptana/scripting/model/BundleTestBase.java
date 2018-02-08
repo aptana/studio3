@@ -7,14 +7,16 @@
  */
 package com.aptana.scripting.model;
 
-import org.junit.After;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.Path;
+import org.junit.After;
 
 import com.aptana.scripting.TestUtils;
 

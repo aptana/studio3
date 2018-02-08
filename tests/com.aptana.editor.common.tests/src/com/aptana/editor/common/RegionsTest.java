@@ -8,14 +8,18 @@
 
 package com.aptana.editor.common;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import java.util.Iterator;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import junit.framework.TestCase;
+import java.util.Iterator;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
+import org.junit.Test;
 
 /**
  * @author Max Stepanov

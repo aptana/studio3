@@ -10,13 +10,13 @@ package com.aptana.editor.html.tests;
 import org.eclipse.core.runtime.CoreException;
 import org.osgi.framework.Bundle;
 
-import com.aptana.core.tests.TestProject;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.EditorContentAssistBasedTests;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor;
 import com.aptana.editor.html.contentassist.index.HTMLFileIndexingParticipant;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
+import com.aptana.testing.utils.TestProject;
 
 /**
  * HTMLEditorBasedTests

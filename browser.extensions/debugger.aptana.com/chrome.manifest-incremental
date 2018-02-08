@@ -1,6 +1,0 @@
-content aptanadebugger	content/aptanadebugger/
-skin	aptanadebugger	classic/1.0	skin/classic/
-locale	aptanadebugger	en-US		locale/en-US/
-
-overlay chrome://browser/content/browser.xul         chrome://aptanadebugger/content/browserOverlay.xul
-overlay chrome://firebug/content/firebug.xul         chrome://aptanadebugger/content/firebugOverlay.xul

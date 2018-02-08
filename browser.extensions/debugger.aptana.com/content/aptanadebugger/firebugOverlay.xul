@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-
-<?xml-stylesheet href="chrome://aptanadebugger/content/aptana.css"?>
-
-<!DOCTYPE window SYSTEM "chrome://aptanadebugger/locale/aptanadebugger.dtd" >
-<overlay id="AptanaFirebugOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-    
-
-</overlay>

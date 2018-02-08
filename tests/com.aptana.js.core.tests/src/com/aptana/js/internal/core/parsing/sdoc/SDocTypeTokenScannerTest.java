@@ -7,46 +7,31 @@
  */
 package com.aptana.js.internal.core.parsing.sdoc;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 
-import junit.framework.TestCase;
-import beaver.Symbol;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import com.aptana.js.internal.core.parsing.sdoc.SDocFlexScanner;
-import com.aptana.js.internal.core.parsing.sdoc.SDocTokenType;
+import beaver.Symbol;
 
 public class SDocTypeTokenScannerTest
 {
 	private SDocFlexScanner _scanner;
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
-
 		_scanner = new SDocFlexScanner();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{
 		_scanner = null;
-
-//		super.tearDown();
 	}
 
 	/**

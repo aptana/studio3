@@ -7,11 +7,11 @@
  */
 package com.aptana.editor.css.outline;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.After;
-import org.junit.Test;
 import org.junit.Before;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import com.aptana.css.core.parsing.CSSParser;
 import com.aptana.css.core.parsing.ast.CSSRuleNode;
@@ -29,7 +29,6 @@ public class CSSOutlineProviderTest
 	private CSSParser fParser;
 	private CSSScanner fScanner;
 
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
@@ -39,7 +38,6 @@ public class CSSOutlineProviderTest
 		fScanner = new CSSScanner();
 	}
 
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{

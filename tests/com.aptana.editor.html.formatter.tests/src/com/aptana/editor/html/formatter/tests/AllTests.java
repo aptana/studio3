@@ -14,7 +14,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 //@formatter:off
 @SuiteClasses({
-	FormattingTests.class
+	FormattingTest.class
 })
 //@formatter:on
 public class AllTests

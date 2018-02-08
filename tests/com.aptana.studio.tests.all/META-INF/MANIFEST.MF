@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.4.0",
- org.junit;bundle-version="4.0.0",
+ org.junit;bundle-version="4.8.0",
  com.aptana.editor.common,
  com.aptana.editor.css,
  com.aptana.editor.findbar,
@@ -55,7 +55,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.usage;bundle-version="3.0.0",
  com.aptana.js.debug.core;bundle-version="3.0.3",
  com.aptana.ui;bundle-version="3.1.4",
- com.aptana.samples.ui.tests,
- com.aptana.webserver.core
+ com.aptana.webserver.core,
+ com.aptana.samples.ui;bundle-version="3.0.0",
+ com.aptana.testing.libraries;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: com.aptana.studio.tests.all

@@ -7,14 +7,12 @@
  */
 package com.aptana.editor.css.contentassist;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.File;
 import java.io.FileWriter;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -24,6 +22,9 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.ide.IDE;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.css.core.index.CSSIndexQueryHelper;
 import com.aptana.css.core.index.CSSMetadataLoader;
@@ -43,16 +44,9 @@ public class CSSTextHoverTests
 	private Object hoverObject;
 	private CSSIndexQueryHelper queryHelper;
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
-
 		CSSMetadataLoader loader = new CSSMetadataLoader();
 		loader.schedule();
 		loader.join();
@@ -70,11 +64,6 @@ public class CSSTextHoverTests
 		};
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{
@@ -101,7 +90,6 @@ public class CSSTextHoverTests
 			file = null;
 			editor = null;
 			fHover = null;
-//			super.tearDown();
 		}
 	}
 

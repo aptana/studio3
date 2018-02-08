@@ -23,15 +23,19 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.junit.After;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.GitTestCase;
+import com.aptana.testing.categories.IntegrationTests;
 import com.aptana.testing.utils.ProjectCreator;
 
+@Category({ IntegrationTests.class })
 public class GitMoveDeleteIntegrationTest extends GitTestCase
 {
 
@@ -39,7 +43,7 @@ public class GitMoveDeleteIntegrationTest extends GitTestCase
 
 	private IProject fProject;
 
-	@Override
+	@After
 	public void tearDown() throws Exception
 	{
 		try
@@ -52,7 +56,6 @@ public class GitMoveDeleteIntegrationTest extends GitTestCase
 		finally
 		{
 			fProject = null;
-			super.tearDown();
 		}
 	}
 

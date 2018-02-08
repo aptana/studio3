@@ -12,12 +12,15 @@ import java.io.InputStream;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.junit.experimental.categories.Category;
 
 import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.IOUtil;
+import com.aptana.testing.categories.PerformanceTests;
 
 import beaver.Symbol;
 
+@Category({ PerformanceTests.class })
 public class CSSScannerPerformanceTest extends GlobalTimePerformanceTestCase
 {
 	private CSSFlexScanner fScanner;

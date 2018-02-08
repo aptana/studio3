@@ -7,38 +7,16 @@
  */
 package com.aptana.js.internal.core.parsing;
 
-import org.junit.runners.Suite.SuiteClasses;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * @author klindsey
- *
  */
 @RunWith(Suite.class)
-@SuiteClasses({VSDocNodeAttachmentTest.class, VSDocReaderTest.class, })
+@SuiteClasses({ VSDocNodeAttachmentTest.class, VSDocReaderTest.class, })
 public class InternalCoreParsingTests
 {
 
-//	public static Test suite()
-//	{
-//		TestSuite suite = new TestSuite("Tests for com.aptana.js.internal.core.parsing")
-//		{
-//			@Override
-//			public void runTest(Test test, TestResult result)
-//			{
-//				System.err.println("Running test: " + test.toString());
-//				super.runTest(test, result);
-//			}
-//		};
-//		//$JUnit-BEGIN$
-//		suite.addTestSuite(VSDocNodeAttachmentTest.class);
-//		suite.addTestSuite(VSDocReaderTest.class);
-//		//$JUnit-END$
-//		return suite;
-//	}
-//
 }

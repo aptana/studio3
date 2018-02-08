@@ -1,16 +1,18 @@
 package com.aptana.core.build;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
-import java.io.InputStream;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import junit.framework.TestCase;
+import java.io.InputStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
@@ -23,7 +25,6 @@ public class ReconcileContextTest
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
 		context = new ReconcileContext(null, (IFile) null, null);
 	}
 
@@ -31,7 +32,6 @@ public class ReconcileContextTest
 	public void tearDown() throws Exception
 	{
 		context = null;
-//		super.tearDown();
 	}
 
 	@Test

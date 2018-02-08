@@ -18,7 +18,7 @@ import org.eclipse.test.performance.PerformanceTestCase;
  * 
  * @author pinnamuri
  */
-public class GlobalTimePerformanceTestCase extends PerformanceTestCase
+public abstract class GlobalTimePerformanceTestCase extends PerformanceTestCase
 {
 
 	public GlobalTimePerformanceTestCase()

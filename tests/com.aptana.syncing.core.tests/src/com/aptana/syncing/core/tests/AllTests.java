@@ -12,9 +12,9 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ LocalSyncingTests.class, LocalSyncingTestsWithSpaces.class, FTPSyncingTests.class,
-		FTPSyncingTestsWithSpaces.class, SFTPSyncingTests.class, SFTPSyncingTestsWithSpaces.class,
-		LocalLargeSampleSyncingTests.class, FTPLargeSampleSyncingTests.class, })
+@SuiteClasses({ LocalSyncingTest.class, LocalSyncingWithSpacesTest.class, FTPSyncingTest.class,
+		FTPSyncingWithSpacesTest.class, SFTPSyncingTest.class, SFTPSyncingWithSpacesTest.class,
+		LocalLargeSampleSyncingTest.class, FTPLargeSampleSyncingTest.class, })
 public class AllTests
 {
 }

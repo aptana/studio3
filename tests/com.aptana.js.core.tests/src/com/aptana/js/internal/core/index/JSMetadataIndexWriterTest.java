@@ -7,19 +7,20 @@
  */
 package com.aptana.js.internal.core.index;
 
-import org.junit.After;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.junit.After;
+import org.junit.Test;
 
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
@@ -33,17 +34,10 @@ import com.aptana.js.core.model.TypeElement;
 
 public class JSMetadataIndexWriterTest
 {
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{
 		getIndexManager().removeIndex(URI.create(IJSIndexConstants.METADATA_INDEX_LOCATION));
-
-//		super.tearDown();
 	}
 
 	protected IndexManager getIndexManager()

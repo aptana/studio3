@@ -31,6 +31,7 @@ public class ProgressStatisticsTest
 	public void test() throws InterruptedException
 	{
 		long total = 100000;
+		// TODO Modify so we can pass in the minimum time before values get reported, defaults to 1 second right now...
 		stats = new ProgressStatistics(URI.create("http://www.example.com"), "fileName", total);
 		assertTrue(stats.shouldReport()); // first call should be true
 		assertFalse(stats.shouldReport()); // then should be false until report interval has elapsed

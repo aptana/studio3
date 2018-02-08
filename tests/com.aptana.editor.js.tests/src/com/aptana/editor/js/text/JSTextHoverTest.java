@@ -112,7 +112,7 @@ public class JSTextHoverTest extends JSEditorBasedTestCase
 
 		// write type to index
 		JSIndexWriter indexWriter = new JSIndexWriter();
-		indexWriter.writeType(getIndex(), window, EditorUtil.getURI((AbstractThemeableEditor) this.editor));
+		indexWriter.writeType(getIndex(), window, EditorUtil.getURI(this.editor));
 
 	}
 

@@ -1,7 +1,10 @@
 package com.aptana.scripting.model;
 
-import com.aptana.core.tests.GlobalTimePerformanceTestCase;
+import org.junit.experimental.categories.Category;
 
+import com.aptana.core.tests.GlobalTimePerformanceTestCase;
+import com.aptana.testing.categories.PerformanceTests;
+@Category({PerformanceTests.class})
 public class BundleLoadingPerformanceTest extends GlobalTimePerformanceTestCase
 {
 	private BundleManager manager;

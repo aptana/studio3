@@ -13,6 +13,7 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.junit.experimental.categories.Category;
 
 import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.ResourceUtil;
@@ -20,8 +21,10 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.scripting.commands.TextEditorUtils;
 import com.aptana.editor.epl.tests.EditorTestHelper;
+import com.aptana.testing.categories.PerformanceTests;
 import com.aptana.ui.util.UIUtils;
 
+@Category({ PerformanceTests.class })
 public class DocumentScopeManagerPerformanceTest extends GlobalTimePerformanceTestCase
 {
 
@@ -48,7 +51,7 @@ public class DocumentScopeManagerPerformanceTest extends GlobalTimePerformanceTe
 			IDocument doc = viewer.getDocument();
 			int length = doc.getLength();
 			EditorTestHelper.closeAllEditors();
-			
+
 			IEditorReference[] refs = page.getEditorReferences();
 			assertEquals(0, refs.length);
 

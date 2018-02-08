@@ -11,8 +11,9 @@
 
 package com.aptana.webserver.internal.core.builtin;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,11 +23,10 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import junit.framework.TestCase;
-
-import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.debug.core.ILaunchManager;
+import org.junit.Test;
 
 /**
  * @author Max Stepanov
@@ -51,7 +51,8 @@ public class LocalWebServerTest
 		LocalWebServer webServer = null;
 		try
 		{
-			webServer = new LocalWebServer(EFS.getLocalFileSystem().fromLocalFile(dir).toURI());
+			webServer = new LocalWebServer(dir.toURI());
+			webServer.start(ILaunchManager.RUN_MODE, new NullProgressMonitor());
 			URL url = webServer.getBaseURL();
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setAllowUserInteraction(false);

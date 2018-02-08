@@ -7,60 +7,45 @@
  */
 package com.aptana.js.internal.core.index;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 import com.aptana.js.core.JSCorePlugin;
 
 public class MetadataTest
 {
-	/**
-	 * testDOM0
-	 */
 	@Test
 	public void testDOM0()
 	{
 		this.loadMetadata("/metadata/dom_0.xml");
 	}
 
-	/**
-	 * testDOM2
-	 */
 	@Test
 	public void testDOM2()
 	{
 		this.loadMetadata("/metadata/dom_2.xml");
 	}
 
-	/**
-	 * testDOM3
-	 */
 	@Test
 	public void testDOM3()
 	{
 		this.loadMetadata("/metadata/dom_3.xml");
 	}
 
-	/**
-	 * testDOM5
-	 */
 	@Test
 	public void testDOM5()
 	{
 		this.loadMetadata("/metadata/dom_5.xml");
 	}
 
-	/**
-	 * testJSCore
-	 */
 	@Test
 	public void testJSCore()
 	{

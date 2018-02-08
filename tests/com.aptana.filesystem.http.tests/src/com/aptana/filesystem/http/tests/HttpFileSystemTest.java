@@ -27,5 +27,4 @@ public class HttpFileSystemTest
 		assertNotNull(store);
 	}
 
-
 }

@@ -660,10 +660,8 @@ public class JSIndexTest
 		type.setName("Testing");
 
 		// add a user agent
-		IUserAgentManager manager = CorePlugin.getDefault().getUserAgentManager();
-		IUserAgent agent = manager.getAllUserAgents()[0];
 		UserAgentElement uaElement = new UserAgentElement();
-		uaElement.setPlatform(agent.getName());
+		uaElement.setPlatform("chrome");
 		type.addUserAgent(uaElement);
 
 		// write type and its properties

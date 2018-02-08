@@ -10,14 +10,18 @@
  *******************************************************************************/
 package com.aptana.studio.tests.startup;
 
+import org.eclipse.test.performance.Dimension;
+import org.eclipse.test.performance.Performance;
+import org.eclipse.test.performance.PerformanceMeter;
+import org.junit.experimental.categories.Category;
+
+import com.aptana.testing.categories.PerformanceTests;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.eclipse.test.performance.Dimension;
-import org.eclipse.test.performance.Performance;
-import org.eclipse.test.performance.PerformanceMeter;
-
+@Category({ PerformanceTests.class })
 public class UIStartupTest extends TestCase
 {
 

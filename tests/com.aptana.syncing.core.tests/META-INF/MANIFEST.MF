@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.syncing.core.tests
-Bundle-Version: 3.0.0.qualifier
+Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: %providerName
 Fragment-Host: com.aptana.syncing.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Require-Bundle: org.junit,
+Require-Bundle: org.junit;bundle-version="4.8.0",
  com.aptana.filesystem.ftp;bundle-version="3.0.0",
  com.aptana.filesystem.secureftp;bundle-version="3.0.0",
- org.kohsuke.junit;bundle-version="1.0.0",
- com.aptana.git.core;bundle-version="1.0.0"
+ com.aptana.git.core;bundle-version="1.0.0",
+ com.aptana.testing.libraries;bundle-version="1.0.0"
 Export-Package: com.aptana.syncing.core.tests
