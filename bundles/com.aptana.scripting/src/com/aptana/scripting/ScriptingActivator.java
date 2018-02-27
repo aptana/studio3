@@ -38,7 +38,8 @@ public class ScriptingActivator extends Plugin
 		// characters.
 		// This makes the jruby posix implementation use a java-only implementation which does handle unicode characters
 		// properly when on windows.
-		RubyInstanceConfig.nativeEnabled = false;
+//		RubyInstanceConfig.nativeEnabled = false;
+		RubyInstanceConfig.setLoadedNativeExtensions(false);
 	}
 
 	/**

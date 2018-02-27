@@ -271,6 +271,7 @@ public class ScriptingEngine
 
 		try
 		{
+			System.out.println("run script: "+fullPath);
 			job.run("Load '" + fullPath + "'", runType, async); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (InterruptedException e)

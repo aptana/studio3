@@ -27,6 +27,7 @@ import org.jruby.RubyIO;
 import org.jruby.RubyProc;
 import org.jruby.RubySystemExit;
 import org.jruby.exceptions.RaiseException;
+import org.jruby.internal.runtime.GlobalVariable.Scope;
 import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
@@ -381,7 +382,7 @@ public class CommandBlockRunner extends AbstractCommandRunner
 		{
 			RubyIO io = new RubyIO(runtime, ostream);
 
-			io.getOpenFile().getMainStream().setSync(true);
+			io.getOpenFile().setSync(true);
 			setConsole(io);
 		}
 
@@ -397,7 +398,7 @@ public class CommandBlockRunner extends AbstractCommandRunner
 	{
 		Ruby runtime = getRuntime();
 
-		runtime.defineVariable(new OutputGlobalVariable(runtime, STDERR_GLOBAL, io));
+		runtime.defineVariable(new OutputGlobalVariable(runtime, STDERR_GLOBAL, io), Scope.GLOBAL);
 		runtime.defineGlobalConstant(STDERR_CONSTANT, io);
 		runtime.getGlobalVariables().alias(DEFERR_GLOBAL, STDERR_GLOBAL);
 	}
@@ -417,7 +418,7 @@ public class CommandBlockRunner extends AbstractCommandRunner
 			PrintStream pstream = new PrintStream(ostream);
 			RubyIO io = new RubyIO(runtime, pstream);
 
-			io.getOpenFile().getMainStream().setSync(true);
+			io.getOpenFile().setSync(true);
 			setErrorWriter(io);
 		}
 
@@ -451,7 +452,7 @@ public class CommandBlockRunner extends AbstractCommandRunner
 	{
 		Ruby runtime = this.getRuntime();
 
-		runtime.defineVariable(new InputGlobalVariable(runtime, STDIN_GLOBAL, io));
+		runtime.defineVariable(new InputGlobalVariable(runtime, STDIN_GLOBAL, io), Scope.GLOBAL);
 		runtime.defineGlobalConstant(STDIN_CONSTANT, io);
 	}
 
@@ -464,7 +465,7 @@ public class CommandBlockRunner extends AbstractCommandRunner
 	{
 		Ruby runtime = this.getRuntime();
 
-		runtime.defineVariable(new OutputGlobalVariable(runtime, STDOUT_GLOBAL, io));
+		runtime.defineVariable(new OutputGlobalVariable(runtime, STDOUT_GLOBAL, io), Scope.GLOBAL);
 		runtime.defineGlobalConstant(STDOUT_CONSTANT, io);
 		runtime.getGlobalVariables().alias(STDOUT_GLOBAL2, STDOUT_GLOBAL);
 		runtime.getGlobalVariables().alias(DEFOUT_GLOBAL, STDOUT_GLOBAL);
@@ -485,7 +486,7 @@ public class CommandBlockRunner extends AbstractCommandRunner
 			PrintStream pstream = new PrintStream(ostream);
 			RubyIO io = new RubyIO(runtime, pstream);
 
-			io.getOpenFile().getMainStream().setSync(true);
+			io.getOpenFile().setSync(true);
 			setWriter(io);
 		}
 
