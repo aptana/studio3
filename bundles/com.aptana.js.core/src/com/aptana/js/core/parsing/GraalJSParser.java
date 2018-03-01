@@ -21,7 +21,6 @@ import com.oracle.js.parser.ir.LexicalContext;
 public class GraalJSParser implements IParser
 {
 
-	@Override
 	public synchronized ParseResult parse(IParseState parseState) throws java.lang.Exception
 	{
 		WorkingParseResult working = new WorkingParseResult();
