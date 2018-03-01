@@ -97,6 +97,7 @@
     <module>com.aptana.xml.core</module>
     <module>org.apache.httpcomponents.httpcore-nio</module>
     <module>org.apache.velocity</module>
+    <module>com.oracle.js.parser</module>
     <module>org.eclipse.tm.terminal</module>
     <module>org.jruby</module>
     <module>org.json.simple</module>
