@@ -33,5 +33,4 @@ Export-Package: com.aptana.js.core,
  com.aptana.js.internal.core.parsing.sdoc;x-friends:="com.appcelerator.hyperloop.core",
  com.aptana.js.internal.core.parsing.sdoc.model;x-friends:="com.appcelerator.hyperloop.core"
 Eclipse-ExtensibleAPI: true
-Bundle-ClassPath: lib/antlr-4.7-complete.jar,
- .
+Bundle-ClassPath: .
