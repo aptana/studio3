@@ -1727,8 +1727,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		int finish = callNode.getFinish() - 1;
 		if (source.charAt(start) == '(')
 		{
-			addToParentAndPushNodeToStack(
-					new JSGroupNode(toSymbol(JSTokenType.LPAREN, start), toSymbol(JSTokenType.RPAREN, finish)));
+//			addToParentAndPushNodeToStack(
+//					new JSGroupNode(toSymbol(JSTokenType.LPAREN, start), toSymbol(JSTokenType.RPAREN, finish)));
 			start += 1;
 			finish -= 1;
 		}
@@ -1738,6 +1738,11 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		// FIXME: prefer start of first arg as last index to search!
 		int lParen = findChar('(', callNode.getFunction().getFinish(), finish);
 		int rParen = findLastChar(')', finish);
+		// Could be no args, as in "var whatever = new Date"! Therefore no parens!
+		if (lParen == -1 || rParen == -1) {
+			lParen = start; // give same offset as start of call, we can't keep a -1 offset!
+			rParen = start - 1; // "empty"
+		}
 
 		// We need to visit the expression first, then push the arguments node...
 		// This is very ugly, but I don't see how else to do it...
@@ -1751,10 +1756,10 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		popNode(); // arguments node
 		popNode(); // invoke node
 		// if wrapped in parens, pop the wrapping Group Node!
-		if (source.charAt(callNode.getStart()) == '(')
-		{
-			popNode(); // group node
-		}
+//		if (source.charAt(callNode.getStart()) == '(')
+//		{
+//			popNode(); // group node
+//		}
 		return super.leaveCallNode(callNode);
 	}
 
