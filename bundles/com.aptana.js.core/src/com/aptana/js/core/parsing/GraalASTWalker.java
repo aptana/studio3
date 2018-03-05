@@ -413,22 +413,26 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		if (!varNode.isFunctionDeclaration() && !(varNode.getInit() instanceof ClassNode))
 		{
+			// Need to search backwards for "var"/"let"/"const". No guarantee how much whitespace/comments are between
+			// the keyword and var name!
+			// varNode.getStart() points at the var name!
+			String keywordName = "var";
 			JSTokenType type = JSTokenType.VAR;
-			int adjustStartOffsetBy = 4; // The start offset points to where the name starts, not the beginning of
-											// var/let/const keyword!
 			if (varNode.isConst())
 			{
 				type = JSTokenType.CONST;
-				adjustStartOffsetBy = 5;
+				keywordName = "const";
 			}
 			else if (varNode.isLet())
 			{
 				type = JSTokenType.LET;
+				keywordName = "let";
 			}
-			Symbol var = toSymbol(type, varNode.getStart() - adjustStartOffsetBy, varNode.getFinish() - 1);
+			int varStart = this.source.lastIndexOf(keywordName, varNode.getStart() - (keywordName.length() + 1));
+			Symbol var = toSymbol(type, varStart, varStart + (keywordName.length() - 1));
 
 			ExportedStatus exportStatus = getExportStatus(varNode.getName());
-			JSNode node = new JSVarNode(var);
+			JSNode node = new JSVarNode(varStart, varNode.getFinish() - 1, var);
 			if (exportStatus.isExported)
 			{
 				// push export node
@@ -442,10 +446,15 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				node.setSemicolonIncluded(true);
 				addToParentAndPushNodeToStack(node);
 			}
-			int equalOffset = findChar('=', varNode.getName().getFinish(),
-					varNode.getInit() != null ? varNode.getInit().getStart() : varNode.getFinish());
-			addToParentAndPushNodeToStack(new JSDeclarationNode(varNode.getStart(), varNode.getFinish() - 1,
-					toSymbol(JSTokenType.EQUAL, equalOffset)));
+			// There may be an assignment (or not)
+			Symbol equalSign = null;
+			if (varNode.getInit() != null)
+			{
+				int equalOffset = findChar('=', varNode.getName().getFinish(), varNode.getInit().getStart());
+				equalSign = toSymbol(JSTokenType.EQUAL, equalOffset);
+			}
+			addToParentAndPushNodeToStack(
+					new JSDeclarationNode(varNode.getStart(), varNode.getFinish() - 1, equalSign));
 		}
 		else if (varNode.getInit() instanceof ClassNode)
 		{
@@ -533,18 +542,13 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterFunctionNode(FunctionNode functionNode)
 	{
-		// FIXME: The shape of the AST seems wrong for test1.js
-		// it'd be good to do an AST dump on old parser versus new to see what it is
-		// Because when formatting it appears to expect a "parent node" in the format stack
-		// I think I messed up the relationship between JSVarNode, JSDeclarationNode and JSFunctionNode?
-		// for cases like: var myFunc = function() {};
 		if (!functionNode.isProgram())
 		{
 			IdentNode ident = functionNode.getIdent();
 			Block body = functionNode.getBody();
 			// If anonymous "normal" function, ident points at start of function keyword
 			int funcStart = ident.getStart();
-			int funcEnd = body.getFinish() + 1; // FIXME This is wrong! Look for closing brace explicitly?
+			int funcEnd = body.getFinish() + 1;
 			// Arrow functions don't require braces, but normal do!
 			JSFunctionNode funcNode;
 			switch (functionNode.getKind())
@@ -558,8 +562,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				default:
 					if (!functionNode.isAnonymous())
 					{
-						funcStart -= 9; // TODO: if named, ident points at start of name, so we need to subtract 9
-						// ("function ")
+						// Should search backwards for "function" from beginning of identifier, minus length of
+						// "function " (which is earliest it could be)
+						funcStart = this.source.lastIndexOf("function", funcStart - 9);
 					}
 					funcNode = new JSFunctionNode(funcStart, funcEnd);
 					break;
@@ -586,7 +591,6 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				addChildToParent(new JSEmptyNode(toSymbol(ident)));
 			}
 			// Need to explicitly visit the params
-			// FIXME end
 			int lParen = findChar('(', ident.getFinish(), body.getStart());
 			int rParen = findLastChar(')', body.getStart());
 			addToParentAndPushNodeToStack(new JSParametersNode(lParen, rParen));
@@ -1727,8 +1731,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		int finish = callNode.getFinish() - 1;
 		if (source.charAt(start) == '(')
 		{
-//			addToParentAndPushNodeToStack(
-//					new JSGroupNode(toSymbol(JSTokenType.LPAREN, start), toSymbol(JSTokenType.RPAREN, finish)));
+			// addToParentAndPushNodeToStack(
+			// new JSGroupNode(toSymbol(JSTokenType.LPAREN, start), toSymbol(JSTokenType.RPAREN, finish)));
 			start += 1;
 			finish -= 1;
 		}
@@ -1739,7 +1743,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		int lParen = findChar('(', callNode.getFunction().getFinish(), finish);
 		int rParen = findLastChar(')', finish);
 		// Could be no args, as in "var whatever = new Date"! Therefore no parens!
-		if (lParen == -1 || rParen == -1) {
+		if (lParen == -1 || rParen == -1)
+		{
 			lParen = start; // give same offset as start of call, we can't keep a -1 offset!
 			rParen = start - 1; // "empty"
 		}
@@ -1756,10 +1761,10 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		popNode(); // arguments node
 		popNode(); // invoke node
 		// if wrapped in parens, pop the wrapping Group Node!
-//		if (source.charAt(callNode.getStart()) == '(')
-//		{
-//			popNode(); // group node
-//		}
+		// if (source.charAt(callNode.getStart()) == '(')
+		// {
+		// popNode(); // group node
+		// }
 		return super.leaveCallNode(callNode);
 	}
 
