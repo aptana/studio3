@@ -1171,9 +1171,11 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			// so the function and block end offsets are *wrong* and do not include the closing brace!
 			// here we fix the end offset of the block and parent function
 			IParseNode parent = getCurrentNode();
-			if (parent instanceof JSFunctionNode) {
+			if (parent instanceof JSFunctionNode)
+			{
 				int maybeRBrace = findChar('}', block.getFinish());
-				if (maybeRBrace != -1) {
+				if (maybeRBrace != -1)
+				{
 					rBrace = maybeRBrace;
 					((JSFunctionNode) parent).setLocation(parent.getStartingOffset(), rBrace);
 				}
@@ -1719,12 +1721,26 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterCallNode(CallNode callNode)
 	{
-		addToParentAndPushNodeToStack(new JSInvokeNode(callNode.getStart(), callNode.getFinish() - 1));
+		// If the call is wrapped in parens, wrap the JSInvokeNode in a JSGroupNode to represent this.
+		// and fix the offsets of the JSInvokeNode to not include the wrapping parens
+		int start = callNode.getStart();
+		int finish = callNode.getFinish() - 1;
+		if (source.charAt(start) == '(')
+		{
+			addToParentAndPushNodeToStack(
+					new JSGroupNode(toSymbol(JSTokenType.LPAREN, start), toSymbol(JSTokenType.RPAREN, finish)));
+			start += 1;
+			finish -= 1;
+		}
+		// push our equivalent of the call node
+		addToParentAndPushNodeToStack(new JSInvokeNode(start, callNode.getFinish() - 1));
+
+		// FIXME: prefer start of first arg as last index to search!
+		int lParen = findChar('(', callNode.getFunction().getFinish(), finish);
+		int rParen = findLastChar(')', finish);
+
 		// We need to visit the expression first, then push the arguments node...
-		int lParen = findChar('(', callNode.getFunction().getFinish(), callNode.getFinish()); // FIXME: prefer start of
-																								// first arg as last
-																								// index to search!
-		int rParen = findLastChar(')', callNode.getFinish());
+		// This is very ugly, but I don't see how else to do it...
 		pushOnLeave.put(callNode.getFunction(), new JSArgumentsNode(lParen, rParen));
 		return super.enterCallNode(callNode);
 	}
@@ -1734,6 +1750,11 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		popNode(); // arguments node
 		popNode(); // invoke node
+		// if wrapped in parens, pop the wrapping Group Node!
+		if (source.charAt(callNode.getStart()) == '(')
+		{
+			popNode(); // group node
+		}
 		return super.leaveCallNode(callNode);
 	}
 
@@ -1777,8 +1798,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterAccessNode(AccessNode accessNode)
 	{
+		int dotOffset = findChar('.', accessNode.getBase().getFinish());
 		addToParentAndPushNodeToStack(new JSGetPropertyNode(accessNode.getStart(), accessNode.getFinish() - 1,
-				toSymbol(JSTokenType.DOT, accessNode.getBase().getFinish())));
+				toSymbol(JSTokenType.DOT, dotOffset)));
 		return super.enterAccessNode(accessNode);
 	}
 
@@ -1789,7 +1811,10 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		int finish = accessNode.getFinish();
 		String propertyName = accessNode.getProperty();
 		int start = finish - propertyName.length();
-		addChildToParent(new JSIdentifierNode(identifierSymbol(start, finish, propertyName)));
+		addChildToParent(new JSIdentifierNode(identifierSymbol(start, finish - 1, propertyName))); // adjust for
+																									// inclusive end
+																									// offset by
+																									// subtracting 1
 		popNode();
 		return super.leaveAccessNode(accessNode);
 	}
