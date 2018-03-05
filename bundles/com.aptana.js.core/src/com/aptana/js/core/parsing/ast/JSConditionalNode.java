@@ -17,28 +17,19 @@ public class JSConditionalNode extends JSNode
 	private Symbol _colon;
 
 	/**
-	 * JSConditionalNode
-	 * 
-	 * @param children
-	 */
-	public JSConditionalNode(JSNode test, Symbol questionMark, JSNode trueCase, Symbol colon, JSNode falseCase)
-	{
-		this(questionMark, colon);
-		setChildren(new JSNode[] { test, trueCase, falseCase });
-	}
-
-	/**
 	 * USed by ANTLR AST
-	 * 
+	 * @param start
+	 * @param end
 	 * @param questionMark
 	 * @param colon
 	 */
-	public JSConditionalNode(Symbol questionMark, Symbol colon)
+	public JSConditionalNode(int start, int end, Symbol questionMark, Symbol colon)
 	{
 		super(IJSNodeTypes.CONDITIONAL);
 
 		this._questionMark = questionMark;
 		this._colon = colon;
+		this.setLocation(start, end);
 	}
 
 	/*

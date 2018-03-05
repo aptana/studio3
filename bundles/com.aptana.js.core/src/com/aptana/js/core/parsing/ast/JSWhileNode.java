@@ -17,27 +17,17 @@ public class JSWhileNode extends JSNode
 	private Symbol _rightParenthesis;
 
 	/**
-	 * JSWhileNode
-	 * 
-	 * @param children
-	 */
-	public JSWhileNode(Symbol leftParenthesis, JSNode condition, Symbol rightParenthesis, JSNode body)
-	{
-		this(leftParenthesis, rightParenthesis);
-		setChildren(new JSNode[] { condition, body });
-	}
-
-	/**
 	 * Used by ANTLR AST
 	 * 
 	 * @param leftParenthesis
 	 * @param rightParenthesis
 	 */
-	public JSWhileNode(Symbol leftParenthesis, Symbol rightParenthesis)
+	public JSWhileNode(int start, int end, Symbol leftParenthesis, Symbol rightParenthesis)
 	{
 		super(IJSNodeTypes.WHILE);
 		this._leftParenthesis = leftParenthesis;
 		this._rightParenthesis = rightParenthesis;
+		this.setLocation(start, end);
 	}
 
 	/*

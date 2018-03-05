@@ -6,16 +6,11 @@ public class JSSpreadElementNode extends JSNode
 {
 	private Symbol _ellipsis;
 
-	public JSSpreadElementNode(Symbol ellipsis, JSNode expression)
-	{
-		this(ellipsis);
-		setChildren(new JSNode[] { expression });
-	}
-
-	public JSSpreadElementNode(Symbol ellipsis)
+	public JSSpreadElementNode(int start, int end, Symbol ellipsis)
 	{
 		super(IJSNodeTypes.SPREAD_ELEMENT);
 		this._ellipsis = ellipsis;
+		this.setLocation(start, end);
 	}
 
 	/*

@@ -28,25 +28,12 @@ public class JSFunctionNode extends JSNode
 	private boolean _isStatic;
 
 	/**
-	 * JSFunctionNode
-	 * 
-	 * @param name
-	 *            (JSIdentifierNode, or JSEmptyNode)
-	 * @param params
-	 * @param body
-	 */
-	public JSFunctionNode(JSNode name, JSParametersNode params, JSStatementsNode body)
-	{
-		this();
-		setChildren(new JSNode[] { name, params, body });
-	}
-
-	/**
 	 * Used by ANTLR AST
 	 */
-	public JSFunctionNode()
+	public JSFunctionNode(int start, int end)
 	{
 		super(IJSNodeTypes.FUNCTION);
+		this.setLocation(start, end);
 	}
 
 	/*

@@ -14,9 +14,10 @@ public class JSBreakNode extends JSLabelStatementNode
 	/**
 	 * JSBreakNode
 	 */
-	public JSBreakNode()
+	public JSBreakNode(int start, int end)
 	{
 		super(IJSNodeTypes.BREAK);
+		this.setLocation(start, end);
 	}
 
 	/**
@@ -24,9 +25,10 @@ public class JSBreakNode extends JSLabelStatementNode
 	 * 
 	 * @param label
 	 */
-	public JSBreakNode(Symbol label)
+	public JSBreakNode(int start, int end, Symbol label)
 	{
 		super(IJSNodeTypes.BREAK, label);
+		this.setLocation(start, end);
 	}
 
 	/*

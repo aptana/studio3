@@ -25,6 +25,7 @@ public class JSArrayNode extends JSNode
 
 		this._leftBracket = leftBracket;
 		this._rightBracket = rightBracket;
+		this.setLocation(leftBracket.getStart(), rightBracket.getEnd());
 	}
 
 	/*

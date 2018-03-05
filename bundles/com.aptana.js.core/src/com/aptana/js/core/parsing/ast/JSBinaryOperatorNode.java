@@ -20,24 +20,10 @@ public abstract class JSBinaryOperatorNode extends JSNode
 	 * Used when building ANTLR AST. Children get added later!
 	 * @param operator
 	 */
-	protected JSBinaryOperatorNode(Symbol operator)
+	protected JSBinaryOperatorNode(int start, int end, Symbol operator)
 	{
 		this._operator = operator;
-	}
-
-	/**
-	 * JSBinaryOperatorNode
-	 * 
-	 * @param left
-	 * @param operator
-	 * @param right
-	 */
-	protected JSBinaryOperatorNode(JSNode left, Symbol operator, JSNode right)
-	{
-		this(operator);
-
-		this.setLocation(left.getStart(), right.getEnd());
-		this.setChildren(new JSNode[] { left, right });
+		this.setLocation(start, end);
 	}
 
 	/**

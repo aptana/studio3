@@ -7,36 +7,27 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.js.core.parsing.JSTokenType;
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSPostUnaryOperatorNode extends JSNode
 {
 	private Symbol _operator;
 
 	/**
-	 * JSPostUnaryOperatorNode
-	 * 
-	 * @param operator
-	 * @param expression
-	 */
-	public JSPostUnaryOperatorNode(Symbol operator, JSNode expression)
-	{
-		this(operator);
-		this.setChildren(new JSNode[] { expression });
-	}
-
-	/**
 	 * Used by ANTLR AST
 	 * 
+	 * @param start
+	 * @param end
 	 * @param operator
 	 */
-	public JSPostUnaryOperatorNode(Symbol operator)
+	public JSPostUnaryOperatorNode(int start, int end, Symbol operator)
 	{
 		super();
 		this._operator = operator;
+		this.setLocation(start, end);
 
 		short type = DEFAULT_TYPE;
 		JSTokenType token = JSTokenType.get((String) operator.value);

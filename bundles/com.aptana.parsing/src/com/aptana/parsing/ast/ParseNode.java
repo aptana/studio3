@@ -195,6 +195,7 @@ public abstract class ParseNode extends Node implements IParseNode
 		{
 			return fChildren[index];
 		}
+		// FIXME We should be more strict and throw an exception, but apparently a lot of code relies on getting null!
 		throw new ArrayIndexOutOfBoundsException(index);
 //		return null;
 	}

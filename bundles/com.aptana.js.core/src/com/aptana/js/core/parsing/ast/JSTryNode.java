@@ -11,14 +11,11 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSTryNode extends JSNode
 {
-	/**
-	 * JSTryNode
-	 * 
-	 * @param children
-	 */
-	public JSTryNode(JSNode... children)
+
+	public JSTryNode(int start, int end)
 	{
-		super(IJSNodeTypes.TRY, children);
+		super(IJSNodeTypes.TRY);
+		this.setLocation(start, end);
 	}
 
 	/*

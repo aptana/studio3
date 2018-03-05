@@ -16,27 +16,16 @@ public class JSDeclarationNode extends JSNode
 	private Symbol _equalSign;
 
 	/**
-	 * JSDeclarationNode
-	 * 
-	 * @param children
-	 */
-	public JSDeclarationNode(JSNode identifier, Symbol equalSign, JSNode value)
-	{
-		super(IJSNodeTypes.DECLARATION, identifier, value);
-
-		this._equalSign = equalSign;
-	}
-
-	/**
 	 * Used by ANTLR AST
 	 * 
 	 * @param equalSign
 	 */
-	public JSDeclarationNode(Symbol equalSign)
+	public JSDeclarationNode(int start, int end, Symbol equalSign)
 	{
 		super(IJSNodeTypes.DECLARATION);
 
 		this._equalSign = equalSign;
+		this.setLocation(start, end);
 	}
 
 	/*

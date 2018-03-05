@@ -17,28 +17,20 @@ public class JSWithNode extends JSNode
 	private Symbol _rightParenthesis;
 
 	/**
-	 * JSWithNode
-	 * 
-	 * @param children
-	 */
-	public JSWithNode(Symbol leftParenthesis, JSNode expression, Symbol rightParenthesis, JSNode body)
-	{
-		this(leftParenthesis, rightParenthesis);
-		setChildren(new JSNode[] { expression, body });
-	}
-
-	/**
 	 * JSWithNode Used by ANTLR AST
 	 * 
+	 * @param start
+	 * @param end
 	 * @param leftParenthesis
 	 * @param rightParenthesis
 	 */
-	public JSWithNode(Symbol leftParenthesis, Symbol rightParenthesis)
+	public JSWithNode(int start, int end, Symbol leftParenthesis, Symbol rightParenthesis)
 	{
 		super(IJSNodeTypes.WITH);
 
 		this._leftParenthesis = leftParenthesis;
 		this._rightParenthesis = rightParenthesis;
+		this.setLocation(start, end);
 	}
 
 	/*

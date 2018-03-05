@@ -29,6 +29,7 @@ public class JSStringNode extends JSPrimitiveNode
 	public JSStringNode(Symbol identifier)
 	{
 		this((String) identifier.value);
+		this.setLocation(identifier.getStart(), identifier.getEnd());
 	}
 
 	/*

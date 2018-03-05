@@ -29,6 +29,7 @@ public class JSTrueNode extends JSPrimitiveNode
 	public JSTrueNode(Symbol identifier)
 	{
 		this();
+		this.setLocation(identifier.getStart(), identifier.getEnd());
 	}
 
 	/*

@@ -18,7 +18,7 @@ public class JSEmptyNode extends JSNode
 	 */
 	public JSEmptyNode(Symbol symbol)
 	{
-		this(symbol.getEnd() + 1);
+		this(symbol.getEnd());
 	}
 
 	/**

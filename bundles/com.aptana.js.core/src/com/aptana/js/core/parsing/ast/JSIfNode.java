@@ -17,29 +17,18 @@ public class JSIfNode extends JSNode
 	private Symbol _rightParenthesis;
 
 	/**
-	 * JSIfNode
-	 * 
-	 * @param children
-	 */
-	public JSIfNode(Symbol leftParenthesis, JSNode condition, Symbol rightParenthesis, JSNode trueBlock,
-			JSNode falseBlock)
-	{
-		this(leftParenthesis, rightParenthesis);
-		setChildren(new JSNode[] { condition, trueBlock, falseBlock });
-	}
-
-	/**
 	 * Used by ANTLR AST
 	 * 
 	 * @param leftParenthesis
 	 * @param rightParenthesis
 	 */
-	public JSIfNode(Symbol leftParenthesis, Symbol rightParenthesis)
+	public JSIfNode(int start, int end, Symbol leftParenthesis, Symbol rightParenthesis)
 	{
 		super(IJSNodeTypes.IF);
 
 		this._leftParenthesis = leftParenthesis;
 		this._rightParenthesis = rightParenthesis;
+		this.setLocation(start, end);
 	}
 
 	/*

@@ -11,35 +11,19 @@ import com.aptana.parsing.ast.IParseNode;
 
 import beaver.Symbol;
 
-public class JSForOfNode extends JSNode
+public class JSForOfNode extends JSAbstractForNode
 {
-	private Symbol _leftParenthesis;
-	private Symbol _rightParenthesis;
-
-	/**
-	 * JSForOFNode
-	 * 
-	 * @param children
-	 */
-	public JSForOfNode(Symbol leftParenthesis, JSNode initializer, Symbol of, JSNode expression,
-			Symbol rightParenthesis, JSNode body)
-	{
-		this(leftParenthesis, rightParenthesis);
-		setChildren(new JSNode[] { initializer, expression, body });
-	}
-
 	/**
 	 * Used by ANTLR AST
 	 * 
+	 * @param start
+	 * @param end
 	 * @param leftParenthesis
 	 * @param rightParenthesis
 	 */
-	public JSForOfNode(Symbol leftParenthesis, Symbol rightParenthesis)
+	public JSForOfNode(int start, int end, Symbol leftParenthesis, Symbol rightParenthesis)
 	{
-		super(IJSNodeTypes.FOR_OF);
-
-		this._leftParenthesis = leftParenthesis;
-		this._rightParenthesis = rightParenthesis;
+		super(IJSNodeTypes.FOR_OF, start, end, leftParenthesis, rightParenthesis);
 	}
 
 	/*
@@ -80,25 +64,5 @@ public class JSForOfNode extends JSNode
 	public IParseNode getInitializer()
 	{
 		return this.getChild(0);
-	}
-
-	/**
-	 * getLeftParenthesis
-	 * 
-	 * @return
-	 */
-	public Symbol getLeftParenthesis()
-	{
-		return this._leftParenthesis;
-	}
-
-	/**
-	 * getRightParenthesis
-	 * 
-	 * @return
-	 */
-	public Symbol getRightParenthesis()
-	{
-		return this._rightParenthesis;
 	}
 }

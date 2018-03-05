@@ -5,13 +5,16 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
+import org.eclipse.ui.views.markers.FiltersContributionParameters;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -109,7 +112,7 @@ public abstract class AbstractFormatterTestCase
 	{
 		String directory = FORMATTING_FOLDER;
 		Enumeration<String> entryPaths = Platform.getBundle(testBundleId).getEntryPaths(directory);
-		ArrayList<String> filePaths = new ArrayList<String>();
+		List<String> filePaths = new ArrayList<String>();
 		String path;
 
 		while (entryPaths.hasMoreElements())
@@ -123,7 +126,8 @@ public abstract class AbstractFormatterTestCase
 				filePaths.add(path);
 			}
 		}
-
+		Collections.sort(filePaths);
+		
 		Object[][] value = new Object[filePaths.size()][];
 		int x = 0;
 		for (String filePath : filePaths)

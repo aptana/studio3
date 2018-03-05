@@ -9,22 +9,16 @@ package com.aptana.js.core.parsing.ast;
 
 public class JSReturnNode extends JSPreUnaryOperatorNode
 {
-	/**
-	 * JSReturnNode
-	 * 
-	 * @param expression
-	 */
-	public JSReturnNode(JSNode expression)
-	{
-		super(IJSNodeTypes.RETURN, expression);
-	}
 
 	/**
 	 * Used by ANTLR AST
+	 * @param end
+	 * @param start
 	 */
-	public JSReturnNode()
+	public JSReturnNode(int start, int end)
 	{
 		super(IJSNodeTypes.RETURN);
+		this.setLocation(start, end);
 	}
 
 	/*

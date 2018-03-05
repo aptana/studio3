@@ -2,33 +2,35 @@ package com.aptana.js.core.parsing;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.aptana.core.build.IProblem.Severity;
 import com.aptana.js.core.IJSConstants;
+import com.aptana.js.core.parsing.ast.IJSNodeTypes;
+import com.aptana.js.core.parsing.ast.JSCommentNode;
+import com.aptana.js.core.parsing.ast.JSParseRootNode;
+import com.aptana.parsing.AbstractParser;
 import com.aptana.parsing.IParseState;
-import com.aptana.parsing.IParser;
-import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.WorkingParseResult;
+import com.aptana.parsing.ast.IParseError;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseError;
 import com.oracle.js.parser.ErrorManager;
 import com.oracle.js.parser.Parser;
 import com.oracle.js.parser.ScriptEnvironment;
 import com.oracle.js.parser.Source;
+import com.oracle.js.parser.TokenType;
 import com.oracle.js.parser.ir.FunctionNode;
 import com.oracle.js.parser.ir.LexicalContext;
 
-public class GraalJSParser implements IParser
+public class GraalJSParser extends AbstractParser
 {
 
-	public synchronized ParseResult parse(IParseState parseState) throws java.lang.Exception
-	{
-		WorkingParseResult working = new WorkingParseResult();
-		parse(parseState, working);
-		return working.getImmutableResult();
-	}
+	private CommentCollectingParser fParser;
 
-	private void parse(IParseState parseState, final WorkingParseResult working)
+	protected void parse(IParseState parseState, final WorkingParseResult working) throws Exception
 	{
 		String source = parseState.getSource();
 		String filename = parseState.getFilename();
@@ -39,19 +41,30 @@ public class GraalJSParser implements IParser
 
 		try
 		{
-			IParseRootNode ast = convertAST(source, parse(filename, source, working));
+			FunctionNode graalAST = parse(filename, parseState.getStartingOffset(), source, working);
+			IParseRootNode ast = convertAST(source, graalAST);
+			if (ast != null) {
+				((JSParseRootNode) ast).setCommentNodes(fParser.getCommentNodes());
+			}
 			working.setParseResult(ast);
 		}
 		catch (Exception e)
 		{
-			// print the stack traces to a string!
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			PrintWriter pw = new PrintWriter(out);
-			e.printStackTrace(pw);
-			working.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, -1, -1,
-					e.getMessage() + "\n" + out.toString(), Severity.ERROR));
+			IParseError error = handleError(e);
+			working.addError(error);
+			throw e;
 		}
 
+	}
+
+	private IParseError handleError(Exception e)
+	{
+		// print the stack traces to a string!
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		PrintWriter pw = new PrintWriter(out);
+		e.printStackTrace(pw);
+		return new ParseError(IJSConstants.CONTENT_TYPE_JS, -1, -1, e.getMessage() + "\n" + out.toString(),
+				Severity.ERROR);
 	}
 
 	private IParseRootNode convertAST(final String source, final FunctionNode result)
@@ -66,7 +79,8 @@ public class GraalJSParser implements IParser
 		return astWalker.getRootNode();
 	}
 
-	private FunctionNode parse(final String filename, final String source, final WorkingParseResult working)
+	private FunctionNode parse(final String filename, int startOffset, final String source,
+			final WorkingParseResult working)
 	{
 		Source src = Source.sourceFor(filename, source);
 
@@ -79,11 +93,14 @@ public class GraalJSParser implements IParser
 				working.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, -1, -1, message, Severity.ERROR));
 			}
 		};
-		Parser p = new Parser(env, src, errorManager);
+
+		// Subclass and collect comments too
+		fParser = new CommentCollectingParser(env, src, errorManager);
 
 		// We try to parse as 'script' first, since that's much more common
+		// TODO Can we do a quick peek/guess based on a regexp to find imports/exports at top-level?
 		// FIXME Based on file extensions, choose module goal explicitly for *.mjs files!
-		FunctionNode result = p.parse();
+		FunctionNode result = fParser.parse(filename, startOffset, source.length() - startOffset, false);
 		if (result == null || errorManager.getParserException() != null)
 		{
 			// FIXME I assume if we get no result or had a parser exception we should retry as module. Sniff the
@@ -91,12 +108,62 @@ public class GraalJSParser implements IParser
 			// Reset errors on working result
 			working.getErrors().clear();
 			env = ScriptEnvironment.builder().es6(true).build();
-			p = new Parser(env, src, errorManager);
+			fParser = new CommentCollectingParser(env, src, errorManager);
 
 			// parse as module
-			result = p.parseModule(filename);
+			result = fParser.parseModule(filename);
 		}
 		return result;
+	}
+
+	private static class CommentCollectingParser extends Parser
+	{
+		private static final int DIDNT_SEE_COMMENT = -1;
+		private final List<IParseNode> comments = new ArrayList<IParseNode>();
+		private int fLastCommentStart = DIDNT_SEE_COMMENT;
+
+		public CommentCollectingParser(ScriptEnvironment env, Source src, ErrorManager errorManager)
+		{
+			super(env, src, errorManager);
+		}
+
+		@Override
+		protected TokenType nextToken()
+		{
+			TokenType tt = super.nextToken();
+			if (sawCommentLastTime())
+			{
+				// we saw a comment last time, so grab where it ended now and record it!
+				recordComment();
+			}
+			if (tt == TokenType.COMMENT)
+			{
+				// Record the comment start
+				fLastCommentStart = start;
+			}
+			return tt;
+		}
+
+		private void recordComment()
+		{
+			char c = source.getContent().charAt(fLastCommentStart + 1); // is the second char of comment a '*' or '/'?
+			short type = c == '*' ? IJSNodeTypes.MULTI_LINE_COMMENT : IJSNodeTypes.SINGLE_LINE_COMMENT;
+			comments.add(new JSCommentNode(type, fLastCommentStart, finish - 1)); // we use inclusive end, graal uses
+																					// exclusive, so we need to subtract
+																					// one!
+			fLastCommentStart = DIDNT_SEE_COMMENT; // reset
+		}
+
+		private boolean sawCommentLastTime()
+		{
+			return fLastCommentStart != DIDNT_SEE_COMMENT;
+		}
+
+		public IParseNode[] getCommentNodes()
+		{
+			return this.comments.toArray(new IParseNode[comments.size()]);
+		}
+
 	}
 
 }

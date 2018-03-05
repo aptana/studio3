@@ -16,57 +16,22 @@ public class JSNameValuePairNode extends JSNode
 	private Symbol _colon;
 
 	/**
-	 * This version represent a typical "key": "value" style property assignment.
-	 */
-	public JSNameValuePairNode(JSNode name, Symbol colon, JSNode value)
-	{
-		this(colon);
-		setChildren(new JSNode[] { name, value });
-	}
-
-	/**
-	 * Represents an ECMAScript 5 get property
-	 */
-	public JSNameValuePairNode(JSNode name, JSNode functionBody)
-	{
-		super(IJSNodeTypes.NAME_VALUE_PAIR, name, functionBody);
-	}
-
-	public JSNameValuePairNode(JSNode name, JSNode[] functionBody)
-	{
-		this(name, new JSStatementsNode(functionBody));
-	}
-
-	/**
-	 * Represents an ECMAScript 5 set property
-	 */
-	public JSNameValuePairNode(JSNode name, JSParametersNode param, JSNode functionBody)
-	{
-		super(IJSNodeTypes.NAME_VALUE_PAIR, name, param, functionBody);
-	}
-
-	public JSNameValuePairNode(JSNode name, JSParametersNode param, JSNode[] functionBody)
-	{
-		this(name, param, new JSStatementsNode(functionBody));
-	}
-
-	/**
 	 * Used by ANTLR AST for typical property: value definitions
-	 * 
 	 * @param colon
 	 */
-	public JSNameValuePairNode(Symbol colon)
+	public JSNameValuePairNode(int start, int end, Symbol colon)
 	{
 		super(IJSNodeTypes.NAME_VALUE_PAIR);
 		this._colon = colon;
+		this.setLocation(start, end);
 	}
 
 	/**
 	 * Used by ANTLR AST for method definitions in classes/objects.
 	 */
-	public JSNameValuePairNode()
+	public JSNameValuePairNode(int start, int end)
 	{
-		this(null);
+		this(start, end, null);
 	}
 
 	/*

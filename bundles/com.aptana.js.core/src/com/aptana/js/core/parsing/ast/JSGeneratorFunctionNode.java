@@ -2,17 +2,13 @@ package com.aptana.js.core.parsing.ast;
 
 public class JSGeneratorFunctionNode extends JSFunctionNode
 {
-	public JSGeneratorFunctionNode(JSNode name, JSParametersNode params, JSStatementsNode body)
-	{
-		super(name, params, body);
-	}
 
 	/**
 	 * Used by ANTLR AST
 	 */
-	public JSGeneratorFunctionNode()
+	public JSGeneratorFunctionNode(int start, int end)
 	{
-		super();
+		super(start, end);
 	}
 
 	/*

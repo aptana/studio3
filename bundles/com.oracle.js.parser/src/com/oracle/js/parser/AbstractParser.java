@@ -203,7 +203,7 @@ public abstract class AbstractParser {
      *
      * @return tokenType of next token.
      */
-    private TokenType nextToken() {
+    protected TokenType nextToken() {
         // Capture last token type, but ignore comments (which are irrelevant for the purpose of
         // newline detection).
         if (type != COMMENT) {

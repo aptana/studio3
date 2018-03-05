@@ -16,29 +16,15 @@ public class JSCaseNode extends JSNode
 	private Symbol _colon;
 
 	/**
-	 * JSCaseNode
-	 * 
-	 * @param children
-	 */
-	public JSCaseNode(JSNode expression, Symbol colon, JSNode... children)
-	{
-		this(colon);
-		this.addChild(expression);
-		for (JSNode child : children)
-		{
-			this.addChild(child);
-		}
-	}
-
-	/**
 	 * Used by ANTLR AST
 	 * 
 	 * @param colon
 	 */
-	public JSCaseNode(Symbol colon)
+	public JSCaseNode(int start, int end, Symbol colon)
 	{
 		super(IJSNodeTypes.CASE);
 		this._colon = colon;
+		this.setLocation(start, end);
 	}
 
 	/*

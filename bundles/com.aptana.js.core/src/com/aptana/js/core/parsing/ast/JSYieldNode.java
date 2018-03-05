@@ -8,9 +8,10 @@ public class JSYieldNode extends JSNode
 {
 	private final boolean _hasStar;
 
-	public JSYieldNode(Symbol y)
+	public JSYieldNode(int start, int end, Symbol y)
 	{
 		super(IJSNodeTypes.YIELD);
+		this.setLocation(start, end);
 		_hasStar = false;
 	}
 

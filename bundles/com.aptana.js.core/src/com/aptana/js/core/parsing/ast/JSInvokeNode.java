@@ -23,9 +23,10 @@ public class JSInvokeNode extends JSNode
 	/**
 	 * Used by ANTLR AST
 	 */
-	public JSInvokeNode()
+	public JSInvokeNode(int start, int end)
 	{
 		super(IJSNodeTypes.INVOKE);
+		this.setLocation(start, end);
 	}
 
 	/*

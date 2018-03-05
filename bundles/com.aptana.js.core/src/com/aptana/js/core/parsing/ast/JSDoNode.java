@@ -17,28 +17,18 @@ public class JSDoNode extends JSNode
 	private Symbol _rightParenthesis;
 
 	/**
-	 * JSDoNode
-	 * 
-	 * @param children
-	 */
-	public JSDoNode(JSNode body, Symbol leftParenthesis, JSNode condition, Symbol rightParenthesis)
-	{
-		this(leftParenthesis, rightParenthesis);
-		setChildren(new JSNode[] { body, condition });
-	}
-
-	/**
 	 * Used by ANTLR AST
 	 * 
 	 * @param leftParenthesis
 	 * @param rightParenthesis
 	 */
-	public JSDoNode(Symbol leftParenthesis, Symbol rightParenthesis)
+	public JSDoNode(int start, int end, Symbol leftParenthesis, Symbol rightParenthesis)
 	{
 		super(IJSNodeTypes.DO);
 
 		this._leftParenthesis = leftParenthesis;
 		this._rightParenthesis = rightParenthesis;
+		this.setLocation(start, end);
 	}
 
 	/*

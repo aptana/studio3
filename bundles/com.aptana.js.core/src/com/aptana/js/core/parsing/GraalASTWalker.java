@@ -9,6 +9,7 @@ import org.eclipse.core.internal.utils.StringPool;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.JSLanguageConstants;
+import com.aptana.js.core.parsing.ast.JSAbstractForNode;
 import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSArrayNode;
 import com.aptana.js.core.parsing.ast.JSArrowFunctionNode;
@@ -92,6 +93,7 @@ import com.oracle.js.parser.ir.FunctionNode;
 import com.oracle.js.parser.ir.IdentNode;
 import com.oracle.js.parser.ir.IfNode;
 import com.oracle.js.parser.ir.IndexNode;
+import com.oracle.js.parser.ir.JoinPredecessorExpression;
 import com.oracle.js.parser.ir.LabelNode;
 import com.oracle.js.parser.ir.LexicalContext;
 import com.oracle.js.parser.ir.LiteralNode;
@@ -125,7 +127,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	private Map<Expression, JSNode> pushOnLeave;
 	private final String source;
 
-	private StringPool pool; // not sure right now if pooling helps our RAM usage mcuh (or maybe even makes it worse!)
+	private StringPool pool; // not sure right now if pooling helps our RAM usage much (or maybe even makes it worse!)
 
 	private Module module;
 
@@ -154,8 +156,20 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		if (literalNode.isNumeric())
 		{
+			// If there's a trailing comment, the end location may be off by length of comment!
+			// do start position + length of raw value? That could be wrong because they convert numbers based on hex/octal/decimal/whatever!
+			// So... maybe look for first whitespace or '/' and cut off before that?
+			int start = literalNode.getStart();
+			int finish = literalNode.getFinish();
+			String raw = this.source.substring(start, finish);
+			int lastSlash = raw.indexOf('/');
+			if (lastSlash != -1) {
+				raw = raw.substring(0, lastSlash);
+			}
+			raw = raw.trim();
+			finish = start + raw.length() - 1; // we use inclusive end, so subtract one!
 			addChildToParent(
-					new JSNumberNode(toSymbol(JSTokenType.NUMBER, literalNode, pool.add(literalNode.toString()))));
+					new JSNumberNode(toSymbol(JSTokenType.NUMBER, start, finish, pool.add(raw))));
 		}
 		else if (literalNode.isNull())
 		{
@@ -164,9 +178,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		else if (literalNode.isString())
 		{
 			// Peek at offset before literal to sniff the single/double quotes
-			int start = literalNode.getStart() - 1;
-			int finish = start + literalNode.getFinish() + 1;
-			String value = literalNode.getString();
+			int start = literalNode.getStart() - 1; // go back one char to include open quote!
+			int finish = literalNode.getFinish(); // graal uses exclusive end, so offset is already one past string value (i.e. includes quote)
+			String value = literalNode.getString(); // This is the raw value without the quotes
 			char c = source.charAt(start);
 			value = c + value + c;
 			addChildToParent(new JSStringNode(toSymbol(JSTokenType.STRING, start, finish, pool.add(value))));
@@ -184,11 +198,14 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		}
 		else if (literalNode.isArray())
 		{
-			addToParentAndPushNodeToStack(new JSArrayNode(null, null));
+			int lBracket = findChar('[', literalNode.getStart());
+			int rBracket = findLastChar(']', literalNode.getFinish());
+			addToParentAndPushNodeToStack(new JSArrayNode(toSymbol(JSTokenType.LBRACKET, lBracket),
+					toSymbol(JSTokenType.RBRACKET, rBracket)));
 		}
 		else
 		{
-			addChildToParent(new JSRegexNode(literalNode.toString()));
+			addChildToParent(new JSRegexNode(toSymbol(JSTokenType.REGEX, literalNode, literalNode.toString())));
 		}
 		return super.enterLiteralNode(literalNode);
 	}
@@ -237,7 +254,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		// may be a "generated" return from a single expression arrow function body with no braces!
 		if (returnNode.isTokenType(TokenType.RETURN))
 		{
-			JSNode node = new JSReturnNode();
+			JSNode node = new JSReturnNode(returnNode.getStart(), returnNode.getFinish());
 			node.setSemicolonIncluded(true);
 			addToParentAndPushNodeToStack(node);
 		}
@@ -283,8 +300,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				if (matchingInitializer != null)
 				{
 					TernaryNode tn = (TernaryNode) matchingInitializer.rhs();
-
-					JSDeclarationNode declNode = new JSDeclarationNode(null);
+					// FIXME What are the correct offsets? Where's the =?
+					JSDeclarationNode declNode = new JSDeclarationNode(identNode.getStart(), identNode.getFinish() - 1,
+							null);
 					addToParentAndPushNodeToStack(declNode);
 					addChildToParent(ident);
 					tn.getTrueExpression().accept(this);
@@ -365,6 +383,19 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		return toSymbol(type, ident.getStart(), ident.getFinish() - 1, value);
 	}
 
+	/**
+	 * For single-character symbols (i.e. LPAREN, RPAREN, COLON, SEMICOLON)
+	 * 
+	 * @param type
+	 * @param offset
+	 *            single character offset. Symbols assume inclusive range, so start and end will be the same index here!
+	 * @return
+	 */
+	private Symbol toSymbol(JSTokenType type, int offset)
+	{
+		return toSymbol(type, offset, offset);
+	}
+
 	private Symbol toSymbol(JSTokenType type, int start, int finish)
 	{
 		return toSymbol(type, start, finish, type.getName());
@@ -381,15 +412,18 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		if (!varNode.isFunctionDeclaration() && !(varNode.getInit() instanceof ClassNode))
 		{
 			JSTokenType type = JSTokenType.VAR;
+			int adjustStartOffsetBy = 4; // The start offset points to where the name starts, not the beginning of
+											// var/let/const keyword!
 			if (varNode.isConst())
 			{
 				type = JSTokenType.CONST;
+				adjustStartOffsetBy = 5;
 			}
 			else if (varNode.isLet())
 			{
 				type = JSTokenType.LET;
 			}
-			Symbol var = toSymbol(type, varNode);
+			Symbol var = toSymbol(type, varNode.getStart() - adjustStartOffsetBy, varNode.getFinish() - 1);
 
 			ExportedStatus exportStatus = getExportStatus(varNode.getName());
 			JSNode node = new JSVarNode(var);
@@ -406,7 +440,10 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				node.setSemicolonIncluded(true);
 				addToParentAndPushNodeToStack(node);
 			}
-			addToParentAndPushNodeToStack(new JSDeclarationNode(null));
+			int equalOffset = findChar('=', varNode.getName().getFinish(),
+					varNode.getInit() != null ? varNode.getInit().getStart() : varNode.getFinish());
+			addToParentAndPushNodeToStack(new JSDeclarationNode(varNode.getStart(), varNode.getFinish() - 1,
+					toSymbol(JSTokenType.EQUAL, equalOffset)));
 		}
 		else if (varNode.getInit() instanceof ClassNode)
 		{
@@ -494,22 +531,37 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterFunctionNode(FunctionNode functionNode)
 	{
+		// FIXME: The shape of the AST seems wrong for test1.js
+		// it'd be good to do an AST dump on old parser versus new to see what it is
+		// Because when formatting it appears to expect a "parent node" in the format stack
+		// I think I messed up the relationship between JSVarNode, JSDeclarationNode and JSFunctionNode?
+		// for cases like: var myFunc = function() {};
 		if (!functionNode.isProgram())
 		{
+			IdentNode ident = functionNode.getIdent();
+			Block body = functionNode.getBody();
+			// If anonymous "normal" function, ident points at start of function keyword
+			int funcStart = ident.getStart();
+			int funcEnd = body.getFinish() + 1;
 			JSFunctionNode funcNode;
 			switch (functionNode.getKind())
 			{
 				case ARROW:
-					funcNode = new JSArrowFunctionNode();
+					funcNode = new JSArrowFunctionNode(funcStart, funcEnd);
 					break;
 				case GENERATOR:
-					funcNode = new JSGeneratorFunctionNode();
+					funcNode = new JSGeneratorFunctionNode(funcStart, funcEnd);
 					break;
 				default:
-					funcNode = new JSFunctionNode();
+					if (!functionNode.isAnonymous())
+					{
+						funcStart -= 9; // TODO: if named, ident points at start of name, so we need to subtract 9
+									// ("function ")
+					}
+					funcNode = new JSFunctionNode(funcStart, funcEnd);
 					break;
 			}
-			IdentNode ident = functionNode.getIdent();
+			
 			ExportedStatus exportStatus = getExportStatus(ident);
 			if (exportStatus.isExported)
 			{
@@ -531,7 +583,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				addChildToParent(new JSEmptyNode(toSymbol(ident)));
 			}
 			// Need to explicitly visit the params
-			addToParentAndPushNodeToStack(new JSParametersNode());
+			int lParen = findChar('(', ident.getFinish(), body.getStart());
+			int rParen = findLastChar(')', body.getStart());
+			addToParentAndPushNodeToStack(new JSParametersNode(lParen, rParen));
 			functionNode.visitParameters(this);
 			popNode(); // parameters
 		}
@@ -640,72 +694,83 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		JSNode theNode = null;
 		JSTokenType type;
 		TokenType tokenType = unaryNode.tokenType();
+		int start = unaryNode.getStart();
+		int finish = unaryNode.getFinish() - 1; // Symbol is inclusive range, graal uses exclusive end
 		switch (tokenType)
 		{
 			case NOT:
 				type = JSTokenType.EXCLAMATION;
-				theNode = new JSPreUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				theNode = new JSPreUnaryOperatorNode(start, finish,
+						new Symbol(type.getIndex(), unaryNode.getStart(), unaryNode.getStart() + 1, type.getName()));
 				break;
 			case INCPREFIX:
 				type = JSTokenType.PLUS_PLUS;
-				theNode = new JSPreUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				theNode = new JSPreUnaryOperatorNode(start, finish,
+						new Symbol(type.getIndex(), unaryNode.getStart(), unaryNode.getStart() + 2, type.getName()));
 				break;
 			case DECPREFIX:
 				type = JSTokenType.MINUS_MINUS;
-				theNode = new JSPreUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				theNode = new JSPreUnaryOperatorNode(start, finish,
+						new Symbol(type.getIndex(), unaryNode.getStart(), unaryNode.getStart() + 2, type.getName()));
 				break;
 			case INCPOSTFIX:
 				type = JSTokenType.PLUS_PLUS;
-				theNode = new JSPostUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				theNode = new JSPostUnaryOperatorNode(start, finish,
+						new Symbol(type.getIndex(), unaryNode.getFinish() - 2, unaryNode.getFinish(), type.getName()));
 				break;
 			case DECPOSTFIX:
 				type = JSTokenType.MINUS_MINUS;
-				theNode = new JSPostUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				theNode = new JSPostUnaryOperatorNode(start, finish,
+						new Symbol(type.getIndex(), unaryNode.getFinish() - 2, unaryNode.getFinish(), type.getName()));
 				break;
 			case BIT_NOT:
 				type = JSTokenType.TILDE;
-				theNode = new JSPreUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				theNode = new JSPreUnaryOperatorNode(start, finish,
+						new Symbol(type.getIndex(), unaryNode.getStart(), unaryNode.getStart() + 1, type.getName()));
 				break;
 			// case ELLIPSIS:
 			// break;
 			case DELETE:
 				type = JSTokenType.DELETE;
-				theNode = new JSPreUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				theNode = new JSPreUnaryOperatorNode(start, finish,
+						new Symbol(type.getIndex(), unaryNode.getStart(), unaryNode.getStart() + 6, type.getName()));
 				break;
 			case NEW:
 				type = JSTokenType.NEW;
-				theNode = new JSConstructNode();
+				theNode = new JSConstructNode(start, finish);
 				break;
 			case TYPEOF:
 				type = JSTokenType.TYPEOF;
-				theNode = new JSPreUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				theNode = new JSPreUnaryOperatorNode(start, finish,
+						new Symbol(type.getIndex(), unaryNode.getStart(), unaryNode.getStart() + 6, type.getName()));
 				break;
 			case VOID:
 				type = JSTokenType.VOID;
-				theNode = new JSPreUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				theNode = new JSPreUnaryOperatorNode(start, finish,
+						new Symbol(type.getIndex(), unaryNode.getStart(), unaryNode.getStart() + 4, type.getName()));
 				break;
 			case ADD:
 				type = JSTokenType.PLUS;
-				theNode = new JSPreUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				theNode = new JSPreUnaryOperatorNode(start, finish, toSymbol(type, unaryNode.getStart()));
 				break;
 			case SUB:
 				type = JSTokenType.MINUS;
-				theNode = new JSPreUnaryOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				theNode = new JSPreUnaryOperatorNode(start, finish, toSymbol(type, unaryNode.getStart()));
 				break;
 
 			case YIELD:
 				type = JSTokenType.YIELD;
-				theNode = new JSYieldNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				theNode = new JSYieldNode(start, finish, new Symbol(type.getIndex(), 0, 0, type.getName()));
 				break;
 
 			case SPREAD_ARRAY:
 				type = JSTokenType.DOT_DOT_DOT;
-				theNode = new JSSpreadElementNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				theNode = new JSSpreadElementNode(start, finish, new Symbol(type.getIndex(), 0, 0, type.getName()));
 				break;
 
 			case SPREAD_ARGUMENT:
 				type = JSTokenType.DOT_DOT_DOT;
-				theNode = new JSSpreadElementNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				theNode = new JSSpreadElementNode(start, finish, new Symbol(type.getIndex(), 0, 0, type.getName()));
 				break;
 
 			default:
@@ -744,167 +809,214 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		JSNode theNode;
 		JSTokenType type;
 		TokenType tokenType = binaryNode.tokenType();
+		int start = binaryNode.getStart();
+		int finish = binaryNode.getFinish() - 1; // symbols are inclusive ranges, graal uses exclusive end
+		// FIXME So we should be passing the start/end to the JSNode, but the symbols need to be "searched" for between
+		// lhs end and rhs start!
+		int symbolStart;
 		switch (tokenType)
 		{
 			// JSBinaryBooleanOperatorNode
 			case INSTANCEOF:
 				type = JSTokenType.INSTANCEOF;
-				theNode = new JSBinaryBooleanOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('i', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryBooleanOperatorNode(start, finish, toSymbol(type, symbolStart, symbolStart + 9));
 				break;
 			case IN:
 				type = JSTokenType.IN;
-				theNode = new JSBinaryBooleanOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('i', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryBooleanOperatorNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case EQ:
 				type = JSTokenType.EQUAL_EQUAL;
-				theNode = new JSBinaryBooleanOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('=', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryBooleanOperatorNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case EQ_STRICT:
 				type = JSTokenType.EQUAL_EQUAL_EQUAL;
-				theNode = new JSBinaryBooleanOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('=', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryBooleanOperatorNode(start, finish, toSymbol(type, symbolStart, symbolStart + 2));
 				break;
 			case NE:
 				type = JSTokenType.EXCLAMATION_EQUAL;
-				theNode = new JSBinaryBooleanOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('!', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryBooleanOperatorNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case NE_STRICT:
 				type = JSTokenType.EXCLAMATION_EQUAL_EQUAL;
-				theNode = new JSBinaryBooleanOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('!', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryBooleanOperatorNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case LE:
 				type = JSTokenType.LESS_EQUAL;
-				theNode = new JSBinaryBooleanOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('<', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryBooleanOperatorNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case LT:
 				type = JSTokenType.LESS;
-				theNode = new JSBinaryBooleanOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('<', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryBooleanOperatorNode(start, finish, toSymbol(type, symbolStart));
 				break;
 			case GE:
 				type = JSTokenType.GREATER_EQUAL;
-				theNode = new JSBinaryBooleanOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('>', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryBooleanOperatorNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case GT:
 				type = JSTokenType.GREATER;
-				theNode = new JSBinaryBooleanOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('>', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryBooleanOperatorNode(start, finish, toSymbol(type, symbolStart));
 				break;
 			case AND:
 				type = JSTokenType.AMPERSAND_AMPERSAND;
-				theNode = new JSBinaryBooleanOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('&', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryBooleanOperatorNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case OR:
 				type = JSTokenType.PIPE_PIPE;
-				theNode = new JSBinaryBooleanOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('|', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryBooleanOperatorNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 
 			// JSBinaryArithmeticOperatorNode
 			case ADD:
 				type = JSTokenType.PLUS;
-				theNode = new JSBinaryArithmeticOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('+', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryArithmeticOperatorNode(start, finish, toSymbol(type, symbolStart));
 				break;
 			case SUB:
 				type = JSTokenType.MINUS;
-				theNode = new JSBinaryArithmeticOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('-', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryArithmeticOperatorNode(start, finish, toSymbol(type, symbolStart));
 				break;
 			// shift operators
 			case SHL:
 				type = JSTokenType.LESS_LESS;
-				theNode = new JSBinaryArithmeticOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('<', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryArithmeticOperatorNode(start, finish,
+						toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case SAR:
 				type = JSTokenType.GREATER_GREATER;
-				theNode = new JSBinaryArithmeticOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('>', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryArithmeticOperatorNode(start, finish,
+						toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case SHR:
 				type = JSTokenType.GREATER_GREATER_GREATER;
-				theNode = new JSBinaryArithmeticOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('>', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryArithmeticOperatorNode(start, finish,
+						toSymbol(type, symbolStart, symbolStart + 2));
 				break;
 			case BIT_AND:
 				type = JSTokenType.AMPERSAND;
-				theNode = new JSBinaryArithmeticOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('&', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryArithmeticOperatorNode(start, finish, toSymbol(type, symbolStart));
 				break;
 			case BIT_XOR:
 				type = JSTokenType.CARET;
-				theNode = new JSBinaryArithmeticOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('^', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryArithmeticOperatorNode(start, finish, toSymbol(type, symbolStart));
 				break;
 			case BIT_OR:
 				type = JSTokenType.PIPE;
-				theNode = new JSBinaryArithmeticOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('|', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryArithmeticOperatorNode(start, finish, toSymbol(type, symbolStart));
 				break;
 			case MUL:
 				type = JSTokenType.STAR;
-				theNode = new JSBinaryArithmeticOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('*', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryArithmeticOperatorNode(start, finish, toSymbol(type, symbolStart));
 				break;
 			case DIV:
 				type = JSTokenType.FORWARD_SLASH;
-				theNode = new JSBinaryArithmeticOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('/', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryArithmeticOperatorNode(start, finish, toSymbol(type, symbolStart));
 				break;
 			case MOD:
 				type = JSTokenType.PERCENT;
-				theNode = new JSBinaryArithmeticOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('%', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryArithmeticOperatorNode(start, finish, toSymbol(type, symbolStart));
 				break;
 			case EXP:
 				type = JSTokenType.STAR_STAR;
-				theNode = new JSBinaryArithmeticOperatorNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('*', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSBinaryArithmeticOperatorNode(start, finish,
+						toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 
 			// Assignment
 			case ASSIGN:
 				type = JSTokenType.EQUAL;
-				theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('=', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSAssignmentNode(start, finish, toSymbol(type, symbolStart));
 				break;
 			case ASSIGN_BIT_AND:
 				type = JSTokenType.AMPERSAND_EQUAL;
-				theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('&', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSAssignmentNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case ASSIGN_ADD:
 				type = JSTokenType.PLUS_EQUAL;
-				theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('+', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSAssignmentNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case ASSIGN_SHR:
 				type = JSTokenType.GREATER_GREATER_GREATER_EQUAL;
-				theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('>', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSAssignmentNode(start, finish, toSymbol(type, symbolStart, symbolStart + 3));
 				break;
 			case ASSIGN_BIT_OR:
 				type = JSTokenType.PIPE_EQUAL;
-				theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('|', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSAssignmentNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case ASSIGN_BIT_XOR:
 				type = JSTokenType.CARET_EQUAL;
-				theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('^', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSAssignmentNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case ASSIGN_DIV:
 				type = JSTokenType.FORWARD_SLASH_EQUAL;
-				theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('/', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSAssignmentNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case ASSIGN_MOD:
 				type = JSTokenType.PERCENT_EQUAL;
-				theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('%', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSAssignmentNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case ASSIGN_MUL:
 				type = JSTokenType.STAR_EQUAL;
-				theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('*', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSAssignmentNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case ASSIGN_SHL:
 				type = JSTokenType.LESS_LESS_EQUAL;
-				theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('<', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSAssignmentNode(start, finish, toSymbol(type, symbolStart, symbolStart + 2));
 				break;
 			case ASSIGN_SAR:
 				type = JSTokenType.GREATER_GREATER_EQUAL;
-				theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('>', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSAssignmentNode(start, finish, toSymbol(type, symbolStart, symbolStart + 2));
 				break;
 			case ASSIGN_SUB:
 				type = JSTokenType.MINUS_EQUAL;
-				theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('-', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSAssignmentNode(start, finish, toSymbol(type, symbolStart, symbolStart + 1));
 				break;
 			case ASSIGN_EXP:
 				type = JSTokenType.STAR_STAR_EQUAL;
-				theNode = new JSAssignmentNode(new Symbol(type.getIndex(), 0, 0, type.getName()));
+				symbolStart = findChar('*', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSAssignmentNode(start, finish, toSymbol(type, symbolStart, symbolStart + 2));
 				break;
 
 			// comma...
 			case COMMARIGHT:
 				type = JSTokenType.COMMA;
-				theNode = new JSCommaNode();
+				symbolStart = findChar(',', binaryNode.lhs().getFinish(), binaryNode.rhs().getStart());
+				theNode = new JSCommaNode(start, finish, toSymbol(type, symbolStart));
 				break;
 			default:
 				throw new IllegalStateException("Reached unhandled binary node type! " + binaryNode);
@@ -917,7 +1029,25 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		boolean lhsNeedsParens = lhs != null && tokenType.needsParens(lhs.tokenType(), true);
 		if (lhsNeedsParens)
 		{
-			addToParentAndPushNodeToStack(new JSGroupNode(null, null));
+			// Hack this, it looks liek only place we aks for left/right parens here is in formatter as offsets to place
+			// them
+			int lParen = lhs.getStart();
+			int rParen = lhs.getFinish() - 1;
+			// Parens not included in binaryNode's position! We need to search backwards from start!
+			// int lParen = findLastChar('(', binaryNode.getStart());
+			// int rParen = findChar(')', lhs.getFinish(), binaryNode.getAssignmentSource().getStart());
+			// FIXME, the AST is telling us we should inject parens to group, but there may be no parens in the actual
+			// source!
+			// if (lParen == -1)
+			// {
+			// throw new IllegalStateException("Unable to find left paren");
+			// }
+			// if (rParen == -1)
+			// {
+			// throw new IllegalStateException("Unable to find right paren");
+			// }
+			addToParentAndPushNodeToStack(
+					new JSGroupNode(toSymbol(JSTokenType.LPAREN, lParen), toSymbol(JSTokenType.RPAREN, rParen)));
 		}
 		return super.enterBinaryNode(binaryNode);
 	}
@@ -928,8 +1058,10 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		TokenType tokenType = binaryNode.tokenType();
 
 		Expression lhs = binaryNode.lhs();
-		boolean lhsNeedsParens = lhs != null && tokenType.needsParens(lhs.tokenType(), true);
-		boolean rhsNeedsParens = tokenType.needsParens(binaryNode.rhs().tokenType(), false);
+		boolean lhsNeedsParens = lhs != null && tokenType.needsParens(lhs.tokenType(), true); // incorrect?
+		// boolean lhsNeedsParens = lhs != null && lhs.tokenType().needsParens(tokenType, true);
+		boolean rhsNeedsParens = tokenType.needsParens(binaryNode.rhs().tokenType(), false); // incorrect?
+		// boolean rhsNeedsParens = binaryNode.rhs().tokenType().needsParens(tokenType, false);
 		JSNode parentNode = (JSNode) getCurrentNode();
 		JSNode lastChild = (JSNode) parentNode.getLastChild();
 		if (lhsNeedsParens || rhsNeedsParens)
@@ -950,9 +1082,25 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		if (rhsNeedsParens)
 		{
 			// to new group node for RHS parens
-			addToParentAndPushNodeToStack(new JSGroupNode(null, null));
+			// int lParen = findChar('(', lhs.getFinish(), binaryNode.rhs().getStart());
+			// if (lParen == -1)
+			// {
+			// addChildToParent(lastChild);
+			// // FIXME We may be told we *need* to put this in parens, but it may not actually have any!
+			//// throw new IllegalStateException("Unable to find left paren");
+			// } else {
+			// int rParen = findChar(')', binaryNode.rhs().getFinish()); // right paren not included in positions..
+			// if (rParen == -1)
+			// {
+			// throw new IllegalStateException("Unable to find right paren");
+			// }
+			int lParen = binaryNode.rhs().getStart();
+			int rParen = binaryNode.rhs().getFinish() - 1;
+			addToParentAndPushNodeToStack(
+					new JSGroupNode(toSymbol(JSTokenType.LPAREN, lParen), toSymbol(JSTokenType.RPAREN, rParen)));
 			addChildToParent(lastChild);
 			popNode(); // pop RHS parens node, current node is operator again
+			// }
 		}
 		else if (lhsNeedsParens)
 		{
@@ -968,14 +1116,26 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	public Node leaveExpressionStatement(ExpressionStatement expressionStatement)
 	{
 		JSNode node = (JSNode) getLastNode();
-		node.setSemicolonIncluded(true);
+		if (node != null)
+		{
+			node.setSemicolonIncluded(true);
+		}
+		else
+		{
+			// There may have been an error!
+			// throw new IllegalStateException("Ended an expression with no last statement/child within parent node!");
+		}
 		return super.leaveExpressionStatement(expressionStatement);
 	}
 
 	@Override
 	public boolean enterObjectNode(ObjectNode objectNode)
 	{
-		addToParentAndPushNodeToStack(new JSObjectNode(null, null));
+		// lBrace, rBrace
+		int lBrace = objectNode.getStart();
+		int rBrace = objectNode.getFinish() - 1;
+		addToParentAndPushNodeToStack(
+				new JSObjectNode(toSymbol(JSTokenType.LCURLY, lBrace), toSymbol(JSTokenType.RCURLY, rBrace)));
 		return super.enterObjectNode(objectNode);
 	}
 
@@ -997,16 +1157,24 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			super.enterBlock(block); // print our current node
 			// don't create a statements node. We basically need to ignore until last BlockStatement and go into that
 			block.getLastStatement().accept(this);
-			return false; // don't go into this fake node. We already manaully went into the real function body
+			return false; // don't go into this fake node. We already manually went into the real function body
 		}
 		else if (!block.isSynthetic())
 		{
-			addToParentAndPushNodeToStack(new JSStatementsNode());
+			int lBrace = findChar('{', block.getStart());
+			// This gives a bogus end position for empty block in a function definition for me (test95.js)
+			int rBrace = block.getFinish() - 1;
+			// if we can, search for closing brace backwards from end of parent node?
+			IParseNode parent = getCurrentNode();
+			if (parent != null) {
+				rBrace = findLastChar('}', parent.getEndingOffset());
+			}
+			addToParentAndPushNodeToStack(new JSStatementsNode(lBrace, rBrace));
 		}
 		else if (block.getLastStatement() instanceof ForNode)
 		{
 			// Handle synthetic block that holds var/let/const declarations in for loops
-			addToParentAndPushNodeToStack(new JSStatementsNode());
+			addToParentAndPushNodeToStack(new JSStatementsNode(block.getStart(), block.getFinish() - 1));
 		}
 		return super.enterBlock(block);
 	}
@@ -1040,7 +1208,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			{
 				JSNode combinedVarDecls = combineVarDeclarations(statements.getStartingOffset(),
 						statements.getChildren());
-				forNode.replaceChild(0, combinedVarDecls);
+				((JSAbstractForNode) forNode).replaceInit(combinedVarDecls);
+				// TODO Fix the positions of the lParen, semicolon1!
 			}
 
 			// remove statements from it's original parent
@@ -1090,7 +1259,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			heritage.accept(this);
 		}
 		// then wrap body in a statements node
-		addToParentAndPushNodeToStack(new JSStatementsNode());
+		// FIXME: Fix offset. Presumably they should be after heritage?
+		addToParentAndPushNodeToStack(new JSStatementsNode(classNode.getStart(), classNode.getFinish() - 1));
 		// manually walk constructor
 		PropertyNode constructorNode = classNode.getConstructor();
 		if (constructorNode != null)
@@ -1159,21 +1329,78 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterForNode(ForNode forNode)
 	{
-		JSNode blah;
+		JSAbstractForNode blah;
+		Expression init = forNode.getInit();
+		// When finding left paren we want to start after 'for' keyword, and end... at body start (at worst)
+		int lParen = findChar('(', forNode.getStart() + 3,
+				init != null ? init.getStart() : forNode.getBody().getStart());
+		// when finding right paren we want to try from: modify.getFinish() or if null, test.getFinish(), or if null,
+		// init.getFinish(), or if null, lParen + 1
+		JoinPredecessorExpression modify = forNode.getModify();
+		int rParenStart = lParen + 1;
+		if (modify != null)
+		{
+			rParenStart = modify.getFinish();
+		}
+		else if (forNode.getTest() != null)
+		{
+			rParenStart = forNode.getTest().getFinish();
+		}
+		else if (init != null)
+		{
+			rParenStart = init.getFinish();
+		}
+		int rParen = findChar(')', rParenStart, forNode.getBody().getStart());
+
+		if (lParen == -1)
+		{
+			throw new IllegalStateException("Bad left paren index!");
+		}
+		if (rParen == -1)
+		{
+			throw new IllegalStateException("Bad left paren index!");
+		}
+
 		if (forNode.isForIn())
 		{
-			blah = new JSForInNode(null, null, null);
+			// TODO: Create new variant of findChar that searches for strings like "in" here
+			int in = findChar('i', init.getFinish(), modify.getStart());
+			blah = new JSForInNode(forNode.getStart(), forNode.getFinish() - 1, toSymbol(JSTokenType.LPAREN, lParen),
+					toSymbol(JSTokenType.IN, in, in + 2), toSymbol(JSTokenType.RPAREN, rParen));
 		}
 		else if (forNode.isForOf())
 		{
-			blah = new JSForOfNode(null, null);
+			blah = new JSForOfNode(forNode.getStart(), forNode.getFinish() - 1, toSymbol(JSTokenType.LPAREN, lParen),
+					toSymbol(JSTokenType.RPAREN, rParen));
 		}
 		else
 		{
-			blah = new JSForNode(null, null, null, null);
+			// Handle ugly cases where modify/test/init may be null!
+			int semi1End = forNode.getBody().getStart(); // worst case scenario
+			if (forNode.getTest() != null)
+			{
+				semi1End = forNode.getTest().getStart();
+			}
+			int semi1 = findChar(';', init != null ? init.getFinish() : lParen + 1, semi1End);
+
+			int semi2Start = semi1 + 1; // worst case scenario
+			if (forNode.getTest() != null)
+			{
+				semi2Start = forNode.getTest().getFinish();
+			}
+			int semi2End = forNode.getBody().getStart(); // worst case scenario
+			if (modify != null)
+			{
+				semi2End = modify.getStart();
+			}
+
+			int semi2 = findChar(';', semi2Start, semi2End);
+			blah = new JSForNode(forNode.getStart(), forNode.getFinish() - 1, toSymbol(JSTokenType.LPAREN, lParen),
+					toSymbol(JSTokenType.SEMICOLON, semi1), toSymbol(JSTokenType.SEMICOLON, semi2),
+					toSymbol(JSTokenType.RPAREN, rParen));
 		}
 		addToParentAndPushNodeToStack(blah);
-		if (forNode.getInit() == null)
+		if (init == null)
 		{
 			// if current parent
 			addChildToParent(new JSEmptyNode(forNode.getStart()));
@@ -1194,7 +1421,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			// if the body is empty, we need to add an empty JSStatementsNode as body!
 			if (forNode.getBody().getStatementCount() == 0)
 			{
-				theNode.addChild(new JSStatementsNode());
+				theNode.addChild(new JSStatementsNode(forNode.getBody().getStart(), forNode.getBody().getFinish() - 1));
 			}
 
 			// we may have added the 4th child now...
@@ -1231,7 +1458,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				}
 				else
 				{
-					throw new IllegalStateException("Failed to set second and thrid children on for loop node!");
+					throw new IllegalStateException("Failed to set second and third children on for loop node!");
 				}
 				((JSNode) theNode).setChildren(newChildren);
 			}
@@ -1246,22 +1473,24 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		if (propertyNode.getGetter() != null)
 		{
-			addToParentAndPushNodeToStack(new JSGetterNode());
+			addToParentAndPushNodeToStack(new JSGetterNode(propertyNode.getStart(), propertyNode.getFinish() - 1));
 		}
 		else if (propertyNode.getSetter() != null)
 		{
-			addToParentAndPushNodeToStack(new JSSetterNode());
+			addToParentAndPushNodeToStack(new JSSetterNode(propertyNode.getStart(), propertyNode.getFinish() - 1));
 		}
 		else if (propertyNode.getValue() instanceof FunctionNode)
 		{
-			addToParentAndPushNodeToStack(new JSNameValuePairNode());
+			addToParentAndPushNodeToStack(
+					new JSNameValuePairNode(propertyNode.getStart(), propertyNode.getFinish() - 1));
 		}
 		else
 		{
 			Expression key = propertyNode.getKey();
-			int offset = key.getFinish() + 2;
-			Symbol colon = toSymbol(JSTokenType.COLON, offset, offset + 1);
-			addToParentAndPushNodeToStack(new JSNameValuePairNode(colon));
+			int colonOffset = findChar(':', key.getFinish(), propertyNode.getValue().getStart());
+			Symbol colon = toSymbol(JSTokenType.COLON, colonOffset);
+			addToParentAndPushNodeToStack(
+					new JSNameValuePairNode(propertyNode.getStart(), propertyNode.getFinish() - 1, colon));
 			// if the property name is computed, manually traverse
 			if (!(key instanceof LiteralNode) && !(key instanceof IdentNode))
 			{
@@ -1318,12 +1547,12 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterTryNode(TryNode tryNode)
 	{
-		addToParentAndPushNodeToStack(new JSTryNode());
+		addToParentAndPushNodeToStack(new JSTryNode(tryNode.getStart(), tryNode.getFinish() - 1));
 		// if finally block is empty, push empty node for it. We rely on the fact that finally block would typically be
 		// first visited child here. see leave for more
 		if (tryNode.getFinallyBody() == null)
 		{
-			addChildToParent(new JSEmptyNode(tryNode.getBody().getFinish()));
+			addChildToParent(new JSEmptyNode(tryNode.getBody().getFinish() - 1));
 		}
 		return super.enterTryNode(tryNode);
 	}
@@ -1334,7 +1563,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		// Add empty catch
 		if (tryNode.getCatches().isEmpty())
 		{
-			addChildToParent(new JSEmptyNode(tryNode.getBody().getFinish()));
+			addChildToParent(new JSEmptyNode(tryNode.getBody().getFinish() - 1));
 		}
 
 		// Fix the ordering of the children!
@@ -1363,7 +1592,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterCatchNode(CatchNode catchNode)
 	{
-		addToParentAndPushNodeToStack(new JSCatchNode());
+		addToParentAndPushNodeToStack(new JSCatchNode(catchNode.getStart(), catchNode.getFinish() - 1));
 		return super.enterCatchNode(catchNode);
 	}
 
@@ -1377,7 +1606,15 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterSwitchNode(SwitchNode switchNode)
 	{
-		addToParentAndPushNodeToStack(new JSSwitchNode(null, null, null, null));
+		// lParen, rParen, lBrace, rBrace
+		// FIXME Use findChar to get more accurate positions!
+		int lParen = switchNode.getExpression().getStart() - 1;
+		int rParen = switchNode.getExpression().getFinish();
+		int lBrace = rParen + 2; // generate fake position for left brace. I don't think we can do any better than this!
+		int rBrace = switchNode.getFinish();
+		addToParentAndPushNodeToStack(new JSSwitchNode(switchNode.getStart(), switchNode.getFinish() - 1,
+				toSymbol(JSTokenType.LPAREN, lParen), toSymbol(JSTokenType.RPAREN, rParen),
+				toSymbol(JSTokenType.LCURLY, lBrace), toSymbol(JSTokenType.RCURLY, rBrace)));
 		return super.enterSwitchNode(switchNode);
 	}
 
@@ -1392,14 +1629,14 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	public boolean enterCaseNode(CaseNode caseNode)
 	{
 		int offset = caseNode.getFinish() + 1;
-		Symbol colon = toSymbol(JSTokenType.COLON, offset, offset + 1);
+		Symbol colon = toSymbol(JSTokenType.COLON, offset);
 		if (caseNode.getTest() != null)
 		{
-			addToParentAndPushNodeToStack(new JSCaseNode(colon));
+			addToParentAndPushNodeToStack(new JSCaseNode(caseNode.getStart(), caseNode.getFinish() - 1, colon));
 		}
 		else
 		{
-			addToParentAndPushNodeToStack(new JSDefaultNode(colon));
+			addToParentAndPushNodeToStack(new JSDefaultNode(caseNode.getStart(), caseNode.getFinish() - 1, colon));
 		}
 		return super.enterCaseNode(caseNode);
 	}
@@ -1414,13 +1651,20 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterWhileNode(WhileNode whileNode)
 	{
+		int start = whileNode.getTest().getStart();
+		int end = whileNode.getTest().getFinish() + 1;
+		Symbol leftParen = toSymbol(JSTokenType.LPAREN, start);
+		Symbol rightParen = toSymbol(JSTokenType.RPAREN, end);
 		if (whileNode.isDoWhile())
 		{
-			addToParentAndPushNodeToStack(new JSDoNode(null, null));
+			addToParentAndPushNodeToStack(
+					new JSDoNode(whileNode.getStart(), whileNode.getFinish() - 1, leftParen, rightParen));
 		}
 		else
 		{
-			addToParentAndPushNodeToStack(new JSWhileNode(null, null));
+
+			addToParentAndPushNodeToStack(
+					new JSWhileNode(whileNode.getStart(), whileNode.getFinish() - 1, leftParen, rightParen));
 		}
 		return super.enterWhileNode(whileNode);
 	}
@@ -1441,11 +1685,12 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		{
 			int start = breakNode.getFinish() + 2;
 			int finish = start + labelName.length();
-			bn = new JSBreakNode(toSymbol(JSTokenType.IDENTIFIER, start, finish));
+			bn = new JSBreakNode(breakNode.getStart(), breakNode.getFinish() - 1,
+					toSymbol(JSTokenType.IDENTIFIER, start, finish));
 		}
 		else
 		{
-			bn = new JSBreakNode();
+			bn = new JSBreakNode(breakNode.getStart(), breakNode.getFinish() - 1);
 		}
 		bn.setSemicolonIncluded(true);
 		addToParentAndPushNodeToStack(bn);
@@ -1462,9 +1707,11 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterCallNode(CallNode callNode)
 	{
-		addToParentAndPushNodeToStack(new JSInvokeNode());
+		addToParentAndPushNodeToStack(new JSInvokeNode(callNode.getStart(), callNode.getFinish() - 1));
 		// We need to visit the expression first, then push the arguments node...
-		pushOnLeave.put(callNode.getFunction(), new JSArgumentsNode());
+		int lParen = findChar('(', callNode.getFunction().getFinish(), callNode.getFinish()); // FIXME: prefer start of first arg as last index to search!
+		int rParen = findLastChar(')', callNode.getFinish());
+		pushOnLeave.put(callNode.getFunction(), new JSArgumentsNode(lParen, rParen));
 		return super.enterCallNode(callNode);
 	}
 
@@ -1491,7 +1738,11 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterIfNode(IfNode ifNode)
 	{
-		addToParentAndPushNodeToStack(new JSIfNode(null, null));
+		// lParen, rParen
+		int lParen = findChar('(', ifNode.getStart() + 2, ifNode.getTest().getStart());
+		int rParen = findChar(')', ifNode.getTest().getFinish(), ifNode.getPass().getStart());
+		addToParentAndPushNodeToStack(new JSIfNode(ifNode.getStart(), ifNode.getFinish() - 1,
+				toSymbol(JSTokenType.LPAREN, lParen), toSymbol(JSTokenType.RPAREN, rParen)));
 		return super.enterIfNode(ifNode);
 	}
 
@@ -1512,7 +1763,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterAccessNode(AccessNode accessNode)
 	{
-		addToParentAndPushNodeToStack(new JSGetPropertyNode(null));
+		addToParentAndPushNodeToStack(new JSGetPropertyNode(accessNode.getStart(), accessNode.getFinish() - 1,
+				toSymbol(JSTokenType.DOT, accessNode.getBase().getFinish())));
 		return super.enterAccessNode(accessNode);
 	}
 
@@ -1531,7 +1783,11 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterIndexNode(IndexNode indexNode)
 	{
-		addToParentAndPushNodeToStack(new JSGetElementNode(null, null));
+		// FIXME Use findChar to get more accurate positions!
+		int leftBracket = indexNode.getBase().getFinish();
+		int rightBracket = indexNode.getFinish() - 1;
+		addToParentAndPushNodeToStack(new JSGetElementNode(indexNode.getStart(), indexNode.getFinish() - 1,
+				toSymbol(JSTokenType.LBRACKET, leftBracket), toSymbol(JSTokenType.RBRACKET, rightBracket)));
 		return super.enterIndexNode(indexNode);
 	}
 
@@ -1545,8 +1801,53 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterTernaryNode(TernaryNode ternaryNode)
 	{
-		addToParentAndPushNodeToStack(new JSConditionalNode(null, null));
+		// colon is between these two...
+		int possibleColonStart = ternaryNode.getTrueExpression().getFinish(); // inclusive
+		int possibleColonEnd = ternaryNode.getFalseExpression().getStart(); // not inclusive
+		int colon = findChar(':', possibleColonStart, possibleColonEnd);
+
+		// question is between these two
+		int possibleQuestionStart = ternaryNode.getTest().getFinish(); // inclusive
+		int possibleQuestionEnd = ternaryNode.getTrueExpression().getStart(); // not inclusive
+		int question = findChar('?', possibleQuestionStart, possibleQuestionEnd);
+
+		addToParentAndPushNodeToStack(new JSConditionalNode(ternaryNode.getStart(), ternaryNode.getFinish() - 1,
+				toSymbol(JSTokenType.QUESTION, question), toSymbol(JSTokenType.COLON, colon)));
 		return super.enterTernaryNode(ternaryNode);
+	}
+
+	/**
+	 * Searches the source code for a specific characters index in a range. Returns -1 if not found. Returns the
+	 * absolute index if found.
+	 * 
+	 * @param c
+	 *            character to find
+	 * @param startInclusive
+	 *            start index
+	 * @param endNonInclusive
+	 *            end index (non-inclusive, we look up to the position, but not at this position)
+	 * @return
+	 */
+	private int findChar(char c, int startInclusive, int endNonInclusive)
+	{
+		// FIXME Be smarter about possible comments! If we're inside a comment, don't return the position, ignore and
+		// move on!
+		int index = source.substring(startInclusive, endNonInclusive).indexOf(c);
+		if (index == -1)
+		{
+			return -1;
+		}
+		return index + startInclusive;
+	}
+
+	private int findChar(char c, int from)
+	{
+		return source.indexOf(c, from);
+	}
+
+	private int findLastChar(char c, int from)
+	{
+		return source.lastIndexOf(c, from);
 	}
 
 	@Override
@@ -1559,13 +1860,14 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterContinueNode(ContinueNode continueNode)
 	{
-		JSContinueNode cn = new JSContinueNode();
+		JSContinueNode cn = new JSContinueNode(continueNode.getStart(), continueNode.getFinish() - 1);
 		String label = continueNode.getLabelName();
 		if (label != null)
 		{
 			int start = continueNode.getFinish();
 			int finish = start + label.length();
-			cn = new JSContinueNode(toSymbol(JSTokenType.IDENTIFIER, start, finish, label));
+			cn = new JSContinueNode(continueNode.getStart(), continueNode.getFinish() - 1,
+					toSymbol(JSTokenType.IDENTIFIER, start, finish, label));
 		}
 		cn.setSemicolonIncluded(true);
 		addToParentAndPushNodeToStack(cn);
@@ -1582,7 +1884,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterThrowNode(ThrowNode throwNode)
 	{
-		JSNode tn = new JSThrowNode();
+		JSNode tn = new JSThrowNode(throwNode.getStart(), throwNode.getFinish() - 1);
 		tn.setSemicolonIncluded(true);
 		addToParentAndPushNodeToStack(tn);
 		return super.enterThrowNode(throwNode);
@@ -1598,6 +1900,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterLabelNode(LabelNode labelNode)
 	{
+		// TODO: Find colon!
 		addToParentAndPushNodeToStack(
 				new JSLabelledNode(new JSIdentifierNode(identifierSymbol(labelNode, labelNode.getLabelName())), null));
 		return super.enterLabelNode(labelNode);
@@ -1620,7 +1923,12 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterWithNode(WithNode withNode)
 	{
-		addToParentAndPushNodeToStack(new JSWithNode(null, null));
+		// lParen, rParen
+		// FIXME Use findChar to get more accurate positions!
+		int lParen = withNode.getExpression().getStart() - 1;
+		int rParen = withNode.getExpression().getFinish();
+		addToParentAndPushNodeToStack(new JSWithNode(withNode.getStart(), withNode.getFinish() - 1,
+				toSymbol(JSTokenType.LPAREN, lParen), toSymbol(JSTokenType.RPAREN, rParen)));
 		return super.enterWithNode(withNode);
 	}
 

@@ -5,9 +5,9 @@ import com.aptana.parsing.ast.IParseNode;
 public class JSArrowFunctionNode extends JSFunctionNode
 {
 
-	public JSArrowFunctionNode()
+	public JSArrowFunctionNode(int start, int end)
 	{
-		super();
+		super(start, end);
 		setNodeType(IJSNodeTypes.ARROW_FUNCTION);
 	}
 

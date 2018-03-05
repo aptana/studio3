@@ -58,6 +58,9 @@ public class CSSFunctionNode extends CSSExpressionNode
 	 */
 	public CSSExpressionNode getExpression()
 	{
+		if (getChildCount() <= 0) {
+			return null;
+		}
 		return (CSSExpressionNode) getChild(0);
 	}
 

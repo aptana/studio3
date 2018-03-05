@@ -18,9 +18,9 @@ public class JSBinaryBooleanOperatorNode extends JSBinaryOperatorNode
 	 * 
 	 * @param operator
 	 */
-	public JSBinaryBooleanOperatorNode(Symbol operator)
+	public JSBinaryBooleanOperatorNode(int start, int end, Symbol operator)
 	{
-		super(operator);
+		super(start, end, operator);
 
 		JSTokenType token = JSTokenType.get((String) operator.value);
 		short type;
@@ -83,13 +83,6 @@ public class JSBinaryBooleanOperatorNode extends JSBinaryOperatorNode
 		}
 
 		this.setNodeType(type);
-	}
-
-	public JSBinaryBooleanOperatorNode(JSNode left, Symbol operator, JSNode right)
-	{
-		this(operator);
-		this.setLocation(left.getStart(), right.getEnd());
-		this.setChildren(new JSNode[] { left, right });
 	}
 
 	/*

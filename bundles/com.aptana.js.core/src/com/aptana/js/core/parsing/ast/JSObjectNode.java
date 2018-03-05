@@ -27,6 +27,7 @@ public class JSObjectNode extends JSNode
 
 		this._leftBrace = leftBrace;
 		this._rightBrace = rightBrace;
+		this.setLocation(leftBrace.getStart(), rightBrace.getEnd());
 	}
 
 	/*

@@ -17,18 +17,6 @@ public class JSPreUnaryOperatorNode extends JSNode
 	private Symbol _operator;
 
 	/**
-	 * JSUnaryOperatorNode
-	 * 
-	 * @param type
-	 * @param expression
-	 */
-	protected JSPreUnaryOperatorNode(short type, JSNode expression)
-	{
-		this(type);
-		this.setChildren(new JSNode[] { expression });
-	}
-
-	/**
 	 * Used by ANTLR AST
 	 * 
 	 * @param operator
@@ -41,12 +29,15 @@ public class JSPreUnaryOperatorNode extends JSNode
 	/**
 	 * Used by ANTLR AST
 	 * 
+	 * @param start
+	 * @param end
 	 * @param operator
 	 */
-	public JSPreUnaryOperatorNode(Symbol operator)
+	public JSPreUnaryOperatorNode(int start, int end, Symbol operator)
 	{
 		super();
 		this._operator = operator;
+		this.setLocation(start, end);
 		short type;
 		JSTokenType token = JSTokenType.get((String) operator.value);
 
@@ -95,18 +86,6 @@ public class JSPreUnaryOperatorNode extends JSNode
 		setNodeType(type);
 	}
 
-	/**
-	 * JSUnaryOperatorNode
-	 * 
-	 * @param operator
-	 * @param expression
-	 */
-	public JSPreUnaryOperatorNode(Symbol operator, JSNode expression)
-	{
-		this(operator);
-		this.setChildren(new JSNode[] { expression });
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
@@ -124,7 +103,11 @@ public class JSPreUnaryOperatorNode extends JSNode
 	 */
 	public IParseNode getExpression()
 	{
-		return this.getChild(0);
+		if (getChildCount() > 0)
+		{
+			return this.getChild(0);
+		}
+		return null;
 	}
 
 	/**

@@ -29,6 +29,7 @@ public class JSRegexNode extends JSPrimitiveNode
 	public JSRegexNode(Symbol identifier)
 	{
 		this((String) identifier.value);
+		this.setLocation(identifier.getStart(), identifier.getEnd());
 	}
 
 	/*

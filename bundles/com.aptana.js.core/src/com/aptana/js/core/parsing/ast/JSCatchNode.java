@@ -13,12 +13,11 @@ public class JSCatchNode extends JSNode
 {
 	/**
 	 * JSCatchNode
-	 * 
-	 * @param children
 	 */
-	public JSCatchNode(JSNode... children)
+	public JSCatchNode(int start, int end)
 	{
-		super(IJSNodeTypes.CATCH, children);
+		super(IJSNodeTypes.CATCH);
+		this.setLocation(start, end);
 	}
 
 	/*

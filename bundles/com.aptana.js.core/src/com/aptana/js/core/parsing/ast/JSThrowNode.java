@@ -9,22 +9,14 @@ package com.aptana.js.core.parsing.ast;
 
 public class JSThrowNode extends JSPreUnaryOperatorNode
 {
-	/**
-	 * JSThrowNode
-	 * 
-	 * @param expression
-	 */
-	public JSThrowNode(JSNode expression)
-	{
-		super(IJSNodeTypes.THROW, expression);
-	}
 
 	/**
 	 * USed by ANTLR AST
 	 */
-	public JSThrowNode()
+	public JSThrowNode(int start, int end)
 	{
 		super(IJSNodeTypes.THROW);
+		this.setLocation(start, end);
 	}
 
 	/*

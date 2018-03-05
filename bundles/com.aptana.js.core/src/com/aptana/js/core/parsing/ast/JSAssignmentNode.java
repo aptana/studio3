@@ -7,10 +7,10 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.js.core.parsing.JSTokenType;
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSAssignmentNode extends JSNode
 {
@@ -21,9 +21,10 @@ public class JSAssignmentNode extends JSNode
 	 * 
 	 * @param assignOperator
 	 */
-	public JSAssignmentNode(Symbol assignOperator)
+	public JSAssignmentNode(int start, int end, Symbol assignOperator)
 	{
 		this._operator = assignOperator;
+		this.setLocation(start, end);
 
 		short type = DEFAULT_TYPE;
 		JSTokenType token = JSTokenType.get((String) assignOperator.value);
@@ -72,12 +73,7 @@ public class JSAssignmentNode extends JSNode
 		}
 
 		this.setNodeType(type);
-	}
-	
-	public JSAssignmentNode(JSNode left, Symbol assignOperator, JSNode right)
-	{
-		this(assignOperator);
-		this.setChildren(new JSNode[] { left, right });
+		this.setLocation(assignOperator.getStart(), assignOperator.getEnd());
 	}
 
 	/*
