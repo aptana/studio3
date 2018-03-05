@@ -157,19 +157,20 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		if (literalNode.isNumeric())
 		{
 			// If there's a trailing comment, the end location may be off by length of comment!
-			// do start position + length of raw value? That could be wrong because they convert numbers based on hex/octal/decimal/whatever!
+			// do start position + length of raw value? That could be wrong because they convert numbers based on
+			// hex/octal/decimal/whatever!
 			// So... maybe look for first whitespace or '/' and cut off before that?
 			int start = literalNode.getStart();
 			int finish = literalNode.getFinish();
 			String raw = this.source.substring(start, finish);
 			int lastSlash = raw.indexOf('/');
-			if (lastSlash != -1) {
+			if (lastSlash != -1)
+			{
 				raw = raw.substring(0, lastSlash);
 			}
 			raw = raw.trim();
 			finish = start + raw.length() - 1; // we use inclusive end, so subtract one!
-			addChildToParent(
-					new JSNumberNode(toSymbol(JSTokenType.NUMBER, start, finish, pool.add(raw))));
+			addChildToParent(new JSNumberNode(toSymbol(JSTokenType.NUMBER, start, finish, pool.add(raw))));
 		}
 		else if (literalNode.isNull())
 		{
@@ -179,7 +180,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		{
 			// Peek at offset before literal to sniff the single/double quotes
 			int start = literalNode.getStart() - 1; // go back one char to include open quote!
-			int finish = literalNode.getFinish(); // graal uses exclusive end, so offset is already one past string value (i.e. includes quote)
+			int finish = literalNode.getFinish(); // graal uses exclusive end, so offset is already one past string
+													// value (i.e. includes quote)
 			String value = literalNode.getString(); // This is the raw value without the quotes
 			char c = source.charAt(start);
 			value = c + value + c;
@@ -542,7 +544,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			Block body = functionNode.getBody();
 			// If anonymous "normal" function, ident points at start of function keyword
 			int funcStart = ident.getStart();
-			int funcEnd = body.getFinish() + 1;
+			int funcEnd = body.getFinish() + 1; // FIXME This is wrong! Look for closing brace explicitly?
+			// Arrow functions don't require braces, but normal do!
 			JSFunctionNode funcNode;
 			switch (functionNode.getKind())
 			{
@@ -556,12 +559,12 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 					if (!functionNode.isAnonymous())
 					{
 						funcStart -= 9; // TODO: if named, ident points at start of name, so we need to subtract 9
-									// ("function ")
+						// ("function ")
 					}
 					funcNode = new JSFunctionNode(funcStart, funcEnd);
 					break;
 			}
-			
+
 			ExportedStatus exportStatus = getExportStatus(ident);
 			if (exportStatus.isExported)
 			{
@@ -583,6 +586,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				addChildToParent(new JSEmptyNode(toSymbol(ident)));
 			}
 			// Need to explicitly visit the params
+			// FIXME end
 			int lParen = findChar('(', ident.getFinish(), body.getStart());
 			int rParen = findLastChar(')', body.getStart());
 			addToParentAndPushNodeToStack(new JSParametersNode(lParen, rParen));
@@ -664,7 +668,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		if (!functionNode.isProgram())
 		{
-
+			// FIXME Correct end position based on end position of statements node?
 			popNode(); // func node
 			ExportedStatus exportStatus = getExportStatus(functionNode.getIdent());
 			if (exportStatus.isExported)
@@ -1162,13 +1166,19 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		else if (!block.isSynthetic())
 		{
 			int lBrace = findChar('{', block.getStart());
-			// This gives a bogus end position for empty block in a function definition for me (test95.js)
-			int rBrace = block.getFinish() - 1;
-			// if we can, search for closing brace backwards from end of parent node?
+			int rBrace = block.getFinish() - 1; // usually a close brace is at end of block...
+			// but in case of functions, the parser handles them specially as a way to reset parse state
+			// so the function and block end offsets are *wrong* and do not include the closing brace!
+			// here we fix the end offset of the block and parent function
 			IParseNode parent = getCurrentNode();
-			if (parent != null) {
-				rBrace = findLastChar('}', parent.getEndingOffset());
+			if (parent instanceof JSFunctionNode) {
+				int maybeRBrace = findChar('}', block.getFinish());
+				if (maybeRBrace != -1) {
+					rBrace = maybeRBrace;
+					((JSFunctionNode) parent).setLocation(parent.getStartingOffset(), rBrace);
+				}
 			}
+
 			addToParentAndPushNodeToStack(new JSStatementsNode(lBrace, rBrace));
 		}
 		else if (block.getLastStatement() instanceof ForNode)
@@ -1628,14 +1638,16 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterCaseNode(CaseNode caseNode)
 	{
-		int offset = caseNode.getFinish() + 1;
-		Symbol colon = toSymbol(JSTokenType.COLON, offset);
 		if (caseNode.getTest() != null)
 		{
+			int colonOffset = findChar(':', caseNode.getTest().getFinish());
+			Symbol colon = toSymbol(JSTokenType.COLON, colonOffset);
 			addToParentAndPushNodeToStack(new JSCaseNode(caseNode.getStart(), caseNode.getFinish() - 1, colon));
 		}
 		else
 		{
+			int colonOffset = findChar(':', caseNode.getStart() + 7); // "default".length
+			Symbol colon = toSymbol(JSTokenType.COLON, colonOffset);
 			addToParentAndPushNodeToStack(new JSDefaultNode(caseNode.getStart(), caseNode.getFinish() - 1, colon));
 		}
 		return super.enterCaseNode(caseNode);
@@ -1709,7 +1721,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		addToParentAndPushNodeToStack(new JSInvokeNode(callNode.getStart(), callNode.getFinish() - 1));
 		// We need to visit the expression first, then push the arguments node...
-		int lParen = findChar('(', callNode.getFunction().getFinish(), callNode.getFinish()); // FIXME: prefer start of first arg as last index to search!
+		int lParen = findChar('(', callNode.getFunction().getFinish(), callNode.getFinish()); // FIXME: prefer start of
+																								// first arg as last
+																								// index to search!
 		int rParen = findLastChar(')', callNode.getFinish());
 		pushOnLeave.put(callNode.getFunction(), new JSArgumentsNode(lParen, rParen));
 		return super.enterCallNode(callNode);
