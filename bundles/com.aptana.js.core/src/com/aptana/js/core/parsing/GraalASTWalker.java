@@ -1170,8 +1170,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		else if (!block.isSynthetic())
 		{
 			int lBrace = findChar('{', block.getStart());
-			int rBrace = block.getFinish() - 1; // usually a close brace is at end of block...
-			// but in case of functions, the parser handles them specially as a way to reset parse state
+			int rBrace = findLastChar('}', block.getFinish() - 1);
+			// usually a close brace is at end of block, but search backwards in case it's trailed by a
+			// comment. In case of functions, the parser handles them specially as a way to reset parse state
 			// so the function and block end offsets are *wrong* and do not include the closing brace!
 			// here we fix the end offset of the block and parent function
 			IParseNode parent = getCurrentNode();
