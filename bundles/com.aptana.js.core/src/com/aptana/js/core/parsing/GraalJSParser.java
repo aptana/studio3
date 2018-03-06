@@ -134,7 +134,7 @@ public class GraalJSParser extends AbstractParser
 			if (sawCommentLastTime())
 			{
 				// we saw a comment last time, so grab where it ended now and record it!
-				recordComment();
+				recordComment(tt);
 			}
 			if (tt == TokenType.COMMENT)
 			{
@@ -144,13 +144,17 @@ public class GraalJSParser extends AbstractParser
 			return tt;
 		}
 
-		private void recordComment()
+		private void recordComment(TokenType curTokenType)
 		{
-			char c = source.getContent().charAt(fLastCommentStart + 1); // is the second char of comment a '*' or '/'?
-			short type = c == '*' ? IJSNodeTypes.MULTI_LINE_COMMENT : IJSNodeTypes.SINGLE_LINE_COMMENT;
-			comments.add(new JSCommentNode(type, fLastCommentStart, finish - 1)); // we use inclusive end, graal uses
-																					// exclusive, so we need to subtract
-																					// one!
+			int commentEndOffset = finish - 1; // we use inclusive end, graal uses exclusive, so we need to subtract one!
+			// Looks like because eol holds different info in the token (line number/offset) overloading the token length, finish doesn't get updated!
+			if (curTokenType == TokenType.EOL)
+			{
+				commentEndOffset = linePosition - 1; 
+			}
+			char secondCharacter = source.getContent().charAt(fLastCommentStart + 1); // is the second char of comment a '*' or '/'?
+			short commentType = secondCharacter == '*' ? IJSNodeTypes.MULTI_LINE_COMMENT : IJSNodeTypes.SINGLE_LINE_COMMENT;
+			comments.add(new JSCommentNode(commentType, fLastCommentStart, commentEndOffset));
 			fLastCommentStart = DIDNT_SEE_COMMENT; // reset
 		}
 

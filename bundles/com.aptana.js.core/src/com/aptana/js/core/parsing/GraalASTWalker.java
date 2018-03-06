@@ -362,7 +362,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 
 	private Symbol identifierSymbol(Node ident, String value)
 	{
-		return identifierSymbol(ident.getStart(), ident.getFinish() - 1, value);
+		// Sometimes a comment may trail an identifier, and the end position is incorrect.
+		// So generate end offset based on start offset and actual value/length of identifier
+		return identifierSymbol(ident.getStart(), ident.getStart() + value.length() - 1, value);
 	}
 
 	private Symbol identifierSymbol(int start, int finish, String value)
@@ -1622,7 +1624,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		// lParen, rParen, lBrace, rBrace
 		int lParen = findChar('(', switchNode.getStart() + "switch".length(), switchNode.getExpression().getStart());
-		int rParen = findChar(')', switchNode.getExpression().getFinish()); // FIXME Find offset of first case start and limit end to that!
+		int rParen = findChar(')', switchNode.getExpression().getFinish()); // FIXME Find offset of first case start and
+																			// limit end to that!
 		int lBrace = findChar('{', rParen + 1); // FIXME Find offset of first case start and limit end to that!
 		int rBrace = findLastChar('}', switchNode.getFinish() - 1); // Search backwards starting at end of switch block
 		addToParentAndPushNodeToStack(new JSSwitchNode(switchNode.getStart(), switchNode.getFinish() - 1,

@@ -51,9 +51,9 @@ js.formatter.brace.position.function.declaration=same.line
 js.formatter.spaces.after.key.value.operator=1
 js.formatter.brace.position.blocks=same.line
 ==CONTENT==
-var i /*1*/+=
+var i /*1*/=
 /*2*/
 2;
 ==FORMATTED==
-var i /*1*/+=
+var i /*1*/=
 /*2*/2;
