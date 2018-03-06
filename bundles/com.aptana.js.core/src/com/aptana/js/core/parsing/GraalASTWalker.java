@@ -1672,10 +1672,10 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterWhileNode(WhileNode whileNode)
 	{
-		int start = whileNode.getTest().getStart();
-		int end = whileNode.getTest().getFinish() + 1;
-		Symbol leftParen = toSymbol(JSTokenType.LPAREN, start);
-		Symbol rightParen = toSymbol(JSTokenType.RPAREN, end);
+		int lParenOffset = findChar('(', whileNode.getStart() + "while".length(), whileNode.getTest().getStart());
+		int rParenOffset = findChar(')', whileNode.getTest().getFinish(), whileNode.getBody().getStart());
+		Symbol leftParen = toSymbol(JSTokenType.LPAREN, lParenOffset);
+		Symbol rightParen = toSymbol(JSTokenType.RPAREN, rParenOffset);
 		if (whileNode.isDoWhile())
 		{
 			addToParentAndPushNodeToStack(
