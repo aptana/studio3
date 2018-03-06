@@ -1066,10 +1066,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		TokenType tokenType = binaryNode.tokenType();
 
 		Expression lhs = binaryNode.lhs();
-		boolean lhsNeedsParens = lhs != null && tokenType.needsParens(lhs.tokenType(), true); // incorrect?
-		// boolean lhsNeedsParens = lhs != null && lhs.tokenType().needsParens(tokenType, true);
-		boolean rhsNeedsParens = tokenType.needsParens(binaryNode.rhs().tokenType(), false); // incorrect?
-		// boolean rhsNeedsParens = binaryNode.rhs().tokenType().needsParens(tokenType, false);
+		boolean lhsNeedsParens = lhs != null && tokenType.needsParens(lhs.tokenType(), true);
+		boolean rhsNeedsParens = tokenType.needsParens(binaryNode.rhs().tokenType(), false);
 		JSNode parentNode = (JSNode) getCurrentNode();
 		JSNode lastChild = (JSNode) parentNode.getLastChild();
 		if (lhsNeedsParens || rhsNeedsParens)

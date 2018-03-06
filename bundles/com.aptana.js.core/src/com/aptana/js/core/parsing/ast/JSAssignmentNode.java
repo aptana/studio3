@@ -73,7 +73,6 @@ public class JSAssignmentNode extends JSNode
 		}
 
 		this.setNodeType(type);
-		this.setLocation(assignOperator.getStart(), assignOperator.getEnd());
 	}
 
 	/*
