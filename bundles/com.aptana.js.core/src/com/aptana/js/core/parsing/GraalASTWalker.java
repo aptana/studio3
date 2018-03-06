@@ -1621,11 +1621,10 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	public boolean enterSwitchNode(SwitchNode switchNode)
 	{
 		// lParen, rParen, lBrace, rBrace
-		// FIXME Use findChar to get more accurate positions!
-		int lParen = switchNode.getExpression().getStart() - 1;
-		int rParen = switchNode.getExpression().getFinish();
-		int lBrace = rParen + 2; // generate fake position for left brace. I don't think we can do any better than this!
-		int rBrace = switchNode.getFinish();
+		int lParen = findChar('(', switchNode.getStart() + "switch".length(), switchNode.getExpression().getStart());
+		int rParen = findChar(')', switchNode.getExpression().getFinish()); // FIXME Find offset of first case start and limit end to that!
+		int lBrace = findChar('{', rParen + 1); // FIXME Find offset of first case start and limit end to that!
+		int rBrace = findLastChar('}', switchNode.getFinish() - 1); // Search backwards starting at end of switch block
 		addToParentAndPushNodeToStack(new JSSwitchNode(switchNode.getStart(), switchNode.getFinish() - 1,
 				toSymbol(JSTokenType.LPAREN, lParen), toSymbol(JSTokenType.RPAREN, rParen),
 				toSymbol(JSTokenType.LCURLY, lBrace), toSymbol(JSTokenType.RCURLY, rBrace)));
