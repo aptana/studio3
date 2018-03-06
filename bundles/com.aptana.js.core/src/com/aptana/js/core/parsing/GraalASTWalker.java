@@ -256,7 +256,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		// may be a "generated" return from a single expression arrow function body with no braces!
 		if (returnNode.isTokenType(TokenType.RETURN))
 		{
-			JSNode node = new JSReturnNode(returnNode.getStart(), returnNode.getFinish());
+			JSNode node = new JSReturnNode(returnNode.getStart(), returnNode.getFinish() - 1);
 			node.setSemicolonIncluded(true);
 			addToParentAndPushNodeToStack(node);
 		}
