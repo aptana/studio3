@@ -1596,7 +1596,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		// if finally block is not empty, wrap in JSFinallyNode
 		if (!(firstChild instanceof JSEmptyNode))
 		{
-			firstChild = new JSFinallyNode(firstChild);
+			// find beginning of finally by searching backwards from the body of the finally block
+			int finallyKeywordOffset = this.source.lastIndexOf("finally", firstChild.getStartingOffset());
+			firstChild = new JSFinallyNode(finallyKeywordOffset, firstChild.getEndingOffset(), firstChild);
 		}
 		orderedChildren[2] = firstChild;
 		ourTryNode.setChildren(orderedChildren);
@@ -1727,7 +1729,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		// If the call is wrapped in parens, wrap the JSInvokeNode in a JSGroupNode to represent this.
 		// and fix the offsets of the JSInvokeNode to not include the wrapping parens
-		int start = callNode.getStart();
+		int start = getCallNodeStart(callNode);
 		int finish = callNode.getFinish() - 1;
 		if (source.charAt(start) == '(')
 		{
@@ -1737,7 +1739,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			finish -= 1;
 		}
 		// push our equivalent of the call node
-		addToParentAndPushNodeToStack(new JSInvokeNode(start, callNode.getFinish() - 1));
+		addToParentAndPushNodeToStack(new JSInvokeNode(start, finish));
 
 		// FIXME: prefer start of first arg as last index to search!
 		int lParen = findChar('(', callNode.getFunction().getFinish(), finish);
@@ -1753,6 +1755,39 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		// This is very ugly, but I don't see how else to do it...
 		pushOnLeave.put(callNode.getFunction(), new JSArgumentsNode(lParen, rParen));
 		return super.enterCallNode(callNode);
+	}
+
+	/**
+	 * A CallNode's start position is wrong when the "function" is an AccessNode with a bad position.
+	 * 
+	 * @param callNode
+	 * @return
+	 */
+	private int getCallNodeStart(CallNode callNode)
+	{
+		Expression func = callNode.getFunction();
+		if (func instanceof AccessNode)
+		{
+			AccessNode accessNode = (AccessNode) func;
+			return getAccessNodeStart(accessNode);
+		}
+		return callNode.getStart();
+	}
+
+	/**
+	 * An AccessNode's start position is wrong when the base is a CallNode with an incorrect start position!
+	 * 
+	 * @param accessNode
+	 * @return
+	 */
+	private int getAccessNodeStart(AccessNode accessNode)
+	{
+		Expression accessNodeBase = accessNode.getBase();
+		if (accessNodeBase instanceof CallNode)
+		{
+			return getCallNodeStart((CallNode) accessNodeBase);
+		}
+		return accessNodeBase.getStart();
 	}
 
 	@Override
@@ -1809,7 +1844,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	public boolean enterAccessNode(AccessNode accessNode)
 	{
 		int dotOffset = findChar('.', accessNode.getBase().getFinish());
-		addToParentAndPushNodeToStack(new JSGetPropertyNode(accessNode.getStart(), accessNode.getFinish() - 1,
+		addToParentAndPushNodeToStack(new JSGetPropertyNode(getAccessNodeStart(accessNode), accessNode.getFinish() - 1,
 				toSymbol(JSTokenType.DOT, dotOffset)));
 		return super.enterAccessNode(accessNode);
 	}
