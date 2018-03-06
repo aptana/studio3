@@ -1,5 +1,6 @@
 package com.aptana.js.core.parsing;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import org.eclipse.core.internal.utils.StringPool;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.JSLanguageConstants;
+import com.aptana.js.core.parsing.ast.IJSNodeTypes;
 import com.aptana.js.core.parsing.ast.JSAbstractForNode;
 import com.aptana.js.core.parsing.ast.JSArgumentsNode;
 import com.aptana.js.core.parsing.ast.JSArrayNode;
@@ -1039,23 +1041,10 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		boolean lhsNeedsParens = lhs != null && tokenType.needsParens(lhs.tokenType(), true);
 		if (lhsNeedsParens)
 		{
-			// Hack this, it looks liek only place we aks for left/right parens here is in formatter as offsets to place
+			// Hack this, it looks like only place we ask for left/right parens here is in formatter as offsets to place
 			// them
 			int lParen = lhs.getStart();
 			int rParen = lhs.getFinish() - 1;
-			// Parens not included in binaryNode's position! We need to search backwards from start!
-			// int lParen = findLastChar('(', binaryNode.getStart());
-			// int rParen = findChar(')', lhs.getFinish(), binaryNode.getAssignmentSource().getStart());
-			// FIXME, the AST is telling us we should inject parens to group, but there may be no parens in the actual
-			// source!
-			// if (lParen == -1)
-			// {
-			// throw new IllegalStateException("Unable to find left paren");
-			// }
-			// if (rParen == -1)
-			// {
-			// throw new IllegalStateException("Unable to find right paren");
-			// }
 			addToParentAndPushNodeToStack(
 					new JSGroupNode(toSymbol(JSTokenType.LPAREN, lParen), toSymbol(JSTokenType.RPAREN, rParen)));
 		}
@@ -1089,19 +1078,6 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		// where does the last child go now?
 		if (rhsNeedsParens)
 		{
-			// to new group node for RHS parens
-			// int lParen = findChar('(', lhs.getFinish(), binaryNode.rhs().getStart());
-			// if (lParen == -1)
-			// {
-			// addChildToParent(lastChild);
-			// // FIXME We may be told we *need* to put this in parens, but it may not actually have any!
-			//// throw new IllegalStateException("Unable to find left paren");
-			// } else {
-			// int rParen = findChar(')', binaryNode.rhs().getFinish()); // right paren not included in positions..
-			// if (rParen == -1)
-			// {
-			// throw new IllegalStateException("Unable to find right paren");
-			// }
 			int lParen = binaryNode.rhs().getStart();
 			int rParen = binaryNode.rhs().getFinish() - 1;
 			addToParentAndPushNodeToStack(
@@ -1201,7 +1177,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		if (!block.isSynthetic())
 		{
-			popNode();
+			JSStatementsNode statements = (JSStatementsNode) popNode();
+			combineVarDeclarations(statements);
 		}
 		else if (block.getLastStatement() instanceof ForNode)
 		{
@@ -1241,6 +1218,56 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			popNode(); // statements node
 		}
 		return super.leaveBlock(block);
+	}
+
+	private void combineVarDeclarations(JSStatementsNode statements)
+	{
+		IParseNode[] children = statements.getChildren();
+		if (children == null || children.length == 0)
+		{
+			statements.addChild(new JSEmptyNode(statements.getStartingOffset()));
+			return;
+		}
+
+		// FIXME This merges all of them into first var node, *BUT*, we should be merging any JSVarNodes with same start
+		// offset!
+		List<Integer> toRemoveIndices = new ArrayList<Integer>(children.length - 1);
+		JSVarNode firstVarNode = null;
+		for (int i = 0; i < children.length; i++)
+		{
+			IParseNode child = children[i];
+			if (child.getNodeType() == IJSNodeTypes.VAR)
+			{
+				if (firstVarNode == null)
+				{
+					firstVarNode = (JSVarNode) child;
+					firstVarNode.setSemicolonIncluded(false);
+					JSDeclarationNode declNode = (JSDeclarationNode) firstVarNode.getFirstChild();
+					declNode.setSemicolonIncluded(false);
+				}
+				else
+				{
+					JSDeclarationNode declNode = (JSDeclarationNode) child.getFirstChild();
+					// We need to set semicolon included to false on each decl node!
+					declNode.setSemicolonIncluded(false);
+					firstVarNode.addChild(declNode); // add to the first VarNode as a child
+					// Mark for removal from statement!
+					toRemoveIndices.add(i);
+				}
+			}
+		}
+		// Now copy children, skipping the ones we want to remove
+		IParseNode[] newChildren = new IParseNode[children.length - toRemoveIndices.size()];
+		int x = 0;
+		for (int i = 0; i < children.length; i++)
+		{
+			if (!toRemoveIndices.contains(i))
+			{
+				newChildren[x++] = children[i];
+			}
+		}
+		// replace with modified listing!
+		statements.setChildren(newChildren);
 	}
 
 	private JSNode combineVarDeclarations(int offset, IParseNode[] children)
@@ -1673,7 +1700,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	public boolean enterWhileNode(WhileNode whileNode)
 	{
 		int lParenOffset = findChar('(', whileNode.getStart() + "while".length(), whileNode.getTest().getStart());
-		int rParenOffset = findChar(')', whileNode.getTest().getFinish(), whileNode.getBody().getStart());
+		// If this is do-while, body comes before test, so adjust possible end position for searching parens
+		int rParenOffset = findChar(')', whileNode.getTest().getFinish(),
+				whileNode.isDoWhile() ? whileNode.getFinish() : whileNode.getBody().getStart());
 		Symbol leftParen = toSymbol(JSTokenType.LPAREN, lParenOffset);
 		Symbol rightParen = toSymbol(JSTokenType.RPAREN, rParenOffset);
 		if (whileNode.isDoWhile())

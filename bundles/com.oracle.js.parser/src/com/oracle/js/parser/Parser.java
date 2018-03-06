@@ -1101,6 +1101,7 @@ loop:
             }
 
             if (isBindingIdentifier()) {
+            	// FIXME This doesn't handle comment at next lookahead properly! We need a variant of T that skips comments (and probably EOL too)!
                 if (T(k + 1) == COLON && (type != YIELD || !inGeneratorFunction())) {
                     labelStatement();
                     return;
