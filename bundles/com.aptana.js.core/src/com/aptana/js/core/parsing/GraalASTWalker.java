@@ -1,6 +1,9 @@
 package com.aptana.js.core.parsing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -354,66 +357,6 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		return null;
 	}
 
-	private Symbol toSymbol(Node ident)
-	{
-		return new Symbol((short) 0, ident.getStart(), ident.getFinish() - 1, ident.toString());
-	}
-
-	private Symbol identifierSymbol(Node ident)
-	{
-		return identifierSymbol(ident, ident.toString());
-	}
-
-	private Symbol identifierSymbol(Node ident, String value)
-	{
-		// Sometimes a comment may trail an identifier, and the end position is incorrect.
-		// So generate end offset based on start offset and actual value/length of identifier
-		return identifierSymbol(ident.getStart(), ident.getStart() + value.length() - 1, value);
-	}
-
-	private Symbol identifierSymbol(int start, int finish, String value)
-	{
-		return toSymbol(JSTokenType.IDENTIFIER, start, finish, pool.add(value));
-	}
-
-	private Symbol identifierSymbol(String value)
-	{
-		return identifierSymbol(-1, -1, value);
-	}
-
-	private Symbol toSymbol(JSTokenType type, Node ident)
-	{
-		return toSymbol(type, ident.getStart(), ident.getFinish() - 1);
-	}
-
-	private Symbol toSymbol(JSTokenType type, Node ident, Object value)
-	{
-		return toSymbol(type, ident.getStart(), ident.getFinish() - 1, value);
-	}
-
-	/**
-	 * For single-character symbols (i.e. LPAREN, RPAREN, COLON, SEMICOLON)
-	 * 
-	 * @param type
-	 * @param offset
-	 *            single character offset. Symbols assume inclusive range, so start and end will be the same index here!
-	 * @return
-	 */
-	private Symbol toSymbol(JSTokenType type, int offset)
-	{
-		return toSymbol(type, offset, offset);
-	}
-
-	private Symbol toSymbol(JSTokenType type, int start, int finish)
-	{
-		return toSymbol(type, start, finish, type.getName());
-	}
-
-	private Symbol toSymbol(JSTokenType type, int start, int finish, Object value)
-	{
-		return new Symbol(type.getIndex(), start, finish, value);
-	}
-
 	@Override
 	public boolean enterVarNode(VarNode varNode)
 	{
@@ -698,6 +641,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			pushOnLeave = null;
 			// FIXME If nodestack is not empty, spit out an error message
 			fNodeStack = null;
+			reorderChildrenByOffset(fRootNode);
 		}
 		return super.leaveFunctionNode(functionNode);
 	}
@@ -1104,6 +1048,14 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		JSNode node = (JSNode) getLastNode();
 		if (node != null)
 		{
+			if (expressionStatement.getFinish() < this.source.length())
+			{
+				char lastChar = this.source.charAt(expressionStatement.getFinish());
+				if (lastChar == ';')
+				{
+					node.setLocation(node.getStartingOffset(), expressionStatement.getFinish());
+				}
+			}
 			node.setSemicolonIncluded(true);
 		}
 		else
@@ -1181,6 +1133,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		{
 			JSStatementsNode statements = (JSStatementsNode) popNode();
 			combineVarDeclarations(statements);
+			reorderChildrenByOffset(statements);
 		}
 		else if (block.getLastStatement() instanceof ForNode)
 		{
@@ -1554,16 +1507,11 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		{
 			addToParentAndPushNodeToStack(new JSSetterNode(propertyNode.getStart(), propertyNode.getFinish() - 1));
 		}
-		else if (propertyNode.getValue() instanceof FunctionNode)
-		{
-			addToParentAndPushNodeToStack(
-					new JSNameValuePairNode(propertyNode.getStart(), propertyNode.getFinish() - 1));
-		}
 		else
 		{
 			Expression key = propertyNode.getKey();
 			int colonOffset = findChar(':', key.getFinish(), propertyNode.getValue().getStart());
-			Symbol colon = toSymbol(JSTokenType.COLON, colonOffset);
+			Symbol colon = colonOffset == -1 ? null : toSymbol(JSTokenType.COLON, colonOffset);
 			addToParentAndPushNodeToStack(
 					new JSNameValuePairNode(propertyNode.getStart(), propertyNode.getFinish() - 1, colon));
 			// if the property name is computed, manually traverse
@@ -1601,19 +1549,15 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			setterNode.replaceChild(1, paramsNode);
 			setterNode.addChild(bodyNode);
 		}
-		// FIXME If value is a function, drop the name value pair node and just add the function to the parent
-		// JSObjectNode or JSStatementsNode?
 		else if (propertyNode.getValue() instanceof FunctionNode)
 		{
+			// FIXME Move to enterPropertyNode portion?
 			JSNameValuePairNode pairNode = (JSNameValuePairNode) getCurrentNode();
 			JSFunctionNode funcValue = (JSFunctionNode) pairNode.getValue();
 			if (propertyNode.isStatic())
 			{
 				funcValue.setStatic();
 			}
-			IParseNode parent = pairNode.getParent();
-			int numChildren = parent.getChildCount();
-			parent.replaceChild(numChildren - 1, funcValue);
 		}
 		popNode();
 		return super.leavePropertyNode(propertyNode);
@@ -1961,44 +1905,6 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		return super.enterTernaryNode(ternaryNode);
 	}
 
-	/**
-	 * Searches the source code for a specific characters index in a range. Returns -1 if not found. Returns the
-	 * absolute index if found.
-	 * 
-	 * @param c
-	 *            character to find
-	 * @param startInclusive
-	 *            start index
-	 * @param endNonInclusive
-	 *            end index (non-inclusive, we look up to the position, but not at this position)
-	 * @return
-	 */
-	private int findChar(char c, int startInclusive, int endNonInclusive)
-	{
-		if (endNonInclusive <= startInclusive)
-		{
-			return -1;
-		}
-		// FIXME Be smarter about possible comments! If we're inside a comment, don't return the position, ignore and
-		// move on!
-		int index = source.substring(startInclusive, endNonInclusive).indexOf(c);
-		if (index == -1)
-		{
-			return -1;
-		}
-		return index + startInclusive;
-	}
-
-	private int findChar(char c, int from)
-	{
-		return source.indexOf(c, from);
-	}
-
-	private int findLastChar(char c, int from)
-	{
-		return source.lastIndexOf(c, from);
-	}
-
 	@Override
 	public Node leaveTernaryNode(TernaryNode ternaryNode)
 	{
@@ -2093,6 +1999,26 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		return fRootNode;
 	}
 
+	/**
+	 * vars and function declarations get "hoisted" in the Graal AST so we may visit items out of their original source
+	 * order. This re-orders back to original source order.
+	 * 
+	 * @param parent
+	 */
+	private void reorderChildrenByOffset(IParseNode parent)
+	{
+		// This wraps the array and the subsequent sort actually modified the original array for us!
+		List<IParseNode> reorderedChildren = Arrays.asList(parent.getChildren());
+		Collections.sort(reorderedChildren, new Comparator<IParseNode>()
+		{
+			@Override
+			public int compare(IParseNode o1, IParseNode o2)
+			{
+				return Integer.compare(o1.getStartingOffset(), o2.getStartingOffset());
+			}
+		});
+	}
+
 	private void addChildToParent(JSNode node)
 	{
 		IParseNode parent = getCurrentNode();
@@ -2130,6 +2056,104 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		addChildToParent(node);
 		fNodeStack.push(node);
+	}
+
+	private Symbol toSymbol(Node ident)
+	{
+		return new Symbol((short) 0, ident.getStart(), ident.getFinish() - 1, ident.toString());
+	}
+
+	private Symbol identifierSymbol(Node ident)
+	{
+		return identifierSymbol(ident, ident.toString());
+	}
+
+	private Symbol identifierSymbol(Node ident, String value)
+	{
+		// Sometimes a comment may trail an identifier, and the end position is incorrect.
+		// So generate end offset based on start offset and actual value/length of identifier
+		return identifierSymbol(ident.getStart(), ident.getStart() + value.length() - 1, value);
+	}
+
+	private Symbol identifierSymbol(int start, int finish, String value)
+	{
+		return toSymbol(JSTokenType.IDENTIFIER, start, finish, pool.add(value));
+	}
+
+	private Symbol identifierSymbol(String value)
+	{
+		return identifierSymbol(-1, -1, value);
+	}
+
+	private Symbol toSymbol(JSTokenType type, Node ident)
+	{
+		return toSymbol(type, ident.getStart(), ident.getFinish() - 1);
+	}
+
+	private Symbol toSymbol(JSTokenType type, Node ident, Object value)
+	{
+		return toSymbol(type, ident.getStart(), ident.getFinish() - 1, value);
+	}
+
+	/**
+	 * For single-character symbols (i.e. LPAREN, RPAREN, COLON, SEMICOLON)
+	 * 
+	 * @param type
+	 * @param offset
+	 *            single character offset. Symbols assume inclusive range, so start and end will be the same index here!
+	 * @return
+	 */
+	private Symbol toSymbol(JSTokenType type, int offset)
+	{
+		return toSymbol(type, offset, offset);
+	}
+
+	private Symbol toSymbol(JSTokenType type, int start, int finish)
+	{
+		return toSymbol(type, start, finish, type.getName());
+	}
+
+	private Symbol toSymbol(JSTokenType type, int start, int finish, Object value)
+	{
+		return new Symbol(type.getIndex(), start, finish, value);
+	}
+
+	/**
+	 * Searches the source code for a specific characters index in a range. Returns -1 if not found. Returns the
+	 * absolute index if found.
+	 * 
+	 * @param c
+	 *            character to find
+	 * @param startInclusive
+	 *            start index
+	 * @param endNonInclusive
+	 *            end index (non-inclusive, we look up to the position, but not at this position)
+	 * @return
+	 */
+	private int findChar(char c, int startInclusive, int endNonInclusive)
+	{
+		if (endNonInclusive <= startInclusive)
+		{
+			return -1;
+		}
+		// FIXME Be smarter about possible comments! If we're inside a comment, don't return the position, ignore and
+		// move on!
+		int index = source.substring(startInclusive, endNonInclusive).indexOf(c);
+		if (index == -1)
+		{
+			return -1;
+		}
+		return index + startInclusive;
+	}
+
+	private int findChar(char c, int from)
+	{
+		return source.indexOf(c, from);
+	}
+
+	private int findLastChar(char c, int from)
+	{
+		return source.lastIndexOf(c, from);
 	}
 
 	private ExportedStatus getExportStatus(IdentNode ident)
