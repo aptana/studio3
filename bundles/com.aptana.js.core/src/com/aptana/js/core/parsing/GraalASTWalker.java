@@ -2,8 +2,10 @@ package com.aptana.js.core.parsing;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.eclipse.core.internal.utils.StringPool;
@@ -1208,12 +1210,12 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 
 			// remove statements from it's original parent
 			IParseNode[] parentChildren = statementsParent.getChildren();
-			IParseNode[] parentNewCHildren = new IParseNode[parentChildren.length];
-			System.arraycopy(parentChildren, 0, parentNewCHildren, 0, parentChildren.length - 1);
-			parentNewCHildren[parentChildren.length - 1] = forNode; // move for node up to parent of statements as
+			IParseNode[] parentNewChildren = new IParseNode[parentChildren.length];
+			System.arraycopy(parentChildren, 0, parentNewChildren, 0, parentChildren.length - 1);
+			parentNewChildren[parentChildren.length - 1] = forNode; // move for node up to parent of statements as
 																	// last
 																	// child, replacing the statements node
-			((ParseNode) statementsParent).setChildren(parentNewCHildren);
+			((ParseNode) statementsParent).setChildren(parentNewChildren);
 
 			popNode(); // statements node
 		}
@@ -1228,46 +1230,73 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			statements.addChild(new JSEmptyNode(statements.getStartingOffset()));
 			return;
 		}
+		Map<Integer, List<JSVarNode>> startOffsetToListToMerge = gatherVarNodesToMergeByStartOffset(children);
+		Set<IParseNode> toRemove = mergeVarNodesByOffset(startOffsetToListToMerge);
 
-		// FIXME This merges all of them into first var node, *BUT*, we should be merging any JSVarNodes with same start
-		// offset!
-		List<Integer> toRemoveIndices = new ArrayList<Integer>(children.length - 1);
-		JSVarNode firstVarNode = null;
-		for (int i = 0; i < children.length; i++)
-		{
-			IParseNode child = children[i];
-			if (child.getNodeType() == IJSNodeTypes.VAR)
-			{
-				if (firstVarNode == null)
-				{
-					firstVarNode = (JSVarNode) child;
-					firstVarNode.setSemicolonIncluded(false);
-					JSDeclarationNode declNode = (JSDeclarationNode) firstVarNode.getFirstChild();
-					declNode.setSemicolonIncluded(false);
-				}
-				else
-				{
-					JSDeclarationNode declNode = (JSDeclarationNode) child.getFirstChild();
-					// We need to set semicolon included to false on each decl node!
-					declNode.setSemicolonIncluded(false);
-					firstVarNode.addChild(declNode); // add to the first VarNode as a child
-					// Mark for removal from statement!
-					toRemoveIndices.add(i);
-				}
-			}
-		}
 		// Now copy children, skipping the ones we want to remove
-		IParseNode[] newChildren = new IParseNode[children.length - toRemoveIndices.size()];
+		IParseNode[] newChildren = new IParseNode[children.length - toRemove.size()];
 		int x = 0;
 		for (int i = 0; i < children.length; i++)
 		{
-			if (!toRemoveIndices.contains(i))
+			if (!toRemove.contains(children[i]))
 			{
 				newChildren[x++] = children[i];
 			}
 		}
 		// replace with modified listing!
 		statements.setChildren(newChildren);
+	}
+
+	private Map<Integer, List<JSVarNode>> gatherVarNodesToMergeByStartOffset(IParseNode[] children)
+	{
+		Map<Integer, List<JSVarNode>> startOffsetToListToMerge = new HashMap<Integer, List<JSVarNode>>();
+		for (int i = 0; i < children.length; i++)
+		{
+			IParseNode child = children[i];
+			if (child.getNodeType() == IJSNodeTypes.VAR)
+			{
+				List<JSVarNode> nodesAtIndex = startOffsetToListToMerge.get(child.getStartingOffset());
+				if (nodesAtIndex == null)
+				{
+					nodesAtIndex = new ArrayList<JSVarNode>();
+				}
+				nodesAtIndex.add((JSVarNode) child);
+			}
+		}
+		return startOffsetToListToMerge;
+	}
+
+	/**
+	 * Returns a set of the nodes we've merged and need to now be removed.
+	 * 
+	 * @param startOffsetToListToMerge
+	 * @return
+	 */
+	private Set<IParseNode> mergeVarNodesByOffset(Map<Integer, List<JSVarNode>> startOffsetToListToMerge)
+	{
+		Set<IParseNode> toRemove = new HashSet<IParseNode>();
+		// Now go through the map and if there's a list with 2+ elements, merge them!
+		for (Map.Entry<Integer, List<JSVarNode>> entry : startOffsetToListToMerge.entrySet())
+		{
+			if (entry.getValue().size() > 1)
+			{
+				// mark no semicolon for first var node or it's decl.
+				JSVarNode firstVarNode = entry.getValue().get(0);
+				firstVarNode.setSemicolonIncluded(false);
+				((JSNode) firstVarNode.getFirstChild()).setSemicolonIncluded(false);
+
+				// Now loop through the others we want to merge
+				for (JSVarNode other : entry.getValue().subList(1, entry.getValue().size()))
+				{
+					toRemove.add(other); // Mark this JSVarNode for removal from new listing
+					JSDeclarationNode declNode = (JSDeclarationNode) other.getFirstChild();
+					// We need to set semicolon included to false on each decl node!
+					declNode.setSemicolonIncluded(false);
+					firstVarNode.addChild(declNode); // add to the first VarNode as a child
+				}
+			}
+		}
+		return toRemove;
 	}
 
 	private JSNode combineVarDeclarations(int offset, IParseNode[] children)
@@ -1944,6 +1973,10 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	 */
 	private int findChar(char c, int startInclusive, int endNonInclusive)
 	{
+		if (endNonInclusive <= startInclusive)
+		{
+			return -1;
+		}
 		// FIXME Be smarter about possible comments! If we're inside a comment, don't return the position, ignore and
 		// move on!
 		int index = source.substring(startInclusive, endNonInclusive).indexOf(c);
