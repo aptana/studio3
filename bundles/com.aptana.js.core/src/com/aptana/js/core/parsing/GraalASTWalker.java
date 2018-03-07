@@ -1255,12 +1255,14 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			IParseNode child = children[i];
 			if (child.getNodeType() == IJSNodeTypes.VAR)
 			{
-				List<JSVarNode> nodesAtIndex = startOffsetToListToMerge.get(child.getStartingOffset());
+				int startOffset = child.getStartingOffset();
+				List<JSVarNode> nodesAtIndex = startOffsetToListToMerge.get(startOffset);
 				if (nodesAtIndex == null)
 				{
 					nodesAtIndex = new ArrayList<JSVarNode>();
 				}
 				nodesAtIndex.add((JSVarNode) child);
+				startOffsetToListToMerge.put(startOffset, nodesAtIndex);
 			}
 		}
 		return startOffsetToListToMerge;
