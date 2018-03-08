@@ -52,9 +52,9 @@ js.formatter.spaces.after.key.value.operator=1
 js.formatter.brace.position.blocks=same.line
 ==CONTENT==
 var $c;
-foo ('a') = s;
+foo ('a');
 d = bz(a, b, b);
 ==FORMATTED==
 var $c;
-foo('a') = s;
+foo('a');
 d = bz(a, b, b);

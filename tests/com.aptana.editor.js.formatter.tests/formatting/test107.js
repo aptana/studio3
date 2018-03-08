@@ -52,7 +52,7 @@ js.formatter.spaces.after.key.value.operator=1
 js.formatter.brace.position.blocks=same.line
 ==CONTENT==
 var b = a;
-bh.appendChild( b) = 2;
+bh.appendChild( b);
 ==FORMATTED==
 var b = a;
-bh.appendChild(b) = 2;
+bh.appendChild(b);

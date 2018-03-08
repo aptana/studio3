@@ -643,7 +643,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			pushOnLeave = null;
 			// FIXME If nodestack is not empty, spit out an error message
 			fNodeStack = null;
-			reorderChildrenByOffset(fRootNode);
+			reorderChildrenByOffset((ParseNode) fRootNode);
 		}
 		return super.leaveFunctionNode(functionNode);
 	}
@@ -1845,17 +1845,16 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterTernaryNode(TernaryNode ternaryNode)
 	{
-		// colon is between these two...
+		// ternaryNode.getStart() points at '?'
+		int question = ternaryNode.getStart();
+		int actualStart = ternaryNode.getTest().getStart();
+
+		// colon is between the true/false branches...
 		int possibleColonStart = ternaryNode.getTrueExpression().getFinish(); // inclusive
 		int possibleColonEnd = ternaryNode.getFalseExpression().getStart(); // not inclusive
 		int colon = findChar(':', possibleColonStart, possibleColonEnd);
 
-		// question is between these two
-		int possibleQuestionStart = ternaryNode.getTest().getFinish(); // inclusive
-		int possibleQuestionEnd = ternaryNode.getTrueExpression().getStart(); // not inclusive
-		int question = findChar('?', possibleQuestionStart, possibleQuestionEnd);
-
-		addToParentAndPushNodeToStack(new JSConditionalNode(ternaryNode.getStart(), ternaryNode.getFinish() - 1,
+		addToParentAndPushNodeToStack(new JSConditionalNode(actualStart, ternaryNode.getFinish() - 1,
 				toSymbol(JSTokenType.QUESTION, question), toSymbol(JSTokenType.COLON, colon)));
 		return super.enterTernaryNode(ternaryNode);
 	}
@@ -1952,10 +1951,16 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	 * 
 	 * @param parent
 	 */
-	private void reorderChildrenByOffset(IParseNode parent)
+	private void reorderChildrenByOffset(ParseNode parent)
 	{
-		// This wraps the array and the subsequent sort actually modified the original array for us!
-		List<IParseNode> reorderedChildren = Arrays.asList(parent.getChildren());
+		IParseNode[] children = parent.getChildren();
+		if (children == null || children.length < 2)
+		{
+			return;
+		}
+		// This wraps the array and modifies it in place when we sort. The issue is that ParseNode.getChildren() makes a
+		// copy of the original...
+		List<IParseNode> reorderedChildren = Arrays.asList(children);
 		Collections.sort(reorderedChildren, new Comparator<IParseNode>()
 		{
 			@Override
@@ -1964,6 +1969,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				return Integer.compare(o1.getStartingOffset(), o2.getStartingOffset());
 			}
 		});
+		parent.setChildren(children);
 	}
 
 	private void addChildToParent(JSNode node)
