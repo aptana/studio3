@@ -502,7 +502,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			Block body = functionNode.getBody();
 			// If anonymous "normal" function, ident points at start of function keyword
 			int funcStart = ident.getStart();
-			int funcEnd = body.getFinish() + 1;
+			int funcEnd = body.getFinish();
 			// Arrow functions don't require braces, but normal do!
 			JSFunctionNode funcNode;
 			switch (functionNode.getKind())
@@ -513,13 +513,16 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				case GENERATOR:
 					funcNode = new JSGeneratorFunctionNode(funcStart, funcEnd);
 					break;
-				default:
+				case NORMAL:
 					if (!functionNode.isAnonymous())
 					{
 						// Should search backwards for "function" from beginning of identifier, minus length of
 						// "function " (which is earliest it could be)
 						funcStart = this.source.lastIndexOf("function", funcStart - 9);
 					}
+					// fall-through!
+					// We don't want to look for "function" keyword for getter/setters!
+				default:
 					funcNode = new JSFunctionNode(funcStart, funcEnd);
 					break;
 			}
@@ -627,7 +630,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		if (!functionNode.isProgram())
 		{
 			// FIXME Correct end position based on end position of statements node?
-			popNode(); // func node
+			JSFunctionNode funcNode = (JSFunctionNode) popNode(); // func node
 			ExportedStatus exportStatus = getExportStatus(functionNode.getIdent());
 			if (exportStatus.isExported)
 			{
@@ -638,6 +641,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			{
 				wipeNextIdent = true;
 			}
+
+			// fix offsets of parent as the function's end offset may have been changed based on #enterBlockNode()
+			fixOffsets((ParseNode) getCurrentNode(), funcNode.getStartingOffset(), funcNode.getEndingOffset());
 		}
 		else
 		{
@@ -1594,7 +1600,11 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterCatchNode(CatchNode catchNode)
 	{
-		addToParentAndPushNodeToStack(new JSCatchNode(catchNode.getStart(), catchNode.getFinish() - 1));
+		int lParen = findChar('(', catchNode.getStart() + 5, catchNode.getException().getStart()); // look past "catch"
+																									// up to
+		int rParen = findLastChar(')', catchNode.getBody().getStart());
+		addToParentAndPushNodeToStack(new JSCatchNode(catchNode.getStart(), catchNode.getFinish() - 1,
+				toSymbol(JSTokenType.LPAREN, lParen), toSymbol(JSTokenType.RPAREN, rParen)));
 		return super.enterCatchNode(catchNode);
 	}
 
@@ -1882,10 +1892,14 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		int question = ternaryNode.getStart();
 		int actualStart = ternaryNode.getTest().getStart();
 
+		// FIXME If the true or false expression is a function node, the offsets are wrong!
+		// We typically avoid an issue here by seraching backwards from start of true expression (so in case of function
+		// it'll go through the parameters, name, 'function' keyword). Maybe params could contain ':'?
+
 		// colon is between the true/false branches...
 		int possibleColonStart = ternaryNode.getTrueExpression().getFinish(); // inclusive
 		int possibleColonEnd = ternaryNode.getFalseExpression().getStart(); // not inclusive
-		int colon = findChar(':', possibleColonStart, possibleColonEnd);
+		int colon = findLastChar(':', possibleColonStart, possibleColonEnd);
 
 		addToParentAndPushNodeToStack(new JSConditionalNode(actualStart, ternaryNode.getFinish() - 1,
 				toSymbol(JSTokenType.QUESTION, question), toSymbol(JSTokenType.COLON, colon)));
@@ -2142,6 +2156,16 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		return source.lastIndexOf(c, from);
 	}
 
+	private int findLastChar(char c, int from, int to)
+	{
+		int index = source.substring(from, to).lastIndexOf(c);
+		if (index == -1)
+		{
+			return -1;
+		}
+		return from + index;
+	}
+
 	private ExportedStatus getExportStatus(IdentNode ident)
 	{
 		if (module != null)
@@ -2234,6 +2258,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 					case IJSNodeTypes.DO:
 						JSDoNode doNode = (JSDoNode) parent;
 						return (doNode.getLeftParenthesis().getStart() != startIndex);
+					case IJSNodeTypes.CATCH:
+						JSCatchNode catchNode = (JSCatchNode) parent;
+						return (catchNode.getLeftParenthesis().getStart() != startIndex);
 
 					case IJSNodeTypes.GROUP:
 					case IJSNodeTypes.ARGUMENTS:

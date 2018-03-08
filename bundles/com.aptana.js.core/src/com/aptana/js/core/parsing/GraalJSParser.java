@@ -43,7 +43,8 @@ public class GraalJSParser extends AbstractParser
 		{
 			FunctionNode graalAST = parse(filename, parseState.getStartingOffset(), source, working);
 			IParseRootNode ast = convertAST(source, graalAST);
-			if (ast != null) {
+			if (ast != null)
+			{
 				((JSParseRootNode) ast).setCommentNodes(fParser.getCommentNodes());
 			}
 			working.setParseResult(ast);
@@ -84,7 +85,7 @@ public class GraalJSParser extends AbstractParser
 	{
 		Source src = Source.sourceFor(filename, source);
 
-		ScriptEnvironment env = ScriptEnvironment.builder().es6(true).emptyStatements(true).build();
+		ScriptEnvironment env = ScriptEnvironment.builder().es6(true).strict(false).emptyStatements(true).build();
 		ErrorManager errorManager = new ErrorManager()
 		{
 			@Override
@@ -93,25 +94,20 @@ public class GraalJSParser extends AbstractParser
 				working.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, -1, -1, message, Severity.ERROR));
 			}
 		};
-
 		// Subclass and collect comments too
 		fParser = new CommentCollectingParser(env, src, errorManager);
 
-		// We try to parse as 'script' first, since that's much more common
 		// TODO Can we do a quick peek/guess based on a regexp to find imports/exports at top-level?
 		// FIXME Based on file extensions, choose module goal explicitly for *.mjs files!
-		FunctionNode result = fParser.parse(filename, startOffset, source.length() - startOffset, false);
+
+		// First try as module. This also implicitly does strict mode.
+		FunctionNode result = fParser.parseModule(filename, startOffset, source.length() - startOffset);
 		if (result == null || errorManager.getParserException() != null)
 		{
-			// FIXME I assume if we get no result or had a parser exception we should retry as module. Sniff the
-			// exception for import/export?
-			// Reset errors on working result
+			// Reset state and fall back to non-strict script as our goal
 			working.getErrors().clear();
-			env = ScriptEnvironment.builder().es6(true).build();
 			fParser = new CommentCollectingParser(env, src, errorManager);
-
-			// parse as module
-			result = fParser.parseModule(filename);
+			result = fParser.parse(filename, startOffset, source.length() - startOffset, false);
 		}
 		return result;
 	}
@@ -147,17 +143,24 @@ public class GraalJSParser extends AbstractParser
 		private void recordComment(TokenType curTokenType)
 		{
 			// FIXME finish can *still* be wrong. If finish is less than fLastCommentStart, use start - 1?
-			int commentEndOffset = finish - 1; // we use inclusive end, graal uses exclusive, so we need to subtract one!
-			// Looks like because eol holds different info in the token (line number/offset) overloading the token length, finish doesn't get updated!
+			int commentEndOffset = finish - 1; // we use inclusive end, graal uses exclusive, so we need to subtract
+												// one!
+			// Looks like because eol holds different info in the token (line number/offset) overloading the token
+			// length, finish doesn't get updated!
 			if (curTokenType == TokenType.EOL)
 			{
-				commentEndOffset = linePosition - 2; // linePosition points at offset of next line, subtract 1 to go back to end of previous line (at newline char), another to remove newline char
+				commentEndOffset = linePosition - 2; // linePosition points at offset of next line, subtract 1 to go
+														// back to end of previous line (at newline char), another to
+														// remove newline char
 			}
-			if (commentEndOffset < fLastCommentStart) {
+			if (commentEndOffset < fLastCommentStart)
+			{
 				commentEndOffset = start - 1;
 			}
-			char secondCharacter = source.getContent().charAt(fLastCommentStart + 1); // is the second char of comment a '*' or '/'?
-			short commentType = secondCharacter == '*' ? IJSNodeTypes.MULTI_LINE_COMMENT : IJSNodeTypes.SINGLE_LINE_COMMENT;
+			char secondCharacter = source.getContent().charAt(fLastCommentStart + 1); // is the second char of comment a
+																						// '*' or '/'?
+			short commentType = secondCharacter == '*' ? IJSNodeTypes.MULTI_LINE_COMMENT
+					: IJSNodeTypes.SINGLE_LINE_COMMENT;
 			comments.add(new JSCommentNode(commentType, fLastCommentStart, commentEndOffset));
 			fLastCommentStart = DIDNT_SEE_COMMENT; // reset
 		}
