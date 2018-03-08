@@ -674,31 +674,32 @@ public abstract class ParseNode extends Node implements IParseNode
 		// magnitude), then we consider the ending offset to be in error
 		if (diff < -1)
 		{
-			String source;
-
-			try
-			{
-				source = this.toString();
-			}
-			catch (Throwable t)
-			{
-				source = ""; //$NON-NLS-1$
-			}
-
-			// @formatter:off
-			String message = MessageFormat.format(
-				Messages.ParseNode_Bad_Ending_Offset,
-				start,
-				end,
-				this.getLanguage(),
-				this.getNodeType(),
-				source
-			);
-			// @formatter:on
-
-			IdeLog.logError(ParsingPlugin.getDefault(), message);
-
-			end = start - 1; // $codepro.audit.disable questionableAssignment
+			throw new IllegalArgumentException("Invalid range given: (" + start + ", " + end + ")");
+//			String source;
+//
+//			try
+//			{
+//				source = this.toString();
+//			}
+//			catch (Throwable t)
+//			{
+//				source = ""; //$NON-NLS-1$
+//			}
+//
+//			// @formatter:off
+//			String message = MessageFormat.format(
+//				Messages.ParseNode_Bad_Ending_Offset,
+//				start,
+//				end,
+//				this.getLanguage(),
+//				this.getNodeType(),
+//				source
+//			);
+//			// @formatter:on
+//
+//			IdeLog.logError(ParsingPlugin.getDefault(), message);
+//
+//			end = start - 1; // $codepro.audit.disable questionableAssignment
 		}
 
 		super.setLocation(start, end);

@@ -146,11 +146,15 @@ public class GraalJSParser extends AbstractParser
 
 		private void recordComment(TokenType curTokenType)
 		{
+			// FIXME finish can *still* be wrong. If finish is less than fLastCommentStart, use start - 1?
 			int commentEndOffset = finish - 1; // we use inclusive end, graal uses exclusive, so we need to subtract one!
 			// Looks like because eol holds different info in the token (line number/offset) overloading the token length, finish doesn't get updated!
 			if (curTokenType == TokenType.EOL)
 			{
 				commentEndOffset = linePosition - 2; // linePosition points at offset of next line, subtract 1 to go back to end of previous line (at newline char), another to remove newline char
+			}
+			if (commentEndOffset < fLastCommentStart) {
+				commentEndOffset = start - 1;
 			}
 			char secondCharacter = source.getContent().charAt(fLastCommentStart + 1); // is the second char of comment a '*' or '/'?
 			short commentType = secondCharacter == '*' ? IJSNodeTypes.MULTI_LINE_COMMENT : IJSNodeTypes.SINGLE_LINE_COMMENT;

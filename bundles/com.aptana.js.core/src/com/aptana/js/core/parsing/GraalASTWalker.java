@@ -137,10 +137,12 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	private StringPool pool; // not sure right now if pooling helps our RAM usage much (or maybe even makes it worse!)
 
 	private Module module;
+	private ParenWrapChecker parenCheck;
 
 	public GraalASTWalker(String source, LexicalContext lc)
 	{
 		super(lc);
+		this.parenCheck = new ParenWrapChecker();
 		this.source = source;
 		fRootNode = new JSParseRootNode();
 		fNodeStack.push(fRootNode);
@@ -757,7 +759,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				cn.setChildren(newChildren);
 			}
 		}
-		popNode();
+		popNode(); // unary node equivalent
 		return super.leaveUnaryNode(unaryNode);
 	}
 
@@ -981,63 +983,12 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		}
 		// push operator node to stack
 		addToParentAndPushNodeToStack(theNode);
-
-		// if lhs needs parens, add group node
-		Expression lhs = binaryNode.lhs();
-		boolean lhsNeedsParens = lhs != null && tokenType.needsParens(lhs.tokenType(), true);
-		if (lhsNeedsParens)
-		{
-			// Hack this, it looks like only place we ask for left/right parens here is in formatter as offsets to place
-			// them
-			int lParen = lhs.getStart();
-			int rParen = lhs.getFinish() - 1;
-			addToParentAndPushNodeToStack(
-					new JSGroupNode(toSymbol(JSTokenType.LPAREN, lParen), toSymbol(JSTokenType.RPAREN, rParen)));
-		}
 		return super.enterBinaryNode(binaryNode);
 	}
 
 	@Override
 	public Node leaveBinaryNode(BinaryNode binaryNode)
 	{
-		TokenType tokenType = binaryNode.tokenType();
-
-		Expression lhs = binaryNode.lhs();
-		boolean lhsNeedsParens = lhs != null && tokenType.needsParens(lhs.tokenType(), true);
-		boolean rhsNeedsParens = tokenType.needsParens(binaryNode.rhs().tokenType(), false);
-		JSNode parentNode = (JSNode) getCurrentNode();
-		JSNode lastChild = (JSNode) parentNode.getLastChild();
-		if (lhsNeedsParens || rhsNeedsParens)
-		{
-			// remove the last child, it'll need to be placed under new parent
-			IParseNode[] children = parentNode.getChildren();
-			IParseNode[] newChildren = new IParseNode[children.length - 1];
-			System.arraycopy(children, 0, newChildren, 0, children.length - 1);
-			parentNode.setChildren(newChildren);
-		}
-
-		if (lhsNeedsParens)
-		{
-			popNode(); // remove the LHS group node, now current node is operator
-		}
-
-		// where does the last child go now?
-		if (rhsNeedsParens)
-		{
-			int lParen = binaryNode.rhs().getStart();
-			int rParen = binaryNode.rhs().getFinish() - 1;
-			addToParentAndPushNodeToStack(
-					new JSGroupNode(toSymbol(JSTokenType.LPAREN, lParen), toSymbol(JSTokenType.RPAREN, rParen)));
-			addChildToParent(lastChild);
-			popNode(); // pop RHS parens node, current node is operator again
-			// }
-		}
-		else if (lhsNeedsParens)
-		{
-			// add last child to operator node (moved out from incorrect LHS grouping)
-			addChildToParent(lastChild);
-		}
-
 		popNode(); // pop operator node
 		return super.leaveBinaryNode(binaryNode);
 	}
@@ -1045,24 +996,21 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public Node leaveExpressionStatement(ExpressionStatement expressionStatement)
 	{
-		JSNode node = (JSNode) getLastNode();
-		if (node != null)
+		JSNode nodeToAlter = (JSNode) getLastNode();
+		// hack the node!
+		if (nodeToAlter != null)
 		{
 			if (expressionStatement.getFinish() < this.source.length())
 			{
 				char lastChar = this.source.charAt(expressionStatement.getFinish());
 				if (lastChar == ';')
 				{
-					node.setLocation(node.getStartingOffset(), expressionStatement.getFinish());
+					nodeToAlter.setLocation(nodeToAlter.getStartingOffset(), expressionStatement.getFinish());
 				}
 			}
-			node.setSemicolonIncluded(true);
+			nodeToAlter.setSemicolonIncluded(true);
 		}
-		else
-		{
-			// There may have been an error!
-			// throw new IllegalStateException("Ended an expression with no last statement/child within parent node!");
-		}
+
 		return super.leaveExpressionStatement(expressionStatement);
 	}
 
@@ -1732,14 +1680,11 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterCallNode(CallNode callNode)
 	{
-		// If the call is wrapped in parens, wrap the JSInvokeNode in a JSGroupNode to represent this.
-		// and fix the offsets of the JSInvokeNode to not include the wrapping parens
+		// If the call is wrapped in parens, fix the offsets of the JSInvokeNode to not include the wrapping parens
 		int start = getCallNodeStart(callNode);
 		int finish = callNode.getFinish() - 1;
 		if (source.charAt(start) == '(')
 		{
-			// addToParentAndPushNodeToStack(
-			// new JSGroupNode(toSymbol(JSTokenType.LPAREN, start), toSymbol(JSTokenType.RPAREN, finish)));
 			start += 1;
 			finish -= 1;
 		}
@@ -1800,17 +1745,17 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		popNode(); // arguments node
 		popNode(); // invoke node
-		// if wrapped in parens, pop the wrapping Group Node!
-		// if (source.charAt(callNode.getStart()) == '(')
-		// {
-		// popNode(); // group node
-		// }
 		return super.leaveCallNode(callNode);
 	}
 
 	@Override
 	protected Node leaveDefault(Node node)
 	{
+		if (parenCheck.isEnclosed(node))
+		{
+			parenCheck.wrapInGroupNode(node);
+		}
+
 		// System.out.println("Leaving node: " + node.getClass().getName() + ": " + node);
 		if (pushOnLeave != null && pushOnLeave.containsKey(node))
 		{
@@ -1825,7 +1770,10 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		// lParen, rParen
 		int lParen = findChar('(', ifNode.getStart() + 2, ifNode.getTest().getStart());
-		int rParen = findChar(')', ifNode.getTest().getFinish(), ifNode.getPass().getStart());
+		int rParen = findLastChar(')', ifNode.getPass().getStart()); // search backwards from pass block. If we search
+																		// forwards from test end, it may pick up an
+																		// enclosing paren surrounding a portion of the
+																		// test expression!
 		addToParentAndPushNodeToStack(new JSIfNode(ifNode.getStart(), ifNode.getFinish() - 1,
 				toSymbol(JSTokenType.LPAREN, lParen), toSymbol(JSTokenType.RPAREN, rParen)));
 		return super.enterIfNode(ifNode);
@@ -1872,9 +1820,16 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterIndexNode(IndexNode indexNode)
 	{
-		// FIXME Use findChar to get more accurate positions!
-		int leftBracket = indexNode.getBase().getFinish();
-		int rightBracket = indexNode.getFinish() - 1;
+		int leftBracket = findChar('[', indexNode.getBase().getFinish(), indexNode.getIndex().getStart());
+		if (leftBracket == -1)
+		{
+			throw new IllegalStateException("Unabel to find open bracket for IndexNode: " + indexNode);
+		}
+		int rightBracket = findChar(']', indexNode.getIndex().getFinish(), indexNode.getFinish());
+		if (rightBracket == -1)
+		{
+			throw new IllegalStateException("Unabel to find close bracket for IndexNode: " + indexNode);
+		}
 		addToParentAndPushNodeToStack(new JSGetElementNode(indexNode.getStart(), indexNode.getFinish() - 1,
 				toSymbol(JSTokenType.LBRACKET, leftBracket), toSymbol(JSTokenType.RBRACKET, rightBracket)));
 		return super.enterIndexNode(indexNode);
@@ -1968,20 +1923,12 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		return super.leaveLabelNode(labelNode);
 	}
 
-	// @Override
-	// protected boolean enterDefault(Node node)
-	// {
-	// System.out.println("Entering node: " + node.getClass().getName() + ": " + node);
-	// return super.enterDefault(node);
-	// }
-
 	@Override
 	public boolean enterWithNode(WithNode withNode)
 	{
 		// lParen, rParen
-		// FIXME Use findChar to get more accurate positions!
-		int lParen = withNode.getExpression().getStart() - 1;
-		int rParen = withNode.getExpression().getFinish();
+		int lParen = findChar('(', withNode.getStart() + 4, withNode.getExpression().getStart());
+		int rParen = findLastChar(')', withNode.getBody().getStart());
 		addToParentAndPushNodeToStack(new JSWithNode(withNode.getStart(), withNode.getFinish() - 1,
 				toSymbol(JSTokenType.LPAREN, lParen), toSymbol(JSTokenType.RPAREN, rParen)));
 		return super.enterWithNode(withNode);
@@ -2045,7 +1992,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 
 	private IParseNode getCurrentNode()
 	{
-		if (fNodeStack.isEmpty())
+		if (fNodeStack == null || fNodeStack.isEmpty())
 		{
 			return null;
 		}
@@ -2181,6 +2128,177 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		{
 			this.isExported = isExported;
 			this.isDefault = isDefault;
+		}
+	}
+
+	private class ParenWrapChecker
+	{
+		private int startIndex;
+
+		private boolean isEnclosed()
+		{
+			JSNode matchingJSNode = (JSNode) getLastNode();
+			if (matchingJSNode == null)
+			{
+				return false;
+			}
+
+			// Use the JSNode we created, as we may have altered it's offsets to avoid double-"claiming" parens on
+			// multiple nodes with same start offset
+			startIndex = getEnclosingOpenParenIndex(matchingJSNode.getStartingOffset());
+			if (startIndex == -1)
+			{
+				return false;
+			}
+			// Look to see if this is an "unclaimed" paren. If it's part of an existing group node, if syntax, while
+			// syntax, method call, function parameter syntax, etc then don't match
+			// This is meant to cull out obvious cases we shouldn't try, but we also do a sanity check in
+			// wrapInGroupNode. If the close paren location looks invalid we will not generate and wrap in a group node!
+			IParseNode parent = getCurrentNode();
+			while (parent != null)
+			{
+				switch (parent.getNodeType())
+				{
+					case IJSNodeTypes.IF:
+						JSIfNode ifNode = (JSIfNode) parent;
+						return (ifNode.getLeftParenthesis().getStart() != startIndex);
+					case IJSNodeTypes.WHILE:
+						JSWhileNode whileNode = (JSWhileNode) parent;
+						return (whileNode.getLeftParenthesis().getStart() != startIndex);
+					case IJSNodeTypes.WITH:
+						JSWithNode withNode = (JSWithNode) parent;
+						return (withNode.getLeftParenthesis().getStart() != startIndex);
+					case IJSNodeTypes.DO:
+						JSDoNode doNode = (JSDoNode) parent;
+						return (doNode.getLeftParenthesis().getStart() != startIndex);
+
+					case IJSNodeTypes.GROUP:
+					case IJSNodeTypes.ARGUMENTS:
+					case IJSNodeTypes.PARAMETERS:
+						return (parent.getStartingOffset() != startIndex);
+					default:
+						parent = parent.getParent();
+						break;
+				}
+
+			}
+			return true;
+		}
+
+		public void wrapInGroupNode(Node node)
+		{
+			if (node instanceof Expression)
+			{
+				wrapInGroupNode();
+			}
+		}
+
+		public boolean isEnclosed(Node node)
+		{
+			if (node instanceof Expression)
+			{
+				if (node instanceof JoinPredecessorExpression)
+				{
+					return false;
+				}
+				return isEnclosed();
+			}
+			return false;
+		}
+
+		private void wrapInGroupNode()
+		{
+			// What's our parent? What's the corresponding node we're wrapping?
+			ParseNode parent = (ParseNode) getCurrentNode();
+			int nodeToWrapIndex = parent.getChildCount() - 1;
+			IParseNode nodeToWrap = parent.getChild(nodeToWrapIndex);
+
+			JSGroupNode groupNode = generateGroupNode(nodeToWrap.getEndingOffset() + 1);
+			if (groupNode == null)
+			{
+				return; // if invalid location, stop and do nothing
+			}
+
+			// Fix the start/end positions of parent node! They may be incorrect and group node extends beyond it!
+			fixOffsets(parent, groupNode.getStartingOffset(), groupNode.getEndingOffset());
+
+			groupNode.setChildren(new IParseNode[] { nodeToWrap }); // wrap the node in the group node
+
+			// Now replace the corresponding node with a group node that wraps it!
+			parent.replaceChild(nodeToWrapIndex, groupNode);
+		}
+
+		/**
+		 * Recursively update location of parents to enclose the given offsets.
+		 * 
+		 * @param parent
+		 * @param startOffset
+		 * @param endOffset
+		 */
+		private void fixOffsets(ParseNode parent, int startOffset, int endOffset)
+		{
+			if (parent == null)
+			{
+				return;
+			}
+			if ((parent.getStartingOffset() > startOffset) || (parent.getEndingOffset() < endOffset))
+			{
+				parent.setLocation(Math.min(parent.getStartingOffset(), startOffset),
+						Math.max(parent.getEndingOffset(), endOffset));
+				fixOffsets((ParseNode) parent.getParent(), startOffset, endOffset);
+			}
+
+		}
+
+		/**
+		 * Returns the generated group node with paren locations. If unable to find a valid closing paren, this will
+		 * return null.
+		 * 
+		 * @param offsetToBeginSearch
+		 * @return
+		 */
+		private JSGroupNode generateGroupNode(int offsetToBeginSearch)
+		{
+			int closeParen = getEnclosingCloseParenIndex(offsetToBeginSearch);
+			if (closeParen == -1)
+			{
+				return null;
+			}
+			return new JSGroupNode(toSymbol(JSTokenType.LPAREN, startIndex), toSymbol(JSTokenType.RPAREN, closeParen));
+		}
+
+		private int getEnclosingOpenParenIndex(int startOffset)
+		{
+			int openParen = findLastChar('(', startOffset);
+			if (openParen == -1)
+			{
+				return -1;
+			}
+			String between = source.substring(openParen, startOffset);
+			if (between.trim().length() == 1)
+			{ // if we hack off whitespace, only the paren should be left! // FIXME or comment!
+				return openParen;
+			}
+			return -1;
+		}
+
+		private int getEnclosingCloseParenIndex(int offsetToBeginSearch)
+		{
+			int closeParen = findChar(')', offsetToBeginSearch);
+			if (closeParen == -1)
+			{
+				return -1;
+			}
+			if (closeParen == offsetToBeginSearch)
+			{
+				return closeParen;
+			}
+			String between = source.substring(offsetToBeginSearch, closeParen);
+			if (between.trim().length() == 1)
+			{ // if we hack off whitespace, only the paren should be left! // FIXME or comment!
+				return closeParen;
+			}
+			return -1;
 		}
 	}
 }
