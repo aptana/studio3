@@ -2300,8 +2300,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				return closeParen;
 			}
 			String between = source.substring(offsetToBeginSearch, closeParen);
-			if (between.trim().length() == 1)
-			{ // if we hack off whitespace, only the paren should be left! // FIXME or comment!
+			if (between.trim().length() == 0)
+			{ // if we hack off whitespace, nothing should be left (since end index here was the close paren)! // FIXME or comment!
 				return closeParen;
 			}
 			return -1;
