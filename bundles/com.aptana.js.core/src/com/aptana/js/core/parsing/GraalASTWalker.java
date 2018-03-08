@@ -194,6 +194,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			String value = literalNode.getString(); // This is the raw value without the quotes
 			char c = source.charAt(start);
 			value = c + value + c;
+			// fix offset of parents and up stack
+			ParseNode parent = (ParseNode) getCurrentNode();
+			fixOffsets(parent, start, finish);
 			addChildToParent(new JSStringNode(toSymbol(JSTokenType.STRING, start, finish, pool.add(value))));
 		}
 		else if (literalNode.isBoolean())
@@ -638,12 +641,12 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		}
 		else
 		{
+			leaveScope((ParseNode) fRootNode);
 			module = null;
 			pool = null;
 			pushOnLeave = null;
 			// FIXME If nodestack is not empty, spit out an error message
 			fNodeStack = null;
-			reorderChildrenByOffset((ParseNode) fRootNode);
 		}
 		return super.leaveFunctionNode(functionNode);
 	}
@@ -1079,9 +1082,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		if (!block.isSynthetic())
 		{
-			JSStatementsNode statements = (JSStatementsNode) popNode();
-			combineVarDeclarations(statements);
-			reorderChildrenByOffset(statements);
+			leaveScope((ParseNode) popNode());
 		}
 		else if (block.getLastStatement() instanceof ForNode)
 		{
@@ -1123,7 +1124,13 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		return super.leaveBlock(block);
 	}
 
-	private void combineVarDeclarations(JSStatementsNode statements)
+	private void leaveScope(ParseNode statements)
+	{
+		combineVarDeclarations(statements);
+		reorderChildrenByOffset(statements);
+	}
+
+	private void combineVarDeclarations(ParseNode statements)
 	{
 		IParseNode[] children = statements.getChildren();
 		if (children == null || children.length == 0)
@@ -1447,57 +1454,83 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterPropertyNode(PropertyNode propertyNode)
 	{
-		if (propertyNode.getGetter() != null)
+		// A property can have both a getter *and* setter!
+		FunctionNode getter = propertyNode.getGetter();
+		FunctionNode setter = propertyNode.getSetter();
+		if (getter != null || setter != null)
 		{
-			addToParentAndPushNodeToStack(new JSGetterNode(propertyNode.getStart(), propertyNode.getFinish() - 1));
+			handleGetter(getter);
+			handleSetter(setter);
+			return false;
 		}
-		else if (propertyNode.getSetter() != null)
+
+		Expression key = propertyNode.getKey();
+		int colonOffset = findChar(':', key.getFinish(), propertyNode.getValue().getStart());
+		Symbol colon = colonOffset == -1 ? null : toSymbol(JSTokenType.COLON, colonOffset);
+		addToParentAndPushNodeToStack(
+				new JSNameValuePairNode(propertyNode.getStart(), propertyNode.getFinish() - 1, colon));
+		// if the property name is computed, manually traverse
+		if (!(key instanceof LiteralNode) && !(key instanceof IdentNode))
 		{
-			addToParentAndPushNodeToStack(new JSSetterNode(propertyNode.getStart(), propertyNode.getFinish() - 1));
+			addToParentAndPushNodeToStack(new JSComputedPropertyNameNode());
+			propertyNode.getKey().accept(this);
+			popNode(); // computed property name node
+			propertyNode.getValue().accept(this);
+			popNode(); // name value pair node
+			return false;
 		}
-		else
-		{
-			Expression key = propertyNode.getKey();
-			int colonOffset = findChar(':', key.getFinish(), propertyNode.getValue().getStart());
-			Symbol colon = colonOffset == -1 ? null : toSymbol(JSTokenType.COLON, colonOffset);
-			addToParentAndPushNodeToStack(
-					new JSNameValuePairNode(propertyNode.getStart(), propertyNode.getFinish() - 1, colon));
-			// if the property name is computed, manually traverse
-			if (!(key instanceof LiteralNode) && !(key instanceof IdentNode))
-			{
-				addToParentAndPushNodeToStack(new JSComputedPropertyNameNode());
-				propertyNode.getKey().accept(this);
-				popNode(); // computed property name node
-				propertyNode.getValue().accept(this);
-				popNode(); // name value pair node
-				return false;
-			}
-		}
+
 		return super.enterPropertyNode(propertyNode);
+	}
+
+	private void handleGetter(FunctionNode getter)
+	{
+		if (getter == null)
+		{
+			return;
+		}
+
+		int getIndex = this.source.lastIndexOf("get", getter.getIdent().getStart());
+		addToParentAndPushNodeToStack(new JSGetterNode(getIndex, getter.getFinish() - 1));
+		String name = getter.getIdent().getName().substring(4); // drop leading "get "
+		addChildToParent(new JSIdentifierNode(identifierSymbol(getter.getIdent(), name)));
+		getter.accept(this); // function node
+
+		// if getter, grab "value", which should be a function node
+		// Grab function node's body. Replace our value with that body
+		JSGetterNode getterNode = (JSGetterNode) popNode(); // GetterNode
+		JSFunctionNode funcValue = (JSFunctionNode) getterNode.getValue();
+		JSStatementsNode bodyNode = (JSStatementsNode) funcValue.getBody();
+		getterNode.replaceChild(1, bodyNode);
+		getterNode.setLocation(getterNode.getStartingOffset(), bodyNode.getEndingOffset());
+	}
+
+	private void handleSetter(FunctionNode setter)
+	{
+		if (setter == null)
+		{
+			return;
+		}
+
+		int setIndex = this.source.lastIndexOf("set", setter.getIdent().getStart());
+		addToParentAndPushNodeToStack(new JSSetterNode(setIndex, setter.getFinish() - 1));
+		String name = setter.getIdent().getName().substring(4); // drop leading "set "
+		addChildToParent(new JSIdentifierNode(identifierSymbol(setter.getIdent(), name)));
+		setter.accept(this); // function node
+
+		JSSetterNode setterNode = (JSSetterNode) popNode(); // SetterNode
+		JSFunctionNode funcValue = (JSFunctionNode) setterNode.getValue();
+		JSStatementsNode bodyNode = (JSStatementsNode) funcValue.getBody();
+		JSParametersNode paramsNode = (JSParametersNode) funcValue.getParameters();
+		setterNode.replaceChild(1, paramsNode);
+		setterNode.addChild(bodyNode);
+		setterNode.setLocation(setterNode.getStartingOffset(), bodyNode.getEndingOffset());
 	}
 
 	@Override
 	public Node leavePropertyNode(PropertyNode propertyNode)
 	{
-		if (propertyNode.getGetter() != null)
-		{
-			// if getter, grab "value", which should be a function node
-			// Grab function node's body. Replace our value with that body
-			JSGetterNode getterNode = (JSGetterNode) getCurrentNode();
-			JSFunctionNode funcValue = (JSFunctionNode) getterNode.getValue();
-			JSStatementsNode bodyNode = (JSStatementsNode) funcValue.getBody();
-			getterNode.replaceChild(1, bodyNode);
-		}
-		else if (propertyNode.getSetter() != null)
-		{
-			JSSetterNode setterNode = (JSSetterNode) getCurrentNode();
-			JSFunctionNode funcValue = (JSFunctionNode) setterNode.getValue();
-			JSStatementsNode bodyNode = (JSStatementsNode) funcValue.getBody();
-			JSParametersNode paramsNode = (JSParametersNode) funcValue.getParameters();
-			setterNode.replaceChild(1, paramsNode);
-			setterNode.addChild(bodyNode);
-		}
-		else if (propertyNode.getValue() instanceof FunctionNode)
+		if (propertyNode.getValue() instanceof FunctionNode)
 		{
 			// FIXME Move to enterPropertyNode portion?
 			JSNameValuePairNode pairNode = (JSNameValuePairNode) getCurrentNode();
@@ -2125,6 +2158,30 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		return new ExportedStatus(false, false);
 	}
 
+	/**
+	 * Recursively update location of parents to enclose the given offsets. The parent will use the minimum of it's
+	 * starta nd the requested start offset; and the maximum of it's ending offset and the requested offset. This should
+	 * stop recursing once we're no longer updating any values.
+	 * 
+	 * @param parent
+	 * @param startOffset
+	 * @param endOffset
+	 */
+	private void fixOffsets(ParseNode parent, int startOffset, int endOffset)
+	{
+		if (parent == null)
+		{
+			return;
+		}
+		if ((parent.getStartingOffset() > startOffset) || (parent.getEndingOffset() < endOffset))
+		{
+			parent.setLocation(Math.min(parent.getStartingOffset(), startOffset),
+					Math.max(parent.getEndingOffset(), endOffset));
+			fixOffsets((ParseNode) parent.getParent(), startOffset, endOffset);
+		}
+
+	}
+
 	private static class ExportedStatus
 	{
 		final boolean isExported;
@@ -2235,28 +2292,6 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		}
 
 		/**
-		 * Recursively update location of parents to enclose the given offsets.
-		 * 
-		 * @param parent
-		 * @param startOffset
-		 * @param endOffset
-		 */
-		private void fixOffsets(ParseNode parent, int startOffset, int endOffset)
-		{
-			if (parent == null)
-			{
-				return;
-			}
-			if ((parent.getStartingOffset() > startOffset) || (parent.getEndingOffset() < endOffset))
-			{
-				parent.setLocation(Math.min(parent.getStartingOffset(), startOffset),
-						Math.max(parent.getEndingOffset(), endOffset));
-				fixOffsets((ParseNode) parent.getParent(), startOffset, endOffset);
-			}
-
-		}
-
-		/**
 		 * Returns the generated group node with paren locations. If unable to find a valid closing paren, this will
 		 * return null.
 		 * 
@@ -2301,7 +2336,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			}
 			String between = source.substring(offsetToBeginSearch, closeParen);
 			if (between.trim().length() == 0)
-			{ // if we hack off whitespace, nothing should be left (since end index here was the close paren)! // FIXME or comment!
+			{ // if we hack off whitespace, nothing should be left (since end index here was the close paren)! // FIXME
+				// or comment!
 				return closeParen;
 			}
 			return -1;
