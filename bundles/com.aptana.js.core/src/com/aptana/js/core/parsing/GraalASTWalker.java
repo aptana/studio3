@@ -382,7 +382,22 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				type = JSTokenType.LET;
 				keywordName = "let";
 			}
+			// FIXME We need to look backwards for keyword, but if we find anything other than whitespace/comments in
+			// between, we should assume the var belongs to previous var declared in same scope! We do that right now by
+			// assigning the same start offset...
 			int varStart = this.source.lastIndexOf(keywordName, varNode.getStart() - (keywordName.length() + 1));
+			String possible = this.source.substring(varStart, varNode.getStart());
+			if (!possible.trim().equals(keywordName)) // FIXME Strip comments too!
+			{
+				// Look up the previous var decl in this scope and steal it's start offset!
+				IParseNode parent = getCurrentNode();
+				JSVarNode firstVar = (JSVarNode) parent.getFirstChild(); // due to hoisting, this should be a var...
+				if (firstVar != null) {
+					varStart = firstVar.getStartingOffset();
+//				} else {
+//					throw new IllegalStateException("Couldn't find first hoisted var to match up with!");
+				}
+			}
 			Symbol var = toSymbol(type, varStart, varStart + (keywordName.length() - 1));
 
 			ExportedStatus exportStatus = getExportStatus(varNode.getName());
@@ -670,17 +685,17 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			case NOT:
 				type = JSTokenType.EXCLAMATION;
 				theNode = new JSPreUnaryOperatorNode(start, finish,
-						new Symbol(type.getIndex(), unaryNode.getStart(), unaryNode.getStart() + 1, type.getName()));
+						new Symbol(type.getIndex(), start, start + 1, type.getName()));
 				break;
 			case INCPREFIX:
 				type = JSTokenType.PLUS_PLUS;
 				theNode = new JSPreUnaryOperatorNode(start, finish,
-						new Symbol(type.getIndex(), unaryNode.getStart(), unaryNode.getStart() + 2, type.getName()));
+						new Symbol(type.getIndex(), start, start + 2, type.getName()));
 				break;
 			case DECPREFIX:
 				type = JSTokenType.MINUS_MINUS;
 				theNode = new JSPreUnaryOperatorNode(start, finish,
-						new Symbol(type.getIndex(), unaryNode.getStart(), unaryNode.getStart() + 2, type.getName()));
+						new Symbol(type.getIndex(), start, start + 2, type.getName()));
 				break;
 			case INCPOSTFIX:
 				type = JSTokenType.PLUS_PLUS;
@@ -695,14 +710,14 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			case BIT_NOT:
 				type = JSTokenType.TILDE;
 				theNode = new JSPreUnaryOperatorNode(start, finish,
-						new Symbol(type.getIndex(), unaryNode.getStart(), unaryNode.getStart() + 1, type.getName()));
+						new Symbol(type.getIndex(), start, start + 1, type.getName()));
 				break;
 			// case ELLIPSIS:
 			// break;
 			case DELETE:
 				type = JSTokenType.DELETE;
 				theNode = new JSPreUnaryOperatorNode(start, finish,
-						new Symbol(type.getIndex(), unaryNode.getStart(), unaryNode.getStart() + 6, type.getName()));
+						new Symbol(type.getIndex(), start, start + 6, type.getName()));
 				break;
 			case NEW:
 				type = JSTokenType.NEW;
@@ -711,20 +726,20 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			case TYPEOF:
 				type = JSTokenType.TYPEOF;
 				theNode = new JSPreUnaryOperatorNode(start, finish,
-						new Symbol(type.getIndex(), unaryNode.getStart(), unaryNode.getStart() + 6, type.getName()));
+						new Symbol(type.getIndex(), start, start + 6, type.getName()));
 				break;
 			case VOID:
 				type = JSTokenType.VOID;
 				theNode = new JSPreUnaryOperatorNode(start, finish,
-						new Symbol(type.getIndex(), unaryNode.getStart(), unaryNode.getStart() + 4, type.getName()));
+						new Symbol(type.getIndex(), start, start + 4, type.getName()));
 				break;
 			case ADD:
 				type = JSTokenType.PLUS;
-				theNode = new JSPreUnaryOperatorNode(start, finish, toSymbol(type, unaryNode.getStart()));
+				theNode = new JSPreUnaryOperatorNode(start, finish, toSymbol(type, start));
 				break;
 			case SUB:
 				type = JSTokenType.MINUS;
-				theNode = new JSPreUnaryOperatorNode(start, finish, toSymbol(type, unaryNode.getStart()));
+				theNode = new JSPreUnaryOperatorNode(start, finish, toSymbol(type, start));
 				break;
 
 			case YIELD:
@@ -778,7 +793,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		JSNode theNode;
 		JSTokenType type;
 		TokenType tokenType = binaryNode.tokenType();
-		int start = binaryNode.getStart();
+		int start = getNodeStart(binaryNode);
 		int finish = binaryNode.getFinish() - 1; // symbols are inclusive ranges, graal uses exclusive end
 		// FIXME So we should be passing the start/end to the JSNode, but the symbols need to be "searched" for between
 		// lhs end and rhs start!
@@ -1735,7 +1750,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		addToParentAndPushNodeToStack(new JSInvokeNode(start, finish));
 
 		// FIXME: prefer start of first arg as last index to search!
-		int lParen = findChar('(', callNode.getFunction().getFinish(), finish);
+		int lParen = findChar('(', getNodeEnd(callNode.getFunction()), finish);
 		int rParen = findLastChar(')', finish);
 		// Could be no args, as in "var whatever = new Date"! Therefore no parens!
 		if (lParen == -1 || rParen == -1)
@@ -1890,7 +1905,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		// ternaryNode.getStart() points at '?'
 		int question = ternaryNode.getStart();
-		int actualStart = ternaryNode.getTest().getStart();
+		int actualStart = getNodeStart(ternaryNode);
 
 		// FIXME If the true or false expression is a function node, the offsets are wrong!
 		// We typically avoid an issue here by seraching backwards from start of true expression (so in case of function
@@ -1904,6 +1919,45 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		addToParentAndPushNodeToStack(new JSConditionalNode(actualStart, ternaryNode.getFinish() - 1,
 				toSymbol(JSTokenType.QUESTION, question), toSymbol(JSTokenType.COLON, colon)));
 		return super.enterTernaryNode(ternaryNode);
+	}
+
+	/**
+	 * Nodes lie about their positions. A lot. This finds the "actual" start offset.
+	 * 
+	 * @param node
+	 * @return
+	 */
+	private int getNodeStart(Node node)
+	{
+		if (node instanceof AccessNode)
+		{
+			return getAccessNodeStart((AccessNode) node);
+		}
+		else if (node instanceof TernaryNode)
+		{
+			return ((TernaryNode) node).getTest().getStart();
+		}
+		if (node instanceof CallNode)
+		{
+			return getCallNodeStart((CallNode) node);
+		}
+		if (node instanceof BinaryNode)
+		{
+			BinaryNode binaryNode = (BinaryNode) node;
+			return getNodeStart(binaryNode.lhs());
+		}
+		// TODO What about FunctionNodes?
+		return node.getStart();
+	}
+
+	private int getNodeEnd(Node node)
+	{
+		if (node instanceof FunctionNode)
+		{
+			FunctionNode funcNode = (FunctionNode) node;
+			return getNodeEnd(funcNode.getBody());
+		}
+		return node.getFinish();
 	}
 
 	@Override
