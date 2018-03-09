@@ -3,8 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: JRuby
 Bundle-SymbolicName: org.jruby
 Bundle-Version: 1.6.4.qualifier
-Bundle-ClassPath: lib/jruby.jar,
- lib/snakeyaml-1.9.jar
+Bundle-ClassPath: lib/jruby.jar
 Bundle-Vendor: jruby.org
 Export-Package: .,
  com.martiansoftware.nailgun,
@@ -102,24 +101,7 @@ Export-Package: .,
  org.jruby.util.collections,
  org.jruby.util.func,
  org.jruby.util.io,
- org.jruby.util.unsafe,
- org.yaml.snakeyaml,
- org.yaml.snakeyaml.composer,
- org.yaml.snakeyaml.constructor,
- org.yaml.snakeyaml.emitter,
- org.yaml.snakeyaml.error,
- org.yaml.snakeyaml.events,
- org.yaml.snakeyaml.extensions.compactnotation,
- org.yaml.snakeyaml.introspector,
- org.yaml.snakeyaml.nodes,
- org.yaml.snakeyaml.parser,
- org.yaml.snakeyaml.reader,
- org.yaml.snakeyaml.representer,
- org.yaml.snakeyaml.resolver,
- org.yaml.snakeyaml.scanner,
- org.yaml.snakeyaml.serializer,
- org.yaml.snakeyaml.tokens,
- org.yaml.snakeyaml.util
+ org.jruby.util.unsafe
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-BuddyPolicy: global
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.4.0"
