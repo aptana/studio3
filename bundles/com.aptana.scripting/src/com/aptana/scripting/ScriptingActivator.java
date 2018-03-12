@@ -7,14 +7,11 @@
  */
 package com.aptana.scripting;
 
-import net.contentobjects.jnotify.JNotifyException;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.jruby.RubyInstanceConfig;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.logging.IdeLog;
@@ -24,6 +21,8 @@ import com.aptana.scripting.listeners.FileWatcherRegistrant;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.RunType;
 
+import net.contentobjects.jnotify.JNotifyException;
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -31,16 +30,6 @@ public class ScriptingActivator extends Plugin
 {
 	public static final String PLUGIN_ID = "com.aptana.scripting"; //$NON-NLS-1$
 	private static ScriptingActivator plugin;
-
-	static
-	{
-		// Fix for: APSTUD-4508 Rubles don't appear to load correctly when Aptana Studio is in a directory with foreign
-		// characters.
-		// This makes the jruby posix implementation use a java-only implementation which does handle unicode characters
-		// properly when on windows.
-//		RubyInstanceConfig.nativeEnabled = false;
-		RubyInstanceConfig.setLoadedNativeExtensions(false);
-	}
 
 	/**
 	 * Context id set by workbench part to indicate it's an Aptana Editor and make it aware to any generic command.

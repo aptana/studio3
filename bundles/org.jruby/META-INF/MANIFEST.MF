@@ -8,7 +8,7 @@ Bundle-Vendor: jruby.org
 Export-Package: .,
  com.martiansoftware.nailgun,
  com.martiansoftware.nailgun.builtins,
- jnr.netdb,
+ jnr.posix,
  org.jcodings,
  org.jcodings.ascii,
  org.jcodings.constants,

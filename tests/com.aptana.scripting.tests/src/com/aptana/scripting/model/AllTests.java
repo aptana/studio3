@@ -14,7 +14,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 // @formatter:off
 @SuiteClasses({
-	BundleCacherTest.class,
 	BundleTests.class,
 	BundleVisibilityTests.class,
 	CommandBlockRunnerTests.class,

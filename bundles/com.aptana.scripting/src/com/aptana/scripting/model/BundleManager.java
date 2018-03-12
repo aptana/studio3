@@ -97,66 +97,38 @@ public class BundleManager
 			{
 				if (bundleScripts.size() > 0)
 				{
-					boolean useCache = Boolean.valueOf(System.getProperty(USE_BUNDLE_CACHE, Boolean.TRUE.toString()));
+					showBundleLoadInfo("cached failed, loading files directly: " + bundleDirectory); //$NON-NLS-1$
 
-					BundleElement be = null;
-					if (useCache)
+					List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
+
+					// first script is always bundle.rb, so go ahead
+					// and process that
+					File bundleScript = bundleScripts.get(0);
+					sub.subTask(bundleScript.getAbsolutePath());
+					loadScript(bundleScript, true, bundleLoadPaths);
+					sub.worked(1);
+
+					// some new scripts may have come in while we were
+					// processing bundle.rb, so recalculate the list of
+					// scripts to process
+					bundleScripts = getBundleScripts(bundleDirectory);
+
+					if (bundleScripts.size() > 0)
 					{
-						showBundleLoadInfo("attempting to read cache: " + bundleDirectory); //$NON-NLS-1$
-						// include the localization files in the arg we pass here, so that we blow out the cache if
-						// translations change!
-						List<File> filesTocheckTimestamp = new ArrayList<File>(bundleScripts);
-						filesTocheckTimestamp.addAll(localizationFiles(bundleDirectory));
-						be = getCacher().load(bundleDirectory, filesTocheckTimestamp,
-								sub.newChild(bundleScripts.size()));
-					}
-					if (be != null)
-					{
-						showBundleLoadInfo("cache succeeded"); //$NON-NLS-1$
+						// we've already loaded bundle.rb, so remove it from
+						// the list. Note that at this point we have a
+						// bundle element for this bundle, so any file
+						// events that occur now correctly update the bundle
+						// element
+						bundleScripts.remove(0);
 
-						addBundle(be);
-					}
-					else
-					{
-						showBundleLoadInfo("cached failed, loading files directly: " + bundleDirectory); //$NON-NLS-1$
-
-						List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
-
-						// first script is always bundle.rb, so go ahead
-						// and process that
-						File bundleScript = bundleScripts.get(0);
-						sub.subTask(bundleScript.getAbsolutePath());
-						loadScript(bundleScript, true, bundleLoadPaths);
-						sub.worked(1);
-
-						// some new scripts may have come in while we were
-						// processing bundle.rb, so recalculate the list of
-						// scripts to process
-						bundleScripts = getBundleScripts(bundleDirectory);
-
-						if (bundleScripts.size() > 0)
+						// process the rest of the scripts in the bundle
+						for (File script : bundleScripts)
 						{
-							// we've already loaded bundle.rb, so remove it from
-							// the list. Note that at this point we have a
-							// bundle element for this bundle, so any file
-							// events that occur now correctly update the bundle
-							// element
-							bundleScripts.remove(0);
-
-							// process the rest of the scripts in the bundle
-							for (File script : bundleScripts)
-							{
-								sub.subTask(script.getAbsolutePath());
-								loadScript(script, true, bundleLoadPaths);
-								sub.worked(1);
-							}
+							sub.subTask(script.getAbsolutePath());
+							loadScript(script, true, bundleLoadPaths);
+							sub.worked(1);
 						}
-
-						if (useCache)
-						{
-							getCacher().cache(bundleDirectory, sub.newChild(1));
-						}
-
 					}
 				}
 			}
@@ -247,17 +219,6 @@ public class BundleManager
 	public static BundleManager getInstance()
 	{
 		return getInstance(null, null);
-	}
-
-	private BundleCacher cacher;
-
-	protected synchronized BundleCacher getCacher()
-	{
-		if (cacher == null)
-		{
-			cacher = new BundleCacher();
-		}
-		return cacher;
 	}
 
 	/**
@@ -369,10 +330,8 @@ public class BundleManager
 					}
 					else
 					{
-						IdeLog.logError(
-								ScriptingActivator.getDefault(),
-								MessageFormat.format(Messages.BundleManager_USER_PATH_NOT_READ_WRITE,
-										f.getAbsolutePath()));
+						IdeLog.logError(ScriptingActivator.getDefault(), MessageFormat
+								.format(Messages.BundleManager_USER_PATH_NOT_READ_WRITE, f.getAbsolutePath()));
 					}
 				}
 				else
@@ -449,7 +408,8 @@ public class BundleManager
 	private List<String> applicationBundlesPaths;
 	private String userBundlesPath;
 
-	// TODO We should do a better job synchronizing these collections. We need to synchronize the Lists inside this first map too
+	// TODO We should do a better job synchronizing these collections. We need to synchronize the Lists inside this
+	// first map too
 	private Map<File, List<BundleElement>> _bundlesByPath;
 	private Map<String, BundleEntry> _entriesByName;
 
@@ -745,8 +705,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					IdeLog.logError(ScriptingActivator.getDefault(),
-							Messages.BundleManager_Script_Reloaded_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(), Messages.BundleManager_Script_Reloaded_Event_Error,
+							t);
 				}
 			}
 		}
@@ -771,8 +731,8 @@ public class BundleManager
 				}
 				catch (Throwable t)
 				{
-					IdeLog.logError(ScriptingActivator.getDefault(),
-							Messages.BundleManager_Script_Unloaded_Event_Error, t);
+					IdeLog.logError(ScriptingActivator.getDefault(), Messages.BundleManager_Script_Unloaded_Event_Error,
+							t);
 				}
 			}
 		}
@@ -888,7 +848,8 @@ public class BundleManager
 			{
 				public boolean accept(File pathname)
 				{
-					return (pathname.isDirectory() && !pathname.getName().startsWith(".") && isValidBundleDirectory(pathname)); //$NON-NLS-1$
+					return (pathname.isDirectory() && !pathname.getName().startsWith(".") //$NON-NLS-1$
+							&& isValidBundleDirectory(pathname));
 				}
 			});
 		}
@@ -2023,8 +1984,8 @@ public class BundleManager
 
 		if (!script.canRead())
 		{
-			ScriptLogger.logError(MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT,
-					script.getAbsolutePath()));
+			ScriptLogger
+					.logError(MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT, script.getAbsolutePath()));
 			return;
 		}
 
