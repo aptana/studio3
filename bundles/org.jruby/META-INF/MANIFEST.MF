@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: JRuby
 Bundle-SymbolicName: org.jruby
-Bundle-Version: 1.6.4.qualifier
+Bundle-Version: 9.1.16.qualifier
 Bundle-ClassPath: lib/jruby.jar
 Bundle-Vendor: jruby.org
 Export-Package: .,
