@@ -7,6 +7,11 @@ Aptana Studio 3 Core holds the core set of plugins used to build the Aptana Stud
 
 This set of plugins deals with providing support for web development: HTML, CSS, XML, and JavaScript. It also includes our own Git plugin support. Features that deal with adding support for [PHP](https://github.com/aptana/studio3-php), [Python](https://github.com/aptana/PyDev) and [Ruby](https://github.com/aptana/studio3-ruby) are broken out to other repositories. The Portion dealing with bundling all of that together to form the IDE is in the [studio3-rcp](https://github.com/aptana/studio3-rcp) repository.
 
+How to Download Aptana
+----------
+ 1. Visit https://github.com/aptana/studio3/releases
+ 2. Download the latest version for your operating system. Windows (.exe) and Mac (.dmg) have installers. Linux is a .zip file that you'll expand in your chosen location.
+
 How to Contribute
 ----------
  1. Fork this repo.
