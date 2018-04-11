@@ -1,0 +1,145 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.aptana.studio</groupId>
+	<artifactId>com.aptana.studio.config</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<properties>
+		<tycho-version>1.0.0</tycho-version>
+		<tycho-extras.version>${tycho-version}</tycho-extras.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- by default assume libraries_com git repo is a sibling of studio3 on dev's machine -->
+		<sftp.p2.repo.url>file:${project.basedir}/../../../libraries_com/releng/com.aptana.ide.libraries.subscription.update/target/repository/</sftp.p2.repo.url>
+		<jarsigner.alias>appcelerator</jarsigner.alias>
+		<!-- To sign the plugins, you must supply the following properties via the command line:
+			jarsigner.keystore=/path/to.keystore
+			jarsigner.keypass=key_password
+			jarsigner.storepass=keystore_password
+
+			for example:
+			mvn clean verify -Djarsigner.keystore/Users/example/appcelerator.keystore -Djarsigner.keypass=changeme -Djarsigner.storepass=storepass
+		-->
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>aptana-sftp-libraries</id>
+			<url>${sftp.p2.repo.url}</url>
+			<layout>p2</layout>
+		</repository>
+	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<!-- target platform -->
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<target>
+						<artifact>
+							<groupId>com.aptana.studio</groupId>
+							<artifactId>com.aptana.studio.target</artifactId>
+							<version>1.0.0-SNAPSHOT</version>
+						</artifact>
+					</target>
+					<resolver>p2</resolver>
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
+			<!-- use last git commit timestamp as build qualifier for plugins -->
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-packaging-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.eclipse.tycho.extras</groupId>
+						<artifactId>tycho-buildtimestamp-jgit</artifactId>
+						<version>${tycho-extras.version}</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<timestampProvider>jgit</timestampProvider>
+					<jgit.ignore>
+					pom.xml
+					.polyglot.build.properties
+					</jgit.ignore>
+					<!-- FIXME Set to warning? Only override to ignore on specific plugins liek titanium.core where we hack the qualifier? -->
+					<jgit.dirtyWorkingTree>ignore</jgit.dirtyWorkingTree>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<!-- We only sign the jars when the jarsigner.keystore property actually is provided and exists -->
+			<id>sign-jars</id>
+			<activation>
+				<file>
+					<exists>${jarsigner.keystore}</exists>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<!-- Sign the JARs -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jarsigner-plugin</artifactId>
+						<version>1.2</version>
+						<configuration>
+							<keystore>${jarsigner.keystore}</keystore>
+							<storepass>${jarsigner.storepass}</storepass>
+							<alias>${jarsigner.alias}</alias>
+							<keypass>${jarsigner.keypass}</keypass>
+						</configuration>
+						<executions>
+							<execution>
+								<id>sign</id>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

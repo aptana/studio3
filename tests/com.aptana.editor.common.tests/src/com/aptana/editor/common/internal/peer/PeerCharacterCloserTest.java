@@ -9,12 +9,11 @@ package com.aptana.editor.common.internal.peer;
 
 import org.junit.After;
 import org.junit.Test;
+
 import org.junit.Before;
 import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPartitioningException;

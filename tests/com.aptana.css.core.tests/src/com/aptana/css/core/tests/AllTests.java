@@ -7,39 +7,16 @@
  */
 package com.aptana.css.core.tests;
 
-import org.junit.runners.Suite.SuiteClasses;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runners.Suite.SuiteClasses;
 
 import com.aptana.css.core.index.CSSIndexTests;
 import com.aptana.css.core.internal.build.CSSBuildParticipantsTests;
 import com.aptana.css.core.parsing.CSSParsingTests;
 
 @RunWith(Suite.class)
-@SuiteClasses({CSSParsingTests.class, CSSIndexTests.class, CSSBuildParticipantsTests.class, })
+@SuiteClasses({ CSSParsingTests.class, CSSIndexTests.class, CSSBuildParticipantsTests.class, })
 public class AllTests
 {
-
-//	public static Test suite()
-//	{
-//		TestSuite suite = new TestSuite(AllTests.class.getName())
-//		{
-//			@Override
-//			public void runTest(Test test, TestResult result)
-//			{
-//				System.err.println("Running test: " + test.toString());
-//				super.runTest(test, result);
-//			}
-//		};
-//		// $JUnit-BEGIN$
-//		suite.addTest(CSSParsingTests.suite());
-//		suite.addTest(CSSIndexTests.suite());
-//		suite.addTest(CSSBuildParticipantsTests.suite());
-//		// $JUnit-END$
-//		return suite;
-//	}
 }

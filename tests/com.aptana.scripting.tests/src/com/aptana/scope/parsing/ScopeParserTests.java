@@ -7,11 +7,14 @@
  */
 package com.aptana.scope.parsing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.junit.After;
-import org.junit.Test;
 import org.junit.Before;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import com.aptana.scope.ISelectorNode;
 import com.aptana.scope.ScopeUtil;
@@ -23,28 +26,16 @@ public class ScopeParserTests
 {
 	private ScopeParser parser;
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
-
 		parser = new ScopeParser();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
 	@After
 	public void tearDown() throws Exception
 	{
 		parser = null;
-
-//		super.tearDown();
 	}
 
 	protected void assertParseResult(String source, String treeString)

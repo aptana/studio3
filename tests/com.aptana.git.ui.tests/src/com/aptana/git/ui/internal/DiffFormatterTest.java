@@ -7,11 +7,11 @@
  */
 package com.aptana.git.ui.internal;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import com.aptana.git.ui.DiffFormatter;
+import static org.junit.Assert.assertEquals;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
+import com.aptana.git.ui.DiffFormatter;
 
 public class DiffFormatterTest
 {

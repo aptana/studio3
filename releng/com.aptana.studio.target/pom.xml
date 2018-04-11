@@ -1,0 +1,13 @@
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.aptana.studio</groupId>
+	<artifactId>com.aptana.studio.target</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>eclipse-target-definition</packaging>
+
+	<parent>
+		<groupId>com.aptana.studio</groupId>
+		<artifactId>com.aptana.studio.releng</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+</project>

@@ -18,12 +18,10 @@ import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
@@ -32,23 +30,14 @@ import com.aptana.editor.common.ICommonConstants;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 
-/**
- * The class <code>CommonProjectionViewerTest</code> contains tests for the class
- * <code>{@link CommonProjectionViewer}</code>.
- */
 public class CommonProjectionViewerTest extends EditorBasedTests
 {
 
-	/**
-	 * testSnippetProposalActivation
-	 * 
-	 * @throws IOException
-	 */
 	@Test
 	public void testSnippetProposalActivation() throws IOException
 	{
-
-		IFileStore fileStore = createFileStore("proposal_tests", "html", "");
+		// FIXME: Can we generate a test editor/formatter to use so we don't rely on text/html/html.formatter plugins?!
+		IFileStore fileStore = createFileStore("proposal_tests", "test", "");
 		this.setupTestContext(fileStore);
 
 		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(CommonEditorPlugin.PLUGIN_ID);
@@ -79,9 +68,9 @@ public class CommonProjectionViewerTest extends EditorBasedTests
 	}
 
 	@Test
-	public void testCreateFormattingContextText()
+	public void testCreateFormattingContext()
 	{
-		IFileStore fileStore = createFileStore("proposal_tests", "txt", "");
+		IFileStore fileStore = createFileStore("proposal_tests", "test", "");
 		this.setupTestContext(fileStore);
 
 		CommonProjectionViewer textViewer = (CommonProjectionViewer) editor.getAdapter(ITextOperationTarget.class);
@@ -89,21 +78,6 @@ public class CommonProjectionViewerTest extends EditorBasedTests
 		assertNotNull(context);
 		assertNull(context.getProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID));
 		assertNull(context.getProperty(FormattingContextProperties.CONTEXT_PREFERENCES));
-		context.dispose();
-	}
-
-	@Test
-	public void testCreateFormattingContextHtml()
-	{
-		IFileStore fileStore = createFileStore("proposal_tests", "html", "");
-		FileStoreEditorInput editorInput = new FileStoreEditorInput(fileStore);
-		editor = this.createEditor(editorInput, "com.aptana.editor.html");
-
-		CommonProjectionViewer textViewer = (CommonProjectionViewer) editor.getAdapter(ITextOperationTarget.class);
-		IFormattingContext context = textViewer.createFormattingContext();
-		assertNotNull(context);
-		assertNotNull(context.getProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID));
-		assertNotNull(context.getProperty(FormattingContextProperties.CONTEXT_PREFERENCES));
 		context.dispose();
 	}
 
@@ -125,7 +99,7 @@ public class CommonProjectionViewerTest extends EditorBasedTests
 	protected String getEditorId()
 	{
 		// straight text editor
-		return "com.aptana.editor.text";
+		return "com.aptana.editor.test";
 	}
 
 	protected class TestCommonProjectionViewer extends CommonProjectionViewer

@@ -71,7 +71,7 @@ public class CSSTokensTest
 				{
 					// Add in token types that are being tested, regardless if they pass or not. This info is used by
 					// another test to determine if we've covered all token types during testing
-					VerifyTestedTokensTest.TESTED_TOKEN_TYPES.add(info.type);
+					//VerifyTestedTokensTest.TESTED_TOKEN_TYPES.add(info.type);
 
 					assertEquals("Checking token type for '" + source + "'", info.type.getIndex(), token.getId());
 				}

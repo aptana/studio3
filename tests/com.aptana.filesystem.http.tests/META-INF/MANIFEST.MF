@@ -6,7 +6,6 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: %providerName
 Fragment-Host: com.aptana.filesystem.http;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Require-Bundle: org.junit;bundle-version="4.0.0",
- org.kohsuke.junit;bundle-version="1.0.0"
+Require-Bundle: org.junit;bundle-version="4.8.0"
 Export-Package: com.aptana.filesystem.http.tests
 Bundle-ClassPath: .

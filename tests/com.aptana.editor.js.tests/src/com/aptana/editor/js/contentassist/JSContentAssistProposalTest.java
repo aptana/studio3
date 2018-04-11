@@ -34,7 +34,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import com.aptana.core.tests.TestProject;
 import com.aptana.core.util.FileUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
@@ -50,6 +49,7 @@ import com.aptana.js.core.model.PropertyElement;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.testing.utils.TestProject;
 
 /**
  * JSContentAssistProposalTests

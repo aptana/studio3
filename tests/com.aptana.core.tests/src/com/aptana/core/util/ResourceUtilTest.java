@@ -192,20 +192,6 @@ public class ResourceUtilTest
 		// That there is _not_ the builder in question;
 		assertFalse(foundBuilder);
 
-		// re-add builder
-		ResourceUtil.addBuilder(testProject, UnifiedBuilder_ID);
-
-		desc = testProject.getDescription();
-
-		// now add two Aptana natures
-		ResourceUtil.addNature(testProject, WEBNATUREID);
-
-		// try to remove the builder. It should not
-		assertFalse(ResourceUtil.removeBuilderIfOrphaned(testProject, UnifiedBuilder_ID));
-
-		// remove a nature. Internally will remove builder if orphaned
-		ResourceUtil.removeNature(testProject, WEBNATUREID);
-
 		// back to original builder length
 		assertEquals(numCommands, testProject.getDescription().getBuildSpec().length);
 	}

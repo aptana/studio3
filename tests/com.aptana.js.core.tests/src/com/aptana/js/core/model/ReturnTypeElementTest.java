@@ -1,10 +1,8 @@
 package com.aptana.js.core.model;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import com.aptana.js.core.model.ReturnTypeElement;
+import static org.junit.Assert.assertEquals;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 public class ReturnTypeElementTest
 {

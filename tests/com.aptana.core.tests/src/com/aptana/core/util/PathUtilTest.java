@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.core.runtime.Path;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Test;
 
 import com.aptana.core.ShellExecutable;
@@ -23,9 +24,11 @@ public class PathUtilTest
 	{
 		ShellExecutable.setPreferenceShellPath(null);
 	}
+	// FIXME Fails under tycho, likely due to use of org.eclipse.core.runtime.Platform to detect if win32 or not!
 	@Test
 	public void testCygwinPath() throws Exception
 	{
+		Assume.assumeTrue("Assumes we're running on Windows OS", PlatformUtil.isWindows());
 		ShellExecutable.setPreferenceShellPath(Path.fromOSString("C:\\cygwin\\bin\\sh.exe"));
 		String rawPATH = "/usr/local/bin:/usr/bin:/cygdrive/c/Windows/system32:/cygdrive/c/Windows:/cygdrive/c/Windows/System32/Wbem:/cygdrive/c/Windows/System32/WindowsPowerShell/v1.0:/cygdrive/c/apache-ant-1.7.1/bin:/cygdrive/c/RailsInstaller/Git/cmd:/cygdrive/c/RailsInstaller/Ruby1.8.7/bin:/cygdrive/c/Program Files (x86)/CVSNT";
 		String actual = PathUtil.convertPATH(rawPATH);

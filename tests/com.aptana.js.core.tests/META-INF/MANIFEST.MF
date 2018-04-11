@@ -8,5 +8,9 @@ Fragment-Host: com.aptana.js.core;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.junit,
  org.eclipse.test.performance,
- com.aptana.testing.mocks
+ com.aptana.testing.libraries,
+ com.aptana.testing.mocks,
+ com.aptana.testing.utils;bundle-version="1.0.0"
 Export-Package: com.aptana.js.core.tests
+Import-Package: com.aptana.core.tests,
+ com.aptana.buildpath.core.tests

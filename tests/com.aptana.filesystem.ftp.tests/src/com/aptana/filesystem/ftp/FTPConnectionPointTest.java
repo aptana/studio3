@@ -13,14 +13,16 @@ import static org.junit.Assert.assertEquals;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
+import com.aptana.testing.categories.IntegrationTests;
 
 /**
  * @author Max Stepanov
  */
-@SuppressWarnings("nls")
+@Category({ IntegrationTests.class })
 public class FTPConnectionPointTest
 {
 

@@ -7,15 +7,14 @@
  */
 package com.aptana.core.util;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import java.io.InputStream;
+import static org.junit.Assert.assertEquals;
 
-import junit.framework.TestCase;
+import java.io.InputStream;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.junit.Test;
 
 public class StreamUtilTest
 {

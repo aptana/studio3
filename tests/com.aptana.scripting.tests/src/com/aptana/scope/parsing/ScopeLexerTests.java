@@ -7,11 +7,14 @@
  */
 package com.aptana.scope.parsing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import org.junit.After;
-import org.junit.Test;
 import org.junit.Before;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import org.junit.Test;
+
 import beaver.Symbol;
 
 /**
@@ -21,30 +24,16 @@ public class ScopeLexerTests
 {
 	private ScopeFlexScanner scanner;
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
-
 		scanner = new ScopeFlexScanner();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{
 		scanner = null;
-
-//		super.tearDown();
 	}
 
 	protected void assertTokenType(String source, ScopeTokenType type)

@@ -7,16 +7,15 @@
  */
 package com.aptana.syncing.core.tests;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Properties;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
@@ -24,6 +23,9 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.io.vfs.IExtendedFileStore;
@@ -52,9 +54,6 @@ public abstract class LargeSampleSyncingTests
 		return SyncingTests.getConfig();
 	}
 
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@Before
 	public void setUp() throws Exception
 	{
@@ -72,13 +71,8 @@ public abstract class LargeSampleSyncingTests
 		serverDirectory = serverManager.getRoot().getFileStore(new Path("/server" + System.currentTimeMillis()));
 		assertNotNull(serverDirectory);
 		serverDirectory.mkdir(EFS.NONE, null);
-
-//		super.setUp();
 	}
 
-	/**
-	 * @see junit.framework.TestCase#tearDown()
-	 */
 	@After
 	public void tearDown() throws Exception
 	{
@@ -113,8 +107,6 @@ public abstract class LargeSampleSyncingTests
 				serverManager.disconnect(null);
 			}
 		}
-
-//		super.tearDown();
 	}
 
 	/*
@@ -209,11 +201,11 @@ public abstract class LargeSampleSyncingTests
 		syncManager.upload(items, null);
 
 		System.out.println("5) ensure local version matches remote version");
-		testDirectoriesEqual(serverLocalDirectory, serverTestDirectory, includeCloakedFiles, timeTolerance);
+		assertDirectoriesEqual(serverLocalDirectory, serverTestDirectory, includeCloakedFiles, timeTolerance);
 
 		System.out
 				.println("6) test to make sure client_test and client_control are identical, as nothing should have changed locally");
-		testDirectoriesEqual(clientTestDirectory, clientControlDirectory, includeCloakedFiles, timeTolerance);
+		assertDirectoriesEqual(clientTestDirectory, clientControlDirectory, includeCloakedFiles, timeTolerance);
 
 		// Now get sync items between local and remote directories
 		System.out.println("7) sync between client_test and server_test, deleting on remote");
@@ -223,14 +215,13 @@ public abstract class LargeSampleSyncingTests
 
 		System.out
 				.println("8) test to make sure client_test and client_control are identical, as nothing should have changed locally");
-		testDirectoriesEqual(clientTestDirectory, clientControlDirectory, includeCloakedFiles, timeTolerance);
+		assertDirectoriesEqual(clientTestDirectory, clientControlDirectory, includeCloakedFiles, timeTolerance);
 
 		System.out.println("9) test to make sure client_test and server_test are identical after sync");
-		testDirectoriesEqual(clientTestDirectory, serverTestDirectory, includeCloakedFiles, timeTolerance);
+		assertDirectoriesEqual(clientTestDirectory, serverTestDirectory, includeCloakedFiles, timeTolerance);
 	}
 
-	@Test
-	protected void testDirectoriesEqual(IFileStore root1, IFileStore root2, boolean includeCloakedFiles,
+	protected void assertDirectoriesEqual(IFileStore root1, IFileStore root2, boolean includeCloakedFiles,
 			int timeTolerance) throws CoreException
 	{
 		IFileStore[] ctd = EFSUtils.getFiles(root1, true, includeCloakedFiles);
@@ -251,12 +242,11 @@ public abstract class LargeSampleSyncingTests
 		for (int i = 0; i < ctd.length; i++)
 		{
 			IFileStore fsControl = ctd[i];
-			testFilesExists(map, root1, fsControl, timeTolerance);
+			assertFilesExists(map, root1, fsControl, timeTolerance);
 		}
 	}
 
-	@Test
-	protected void testFilesEqual(IFileStore root1, IFileStore root2, IFileStore file1, IFileStore file2)
+	protected void assertFilesEqual(IFileStore root1, IFileStore root2, IFileStore file1, IFileStore file2)
 			throws CoreException
 	{
 		String file1RelPath = EFSUtils.getRelativePath(root1, file1, null);
@@ -275,8 +265,7 @@ public abstract class LargeSampleSyncingTests
 		}
 	}
 
-	@Test
-	protected void testFilesExists(HashMap<String, IFileStore> destMap, IFileStore sourceRoot, IFileStore sourceFile,
+	protected void assertFilesExists(HashMap<String, IFileStore> destMap, IFileStore sourceRoot, IFileStore sourceFile,
 			int timeTolerance) throws CoreException
 	{
 		String relPath = EFSUtils.getRelativePath(sourceRoot, sourceFile, null);

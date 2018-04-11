@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Libraries
+Bundle-SymbolicName: com.aptana.testing.libraries
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: APTANA
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: com.aptana.testing.categories

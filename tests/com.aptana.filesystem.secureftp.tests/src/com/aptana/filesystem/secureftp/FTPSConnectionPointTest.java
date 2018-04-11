@@ -8,12 +8,11 @@
 
 package com.aptana.filesystem.secureftp;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
@@ -23,7 +22,6 @@ import com.aptana.filesystem.ftp.IFTPConstants;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("nls")
 public class FTPSConnectionPointTest {
 
 	private static final String name = "My FTPS Site";

@@ -7,12 +7,10 @@
  */
 package com.aptana.editor.xml;
 
-import org.junit.After;
-import org.junit.Test;
-import static org.junit.Assert.*;
-import java.io.File;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-import junit.framework.TestCase;
+import java.io.File;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -20,6 +18,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.junit.After;
+import org.junit.Test;
 
 import com.aptana.editor.epl.tests.EditorTestHelper;
 
@@ -28,7 +28,6 @@ public class XMLEditorTest
 
 	private ITextEditor editor;
 
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{
@@ -37,7 +36,6 @@ public class XMLEditorTest
 			EditorTestHelper.closeEditor(editor);
 			editor = null;
 		}
-//		super.tearDown();
 	}
 
 	@Test

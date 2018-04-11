@@ -9,6 +9,7 @@ package com.aptana.editor.common.scripting;
 
 import org.eclipse.ui.PartInitException;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.editor.common.tests.SingleEditorTestCase;
@@ -17,6 +18,7 @@ import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InputType;
 import com.aptana.scripting.model.OutputType;
+import com.aptana.testing.categories.IntegrationTests;
 
 /**
  * This "unit" test is really a higher-level integration tests for checking how command output is applied to a text
@@ -24,6 +26,7 @@ import com.aptana.scripting.model.OutputType;
  * 
  * @author cwilliams
  */
+@Category({ IntegrationTests.class })
 public class ScriptingInputOutputIntegrationTest extends SingleEditorTestCase
 {
 

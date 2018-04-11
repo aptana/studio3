@@ -9,14 +9,16 @@
 package com.aptana.filesystem.ftp.tests;
 
 import org.eclipse.core.runtime.Path;
+import org.junit.experimental.categories.Category;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
+import com.aptana.testing.categories.IntegrationTests;
 
 /**
  * @author Max Stepanov
  */
-@SuppressWarnings("nls")
+@Category({ IntegrationTests.class })
 public class FTPConnectionTest extends CommonConnectionTest
 {
 

@@ -7,18 +7,13 @@
  */
 package com.aptana.editor.css.tests.performance;
 
-import org.junit.runners.Suite.SuiteClasses;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
-
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -29,15 +24,21 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.ui.PartInitException;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.epl.tests.OpenEditorTest;
 import com.aptana.editor.epl.tests.ResourceTestHelper;
+import com.aptana.testing.categories.PerformanceTests;
 
-@RunWith(Suite.class)
-@SuiteClasses({})
+@Category({ PerformanceTests.class })
 public class OpenCSSEditorTest extends OpenEditorTest
 {
 
@@ -66,105 +67,87 @@ public class OpenCSSEditorTest extends OpenEditorTest
 		return Path.fromPortableString(getPrefix(baseName) + FILE_SUFFIX);
 	}
 
-	public OpenCSSEditorTest(String name)
+	@Before
+	public void setUp() throws Exception
 	{
-		super(name);
-	}
-
-//	public static Test suite()
-//	{
-//		// ensure sequence
-//		TestSuite suite = new TestSuite(OpenCSSEditorTest.class.getName());
-//		suite.addTest(new OpenCSSEditorTest("testOpenCSSEditor1")); // YUI
-//		// suite.addTest(new OpenCSSEditorTest("testOpenFromMetadata"));
-//		// suite.addTest(new OpenCSSEditorTest("testOpenGithubFormatted"));
-//		// suite.addTest(new OpenCSSEditorTest("testOpenGithubMinimized"));
-//		suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOnOutlineOn")); // WORDPRESS_MINIMIZED
-//		// suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOffOutlineOn")); // WORDPRESS_MINIMIZED
-//		suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOnOutlineOff")); // WORDPRESS_MINIMIZED
-//		// suite.addTest(new OpenCSSEditorTest("testOpenLargeMinifiedFileFoldingOffOutlineOff")); // WORDPRESS_MINIMIZED
-//		suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOnOutlineOn")); // WORDPRESS_ADMIN
-//		// suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOffOutlineOn")); // WORDPRESS_ADMIN
-//		suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOnOutlineOff")); // WORDPRESS_ADMIN
-//		// suite.addTest(new OpenCSSEditorTest("testOpenLargeFileFoldingOffOutlineOff")); // WORDPRESS_ADMIN
-//		return new Setup(suite);
-//	}
-//
-//	/*
-//	 * @see junit.framework.TestCase#setUp()
-//	 */
-	protected void setUp() throws Exception
-	{
-		super.setUp();
 		EditorTestHelper.runEventQueue();
 		setWarmUpRuns(WARM_UP_RUNS);
 		setMeasuredRuns(MEASURED_RUNS);
 	}
 
-	/*
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		EditorTestHelper.closeAllEditors();
-		super.tearDown();
 	}
 
+	@Test
 	public void testOpenCSSEditor1() throws Exception
 	{
 		timeOpening(YUI, false);
 	}
 
+	@Test
 	public void testOpenFromMetadata() throws Exception
 	{
 		timeOpening(FROM_METADATA, true);
 	}
 
+	@Test
 	public void testOpenGithubFormatted() throws Exception
 	{
 		timeOpening(GITHUB_FORMATTED, true);
 	}
 
+	@Test
 	public void testOpenGithubMinimized() throws Exception
 	{
 		timeOpening(GITHUB_MINIMIZED, true);
 	}
 
+	@Test
 	public void testOpenLargeFileFoldingOnOutlineOn() throws Exception
 	{
 		measureOpenInEditor(getFile(WORDPRESS_ADMIN), true, true, createPerformanceMeter());
 	}
 
+	// @Test
 	// public void testOpenLargeFileFoldingOffOutlineOn() throws Exception
 	// {
 	// measureOpenInEditor(getFile(WORDPRESS_ADMIN), false, true, createPerformanceMeter());
 	// }
 
+	@Test
 	public void testOpenLargeFileFoldingOnOutlineOff() throws Exception
 	{
 		measureOpenInEditor(getFile(WORDPRESS_ADMIN), true, false, createPerformanceMeter());
 	}
 
+	// @Test
 	// public void testOpenLargeFileFoldingOffOutlineOff() throws Exception
 	// {
 	// measureOpenInEditor(getFile(WORDPRESS_ADMIN), false, false, createPerformanceMeter());
 	// }
 
+	@Test
 	public void testOpenLargeMinifiedFileFoldingOnOutlineOn() throws Exception
 	{
 		measureOpenInEditor(getFile(WORDPRESS_ADMIN_MINIMIZED), true, true, createPerformanceMeter());
 	}
 
+	// @Test
 	// public void testOpenLargeMinifiedFileFoldingOffOutlineOn() throws Exception
 	// {
 	// measureOpenInEditor(getFile(WORDPRESS_ADMIN_MINIMIZED), false, true, createPerformanceMeter());
 	// }
 
+	@Test
 	public void testOpenLargeMinifiedFileFoldingOnOutlineOff() throws Exception
 	{
 		measureOpenInEditor(getFile(WORDPRESS_ADMIN_MINIMIZED), true, false, createPerformanceMeter());
 	}
 
+	// @Test
 	// public void testOpenLargeMinifiedFileFoldingOffOutlineOff() throws Exception
 	// {
 	// measureOpenInEditor(getFile(WORDPRESS_ADMIN_MINIMIZED), false, false, createPerformanceMeter());
@@ -205,94 +188,67 @@ public class OpenCSSEditorTest extends OpenEditorTest
 		return EditorTestHelper.showView(EditorTestHelper.OUTLINE_VIEW_ID, show);
 	}
 
-	/**
-	 * Setup and teardown done once for the whole suite.
-	 * 
-	 * @author cwilliams
-	 */
-	public static class Setup extends TestSetup
+	@BeforeClass
+	public void setUpSuite() throws Exception
 	{
+		EditorTestHelper.showView(EditorTestHelper.INTRO_VIEW_ID, false);
 
-		private boolean fSetPerspective;
-		private boolean fTearDown;
+		EditorTestHelper.showPerspective(EditorTestHelper.WEB_PERSPECTIVE_ID);
 
-		public Setup(Test test)
+		if (!ResourceTestHelper.projectExists(PROJECT))
 		{
-			this(test, true, true);
+			// boolean wasAutobuilding = CoreUtility.setAutoBuilding(false);
+			setUpProject();
+			// ResourceTestHelper.fullBuild();
+			// if (wasAutobuilding)
+			// CoreUtility.setAutoBuilding(true);
+
+			EditorTestHelper.joinBackgroundActivities();
 		}
 
-		public Setup(Test test, boolean tearDown, boolean setPerspective)
+		replicate(FROM_METADATA);
+		replicate(GITHUB_FORMATTED);
+		replicate(GITHUB_MINIMIZED);
+		replicate(YUI);
+		// Wordpress files don't need to be replicated
+	}
+
+	private void replicate(String baseFileName) throws CoreException
+	{
+		ResourceTestHelper.replicate(getFile(baseFileName), getPrefix(baseFileName), FILE_SUFFIX,
+				WARM_UP_RUNS + MEASURED_RUNS, ResourceTestHelper.IfExists.SKIP);
+	}
+
+	private void setUpProject() throws Exception
+	{
+		IProject project = ResourceTestHelper.createExistingProject(PROJECT);
+		assertTrue("Failed to create an open project", project.isAccessible());
+
+		// Copy all project contents from under "performance"
+		Bundle bundle = Platform.getBundle("com.aptana.editor.css.tests");
+		Enumeration<URL> urls = bundle.findEntries("performance", "*.css", true);
+		assertTrue("Got no performance files to copy", urls.hasMoreElements());
+		while (urls.hasMoreElements())
 		{
-			super(test);
-			fTearDown = tearDown;
-			fSetPerspective = setPerspective;
-		}
-
-		protected void setUp() throws Exception
-		{
-			EditorTestHelper.showView(EditorTestHelper.INTRO_VIEW_ID, false);
-
-			if (fSetPerspective)
-			{
-				EditorTestHelper.showPerspective(EditorTestHelper.WEB_PERSPECTIVE_ID);
-			}
-
-			if (!ResourceTestHelper.projectExists(PROJECT))
-			{
-				// boolean wasAutobuilding = CoreUtility.setAutoBuilding(false);
-				setUpProject();
-				// ResourceTestHelper.fullBuild();
-				// if (wasAutobuilding)
-				// CoreUtility.setAutoBuilding(true);
-
-				EditorTestHelper.joinBackgroundActivities();
-			}
-
-			replicate(FROM_METADATA);
-			replicate(GITHUB_FORMATTED);
-			replicate(GITHUB_MINIMIZED);
-			replicate(YUI);
-			// Wordpress files don't need to be replicated
-		}
-
-		private void replicate(String baseFileName) throws CoreException
-		{
-			ResourceTestHelper.replicate(getFile(baseFileName), getPrefix(baseFileName), FILE_SUFFIX, WARM_UP_RUNS
-					+ MEASURED_RUNS, ResourceTestHelper.IfExists.SKIP);
-		}
-
-		private void setUpProject() throws Exception
-		{
-			IProject project = ResourceTestHelper.createExistingProject(PROJECT);
-			assertTrue("Failed to create an open project", project.isAccessible());
-
-			// Copy all project contents from under "performance"
-			Bundle bundle = Platform.getBundle("com.aptana.editor.css.tests");
-			Enumeration<URL> urls = bundle.findEntries("performance", "*.css", true);
-			assertTrue("Got no performance files to copy", urls.hasMoreElements());
-			while (urls.hasMoreElements())
-			{
-				// Extract performance file to filesystem
-				File file = ResourceUtil.resourcePathToFile(urls.nextElement());
-				// create a file in the new project with the extracted contents.
-				IFile iFile = project.getFile(file.getName());
-				InputStream stream = new FileInputStream(file);
-				iFile.create(stream, true, null);
-				stream.close();
-				// verify we created the file.
-				assertTrue("Failed to copy performance file into project", iFile.exists());
-			}
-		}
-
-		protected void tearDown() throws Exception
-		{
-			if (fTearDown)
-			{
-				ResourceTestHelper.delete(getPrefix(FROM_METADATA), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
-				ResourceTestHelper.delete(getPrefix(GITHUB_FORMATTED), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
-				ResourceTestHelper.delete(getPrefix(GITHUB_MINIMIZED), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
-				ResourceTestHelper.delete(getPrefix(YUI), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
-			}
+			// Extract performance file to filesystem
+			File file = ResourceUtil.resourcePathToFile(urls.nextElement());
+			// create a file in the new project with the extracted contents.
+			IFile iFile = project.getFile(file.getName());
+			InputStream stream = new FileInputStream(file);
+			iFile.create(stream, true, null);
+			stream.close();
+			// verify we created the file.
+			assertTrue("Failed to copy performance file into project", iFile.exists());
 		}
 	}
+
+	@AfterClass
+	public void tearDownSuite() throws Exception
+	{
+		ResourceTestHelper.delete(getPrefix(FROM_METADATA), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+		ResourceTestHelper.delete(getPrefix(GITHUB_FORMATTED), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+		ResourceTestHelper.delete(getPrefix(GITHUB_MINIMIZED), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+		ResourceTestHelper.delete(getPrefix(YUI), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+	}
+
 }

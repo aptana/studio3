@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 
 import com.aptana.core.IMap;
-import com.aptana.core.tests.TestProject;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
@@ -29,6 +28,7 @@ import com.aptana.js.core.index.JSFileIndexingParticipant;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
 import com.aptana.js.internal.core.index.JSIndexReader;
+import com.aptana.testing.utils.TestProject;
 
 public class FunctionInferencingTest extends InferencingTestsBase
 {

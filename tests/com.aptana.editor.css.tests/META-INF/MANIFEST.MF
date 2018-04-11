@@ -6,11 +6,14 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: %providerName
 Fragment-Host: com.aptana.editor.css;bundle-version="1.0.0"
 Require-Bundle: org.eclipse.core.runtime,
- org.junit;bundle-version="4.0.0",
+ org.junit;bundle-version="4.8.0",
  org.eclipse.jface.text,
  com.aptana.editor.common;bundle-version="1.0.0",
  org.eclipse.core.filesystem,
  org.eclipse.ui.ide,
- org.eclipse.test.performance;bundle-version="3.4.0"
+ org.eclipse.test.performance;bundle-version="3.4.0",
+ com.aptana.testing.libraries;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: com.aptana.editor.css.tests
+Import-Package: com.aptana.core.tests,
+ com.aptana.editor.common.tests

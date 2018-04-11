@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ FormattingTests.class })
+@Suite.SuiteClasses({ FormattingTest.class })
 public class AllTests
 {
 

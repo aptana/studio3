@@ -7,5 +7,9 @@ Bundle-Vendor: Appcelerator, Inc.
 Fragment-Host: com.aptana.css.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.junit,
- org.eclipse.test.performance
+ org.eclipse.test.performance,
+ com.aptana.testing.utils;bundle-version="1.0.0",
+ com.aptana.testing.libraries;bundle-version="1.0.0"
 Export-Package: com.aptana.css.core.tests
+Import-Package: com.aptana.buildpath.core.tests,
+ com.aptana.core.tests

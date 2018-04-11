@@ -7,15 +7,13 @@
  */
 package com.aptana.scope;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
 
 public class OrSelectorTests
 {
-	/**
-	 * testPrefixThenNonMatch
-	 */
 	@Test
 	public void testPrefixThenNonMatch()
 	{
@@ -25,9 +23,6 @@ public class OrSelectorTests
 		assertFalse(selector.matches("string.quoted.double.ruby"));
 	}
 
-	/**
-	 * testNonMatchThenPrefix
-	 */
 	@Test
 	public void testNonMatchThenPrefix()
 	{
@@ -37,9 +32,6 @@ public class OrSelectorTests
 		assertTrue(selector.matches("string.quoted.double.ruby"));
 	}
 
-	/**
-	 * testNamesArePrefixes
-	 */
 	@Test
 	public void testNamesArePrefixes()
 	{
@@ -49,9 +41,6 @@ public class OrSelectorTests
 		assertTrue(selector.matches("string.quoted.double.ruby"));
 	}
 
-	/**
-	 * testExactThenNonMatch
-	 */
 	@Test
 	public void testExactThenNonMatch()
 	{
@@ -61,9 +50,6 @@ public class OrSelectorTests
 		assertFalse(selector.matches("string.quoted.double.ruby"));
 	}
 
-	/**
-	 * testNonMatchThenExact
-	 */
 	@Test
 	public void testNonMatchThenExact()
 	{
@@ -73,9 +59,6 @@ public class OrSelectorTests
 		assertTrue(selector.matches("string.quoted.double.ruby"));
 	}
 
-	/**
-	 * testNamesAreExact
-	 */
 	@Test
 	public void testNamesAreExact()
 	{
@@ -85,9 +68,6 @@ public class OrSelectorTests
 		assertTrue(selector.matches("string.quoted.double.ruby"));
 	}
 
-	/**
-	 * testMixedMatch
-	 */
 	@Test
 	public void testMixedMatch()
 	{

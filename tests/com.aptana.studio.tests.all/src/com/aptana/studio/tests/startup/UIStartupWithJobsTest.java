@@ -10,16 +10,19 @@
  *******************************************************************************/
 package com.aptana.studio.tests.startup;
 
+import org.eclipse.test.performance.Dimension;
+import org.eclipse.test.performance.Performance;
+import org.eclipse.test.performance.PerformanceMeter;
+import org.junit.experimental.categories.Category;
+
+import com.aptana.editor.epl.tests.EditorTestHelper;
+import com.aptana.testing.categories.PerformanceTests;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.eclipse.test.performance.Dimension;
-import org.eclipse.test.performance.Performance;
-import org.eclipse.test.performance.PerformanceMeter;
-
-import com.aptana.editor.epl.tests.EditorTestHelper;
-
+@Category({ PerformanceTests.class })
 public class UIStartupWithJobsTest extends TestCase
 {
 

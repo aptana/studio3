@@ -7,17 +7,17 @@
  */
 package com.aptana.theme;
 
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.ui.util.UIUtils;
 
@@ -30,13 +30,11 @@ public class ColorManagerTest
 	boolean executed;
 	Color color;
 
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
 		executed = false;
 		finished = 0;
-//		super.setUp();
 	}
 
 	private class ThreadColor extends Thread

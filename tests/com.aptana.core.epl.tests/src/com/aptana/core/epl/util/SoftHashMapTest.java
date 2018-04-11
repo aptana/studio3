@@ -7,22 +7,25 @@
  */
 package com.aptana.core.epl.util;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 public class SoftHashMapTest
 {
+	private static final int ONE_MB = 1024 * 1024; // 1 MB
+
 	@Test
 	public void testSoftHashMap() throws Exception
 	{
-		// This test grows our memory until the values are prunned (or we'd get an out of memory error).
+		// This test grows our memory until the values are pruned (or we'd get an out of memory error).
 		Map<Integer, byte[]> softHashMap = new SoftHashMap<Integer, byte[]>();
 		for (int i = 0; i < Integer.MAX_VALUE; i++)
 		{
-			softHashMap.put(i, new byte[1024 * 1024]); // 1 MB
+			softHashMap.put(i, new byte[ONE_MB]);
 
 			int notFound = 0;
 			int found = 0;

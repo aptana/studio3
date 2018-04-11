@@ -7,10 +7,12 @@
  */
 package com.aptana.syncing.core.tests;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,13 +25,14 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.logging.IdeLog;
@@ -109,9 +112,6 @@ public abstract class SyncingTests
 		return cachedProperties;
 	}
 
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@Before
 	public void setUp() throws Exception
 	{
@@ -130,14 +130,8 @@ public abstract class SyncingTests
 		serverDirectory = serverManager.getRoot().getFileStore(new Path("/server_" + millis + "_" + i));
 		assertNotNull(serverDirectory);
 		serverDirectory.mkdir(EFS.NONE, null);
-
-//		super.setUp();
-
 	}
 
-	/**
-	 * @see junit.framework.TestCase#tearDown()
-	 */
 	@After
 	public void tearDown() throws Exception
 	{
@@ -171,8 +165,6 @@ public abstract class SyncingTests
 				serverManager.disconnect(null);
 			}
 		}
-
-//		super.tearDown();
 	}
 
 	/**

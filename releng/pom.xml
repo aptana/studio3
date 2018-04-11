@@ -1,0 +1,19 @@
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.aptana.studio</groupId>
+	<artifactId>com.aptana.studio.releng</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<parent>
+		<groupId>com.aptana.studio</groupId>
+		<artifactId>com.aptana.studio.root</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
+	<modules>
+		<module>com.aptana.studio.update</module>
+		<module>com.aptana.studio.target</module>
+		<module>com.aptana.studio.test.update</module>
+	</modules>
+</project>

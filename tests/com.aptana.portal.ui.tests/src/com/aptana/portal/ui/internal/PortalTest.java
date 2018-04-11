@@ -17,10 +17,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.aptana.core.tests.TestProject;
 import com.aptana.core.util.StringUtil;
 import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
+import com.aptana.testing.utils.TestProject;
 import com.aptana.theme.IThemeManager;
 import com.aptana.usage.UsagePlugin;
 

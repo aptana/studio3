@@ -7,13 +7,12 @@
  */
 package com.aptana.editor.css.contentassist;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
 import java.text.MessageFormat;
 
-import junit.framework.TestCase;
-
 import org.eclipse.jface.text.IDocument;
+import org.junit.Test;
 
 import com.aptana.css.core.parsing.CSSTokenType;
 import com.aptana.editor.common.contentassist.ILexemeProvider;
@@ -49,10 +48,7 @@ public class FineLocationTests
 			}
 		}
 	}
-	
-	/**
-	 * testEmptyBody
-	 */
+
 	@Test
 	public void testEmptyBody()
 	{
@@ -63,10 +59,7 @@ public class FineLocationTests
 			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 6)
 		);
 	}
-	
-	/**
-	 * testEmptyBody2
-	 */
+
 	@Test
 	public void testEmptyBody2()
 	{
@@ -77,10 +70,7 @@ public class FineLocationTests
 			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 6, 10)
 		);
 	}
-	
-	/**
-	 * testTwoRules
-	 */
+
 	@Test
 	public void testTwoRules()
 	{
@@ -92,10 +82,7 @@ public class FineLocationTests
 			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 20, 24)
 		);
 	}
-	
-	/**
-	 * testProperty
-	 */
+
 	@Test
 	public void testProperty()
 	{
@@ -106,10 +93,7 @@ public class FineLocationTests
 			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 5, 15)
 		);
 	}
-	
-	/**
-	 * testProperty2
-	 */
+
 	@Test
 	public void testProperty2()
 	{
@@ -120,10 +104,7 @@ public class FineLocationTests
 			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 5, 18)
 		);
 	}
-	
-	/**
-	 * testPropertyNoValue
-	 */
+
 	@Test
 	public void testPropertyNoValue()
 	{
@@ -135,10 +116,7 @@ public class FineLocationTests
 			new LocationTypeRange(LocationType.INSIDE_VALUE, 16)
 		);
 	}
-	
-	/**
-	 * testPropertyNoValue
-	 */
+
 	@Test
 	public void testPropertyNoValue2()
 	{
@@ -150,10 +128,7 @@ public class FineLocationTests
 			new LocationTypeRange(LocationType.INSIDE_VALUE, 19)
 		);
 	}
-	
-	/**
-	 * testPropertyAndValueNoSemi
-	 */
+
 	@Test
 	public void testPropertyAndValueNoSemi()
 	{
@@ -165,10 +140,7 @@ public class FineLocationTests
 			new LocationTypeRange(LocationType.INSIDE_VALUE, 16, 19)
 		);
 	}
-	
-	/**
-	 * testPropertyAndValueNoSemi2
-	 */
+
 	@Test
 	public void testPropertyAndValueNoSemi2()
 	{
@@ -182,9 +154,6 @@ public class FineLocationTests
 		);
 	}
 	
-	/**
-	 * testPropertyAndValue
-	 */
 	@Test
 	public void testPropertyAndValue()
 	{
@@ -197,10 +166,7 @@ public class FineLocationTests
 			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 20)
 		);
 	}
-	
-	/**
-	 * testPropertyAndValue2
-	 */
+
 	@Test
 	public void testPropertyAndValue2()
 	{
@@ -213,10 +179,7 @@ public class FineLocationTests
 			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 23, 24)
 		);
 	}
-	
-	/**
-	 * testMultipleProperties
-	 */
+
 	@Test
 	public void testMultipleProperties()
 	{
@@ -230,10 +193,7 @@ public class FineLocationTests
 			new LocationTypeRange(LocationType.INSIDE_VALUE, 27, 41)
 		);
 	}
-	
-	/**
-	 * testMultipleProperties2
-	 */
+
 	@Test
 	public void testMultipleProperties2()
 	{
@@ -248,10 +208,7 @@ public class FineLocationTests
 			new LocationTypeRange(LocationType.INSIDE_PROPERTY, 49)
 		);
 	}
-	
-	/**
-	 * testSpaceAfterColon
-	 */
+
 	@Test
 	public void testSpaceAfterColon()
 	{
@@ -263,10 +220,7 @@ public class FineLocationTests
 			new LocationTypeRange(LocationType.INSIDE_VALUE, 22, 24)
 		);
 	}
-	
-	/**
-	 * testDotInProperty
-	 */
+
 	@Test
 	public void testDotInProperty()
 	{
@@ -278,10 +232,7 @@ public class FineLocationTests
 			new LocationTypeRange(LocationType.ERROR, 24)
 		);
 	}
-	
-	/**
-	 * testHashInProperty
-	 */
+
 	@Test
 	public void testHashInProperty()
 	{

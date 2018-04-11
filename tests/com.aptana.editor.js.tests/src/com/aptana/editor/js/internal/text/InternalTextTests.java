@@ -7,37 +7,12 @@
  */
 package com.aptana.editor.js.internal.text;
 
-import org.junit.runners.Suite.SuiteClasses;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runners.Suite.SuiteClasses;
 
-/**
- * AllTests
- */
 @RunWith(Suite.class)
 @SuiteClasses({JSFoldingComputerTest.class, })
 public class InternalTextTests
 {
-
-//	public static Test suite()
-//	{
-//		TestSuite suite = new TestSuite(InternalTextTests.class.getName())
-//		{
-//			@Override
-//			public void runTest(Test test, TestResult result)
-//			{
-//				System.err.println("Running test: " + test.toString());
-//				super.runTest(test, result);
-//			}
-//		};
-//		//$JUnit-BEGIN$
-//		suite.addTestSuite(JSFoldingComputerTest.class);
-//		//$JUnit-END$
-//		return suite;
-//	}
-//
 }

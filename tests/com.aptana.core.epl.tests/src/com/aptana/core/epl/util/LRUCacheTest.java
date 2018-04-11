@@ -7,13 +7,13 @@
  */
 package com.aptana.core.epl.util;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 public class LRUCacheTest
 {

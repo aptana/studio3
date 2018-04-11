@@ -17,14 +17,17 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
+import org.junit.experimental.categories.Category;
 
+import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.epl.tests.EditorTestHelper;
+import com.aptana.testing.categories.PerformanceTests;
 
+@Category({ PerformanceTests.class })
 public class CSSSourcePartitionScannerPerformanceTest extends GlobalTimePerformanceTestCase
 {
 	private IDocumentPartitioner fPartitioner;

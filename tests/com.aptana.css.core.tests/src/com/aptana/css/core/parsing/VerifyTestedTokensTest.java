@@ -7,20 +7,23 @@
  */
 package com.aptana.css.core.parsing;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import com.aptana.core.util.StringUtil;
 
 /**
- * VerifyTestedTokensTest
+ * This is meant to be run after all the other unit tests for tokens to verify we cover the full set of token types. The
+ * issue is that under tycho we don't necessarily run the others before-hand and build up the set properly.
  */
+@Ignore
 public class VerifyTestedTokensTest
 {
 	/**
@@ -58,7 +61,7 @@ public class VerifyTestedTokensTest
 
 	public VerifyTestedTokensTest()
 	{
-//		super("testTestedTokens");
+		// super("testTestedTokens");
 	}
 
 	@Test

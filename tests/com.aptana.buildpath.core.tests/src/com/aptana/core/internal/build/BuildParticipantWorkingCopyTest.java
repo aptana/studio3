@@ -1,15 +1,16 @@
 package com.aptana.core.internal.build;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.buildpath.core.BuildPathCorePlugin;
 import com.aptana.core.build.AbstractBuildParticipant;
@@ -26,8 +27,6 @@ public class BuildParticipantWorkingCopyTest
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
-
 		participant = new AbstractBuildParticipant()
 		{
 
@@ -51,8 +50,6 @@ public class BuildParticipantWorkingCopyTest
 	public void tearDown() throws Exception
 	{
 		participant = null;
-
-//		super.tearDown();
 	}
 
 	@Test

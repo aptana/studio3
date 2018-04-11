@@ -7,14 +7,17 @@
  */
 package com.aptana.filesystem.ftp.tests;
 
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.aptana.filesystem.ftp.FTPConnectionPointTest;
+import com.aptana.testing.categories.IntegrationTests;
 
 @RunWith(Suite.class)
 @SuiteClasses({ FTPConnectionPointTest.class, FTPConnectionTest.class, FTPConnectionWithBasePathTest.class, })
+@Category({ IntegrationTests.class })
 public class AllTests
 {
 }

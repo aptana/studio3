@@ -7,16 +7,17 @@
  */
 package com.aptana.core.io.tests;
 
-import org.junit.After;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -28,6 +29,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.junit.After;
+import org.junit.Test;
 
 import com.aptana.core.io.efs.WorkspaceFileSystem;
 import com.aptana.core.util.FileUtil;
@@ -38,7 +41,6 @@ public class WorkspaceFileSystemTest
 
 	private IProject project;
 
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{
@@ -67,7 +69,6 @@ public class WorkspaceFileSystemTest
 		finally
 		{
 			project = null;
-//			super.tearDown();
 		}
 	}
 
