@@ -11,23 +11,34 @@
 
 package com.aptana.editor.epl.tests;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.experimental.categories.Category;
+import org.junit.rules.TestName;
+
+import com.aptana.testing.categories.PerformanceTests;
 
 /**
  * Superclass of Text performance test cases.
  *
  * @since 3.1
  */
-public class TextPerformanceTestCase extends TestCase {
+@Category({ PerformanceTests.class })
+public abstract class TextPerformanceTestCase {
 
+	@Rule
+	public final TestName name = new TestName();
+	
 	private static final boolean DEBUG= false;
 
 	/** custom number of warm-up runs */
@@ -45,39 +56,17 @@ public class TextPerformanceTestCase extends TestCase {
 	/** base scenario id */
 	private String fBaseScenarioId;
 
-	/*
-	 * @see TestCase#TestCase()
-	 */
-	public TextPerformanceTestCase() {
-		super();
-	}
-
-	/*
-	 * @see TestCase#TestCase(String)
-	 */
-	public TextPerformanceTestCase(String name) {
-		super(name);
-	}
-
-
-	/*
-	 * @see junit.framework.TestCase#setUp()
-	 * @since 3.1
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 
 		EditorTestHelper.forceFocus();
 
 		if (DEBUG)
-			System.out.println(getClass().getName() + "." + getName() + ": " + System.currentTimeMillis());
+			System.out.println(getClass().getName() + "." + name.getMethodName() + ": " + System.currentTimeMillis());
 	}
 
-	/*
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	@After
+	public void tearDown() throws Exception {
 		if (fPerformanceMeters != null)
 			for (Iterator<PerformanceMeter> iter= fPerformanceMeters.iterator(); iter.hasNext();)
 				iter.next().dispose();
@@ -124,7 +113,7 @@ public class TextPerformanceTestCase extends TestCase {
 	 * @return the default scenario id for this test
 	 */
 	protected final String getDefaultScenarioId() {
-		return Performance.getDefault().getDefaultScenarioId(this);
+		return getClass().getName() + '#' + name.getMethodName() + "()"; //$NON-NLS-1$
 	}
 
 	/**
@@ -135,7 +124,7 @@ public class TextPerformanceTestCase extends TestCase {
 	 */
 	protected final String getBaseScenarioId() {
 		if (fBaseScenarioId == null)
-			fBaseScenarioId= Performance.getDefault().getDefaultScenarioId(this);
+			fBaseScenarioId= getDefaultScenarioId();
 		return fBaseScenarioId;
 	}
 

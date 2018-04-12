@@ -16,10 +16,13 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
-import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
+import org.junit.experimental.categories.Category;
 
+import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.IOUtil;
+import com.aptana.testing.categories.PerformanceTests;
 
+@Category({ PerformanceTests.class })
 public class HTMLTagScannerPerformanceTest extends GlobalTimePerformanceTestCase
 {
 

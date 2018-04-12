@@ -9,13 +9,16 @@
 package com.aptana.filesystem.secureftp.tests;
 
 import org.eclipse.core.runtime.Path;
+import org.junit.experimental.categories.Category;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
 import com.aptana.filesystem.secureftp.SFTPConnectionPoint;
+import com.aptana.testing.categories.IntegrationTests;
 
 /**
  * @author Max Stepanov
  */
+@Category({ IntegrationTests.class })
 public class SFTPConnectionTest extends CommonConnectionTest
 {
 

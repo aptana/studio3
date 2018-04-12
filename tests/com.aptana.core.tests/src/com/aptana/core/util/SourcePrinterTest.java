@@ -7,12 +7,12 @@
  */
 package com.aptana.core.util;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 public class SourcePrinterTest
 {

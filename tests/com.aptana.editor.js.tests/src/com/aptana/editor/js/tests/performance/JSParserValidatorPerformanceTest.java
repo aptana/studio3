@@ -13,17 +13,20 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
+import org.junit.experimental.categories.Category;
 
 import com.aptana.core.build.AbstractBuildParticipant;
-import com.aptana.core.tests.TestProject;
+import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.index.core.RebuildIndexJob;
 import com.aptana.index.core.build.BuildContext;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.internal.core.build.JSParserValidator;
+import com.aptana.testing.categories.PerformanceTests;
+import com.aptana.testing.utils.TestProject;
 
+@Category({ PerformanceTests.class })
 public class JSParserValidatorPerformanceTest extends GlobalTimePerformanceTestCase
 {
 	private AbstractBuildParticipant validator;

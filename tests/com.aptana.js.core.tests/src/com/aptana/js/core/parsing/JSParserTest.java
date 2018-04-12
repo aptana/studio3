@@ -21,18 +21,17 @@ import org.eclipse.core.runtime.Platform;
 import org.junit.Before;
 import org.junit.Test;
 
-import beaver.Symbol;
-
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
-import com.aptana.parsing.ast.ASTUtil;
 import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseNode;
+
+import beaver.Symbol;
 
 public class JSParserTest
 {
@@ -1291,11 +1290,11 @@ public class JSParserTest
 	 * 
 	 * @throws Exception
 	 */
-	public void trimToSize() throws Exception
-	{
-		ParseState parseState = new ParseState(getSource("performance/ext/ext-all-debug-w-comments.js"));
-		ASTUtil.showBeforeAndAfterTrim(parse(parseState));
-	}
+//	public void trimToSize() throws Exception
+//	{
+//		ParseState parseState = new ParseState(getSource("performance/ext/ext-all-debug-w-comments.js"));
+//		ASTUtil.showBeforeAndAfterTrim(parse(parseState));
+//	}
 
 	private IParseRootNode parse(String source) throws Exception
 	{

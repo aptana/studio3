@@ -1,17 +1,19 @@
 package com.aptana.core.internal.build;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.content.IContentType;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IBuildParticipant;
@@ -23,20 +25,16 @@ public class BuildParticipantManagerTest
 
 	private BuildParticipantManager fManager;
 
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
 		fManager = new BuildParticipantManager();
 	}
 
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{
 		fManager = null;
-//		super.tearDown();
 	}
 
 	@Test

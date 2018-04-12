@@ -128,11 +128,11 @@ public class GitExecutableTest
 	{
 		GitExecutable executable = GitExecutable.instance();
 		IPath expectedLocation = Path.fromOSString("/usr/bin/git");
-		// IPath local = Path.fromOSString("/usr/local/bin/git");
-		// if (local.toFile().exists())
-		// {
-		// expectedLocation = local;
-		// }
+		IPath local = Path.fromOSString("/usr/local/bin/git");
+		if (local.toFile().exists())
+		{
+			expectedLocation = local;
+		}
 		assertEquals(expectedLocation, executable.path());
 	}
 

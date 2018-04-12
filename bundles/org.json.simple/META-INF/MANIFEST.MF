@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JSON.simple
+Bundle-SymbolicName: json.simple
+Bundle-Version: 1.1.0
+Export-Package: org.json.simple,
+ org.json.simple.parser
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

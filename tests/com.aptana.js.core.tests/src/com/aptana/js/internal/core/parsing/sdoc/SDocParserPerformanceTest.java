@@ -17,12 +17,15 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
+import org.junit.experimental.categories.Category;
 
+import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.IOUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.tests.ITestFiles;
+import com.aptana.testing.categories.PerformanceTests;
 
+@Category({ PerformanceTests.class })
 public class SDocParserPerformanceTest extends GlobalTimePerformanceTestCase
 {
 	private static final Pattern COMMENT = Pattern.compile("/\\*\\*.*?\\*/", Pattern.DOTALL);

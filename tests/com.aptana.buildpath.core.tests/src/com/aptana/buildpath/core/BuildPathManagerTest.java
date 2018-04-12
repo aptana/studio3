@@ -15,9 +15,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.aptana.core.tests.TestProject;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
+import com.aptana.testing.utils.TestProject;
 
 public class BuildPathManagerTest
 {

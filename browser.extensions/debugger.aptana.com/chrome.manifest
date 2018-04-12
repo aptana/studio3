@@ -1,6 +1,0 @@
-content aptanadebugger    jar:chrome/aptanadebugger.jar!/content/aptanadebugger/ xpcnativewrappers=yes
-skin    aptanadebugger    classic/1.0    jar:chrome/aptanadebugger.jar!/skin/classic/
-locale    aptanadebugger    en-US        jar:chrome/aptanadebugger.jar!/locale/en-US/
-
-overlay chrome://browser/content/browser.xul         chrome://aptanadebugger/content/browserOverlay.xul
-overlay chrome://firebug/content/firebug.xul         chrome://aptanadebugger/content/firebugOverlay.xul

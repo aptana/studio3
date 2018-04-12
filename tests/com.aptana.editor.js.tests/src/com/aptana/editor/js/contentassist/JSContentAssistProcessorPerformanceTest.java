@@ -16,13 +16,16 @@ import org.eclipse.test.performance.PerformanceTestCase;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.TestName;
 
 import com.aptana.editor.js.tests.JSEditorBasedTestCase;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.js.core.index.JSFileIndexingParticipant;
+import com.aptana.testing.categories.PerformanceTests;
 import com.aptana.ui.util.UIUtils;
 
+@Category({ PerformanceTests.class })
 public class JSContentAssistProcessorPerformanceTest extends JSEditorBasedTestCase
 {
 	@Rule

@@ -6,7 +6,8 @@ Bundle-Version: 2.0.101.qualifier
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Fragment-Host: com.aptana.org.eclipse.tm.terminal
-Require-Bundle: org.junit
+Require-Bundle: org.junit;bundle-version="4.8.0",
+ com.aptana.testing.libraries;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.eclipse.tm.internal.terminal.connector;x-internal:=true,
  org.eclipse.tm.internal.terminal.emulator;x-internal:=true,

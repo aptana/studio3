@@ -1,13 +1,12 @@
 package com.aptana.editor.js.tests.performance;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
-
-import junit.extensions.TestSetup;
-import junit.framework.Test;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -20,9 +19,12 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.ui.PartInitException;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.osgi.framework.Bundle;
 
 import com.aptana.core.build.IBuildParticipant.BuildType;
@@ -34,9 +36,9 @@ import com.aptana.editor.epl.tests.ResourceTestHelper;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.internal.core.build.JSLintValidator;
+import com.aptana.testing.categories.PerformanceTests;
 
-@RunWith(Suite.class)
-@SuiteClasses({})
+@Category({ PerformanceTests.class })
 public class OpenJSEditorTest extends OpenEditorTest
 {
 
@@ -65,15 +67,9 @@ public class OpenJSEditorTest extends OpenEditorTest
 		return Path.fromPortableString(getPrefix(baseName) + FILE_SUFFIX);
 	}
 
-	public OpenJSEditorTest(String name)
+	@Before
+	public void setUp() throws Exception
 	{
-		super(name);
-	}
-
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-
 		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(JSPlugin.PLUGIN_ID);
 
 		// Turn off all JS validators!!!!
@@ -85,50 +81,55 @@ public class OpenJSEditorTest extends OpenEditorTest
 		setMeasuredRuns(MEASURED_RUNS);
 	}
 
-	/*
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		EditorTestHelper.closeAllEditors();
-		super.tearDown();
 	}
 
+	@Test
 	public void testOpenTiMobile() throws Exception
 	{
 		timeOpening(TIMOBILE, false);
 	}
 
+	@Test
 	public void testOpenDojo() throws Exception
 	{
 		timeOpening(DOJO, true);
 	}
 
+	@Test
 	public void testOpenDojoMinified() throws Exception
 	{
 		timeOpening(DOJO_MINIFIED, true);
 	}
 
+	@Test
 	public void testOpenTinyMCE() throws Exception
 	{
 		timeOpening(TINY_MCE, true);
 	}
 
+	@Test
 	public void testOpenExtDevFoldingOnOutlineOn() throws Exception
 	{
 		measureOpenInEditor(getFile(EXT_DEV), true, true, createPerformanceMeter());
 	}
 
+	@Test
 	public void testOpenExtDevFoldingOnOutlineOff() throws Exception
 	{
 		measureOpenInEditor(getFile(EXT_DEV), true, false, createPerformanceMeter());
 	}
 
+	// @Test
 	// public void testOpenExtMinifiedFoldingOnOutlineOn() throws Exception
 	// {
 	// measureOpenInEditor(getFile(EXT), true, true, createPerformanceMeter());
 	// }
 
+	// @Test
 	// public void testOpenExtMinifiedFoldingOnOutlineOff() throws Exception
 	// {
 	// measureOpenInEditor(getFile(EXT), true, false, createPerformanceMeter());
@@ -169,94 +170,67 @@ public class OpenJSEditorTest extends OpenEditorTest
 		return EditorTestHelper.showView(EditorTestHelper.OUTLINE_VIEW_ID, show);
 	}
 
-	/**
-	 * Setup and teardown done once for the whole suite.
-	 * 
-	 * @author cwilliams
-	 */
-	public static class Setup extends TestSetup
+	@BeforeClass
+	public void setUpSuite() throws Exception
 	{
+		EditorTestHelper.showView(EditorTestHelper.INTRO_VIEW_ID, false);
 
-		private boolean fSetPerspective;
-		private boolean fTearDown;
+		EditorTestHelper.showPerspective(EditorTestHelper.WEB_PERSPECTIVE_ID);
 
-		public Setup(Test test)
+		if (!ResourceTestHelper.projectExists(PROJECT))
 		{
-			this(test, true, true);
+			// boolean wasAutobuilding = CoreUtility.setAutoBuilding(false);
+			setUpProject();
+			// ResourceTestHelper.fullBuild();
+			// if (wasAutobuilding)
+			// CoreUtility.setAutoBuilding(true);
+
+			EditorTestHelper.joinBackgroundActivities();
 		}
 
-		public Setup(Test test, boolean tearDown, boolean setPerspective)
+		replicate(DOJO);
+		replicate(DOJO_MINIFIED);
+		replicate(TIMOBILE);
+		replicate(TINY_MCE);
+		// Don't need to replicate EXT_DEV or EXT
+	}
+
+	private void replicate(String baseFileName) throws CoreException
+	{
+		ResourceTestHelper.replicate(getFile(baseFileName), getPrefix(baseFileName), FILE_SUFFIX,
+				WARM_UP_RUNS + MEASURED_RUNS, ResourceTestHelper.IfExists.SKIP);
+	}
+
+	private void setUpProject() throws Exception
+	{
+		IProject project = ResourceTestHelper.createExistingProject(PROJECT);
+		assertTrue("Failed to create an open project", project.isAccessible());
+
+		// Copy all project contents from under "performance"
+		Bundle bundle = Platform.getBundle(JSCorePlugin.PLUGIN_ID);
+		Enumeration<URL> urls = bundle.findEntries("performance", "*.js", true);
+		assertTrue("Got no performance files to copy", urls.hasMoreElements());
+		while (urls.hasMoreElements())
 		{
-			super(test);
-			fTearDown = tearDown;
-			fSetPerspective = setPerspective;
-		}
-
-		protected void setUp() throws Exception
-		{
-			EditorTestHelper.showView(EditorTestHelper.INTRO_VIEW_ID, false);
-
-			if (fSetPerspective)
-			{
-				EditorTestHelper.showPerspective(EditorTestHelper.WEB_PERSPECTIVE_ID);
-			}
-
-			if (!ResourceTestHelper.projectExists(PROJECT))
-			{
-				// boolean wasAutobuilding = CoreUtility.setAutoBuilding(false);
-				setUpProject();
-				// ResourceTestHelper.fullBuild();
-				// if (wasAutobuilding)
-				// CoreUtility.setAutoBuilding(true);
-
-				EditorTestHelper.joinBackgroundActivities();
-			}
-
-			replicate(DOJO);
-			replicate(DOJO_MINIFIED);
-			replicate(TIMOBILE);
-			replicate(TINY_MCE);
-			// Don't need to replicate EXT_DEV or EXT
-		}
-
-		private void replicate(String baseFileName) throws CoreException
-		{
-			ResourceTestHelper.replicate(getFile(baseFileName), getPrefix(baseFileName), FILE_SUFFIX, WARM_UP_RUNS
-					+ MEASURED_RUNS, ResourceTestHelper.IfExists.SKIP);
-		}
-
-		private void setUpProject() throws Exception
-		{
-			IProject project = ResourceTestHelper.createExistingProject(PROJECT);
-			assertTrue("Failed to create an open project", project.isAccessible());
-
-			// Copy all project contents from under "performance"
-			Bundle bundle = Platform.getBundle(JSCorePlugin.PLUGIN_ID);
-			Enumeration<URL> urls = bundle.findEntries("performance", "*.js", true);
-			assertTrue("Got no performance files to copy", urls.hasMoreElements());
-			while (urls.hasMoreElements())
-			{
-				// Extract performance file to filesystem
-				File file = ResourceUtil.resourcePathToFile(urls.nextElement());
-				// create a file in the new project with the extracted contents.
-				IFile iFile = project.getFile(file.getName());
-				InputStream stream = new FileInputStream(file);
-				iFile.create(stream, true, null);
-				stream.close();
-				// verify we created the file.
-				assertTrue("Failed to copy performance file into project", iFile.exists());
-			}
-		}
-
-		protected void tearDown() throws Exception
-		{
-			if (fTearDown)
-			{
-				ResourceTestHelper.delete(getPrefix(DOJO), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
-				ResourceTestHelper.delete(getPrefix(DOJO_MINIFIED), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
-				ResourceTestHelper.delete(getPrefix(TIMOBILE), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
-				ResourceTestHelper.delete(getPrefix(TINY_MCE), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
-			}
+			// Extract performance file to filesystem
+			File file = ResourceUtil.resourcePathToFile(urls.nextElement());
+			// create a file in the new project with the extracted contents.
+			IFile iFile = project.getFile(file.getName());
+			InputStream stream = new FileInputStream(file);
+			iFile.create(stream, true, null);
+			stream.close();
+			// verify we created the file.
+			assertTrue("Failed to copy performance file into project", iFile.exists());
 		}
 	}
+
+	@AfterClass
+	public void tearDownSuite() throws Exception
+	{
+		ResourceTestHelper.delete(getPrefix(DOJO), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+		ResourceTestHelper.delete(getPrefix(DOJO_MINIFIED), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+		ResourceTestHelper.delete(getPrefix(TIMOBILE), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+		ResourceTestHelper.delete(getPrefix(TINY_MCE), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+	}
+
 }

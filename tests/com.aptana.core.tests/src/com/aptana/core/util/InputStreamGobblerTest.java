@@ -7,11 +7,12 @@
  */
 package com.aptana.core.util;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.InputStream;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * @author Shalom

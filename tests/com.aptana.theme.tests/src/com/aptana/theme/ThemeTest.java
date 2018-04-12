@@ -7,17 +7,19 @@
  */
 package com.aptana.theme;
 
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 import java.util.Properties;
-
-import junit.framework.TestCase;
 
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.internal.OrderedProperties;
@@ -29,11 +31,9 @@ public class ThemeTest
 	private Theme theme;
 	private ColorManager colormanager;
 
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
 		Properties props = new OrderedProperties();
 		props.put("background", "#ffffff");
 		props.put("foreground", "#ff0000");

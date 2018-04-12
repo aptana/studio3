@@ -7,15 +7,14 @@
  */
 package com.aptana.editor.xml;
 
-import org.junit.After;
-import org.junit.Test;
-import static org.junit.Assert.*;
-import java.text.MessageFormat;
+import static org.junit.Assert.assertEquals;
 
-import junit.framework.TestCase;
+import java.text.MessageFormat;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.junit.After;
+import org.junit.Test;
 
 import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.NullPartitionerSwitchStrategy;
@@ -41,11 +40,9 @@ public class XMLPartitionScannerTest {
 		}
 	}
 
-//	@Override
 	@After
 	public void tearDown() throws Exception {
 		partitioner = null;
-//		super.tearDown();
 	}
 
 	private String getContentType(String content, int offset) {

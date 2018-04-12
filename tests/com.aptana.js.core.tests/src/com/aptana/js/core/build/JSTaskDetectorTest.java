@@ -1,29 +1,30 @@
 package com.aptana.js.core.build;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.build.IProblem;
 import com.aptana.core.resources.IMarkerConstants;
+import com.aptana.core.resources.TaskTag;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.build.BuildContext;
-import com.aptana.js.core.build.JSTaskDetector;
 
 public class JSTaskDetectorTest
 {
@@ -33,15 +34,26 @@ public class JSTaskDetectorTest
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
-		indexer = new JSTaskDetector();
+		indexer = new JSTaskDetector()
+		{
+			@Override
+			protected Collection<TaskTag> getTaskTags()
+			{
+				return CollectionsUtil.newList(new TaskTag("TODO", TaskTag.NORMAL));
+			}
+
+			@Override
+			protected boolean areTaskTagsCaseSensitive()
+			{
+				return true;
+			}
+		};
 	}
 
 	@After
 	public void tearDown() throws Exception
 	{
 		indexer = null;
-//		super.tearDown();
 	}
 
 	@Test

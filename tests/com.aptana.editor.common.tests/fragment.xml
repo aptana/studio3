@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<fragment>
+   <extension
+         point="com.aptana.formatter.epl.formatterFactory">
+      <engineContribution
+            contentType="com.aptana.editor.common.tests.engineContribution1">
+      </engineContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.editor.common.tests.TestEditor"
+            contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
+            default="true"
+            extensions="test"
+            id="com.aptana.editor.test"
+            name="Test Editor">
+         <contentTypeBinding
+               contentTypeId="org.eclipse.core.runtime.text">
+         </contentTypeBinding>
+         <contentTypeBinding
+               contentTypeId="com.aptana.editor.text.content-type.generic">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            id="com.aptana.editor.test"
+            name="Test Content-type"
+            priority="normal">
+      </content-type>
+   </extension>
+
+</fragment>

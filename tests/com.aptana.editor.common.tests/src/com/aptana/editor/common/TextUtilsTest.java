@@ -7,9 +7,9 @@
  */
 package com.aptana.editor.common;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
 
 public class TextUtilsTest
 {

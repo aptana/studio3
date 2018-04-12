@@ -16,13 +16,16 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.source.ICharacterPairMatcher;
-import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
 import org.eclipse.ui.ide.IDE;
+import org.junit.experimental.categories.Category;
 
+import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.testing.categories.PerformanceTests;
 import com.aptana.ui.util.UIUtils;
 
+@Category({PerformanceTests.class})
 public class CharacterPairMatcherPerfTest extends GlobalTimePerformanceTestCase
 {
 	private static final char[] pairs = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'', '\'', '"', '"' };

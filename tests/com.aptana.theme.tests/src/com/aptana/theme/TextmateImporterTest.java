@@ -7,19 +7,18 @@
  */
 package com.aptana.theme;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.net.URL;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
+import org.junit.Test;
 
-@SuppressWarnings("nls")
 public class TextmateImporterTest
 {
 

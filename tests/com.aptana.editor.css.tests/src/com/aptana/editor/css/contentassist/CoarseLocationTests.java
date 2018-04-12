@@ -7,13 +7,12 @@
  */
 package com.aptana.editor.css.contentassist;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
 import java.text.MessageFormat;
 
-import junit.framework.TestCase;
-
 import org.eclipse.jface.text.IDocument;
+import org.junit.Test;
 
 import com.aptana.css.core.parsing.CSSTokenType;
 import com.aptana.editor.common.contentassist.ILexemeProvider;

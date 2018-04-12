@@ -15,16 +15,18 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.junit.experimental.categories.Category;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.testing.categories.IntegrationTests;
 
 /**
  * @author Max Stepanov
  */
-@SuppressWarnings("nls")
+@Category({ IntegrationTests.class })
 public class FTPConnectionWithBasePathTest extends CommonConnectionTest {
 
 	private static FTPConnectionPoint setupConnection() {

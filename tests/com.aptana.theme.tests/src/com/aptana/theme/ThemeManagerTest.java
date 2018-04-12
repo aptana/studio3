@@ -7,21 +7,20 @@
  */
 package com.aptana.theme;
 
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.internal.runtime.RuntimeLog;
 import org.eclipse.core.runtime.ILogListener;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PartInitException;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.theme.internal.ThemeManager;
 import com.aptana.ui.util.UIUtils;
@@ -34,7 +33,6 @@ public class ThemeManagerTest implements ILogListener
 	private boolean executed;
 	private List<IStatus> loggedMessages;
 
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{

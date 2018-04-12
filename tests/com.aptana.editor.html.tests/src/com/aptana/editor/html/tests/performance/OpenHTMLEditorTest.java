@@ -7,12 +7,10 @@
  */
 package com.aptana.editor.html.tests.performance;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.text.MessageFormat;
-
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -24,11 +22,19 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.ui.PartInitException;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.editor.epl.tests.OpenEditorTest;
 import com.aptana.editor.epl.tests.ResourceTestHelper;
+import com.aptana.testing.categories.PerformanceTests;
 
+@Category({ PerformanceTests.class })
 public class OpenHTMLEditorTest extends OpenEditorTest
 {
 
@@ -48,56 +54,57 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 	private static final int MEASURED_RUNS = 20;
 	private static final String FILE_SUFFIX = ".html";
 
-	private static String getPrefix(String baseName)
+	@BeforeClass
+	public void setUpSuite() throws Exception
 	{
-		return "/" + PROJECT + "/" + baseName;
+		EditorTestHelper.showView(EditorTestHelper.INTRO_VIEW_ID, false);
+
+		EditorTestHelper.showPerspective(EditorTestHelper.WEB_PERSPECTIVE_ID);
+
+		if (!ResourceTestHelper.projectExists(PROJECT))
+		{
+			// boolean wasAutobuilding= CoreUtility.setAutoBuilding(false);
+			setUpProject();
+			// ResourceTestHelper.fullBuild();
+			// if (wasAutobuilding)
+			// CoreUtility.setAutoBuilding(true);
+
+			EditorTestHelper.joinBackgroundActivities();
+		}
+
+		replicate(AMAZON);
+		replicate(REDDIT);
+		replicate(REDDIT_NO_CSS_NO_JS);
+		replicate(BIG_HTML);
+
+		EditorTestHelper.joinBackgroundActivities();
 	}
 
-	private static IPath getFile(String baseName)
+	@AfterClass
+	public void tearDownSuite() throws Exception
 	{
-		return Path.fromPortableString(getPrefix(baseName) + FILE_SUFFIX);
+		ResourceTestHelper.delete(getPrefix(AMAZON), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+		ResourceTestHelper.delete(getPrefix(BIG_HTML), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+		ResourceTestHelper.delete(getPrefix(REDDIT_NO_CSS_NO_JS), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+		ResourceTestHelper.delete(getPrefix(REDDIT), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
+		ResourceTestHelper.delete(ResourceTestHelper.getProject(PROJECT).getLocation());
 	}
 
-	public OpenHTMLEditorTest(String name)
+	@Before
+	public void setUp() throws Exception
 	{
-		super(name);
-	}
-
-	public static Test suite()
-	{
-		// ensure sequence
-		TestSuite suite = new TestSuite(OpenHTMLEditorTest.class.getName());
-		suite.addTest(new OpenHTMLEditorTest("testOpenHTMLEditor1"));
-		// suite.addTest(new OpenHTMLEditorTest("testOpenReddit"));
-		// suite.addTest(new OpenHTMLEditorTest("testOpenRedditNoCSSNoJS"));
-		// suite.addTest(new OpenHTMLEditorTest("testOpenBigHTML"));
-		suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOnOutlineOn"));
-		// suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOffOutlineOn"));
-		suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOnOutlineOff"));
-		// suite.addTest(new OpenHTMLEditorTest("testOpenLargeFileFoldingOffOutlineOff"));
-		return new Setup(suite);
-	}
-
-	/*
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception
-	{
-		super.setUp();
 		EditorTestHelper.runEventQueue();
 		setWarmUpRuns(WARM_UP_RUNS);
 		setMeasuredRuns(MEASURED_RUNS);
 	}
 
-	/*
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	protected void tearDown() throws Exception
+	@After
+	public void tearDown() throws Exception
 	{
 		EditorTestHelper.closeAllEditors();
-		super.tearDown();
 	}
 
+	@Test
 	public void testOpenHTMLEditor1() throws Exception
 	{
 		measureOpenInEditor(ResourceTestHelper.findFiles(getPrefix(AMAZON), FILE_SUFFIX, 0, getWarmUpRuns()),
@@ -108,6 +115,7 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 				createPerformanceMeter(), false);
 	}
 
+	@Test
 	public void testOpenReddit() throws Exception
 	{
 		measureOpenInEditor(ResourceTestHelper.findFiles(getPrefix(REDDIT), FILE_SUFFIX, 0, getWarmUpRuns()),
@@ -118,6 +126,7 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 				createPerformanceMeter(), false);
 	}
 
+	@Test
 	public void testOpenRedditNoCSSNoJS() throws Exception
 	{
 		measureOpenInEditor(
@@ -128,6 +137,7 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 				getMeasuredRuns()), createPerformanceMeter(), false);
 	}
 
+	@Test
 	public void testBigHTML() throws Exception
 	{
 		measureOpenInEditor(ResourceTestHelper.findFiles(getPrefix(BIG_HTML), FILE_SUFFIX, 0, getWarmUpRuns()),
@@ -138,22 +148,26 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 				createPerformanceMeter(), false);
 	}
 
+	@Test
 	public void testOpenLargeFileFoldingOnOutlineOn() throws Exception
 	{
 		PerformanceMeter performanceMeter = createPerformanceMeter();
 		measureOpenInEditor(getFile(AMAZON), true, true, performanceMeter);
 	}
 
+	// @Test
 	// public void testOpenLargeFileFoldingOffOutlineOn() throws Exception
 	// {
 	// measureOpenInEditor(getFile("amazon"), false, true, createPerformanceMeter());
 	// }
 
+	@Test
 	public void testOpenLargeFileFoldingOnOutlineOff() throws Exception
 	{
 		measureOpenInEditor(getFile(AMAZON), true, false, createPerformanceMeter());
 	}
 
+	// @Test
 	// public void testOpenLargeFileFoldingOffOutlineOff() throws Exception
 	// {
 	// measureOpenInEditor(getFile("amazon"), false, false, createPerformanceMeter());
@@ -181,97 +195,41 @@ public class OpenHTMLEditorTest extends OpenEditorTest
 		return EditorTestHelper.showView(EditorTestHelper.OUTLINE_VIEW_ID, show);
 	}
 
-	/**
-	 * Setup and teardown done once for the whole suite.
-	 * 
-	 * @author cwilliams
-	 */
-	public static class Setup extends TestSetup
+	private void replicate(String baseName) throws CoreException
 	{
+		ResourceTestHelper.replicate(getFile(baseName), getPrefix(baseName), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS,
+				ResourceTestHelper.IfExists.SKIP);
+	}
 
-		private boolean fSetPerspective;
-		private boolean fTearDown;
+	private void setUpProject() throws Exception
+	{
+		IProject project = ResourceTestHelper.createExistingProject(PROJECT);
+		assertTrue("Failed to create an open project", project.isAccessible());
 
-		public Setup(Test test)
-		{
-			this(test, true, true);
-		}
+		copyFile(project, AMAZON);
+		copyFile(project, BIG_HTML);
+		copyFile(project, REDDIT_NO_CSS_NO_JS);
+		copyFile(project, REDDIT);
+	}
 
-		public Setup(Test test, boolean tearDown, boolean setPerspective)
-		{
-			super(test);
-			fTearDown = tearDown;
-			fSetPerspective = setPerspective;
-		}
+	protected void copyFile(IProject project, String baseName) throws CoreException, IOException
+	{
+		String fileName = baseName + FILE_SUFFIX;
+		// Copy project contents from under "performance"
+		IFile file = project.getFile(fileName);
+		file.create(FileLocator.openStream(Platform.getBundle("com.aptana.editor.html.tests"),
+				Path.fromPortableString("performance/" + fileName), false), true, null);
+		// verify we created the file.
+		assertTrue(MessageFormat.format("Failed to copy performance file ({0}) into project", fileName), file.exists());
+	}
 
-		protected void setUp() throws Exception
-		{
-			EditorTestHelper.showView(EditorTestHelper.INTRO_VIEW_ID, false);
+	private static String getPrefix(String baseName)
+	{
+		return "/" + PROJECT + "/" + baseName;
+	}
 
-			if (fSetPerspective)
-			{
-				EditorTestHelper.showPerspective(EditorTestHelper.WEB_PERSPECTIVE_ID);
-			}
-
-			if (!ResourceTestHelper.projectExists(PROJECT))
-			{
-				// boolean wasAutobuilding= CoreUtility.setAutoBuilding(false);
-				setUpProject();
-				// ResourceTestHelper.fullBuild();
-				// if (wasAutobuilding)
-				// CoreUtility.setAutoBuilding(true);
-
-				EditorTestHelper.joinBackgroundActivities();
-			}
-
-			replicate(AMAZON);
-			replicate(REDDIT);
-			replicate(REDDIT_NO_CSS_NO_JS);
-			replicate(BIG_HTML);
-
-			EditorTestHelper.joinBackgroundActivities();
-		}
-
-		private void replicate(String baseName) throws CoreException
-		{
-			ResourceTestHelper.replicate(getFile(baseName), getPrefix(baseName), FILE_SUFFIX, WARM_UP_RUNS
-					+ MEASURED_RUNS, ResourceTestHelper.IfExists.SKIP);
-		}
-
-		private void setUpProject() throws Exception
-		{
-			IProject project = ResourceTestHelper.createExistingProject(PROJECT);
-			assertTrue("Failed to create an open project", project.isAccessible());
-
-			copyFile(project, AMAZON);
-			copyFile(project, BIG_HTML);
-			copyFile(project, REDDIT_NO_CSS_NO_JS);
-			copyFile(project, REDDIT);
-		}
-
-		protected void copyFile(IProject project, String baseName) throws CoreException, IOException
-		{
-			String fileName = baseName + FILE_SUFFIX;
-			// Copy project contents from under "performance"
-			IFile file = project.getFile(fileName);
-			file.create(
-					FileLocator.openStream(Platform.getBundle("com.aptana.editor.html.tests"),
-							Path.fromPortableString("performance/" + fileName), false), true, null);
-			// verify we created the file.
-			assertTrue(MessageFormat.format("Failed to copy performance file ({0}) into project", fileName),
-					file.exists());
-		}
-
-		protected void tearDown() throws Exception
-		{
-			if (fTearDown)
-			{
-				ResourceTestHelper.delete(getPrefix(AMAZON), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
-				ResourceTestHelper.delete(getPrefix(BIG_HTML), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
-				ResourceTestHelper.delete(getPrefix(REDDIT_NO_CSS_NO_JS), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
-				ResourceTestHelper.delete(getPrefix(REDDIT), FILE_SUFFIX, WARM_UP_RUNS + MEASURED_RUNS);
-				ResourceTestHelper.delete(ResourceTestHelper.getProject(PROJECT).getLocation());
-			}
-		}
+	private static IPath getFile(String baseName)
+	{
+		return Path.fromPortableString(getPrefix(baseName) + FILE_SUFFIX);
 	}
 }

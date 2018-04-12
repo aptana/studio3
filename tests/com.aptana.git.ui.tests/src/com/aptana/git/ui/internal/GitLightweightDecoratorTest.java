@@ -1,17 +1,14 @@
 package com.aptana.git.ui.internal;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.IDecoration;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.git.core.model.GitRepository;
 
@@ -26,7 +23,6 @@ public class GitLightweightDecoratorTest
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
 		context = new Mockery()
 		{
 			{
@@ -41,17 +37,10 @@ public class GitLightweightDecoratorTest
 	@After
 	public void tearDown() throws Exception
 	{
-		try
-		{
-			repo = null;
-			project = null;
-			decoration = null;
-			context = null;
-		}
-		finally
-		{
-//			super.tearDown();
-		}
+		repo = null;
+		project = null;
+		decoration = null;
+		context = null;
 	}
 
 	@Test

@@ -142,12 +142,12 @@ public class EditorUtilTest extends EditorBasedTests
 	@Test
 	public void testGetSpaceIndentSizeEditor()
 	{
-		IFileStore fileStore = createFileStore("proposal_tests", "txt", "");
+		IFileStore fileStore = createFileStore("proposal_tests", "test", "");
 		this.setupTestContext(fileStore);
 
 		int result = EditorUtil.getSpaceIndentSize();
 
-		// default is 4 for TXT editor
+		// default is 4 for TEST editor
 		assertEquals(4, result);
 
 	}
@@ -170,7 +170,7 @@ public class EditorUtilTest extends EditorBasedTests
 	protected String getEditorId()
 	{
 		// straight text editor
-		return "com.aptana.editor.text";
+		return "com.aptana.editor.test";
 	}
 
 }

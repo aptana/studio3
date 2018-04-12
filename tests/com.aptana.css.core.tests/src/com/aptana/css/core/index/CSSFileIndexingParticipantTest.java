@@ -7,18 +7,18 @@
  */
 package com.aptana.css.core.index;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileOutputStream;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
@@ -37,7 +37,6 @@ public class CSSFileIndexingParticipantTest
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
 		indexer = new CSSFileIndexingParticipant();
 	}
 
@@ -45,7 +44,6 @@ public class CSSFileIndexingParticipantTest
 	public void tearDown() throws Exception
 	{
 		indexer = null;
-//		super.tearDown();
 	}
 
 	@Test

@@ -53,9 +53,6 @@ public abstract class SyncingErrorTests
 		return SyncingTests.getConfig();
 	}
 
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@Before
 	public void setUp() throws Exception
 	{
@@ -75,9 +72,6 @@ public abstract class SyncingErrorTests
 		serverDirectory.mkdir(EFS.NONE, null);
 	}
 
-	/**
-	 * @see junit.framework.TestCase#tearDown()
-	 */
 	@After
 	public void tearDown() throws Exception
 	{

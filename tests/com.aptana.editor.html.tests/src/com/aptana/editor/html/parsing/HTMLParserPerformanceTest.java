@@ -12,15 +12,18 @@ import java.io.InputStream;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
+import org.junit.experimental.categories.Category;
 
+import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.epl.tests.EditorTestHelper;
 import com.aptana.parsing.IParseState;
+import com.aptana.testing.categories.PerformanceTests;
 
 /**
  * @author cwilliams
  */
+@Category({ PerformanceTests.class })
 public class HTMLParserPerformanceTest extends GlobalTimePerformanceTestCase
 {
 

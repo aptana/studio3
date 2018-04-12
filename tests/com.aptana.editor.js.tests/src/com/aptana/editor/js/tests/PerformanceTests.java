@@ -7,14 +7,9 @@
  */
 package com.aptana.editor.js.tests;
 
-import org.junit.runners.Suite.SuiteClasses;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import java.text.MessageFormat;
-
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runners.Suite.SuiteClasses;
 
 import com.aptana.editor.js.contentassist.JSBuildPerformanceTest;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessorPerformanceTest;
@@ -27,36 +22,10 @@ import com.aptana.editor.js.text.JSCodeScannerPerformanceTest;
 import com.aptana.editor.js.text.JSSourcePartitionScannerPerformanceTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({JSBuildPerformanceTest.class, JSContentAssistProcessorPerformanceTest.class, JSIndexingPerformanceTest.class, JSCodeScannerPerformanceTest.class, JSSourcePartitionScannerPerformanceTest.class, JSLintValidatorPerformanceTest.class, JSParserValidatorPerformanceTest.class, JSStyleValidatorPerformanceTest.class, OpenJSEditorTest.class, })
+@SuiteClasses({ JSBuildPerformanceTest.class, JSContentAssistProcessorPerformanceTest.class,
+		JSIndexingPerformanceTest.class, JSCodeScannerPerformanceTest.class,
+		JSSourcePartitionScannerPerformanceTest.class, JSLintValidatorPerformanceTest.class,
+		JSParserValidatorPerformanceTest.class, JSStyleValidatorPerformanceTest.class, OpenJSEditorTest.class, })
 public class PerformanceTests
 {
-
-//	public static Test suite()
-//	{
-//		TestSuite suite = new TestSuite("Performance tests for com.aptana.editor.js plugin")
-//		{
-//			@Override
-//			public void runTest(Test test, TestResult result)
-//			{
-//				String msg = MessageFormat.format("Running test: {0}", test.toString());
-//				System.err.println(msg);
-//				super.runTest(test, result);
-//			}
-//		};
-//		// $JUnit-BEGIN$
-//		// content assist
-//		suite.addTestSuite(JSBuildPerformanceTest.class);
-//		suite.addTestSuite(JSContentAssistProcessorPerformanceTest.class);
-//		suite.addTestSuite(JSIndexingPerformanceTest.class);
-//		// Text/Coloring/Partitioning
-//		suite.addTestSuite(JSCodeScannerPerformanceTest.class);
-//		suite.addTestSuite(JSSourcePartitionScannerPerformanceTest.class);
-//		// General/Validation
-//		suite.addTestSuite(JSLintValidatorPerformanceTest.class);
-//		suite.addTestSuite(JSParserValidatorPerformanceTest.class);
-//		suite.addTestSuite(JSStyleValidatorPerformanceTest.class);
-//		suite.addTest(OpenJSEditorTest.suite());
-//		// $JUnit-END$
-//		return suite;
-//	}
 }

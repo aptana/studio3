@@ -1,29 +1,14 @@
 package com.aptana.git.ui.hyperlink;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
+import org.junit.Test;
 
 public class HyperlinkDetectorTest
 {
-
-	@Before
-	public void setUp() throws Exception
-	{
-//		super.setUp();
-	}
-
-	@After
-	public void tearDown() throws Exception
-	{
-//		super.tearDown();
-	}
-
 	@Test
 	public void testDetectFileWithLinesAdded() throws Exception
 	{
@@ -137,8 +122,8 @@ public class HyperlinkDetectorTest
 	public void testRenameLine() throws Exception
 	{
 		HyperlinkDetector detector = new HyperlinkDetector();
-		IHyperlink[] links = detector
-				.detectHyperlinks(" rename plugins/{com.aptana.webserver.core/src/com/aptana/webserver/core/IURLMapper.java => com.aptana.core/src/com/aptana/core/IURIMapper.java} (75%)");
+		IHyperlink[] links = detector.detectHyperlinks(
+				" rename plugins/{com.aptana.webserver.core/src/com/aptana/webserver/core/IURLMapper.java => com.aptana.core/src/com/aptana/core/IURIMapper.java} (75%)");
 		assertNotNull(links);
 		assertEquals(1, links.length);
 		IRegion region = links[0].getHyperlinkRegion();
@@ -150,8 +135,8 @@ public class HyperlinkDetectorTest
 	public void testRenameWithEmptySideLine() throws Exception
 	{
 		HyperlinkDetector detector = new HyperlinkDetector();
-		IHyperlink[] links = detector
-				.detectHyperlinks(" rename plugins/com.aptana.editor.ruby/src/com/aptana/editor/ruby/{ => parsing}/RubyParseState.java (94%)");
+		IHyperlink[] links = detector.detectHyperlinks(
+				" rename plugins/com.aptana.editor.ruby/src/com/aptana/editor/ruby/{ => parsing}/RubyParseState.java (94%)");
 		assertNotNull(links);
 		assertEquals(1, links.length);
 		IRegion region = links[0].getHyperlinkRegion();

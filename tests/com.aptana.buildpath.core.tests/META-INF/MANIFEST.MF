@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: BuildPath Core Tests
 Bundle-SymbolicName: com.aptana.buildpath.core.tests;singleton:=true
-Bundle-Version: 3.1.0.qualifier
+Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Appcelerator, Inc.
 Fragment-Host: com.aptana.buildpath.core;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

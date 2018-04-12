@@ -7,34 +7,12 @@
  */
 package com.aptana.editor.js.outline;
 
-import org.junit.runners.Suite.SuiteClasses;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import junit.framework.Test;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({BlockItemsTest.class, InheritanceItemsTest.class, SimpleItemsTest.class, })
+@SuiteClasses({ BlockItemsTest.class, InheritanceItemsTest.class, SimpleItemsTest.class, })
 public class OutlineTests
 {
-
-//	public static Test suite()
-//	{
-//		TestSuite suite = new TestSuite("Tests for com.aptana.editor.js.outline")
-//		{
-//			@Override
-//			public void runTest(Test test, TestResult result)
-//			{
-//				System.err.println("Running test: " + test.toString());
-//				super.runTest(test, result);
-//			}
-//		};
-//		// $JUnit-BEGIN$
-//		suite.addTestSuite(BlockItemsTest.class);
-//		suite.addTestSuite(InheritanceItemsTest.class);
-//		suite.addTestSuite(SimpleItemsTest.class);
-//		// $JUnit-END$
-//		return suite;
-//	}
 }

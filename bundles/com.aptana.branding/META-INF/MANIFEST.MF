@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: com.aptana.branding
+Bundle-Version: 5.1.0.qualifier
+Bundle-Vendor: %providerName

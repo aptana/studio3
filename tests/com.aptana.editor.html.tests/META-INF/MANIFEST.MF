@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: %providerName
 Fragment-Host: com.aptana.editor.html;bundle-version="1.0.0"
 Require-Bundle: org.eclipse.core.runtime,
- org.junit;bundle-version="4.0.0",
+ org.junit;bundle-version="4.8.0",
  org.eclipse.jface.text,
  com.aptana.editor.common;bundle-version="1.0.0",
  org.eclipse.core.filesystem,
@@ -14,7 +14,13 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.test.performance;bundle-version="3.4.0",
  com.aptana.scripting;bundle-version="3.0.0",
  com.aptana.projects;bundle-version="3.0.0",
- com.aptana.testing.mocks;bundle-version="1.0.0"
+ com.aptana.testing.mocks;bundle-version="1.0.0",
+ com.aptana.testing.utils;bundle-version="1.0.0",
+ com.aptana.testing.libraries;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: com.aptana.editor.html.contentassist,
  com.aptana.editor.html.tests
+Import-Package: com.aptana.core.tests,
+ com.aptana.editor.common.tests,
+ com.aptana.buildpath.core.tests,
+ com.aptana.editor.css.tests

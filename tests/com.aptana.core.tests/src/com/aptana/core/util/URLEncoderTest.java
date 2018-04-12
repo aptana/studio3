@@ -8,12 +8,12 @@
 
 package com.aptana.core.util;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * @author Max Stepanov

@@ -7,11 +7,11 @@
  */
 package com.aptana.editor.xml.outline;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.After;
-import org.junit.Test;
 import org.junit.Before;
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import com.aptana.editor.xml.XMLPlugin;
 import com.aptana.parsing.ParseState;
@@ -25,7 +25,6 @@ public class XMLOutlineTest
 
 	private XMLParser fParser;
 
-//	@Override
 	@Before
 	public void setUp() throws Exception
 	{
@@ -34,7 +33,6 @@ public class XMLOutlineTest
 		fParser = new XMLParser();
 	}
 
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{

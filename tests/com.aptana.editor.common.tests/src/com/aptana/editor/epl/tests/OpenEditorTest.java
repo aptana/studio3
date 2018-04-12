@@ -19,14 +19,13 @@ import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
+import org.junit.experimental.categories.Category;
 
+import com.aptana.testing.categories.PerformanceTests;
+
+@Category({ PerformanceTests.class })
 public abstract class OpenEditorTest extends TextPerformanceTestCase
 {
-
-	public OpenEditorTest(String name)
-	{
-		super(name);
-	}
 
 	protected void measureOpenInEditor(IFile[] files, PerformanceMeter performanceMeter, boolean closeEach)
 			throws PartInitException

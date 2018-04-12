@@ -7,20 +7,20 @@
  */
 package com.aptana.scope;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 public class ScopeSelectorTests
 {
-	/**
-	 * testParseSimpleName
-	 */
 	@Test
 	public void testParseSimpleName()
 	{
@@ -38,9 +38,6 @@ public class ScopeSelectorTests
 		assertTrue(root instanceof NameSelector);
 	}
 
-	/**
-	 * testParseSimpleAndSelector
-	 */
 	@Test
 	public void testParseSimpleAndSelector()
 	{
@@ -63,9 +60,6 @@ public class ScopeSelectorTests
 		assertTrue(andSelector.getRightChild() instanceof NameSelector);
 	}
 
-	/**
-	 * testParseSimpleOrSelector
-	 */
 	@Test
 	public void testParseSimpleOrSelector()
 	{
@@ -88,9 +82,6 @@ public class ScopeSelectorTests
 		assertTrue(orSelector.getRightChild() instanceof NameSelector);
 	}
 
-	/**
-	 * testParseMultiAndSelector
-	 */
 	@Test
 	public void testParseMultiAndSelector()
 	{
@@ -113,9 +104,6 @@ public class ScopeSelectorTests
 		assertTrue(andSelector.getRightChild() instanceof NameSelector);
 	}
 
-	/**
-	 * testParseMultiOrSelector
-	 */
 	@Test
 	public void testParseMultiOrSelector()
 	{
@@ -138,9 +126,6 @@ public class ScopeSelectorTests
 		assertTrue(orSelector.getRightChild() instanceof NameSelector);
 	}
 
-	/**
-	 * testParseMultiMixedSelector
-	 */
 	@Test
 	public void testParseMultiMixedSelector()
 	{
@@ -216,12 +201,8 @@ public class ScopeSelectorTests
 		List<IScopeSelector> selectors = new ArrayList<IScopeSelector>();
 		selectors.add(string);
 		selectors.add(metaTag);
-		assertEquals(
-				string,
-				ScopeSelector
-						.bestMatch(
-								selectors,
-								"text.html.markdown meta.disable-markdown meta.tag.block.any.html meta.attribute-with-value.id.html string.quoted.double.html meta.toc-list.id.html"));
+		assertEquals(string, ScopeSelector.bestMatch(selectors,
+				"text.html.markdown meta.disable-markdown meta.tag.block.any.html meta.attribute-with-value.id.html string.quoted.double.html meta.toc-list.id.html"));
 		assertEquals(string, ScopeSelector.bestMatch(selectors,
 				"text.html.markdown meta.disable-markdown meta.tag.block.any.html string.quoted.double.html"));
 	}
@@ -323,10 +304,8 @@ public class ScopeSelectorTests
 	public void testMatchWhenScopeHasSegmentsBetweenScopeSelectorSegments()
 	{
 		ScopeSelector textSourceSelector = new ScopeSelector("text source");
-		assertTrue(
-				"Selector should match, but doesn't",
-				textSourceSelector
-						.matches("text.haml meta.line.ruby.haml source.ruby.embedded.haml comment.line.number-sign.ruby"));
+		assertTrue("Selector should match, but doesn't", textSourceSelector
+				.matches("text.haml meta.line.ruby.haml source.ruby.embedded.haml comment.line.number-sign.ruby"));
 		assertTrue("Selector should match, but doesn't",
 				textSourceSelector.matches("text.haml meta.line.ruby.haml source.ruby.embedded.haml"));
 	}
@@ -367,14 +346,10 @@ public class ScopeSelectorTests
 		assertFalse("Selector shouldn't match, but does", textSourceSelector.matches(scope));
 
 		// Last one wins
-		assertEquals(
-				textMinusMetaSourceSelector,
-				ScopeSelector.bestMatch(
-						Arrays.asList(textSourceSelector, textMinusMetaSelector, textMinusMetaSourceSelector), scope));
-		assertEquals(
-				textMinusMetaSelector,
-				ScopeSelector.bestMatch(
-						Arrays.asList(textMinusMetaSourceSelector, textSourceSelector, textMinusMetaSelector), scope));
+		assertEquals(textMinusMetaSourceSelector, ScopeSelector.bestMatch(
+				Arrays.asList(textSourceSelector, textMinusMetaSelector, textMinusMetaSourceSelector), scope));
+		assertEquals(textMinusMetaSelector, ScopeSelector.bestMatch(
+				Arrays.asList(textMinusMetaSourceSelector, textSourceSelector, textMinusMetaSelector), scope));
 	}
 
 	@Test
@@ -459,10 +434,8 @@ public class ScopeSelectorTests
 		IScopeSelector textSourceSelector = new ScopeSelector("text.html - (source | string)");
 
 		// test inside attribute string
-		assertFalse(
-				"Selector shouldn't match, but does",
-				textSourceSelector
-						.matches("text.html.basic meta.tag.any.html meta.attribute-with-value.id.html string.quoted.double.html punctuation.definition.string.end.html"));
+		assertFalse("Selector shouldn't match, but does", textSourceSelector.matches(
+				"text.html.basic meta.tag.any.html meta.attribute-with-value.id.html string.quoted.double.html punctuation.definition.string.end.html"));
 
 		// test inside body of html
 		assertTrue("Selector should match, but doesn't", textSourceSelector.matches("text.html.basic"));

@@ -7,8 +7,13 @@
  */
 package com.aptana.core.util;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,7 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+import com.aptana.testing.categories.PerformanceTests;
 
 public class StringUtilTest
 {
@@ -530,6 +538,7 @@ public class StringUtilTest
 	}
 
 	@Test
+	@Category({PerformanceTests.class})
 	public void testJoinSpeed()
 	{
 		// @formatter:off
@@ -542,6 +551,7 @@ public class StringUtilTest
 	}
 
 	@Test
+	@Category({PerformanceTests.class})
 	public void testEmptyDelimiterJoinSpeed()
 	{
 		// @formatter:off
@@ -586,6 +596,7 @@ public class StringUtilTest
 	}
 
 	@Test
+	@Category({PerformanceTests.class})
 	public void testConcatVersusStringBuilder()
 	{
 		timeConcatArray();

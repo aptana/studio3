@@ -20,8 +20,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.test.performance.GlobalTimePerformanceTestCase;
+import org.junit.experimental.categories.Category;
 
+import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.IOUtil;
 import com.aptana.index.core.FileStoreBuildContext;
 import com.aptana.index.core.Index;
@@ -35,7 +36,9 @@ import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseRootNode;
+import com.aptana.testing.categories.PerformanceTests;
 
+@Category({ PerformanceTests.class })
 public class JSIndexingPerformanceTest extends GlobalTimePerformanceTestCase
 {
 
@@ -155,40 +158,21 @@ public class JSIndexingPerformanceTest extends GlobalTimePerformanceTestCase
 	{
 		timeIndex(5, "performance/jaxer/11.2.2-1-n.js", "performance/jaxer/15.10.6.2-2.js",
 				"performance/jaxer/15.5.4.7-2.js", "performance/jaxer/15.9.5.21-3.js",
-				"performance/jaxer/ComposerCommands.js",
-				"performance/jaxer/DBAPI.js",
-				"performance/jaxer/DOMTestCase.js",
-				"performance/jaxer/Microformats.js",
-				"performance/jaxer/MochiKit_packed.js",
-				"performance/jaxer/SimpleTest.js",
-				"performance/jaxer/TestCachePerformance.js",
-				"performance/jaxer/UDDITypes.js",
-				"performance/jaxer/browser_bug_411172.js",
-				"performance/jaxer/clientBothProperty.js",
-				"performance/jaxer/commands.js",
-				"performance/jaxer/crlManager.js",
-				"performance/jaxer/dojo.js",
-				"performance/jaxer/dom.js",
-				"performance/jaxer/editor.js",
-				"performance/jaxer/effects.js",
-				"performance/jaxer/file-utils.js",
-				"performance/jaxer/head_urlformatter.js",
-				"performance/jaxer/httpd.js",
-				"performance/jaxer/ifaceinfotest.js",
-				"performance/jaxer/irc.js",
-				"performance/jaxer/jquery-1.2.1.js",
-				"performance/jaxer/jquery-1.2.6.min.js",
-				"performance/jaxer/jquery-stable.js",
-				"performance/jaxer/jquery.js",
-				"performance/jaxer/lexical-008.js",
-				"performance/jaxer/messages.js",
-				"performance/jaxer/narcissus-exec.js",
-				"performance/jaxer/nsDragAndDrop.js",
-				"performance/jaxer/packed.js",
-				"performance/jaxer/perlstress-001.js",
-				"performance/jaxer/perlstress-002.js",
-				"performance/jaxer/property_database.js",
-				"performance/jaxer/prototype.js",
+				"performance/jaxer/ComposerCommands.js", "performance/jaxer/DBAPI.js",
+				"performance/jaxer/DOMTestCase.js", "performance/jaxer/Microformats.js",
+				"performance/jaxer/MochiKit_packed.js", "performance/jaxer/SimpleTest.js",
+				"performance/jaxer/TestCachePerformance.js", "performance/jaxer/UDDITypes.js",
+				"performance/jaxer/browser_bug_411172.js", "performance/jaxer/clientBothProperty.js",
+				"performance/jaxer/commands.js", "performance/jaxer/crlManager.js", "performance/jaxer/dojo.js",
+				"performance/jaxer/dom.js", "performance/jaxer/editor.js", "performance/jaxer/effects.js",
+				"performance/jaxer/file-utils.js", "performance/jaxer/head_urlformatter.js",
+				"performance/jaxer/httpd.js", "performance/jaxer/ifaceinfotest.js", "performance/jaxer/irc.js",
+				"performance/jaxer/jquery-1.2.1.js", "performance/jaxer/jquery-1.2.6.min.js",
+				"performance/jaxer/jquery-stable.js", "performance/jaxer/jquery.js", "performance/jaxer/lexical-008.js",
+				"performance/jaxer/messages.js", "performance/jaxer/narcissus-exec.js",
+				"performance/jaxer/nsDragAndDrop.js", "performance/jaxer/packed.js",
+				"performance/jaxer/perlstress-001.js", "performance/jaxer/perlstress-002.js",
+				"performance/jaxer/property_database.js", "performance/jaxer/prototype.js",
 				"performance/jaxer/publishprefs.js",
 				// "performance/jaxer/regress-100199.js", "performance/jaxer/regress-111557.js",
 				// "performance/jaxer/regress-155081-2.js", "performance/jaxer/regress-192226.js",

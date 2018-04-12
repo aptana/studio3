@@ -7,16 +7,15 @@
  */
 package com.aptana.editor.js.folding;
 
-import org.junit.After;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -26,6 +25,8 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.ide.FileStoreEditorInput;
+import org.junit.After;
+import org.junit.Test;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
@@ -48,7 +49,6 @@ public class JSEditorFoldingTest
 {
 	private JSSourceEditor editor;
 
-//	@Override
 	@After
 	public void tearDown() throws Exception
 	{
@@ -57,7 +57,6 @@ public class JSEditorFoldingTest
 			EditorTestHelper.closeEditor(editor);
 			editor = null;
 		}
-//		super.tearDown();
 	}
 
 	@Test
@@ -68,24 +67,35 @@ public class JSEditorFoldingTest
 		editor = (JSSourceEditor) page.openEditor(new FileStoreEditorInput(getFileStore(contents)),
 				"com.aptana.editor.js");
 		JSSourceViewerConfiguration jsSourceViewerConfiguration = editor.getJSSourceViewerConfiguration();
-		CommonReconciler reconciler = (CommonReconciler) jsSourceViewerConfiguration.getReconciler(editor
-				.getISourceViewer());
-		// Get the default strategy (i.e.: no match means default will be returned).
-		CompositeReconcilingStrategy strategy = (CompositeReconcilingStrategy) reconciler
-				.getReconcilingStrategy("default_strategy");
+		CommonReconciler reconciler = (CommonReconciler) jsSourceViewerConfiguration
+				.getReconciler(editor.getISourceViewer());
 
-		// Accessing private field with the strategies in unit-test.
-		Field field = CompositeReconcilingStrategy.class.getDeclaredField("fStrategies");
-		field.setAccessible(true);
-		IReconcilingStrategy[] fStrategies = (IReconcilingStrategy[]) field.get(strategy);
 		CommonReconcilingStrategy commonStrategy = null;
-		for (IReconcilingStrategy iReconcilingStrategy : fStrategies)
+		IReconcilingStrategy strategy = reconciler.getReconcilingStrategy("default_strategy");
+		if (strategy instanceof CommonReconcilingStrategy)
 		{
-			if (iReconcilingStrategy instanceof CommonReconcilingStrategy)
+			commonStrategy = (CommonReconcilingStrategy) strategy;
+		}
+		else if (strategy instanceof CompositeReconcilingStrategy)
+		{
+			// Get the default strategy (i.e.: no match means default will be returned).
+			CompositeReconcilingStrategy compositeStrategy = (CompositeReconcilingStrategy) strategy;
+
+			// Accessing private field with the strategies in unit-test.
+			Field field = CompositeReconcilingStrategy.class.getDeclaredField("fStrategies");
+			field.setAccessible(true);
+			IReconcilingStrategy[] fStrategies = (IReconcilingStrategy[]) field.get(compositeStrategy);
+
+			for (IReconcilingStrategy iReconcilingStrategy : fStrategies)
 			{
-				commonStrategy = (CommonReconcilingStrategy) iReconcilingStrategy;
-				break;
+				if (iReconcilingStrategy instanceof CommonReconcilingStrategy)
+				{
+					commonStrategy = (CommonReconcilingStrategy) iReconcilingStrategy;
+					break;
+				}
 			}
+		} else {
+			fail("reconciling strategy is of unexpected type: " + strategy.getClass().getName());
 		}
 
 		try
@@ -108,7 +118,7 @@ public class JSEditorFoldingTest
 			// Clear the ast cache (as we may match a version with comments when asking for a version
 			// without comments).
 			ParserPoolFactory instance = ParserPoolFactory.getInstance();
-			field = instance.getClass().getDeclaredField("fParsingEngine");
+			Field field = instance.getClass().getDeclaredField("fParsingEngine");
 			field.setAccessible(true);
 			ParsingEngine engine = (ParsingEngine) field.get(instance);
 			engine.clearCache();

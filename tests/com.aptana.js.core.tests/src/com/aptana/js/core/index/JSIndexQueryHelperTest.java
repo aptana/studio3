@@ -1,22 +1,22 @@
 package com.aptana.js.core.index;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.jobs.Job;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import com.aptana.core.tests.TestProject;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.js.core.model.TypeElement;
 import com.aptana.js.internal.core.index.JSIndexWriter;
 import com.aptana.js.internal.core.index.JSMetadataLoader;
+import com.aptana.testing.utils.TestProject;
 
 public class JSIndexQueryHelperTest
 {
@@ -29,8 +29,6 @@ public class JSIndexQueryHelperTest
 	@Before
 	public void setUp() throws Exception
 	{
-//		super.setUp();
-
 		project = new TestProject("index_helper", new String[] { "com.aptana.projects..webnature" });
 
 		helper = new JSIndexQueryHelper(project.getInnerProject());
@@ -48,7 +46,6 @@ public class JSIndexQueryHelperTest
 		manager = null;
 		project.delete();
 		project = null;
-//		super.tearDown();
 	}
 
 	@Test
