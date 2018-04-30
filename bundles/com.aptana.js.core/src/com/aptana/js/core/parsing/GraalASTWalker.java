@@ -515,7 +515,6 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		{
 			IdentNode ident = functionNode.getIdent();
 			Block body = functionNode.getBody();
-			// If anonymous "normal" function, ident points at start of function keyword
 			int funcStart = ident.getStart();
 			int funcEnd = body.getFinish();
 			// Arrow functions don't require braces, but normal do!
@@ -563,8 +562,21 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				addChildToParent(new JSEmptyNode(toSymbol(ident)));
 			}
 			// Need to explicitly visit the params
-			int lParen = findChar('(', ident.getFinish(), body.getStart());
-			int rParen = findLastChar(')', body.getStart());
+			int bodyStart = body.getStart();
+			if (body.isParameterBlock()) {
+				// we have default args and the start position of the body is wrong. It points to the parameters!
+				Statement stmt = body.getLastStatement();
+				bodyStart = stmt.getStart();
+			}
+			int lParen = findChar('(', ident.getFinish(), bodyStart);
+			int rParen;
+			// Arrow funcs with one param may have no parens
+			if (lParen == -1 && (funcNode instanceof JSArrowFunctionNode) && functionNode.getNumOfParams() == 1) {
+				lParen = functionNode.getParameter(0).getStart();
+				rParen = functionNode.getParameter(0).getFinish() - 1;
+			} else {
+				rParen = findLastChar(')', bodyStart);
+			}
 			addToParentAndPushNodeToStack(new JSParametersNode(lParen, rParen));
 			functionNode.visitParameters(this);
 			popNode(); // parameters
@@ -1071,20 +1083,28 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		}
 		else if (!block.isSynthetic())
 		{
-			int lBrace = findChar('{', block.getStart());
-			int rBrace = findLastChar('}', block.getFinish() - 1);
-			// usually a close brace is at end of block, but search backwards in case it's trailed by a
-			// comment. In case of functions, the parser handles them specially as a way to reset parse state
-			// so the function and block end offsets are *wrong* and do not include the closing brace!
-			// here we fix the end offset of the block and parent function
 			IParseNode parent = getCurrentNode();
-			if (parent instanceof JSFunctionNode)
-			{
-				int maybeRBrace = findChar('}', block.getFinish());
-				if (maybeRBrace != -1)
+			int lBrace;
+			int rBrace;
+			if (parent instanceof JSArrowFunctionNode) {
+				// If this is the body of an arrow func, it may not be in {}! Let's take the offsets as the truth for now
+				lBrace = block.getStart();
+				rBrace = block.getFinish() - 1;
+			} else {
+				lBrace = findChar('{', block.getStart(), block.getFinish()); // FIXME We need to only accept it if there's only whitespace (or comments) between the initial position and where we find the char!
+				rBrace = findLastChar('}', block.getFinish() - 1);
+				// usually a close brace is at end of block, but search backwards in case it's trailed by a
+				// comment. In case of functions, the parser handles them specially as a way to reset parse state
+				// so the function and block end offsets are *wrong* and do not include the closing brace!
+				// here we fix the end offset of the block and parent function
+				if (parent instanceof JSFunctionNode)
 				{
-					rBrace = maybeRBrace;
-					((JSFunctionNode) parent).setLocation(parent.getStartingOffset(), rBrace);
+					int maybeRBrace = findChar('}', block.getFinish());
+					if (maybeRBrace != -1)
+					{
+						rBrace = maybeRBrace;
+						((JSFunctionNode) parent).setLocation(parent.getStartingOffset(), rBrace);
+					}
 				}
 			}
 

@@ -77,6 +77,7 @@ public class JSCodeScanner extends AbstractFlexTokenScanner
 
 	private enum State
 	{
+		// FIXME Handle being inside a class definition!
 		DEFAULT, FUNCTION_DECLARATION, FUNCTION_DECLARATION_INSIDE_PARENS,
 	}
 
