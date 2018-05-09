@@ -1242,9 +1242,9 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 	/**
 	 * Made public so we can set TM_SOFT_TABS for scripting
+	 *  Keeping different method name to avoid issues with the JRuby calls
 	 */
-	@Override
-	public boolean isTabsToSpacesConversionEnabled()
+	public boolean isTabsToSpacesConversionEnabledAptana()
 	{
 		// Make public so we can grab the value
 		return super.isTabsToSpacesConversionEnabled();
