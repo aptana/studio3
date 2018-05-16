@@ -243,7 +243,7 @@ module Ruble
     
     def scope_at_offset(offset)
       if editor_part.respond_to? :source_viewer
-        com.aptana.editor.common.CommonEditorPlugin.getDefault.get_document_scope_manager.get_scope_at_offset(editor_part.source_viewer, offset)
+        com.aptana.editor.common.CommonEditorPlugin.getDefault.get_document_scope_manager.get_scope_at_offset(editor_part.getISourceViewer(), offset)
       else
         ''
       end
@@ -301,7 +301,7 @@ module Ruble
       result = {}
       
       if editor_part.kind_of?(com.aptana.editor.common.AbstractThemeableEditor)
-        result['TM_SOFT_TABS'] = editor_part.isTabsToSpacesConversionEnabled() ? "YES" : "NO"
+        result['TM_SOFT_TABS'] = editor_part.isTabsToSpacesConversionEnabledAptana() ? "YES" : "NO"
         result['TM_TAB_SIZE'] = editor_part.getTabSize()
       else
         result['TM_SOFT_TABS'] = "NO"
