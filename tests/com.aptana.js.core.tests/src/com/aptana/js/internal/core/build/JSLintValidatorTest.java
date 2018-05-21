@@ -9,7 +9,6 @@ package com.aptana.js.internal.core.build;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,51 +18,17 @@ import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
 
 import com.aptana.buildpath.core.tests.AbstractValidatorTestCase;
-import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IBuildParticipantWorkingCopy;
 import com.aptana.core.build.IProblem;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.js.core.IJSConstants;
-import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.parsing.JSParseState;
 import com.aptana.js.core.preferences.IPreferenceConstants;
 
-public class JSLintValidatorTest extends AbstractValidatorTestCase
+@Deprecated // TODO Merge with subclass JSStyleValidatorTest
+abstract class JSLintValidatorTest extends AbstractValidatorTestCase
 {
-
-	@Override
-	protected IBuildParticipant createValidator()
-	{
-		return new JSLintValidator()
-		{
-			@Override
-			// Don't filter anything out
-			public List<String> getFilters()
-			{
-				return Collections.emptyList();
-			}
-
-			@Override
-			public String getId()
-			{
-				return ID;
-			}
-
-			@Override
-			protected String getPreferenceNode()
-			{
-				return JSCorePlugin.PLUGIN_ID;
-			}
-
-			@Override
-			// Don't skip errors/warnings just because they're on same line!
-			protected boolean hasErrorOrWarningOnLine(List<IProblem> items, int line)
-			{
-				return false;
-			}
-		};
-	}
 
 	@Override
 	protected String getContentType()

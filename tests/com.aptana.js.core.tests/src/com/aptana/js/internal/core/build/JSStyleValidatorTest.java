@@ -14,6 +14,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
 
+import com.aptana.buildpath.core.tests.AbstractValidatorTestCase;
 import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
 import com.aptana.js.core.IJSConstants;
@@ -54,6 +55,23 @@ public class JSStyleValidatorTest extends JSLintValidatorTest
 				return false;
 			}
 		};
+	}
+	
+	@Override
+	protected String getContentType()
+	{
+		return IJSConstants.CONTENT_TYPE_JS;
+	}
+
+	@Override
+	protected String getFileExtension()
+	{
+		return "js";
+	}
+
+	protected List<IProblem> getParseErrors(String source) throws CoreException
+	{
+		return getParseErrors(source, new JSParseState(source), IJSConstants.JSLINT_PROBLEM_MARKER_TYPE);
 	}
 
 	// Warnings that we don't detect/implement yet!
@@ -566,11 +584,6 @@ public class JSStyleValidatorTest extends JSLintValidatorTest
 	protected void setOption(String optionName, boolean value)
 	{
 		((JSStyleValidator) fValidator).setOption(optionName, value);
-	}
-
-	protected List<IProblem> getParseErrors(String source) throws CoreException
-	{
-		return getParseErrors(source, new JSParseState(source), IJSConstants.JSSTYLE_PROBLEM_MARKER_TYPE);
 	}
 
 	// Tests we are intentionally skipping -----------------------
