@@ -12,7 +12,6 @@ Require-Bundle: com.aptana.core;bundle-version="3.3.0";visibility:=reexport,
  json.simple;bundle-version="1.1.0";visibility:=reexport,
  com.aptana.buildpath.core;bundle-version="3.0.0";visibility:=reexport,
  org.eclipse.text;visibility:=reexport,
- org.mozilla.javascript;bundle-version="1.7.5";visibility:=reexport,
  com.aptana.core.io,
  org.eclipse.core.net
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

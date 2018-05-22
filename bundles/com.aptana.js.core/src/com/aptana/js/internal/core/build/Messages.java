@@ -14,8 +14,6 @@ public class Messages extends NLS
 
 	private static final String BUNDLE_NAME = "com.aptana.js.internal.core.build.messages"; //$NON-NLS-1$
 
-	public static String JSLintValidator_ERR_FailToGetJSLint;
-
 	public static String JSStyleValidator_AdsafeA;
 	public static String JSStyleValidator_ALabel;
 	public static String JSStyleValidator_AlreadyDefined;
