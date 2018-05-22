@@ -23,11 +23,6 @@ public interface IJSConstants
 	public String JS_PROBLEM_MARKER_TYPE = JSCorePlugin.PLUGIN_ID + ".problem"; //$NON-NLS-1$
 
 	/**
-	 * Marker type id used for JS Lint problems. Extends {@link #JS_PROBLEM_MARKER_TYPE}
-	 */
-	public String JSLINT_PROBLEM_MARKER_TYPE = JSCorePlugin.PLUGIN_ID + ".jslint_problem"; //$NON-NLS-1$
-
-	/**
 	 * Marker type id used for SDocML problems. Extends {@link IMarker#PROBLEM}
 	 */
 	public String SDOCML_PROBLEM_MARKER_TYPE = JSCorePlugin.PLUGIN_ID + ".sdocml_problem"; //$NON-NLS-1$
