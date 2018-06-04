@@ -10,9 +10,13 @@ package com.aptana.usage;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 
+import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.usage.internal.AnalyticsHandlersManager;
+import com.aptana.usage.preferences.IPreferenceConstants;
 
 public class StudioAnalytics implements IStudioAnalytics
 {
@@ -23,7 +27,7 @@ public class StudioAnalytics implements IStudioAnalytics
 	 */
 	public void sendEvent(AnalyticsEvent event)
 	{
-		if (Platform.inDevelopmentMode() && !EclipseUtil.isTesting())
+		if (Platform.inDevelopmentMode() && !EclipseUtil.isTesting() && !isUsageAnalyticsEnabled())
 		{
 			return;
 		}
@@ -33,5 +37,15 @@ public class StudioAnalytics implements IStudioAnalytics
 		{
 			handler.sendEvent(event);
 		}
+	}
+
+	private boolean isUsageAnalyticsEnabled()
+	{
+		IScopeContext configScope = ConfigurationScope.INSTANCE;
+		boolean isStudioAnalyticsEnabled = Platform.getPreferencesService().getBoolean("com.aptana.ui", //$NON-NLS-1$
+				IPreferenceConstants.ENABLE_STUDIO_USAGE_ANALYTICS, false, new IScopeContext[] { configScope });
+		IdeLog.logInfo(UsagePlugin.getDefault(), "Is Studio usage analytics enabled: " + isStudioAnalyticsEnabled,
+				UsagePlugin.PLUGIN_PREFERENCE_SCOPE);
+		return isStudioAnalyticsEnabled;
 	}
 }
