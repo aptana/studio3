@@ -162,7 +162,6 @@ public class AnalyticsEvent
 		addPostEntry(event, "osver", System.getProperty("os.version")); //$NON-NLS-1$ //$NON-NLS-2$
 		addPostEntry(event, "osarch", System.getProperty("os.arch")); //$NON-NLS-1$ //$NON-NLS-2$
 		addPostEntry(event, "oscpu", Integer.toString(Runtime.getRuntime().availableProcessors())); //$NON-NLS-1$
-		addPostEntry(event, "un", (user == null) ? StringUtil.EMPTY : user.getUsername()); //$NON-NLS-1$
 		addPostEntry(event, "ver", SPEC_VERSION); //$NON-NLS-1$
 
 		TimeZone tz = TimeZone.getDefault();
