@@ -28,6 +28,10 @@ public class Messages extends NLS
 	public static String PasswordPromptDialog_UserName;
 
 	public static String SaveAndLaunchPromptDialog_SaveMessage;
+	public static String StudioPrivacySettingsDialog_DialogMessage;
+	public static String StudioPrivacySettingsDialog_DialogMessagg2;
+	public static String StudioPrivacySettingsDialog_DialogTitle;
+	public static String StudioPrivacySettingsDialog_UsageDataCheckText;
 
 	public static String SudoPasswordPromptDialog_MessagePrompt_Suffix;
 	public static String SudoPasswordPromptDialog_User;

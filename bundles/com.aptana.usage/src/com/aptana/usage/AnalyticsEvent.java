@@ -8,18 +8,11 @@
 package com.aptana.usage;
 
 import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.Platform;
 
@@ -29,7 +22,6 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.jetty.util.epl.ajax.JSON;
 import com.aptana.usage.internal.DefaultAnalyticsInfo;
-import com.eaio.uuid.MACAddress;
 
 public class AnalyticsEvent
 {
@@ -159,10 +151,8 @@ public class AnalyticsEvent
 		addPostEntry(event, "guid", APP_INFO.getAppGuid()); //$NON-NLS-1$
 		addPostEntry(event, "mid", CorePlugin.getMID()); //$NON-NLS-1$
 		addPostEntry(event, "app_id", APP_INFO.getAppId()); //$NON-NLS-1$
-		addPostEntry(event, "creator_user_id", (user == null) ? StringUtil.EMPTY : user.getGUID()); //$NON-NLS-1$
 		addPostEntry(event, "app_name", APP_INFO.getAppName()); //$NON-NLS-1$
 		addPostEntry(event, "app_version", EclipseUtil.getPluginVersion(APP_INFO.getVersionPluginId())); //$NON-NLS-1$
-		addPostEntry(event, "mac_addr", MACAddress.getMACAddress()); //$NON-NLS-1$
 		addPostEntry(event, "platform", Platform.OS_MACOSX.equals(Platform.getOS()) ? "osx" : Platform.getOS()); //$NON-NLS-1$ //$NON-NLS-2$
 		// This field was used for the versions of titanium sdk that developer was build on. This does not apply to
 		// studio so we are leaving it as 1.1.0 for now.
@@ -172,15 +162,12 @@ public class AnalyticsEvent
 		addPostEntry(event, "osver", System.getProperty("os.version")); //$NON-NLS-1$ //$NON-NLS-2$
 		addPostEntry(event, "osarch", System.getProperty("os.arch")); //$NON-NLS-1$ //$NON-NLS-2$
 		addPostEntry(event, "oscpu", Integer.toString(Runtime.getRuntime().availableProcessors())); //$NON-NLS-1$
-		addPostEntry(event, "un", (user == null) ? StringUtil.EMPTY : user.getUsername()); //$NON-NLS-1$
 		addPostEntry(event, "ver", SPEC_VERSION); //$NON-NLS-1$
 
 		TimeZone tz = TimeZone.getDefault();
 		int results = -(tz.getDSTSavings() + tz.getRawOffset());
 		results = (results / 1000) / 60;
 		addPostEntry(event, "tz", Integer.toString(results)); //$NON-NLS-1$
-
-		addIPAddress(event);
 
 		if (!EMPTY_JSON_PAYLOAD.equals(getJSONPayloadString()))
 		{
@@ -201,43 +188,6 @@ public class AnalyticsEvent
 		eventString = event.toString();
 	}
 	
-	private void addIPAddress(final StringBuilder event)
-	{
-
-		ExecutorService executor = Executors.newSingleThreadExecutor();
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		Future<String> future = executor.submit(new Callable()
-		{
-			public String call() throws Exception
-			{
-				InetAddress ip;
-				try
-				{
-					ip = InetAddress.getLocalHost();
-					addPostEntry(event, "ip", ip.getHostAddress()); //$NON-NLS-1$
-				}
-				catch (UnknownHostException e)
-				{
-					addPostEntry(event, "ip", StringUtil.EMPTY); //$NON-NLS-1$
-				}
-
-				return "OK";
-			}
-		});
-
-		try
-		{
-			future.get(1, TimeUnit.SECONDS);
-		}
-		catch (Exception e) // timeout exception
-		{
-			// add empty ip for timeout exception
-			addPostEntry(event, "ip", StringUtil.EMPTY); //$NON-NLS-1$
-		}
-		executor.shutdownNow();
-
-	}
-
 	private void addPostEntry(StringBuilder event, String key, String value)
 	{
 		if (value == null)
