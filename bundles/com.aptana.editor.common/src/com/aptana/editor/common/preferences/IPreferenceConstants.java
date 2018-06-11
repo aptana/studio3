@@ -159,5 +159,5 @@ public interface IPreferenceConstants
 			+ ".removeTrailingWhitespace"; //$NON-NLS-1$
 
 	public static final String EDITOR_SUB_WORD_NAVIGATION = CommonEditorPlugin.PLUGIN_ID + ".camelCaseNavigation"; //$NON-NLS-1$
-
+	
 }
