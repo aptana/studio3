@@ -378,6 +378,17 @@ public class HTMLParserTest
 		assertEquals(new Range(19, 19), endTag.getNameRange());
 	}
 
+	@Test
+	public void testInvalidSyntax() throws Exception
+	{
+		String sourceWithInvalidSyntax = "<script>\n(function() {\nvar foo = function( {};\nfoo.bar = function() {};\n})();\n</script>";
+		fParseState = new HTMLParseState(sourceWithInvalidSyntax);
+		ParseResult result = fParser.parse(fParseState); //should return error due to invalid js syntax
+		List<IParseError> errors = result.getErrors();
+		assertEquals(1, errors.size());
+		
+	}
+	
 	/**
 	 * This method is not being used for formal testing, but it's useful to determine how effective
 	 * {@link ParseNode#trimToSize()} is.

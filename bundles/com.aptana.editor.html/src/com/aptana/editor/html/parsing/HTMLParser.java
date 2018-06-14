@@ -276,7 +276,9 @@ public class HTMLParser extends AbstractParser
 			try
 			{
 				String text = fScanner.getSource().get(start, end - start + 1);
-				ParseState subParseState = new ParseState(text, start);
+
+				//Offset should start with the zero when you're creating subParseState for the extracted text.
+				ParseState subParseState = new ParseState(text, 0);
 				// FIXME We need to propagate options down to sub-languages, i.e. JS's attach/collect comments
 				ParseResult subParseResult = ParserPoolFactory.parse(language, subParseState);
 				IParseNode node = subParseResult.getRootNode();
