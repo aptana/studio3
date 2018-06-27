@@ -95,7 +95,7 @@ public class JSParserValidator extends AbstractBuildParticipant
 					public IProblem map(IParseError parseError)
 					{
 						return new Problem(parseError.getSeverity().intValue(), parseError.getMessage(), parseError
-								.getOffset(), parseError.getLength(), getLine(parseError.getOffset()), fPath);
+								.getOffset(), parseError.getLength(), parseError.getLineNumber(), fPath);
 					}
 				}));
 			}
