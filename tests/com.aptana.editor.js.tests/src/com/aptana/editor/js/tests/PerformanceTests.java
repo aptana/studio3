@@ -24,7 +24,7 @@ import com.aptana.editor.js.text.JSSourcePartitionScannerPerformanceTest;
 @SuiteClasses({ JSBuildPerformanceTest.class, JSContentAssistProcessorPerformanceTest.class,
 		JSIndexingPerformanceTest.class, JSCodeScannerPerformanceTest.class,
 		JSSourcePartitionScannerPerformanceTest.class,
-		JSParserValidatorPerformanceTest.class, JSStyleValidatorPerformanceTest.class, OpenJSEditorTest.class, })
+		JSParserValidatorPerformanceTest.class, OpenJSEditorTest.class, })
 public class PerformanceTests
 {
 }
