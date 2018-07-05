@@ -51,6 +51,8 @@ public class GraalJSParser extends AbstractParser
 		}
 		catch (Exception e)
 		{
+			System.err.println(e);
+			e.printStackTrace();
 			IParseError error = handleError(e);
 			working.addError(error);
 			throw e;

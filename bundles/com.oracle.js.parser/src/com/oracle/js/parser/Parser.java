@@ -5266,7 +5266,11 @@ loop:
                         break;
                 }
                 if (ident != null) {
+//                	    lc.appendStatementToCurrentNode(new VarNode(lineNumber, Token.recast(rhsToken, LET), finish, ident, assignmentExpression));
                     module.addLocalExportEntry(ExportEntry.exportDefault(ident.getName()));
+                    final VarNode varNode  = new VarNode(line, TokenType.FUNCTION.ordinal(), finish, ident, assignmentExpression, 0);
+//                    functionDeclarations.add(varNode);
+                    lc.prependStatementToCurrentNode(varNode);
                 } else {
                     ident = createIdentNode(Token.recast(rhsToken, IDENT), finish, Module.DEFAULT_EXPORT_BINDING_NAME);
                     lc.appendStatementToCurrentNode(new VarNode(lineNumber, Token.recast(rhsToken, LET), finish, ident, assignmentExpression));

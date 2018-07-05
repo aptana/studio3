@@ -28,6 +28,7 @@ import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CommonOutlinePageInput;
 import com.aptana.editor.js.outline.JSOutlineItem.Type;
 import com.aptana.js.core.parsing.ast.IJSNodeTypes;
+import com.aptana.js.core.parsing.ast.JSExportNode;
 import com.aptana.js.core.parsing.ast.JSImportNode;
 import com.aptana.js.core.parsing.ast.JSImportSpecifierNode;
 import com.aptana.parsing.ast.IParseNode;
@@ -199,6 +200,9 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		short type = node.getNodeType();
 		switch (type)
 		{
+			case IJSNodeTypes.EXPORT:
+				processExport(elements, (JSExportNode) node);
+				break;
 			case IJSNodeTypes.IMPORT:
 				processImport(elements, (JSImportNode) node);
 				break;
@@ -261,6 +265,11 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 				processVar(elements, node);
 				break;
 		}
+	}
+
+	private void processExport(Collection<JSOutlineItem> elements, JSExportNode node)
+	{
+		processStatements(elements, node);
 	}
 
 	private void processImport(Collection<JSOutlineItem> elements, JSImportNode node)
@@ -634,6 +643,16 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		{
 			child = node.getChild(i);
 			if (child.getNodeType() == IJSNodeTypes.IMPORT)
+			{
+				processNode(elements, child);
+			}
+		}
+		// processes exports second
+		// TODO Combine exports in some way?
+		for (int i = 0; i < size; ++i)
+		{
+			child = node.getChild(i);
+			if (child.getNodeType() == IJSNodeTypes.EXPORT)
 			{
 				processNode(elements, child);
 			}

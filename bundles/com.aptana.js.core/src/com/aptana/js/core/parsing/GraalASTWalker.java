@@ -138,6 +138,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 
 	private Module module;
 	private ParenWrapChecker parenCheck;
+	private String fDefaultExportName;
 
 	public GraalASTWalker(String source, LexicalContext lc)
 	{
@@ -365,7 +366,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public boolean enterVarNode(VarNode varNode)
 	{
-		if (!varNode.isFunctionDeclaration() && !(varNode.getInit() instanceof ClassNode))
+		// TODO Handle top-level default function export with a name!
+		if (!isDefaultNamedFunctionExport(varNode) && !varNode.isFunctionDeclaration() && !(varNode.getInit() instanceof ClassNode))
 		{
 			// Need to search backwards for "var"/"let"/"const". No guarantee how much whitespace/comments are between
 			// the keyword and var name!
@@ -446,13 +448,18 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		return super.enterVarNode(varNode);
 	}
 
+	private boolean isDefaultNamedFunctionExport(VarNode varNode)
+	{
+		return varNode.getInit() instanceof FunctionNode && fDefaultExportName != null && varNode.getName().getName().equals(fDefaultExportName);
+	}
+
 	@Override
 	public Node leaveVarNode(VarNode varNode)
 	{
 		Expression init = varNode.getInit();
 		// assignment is right associative, so we end up visiting the value before the name. We have to invert the
 		// children
-		if (!varNode.isFunctionDeclaration() && !(init instanceof ClassNode))
+		if (!isDefaultNamedFunctionExport(varNode) && !varNode.isFunctionDeclaration() && !(init instanceof ClassNode))
 		{
 			// Invert the two children of the declaration!
 			IParseNode node = getCurrentNode();
@@ -649,6 +656,13 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		{
 			addChildToParent(new JSExportNode(false, (Symbol) null, "'" + entry.getModuleRequest() + "'"));
 		}
+		
+		// Cache the default export name
+		for (Module.ExportEntry entry : module.getLocalExportEntries()) {
+			if (entry.getExportName().equals("default")) {
+				fDefaultExportName = entry.getLocalName();
+			}
+		}
 	}
 
 	@Override
@@ -676,6 +690,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		{
 			leaveScope((ParseNode) fRootNode);
 			module = null;
+			fDefaultExportName = null;
 			pool = null;
 			pushOnLeave = null;
 			// FIXME If nodestack is not empty, spit out an error message
