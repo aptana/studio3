@@ -5091,7 +5091,7 @@ loop:
             } else if (isBindingIdentifier()) {
                 // ImportedDefaultBinding
                 IdentNode importedDefaultBinding = bindingIdentifier("ImportedBinding");
-                ImportEntry defaultImport = ImportEntry.importDefault(importedDefaultBinding.getName());
+                ImportEntry defaultImport = ImportEntry.importDefault(importedDefaultBinding);
 
                 if (type == COMMARIGHT) {
                     next();
@@ -5136,7 +5136,7 @@ loop:
             throw error(AbstractParser.message("expected.as"), asToken);
         }
         IdentNode localNameSpace = bindingIdentifier("ImportedBinding");
-        return ImportEntry.importStarAsNameSpaceFrom(localNameSpace.getName());
+        return ImportEntry.importStarAsNameSpaceFrom(localNameSpace);
     }
 
     /**
@@ -5164,12 +5164,12 @@ loop:
             if (type == IDENT && "as".equals(getValue())) {
                 next();
                 IdentNode localName = bindingIdentifier("ImportedBinding");
-                importEntries.add(ImportEntry.importSpecifier(importName.getName(), localName.getName()));
+                importEntries.add(ImportEntry.importSpecifier(importName, localName));
             } else if (!bindingIdentifier) {
                 // expected BindingIdentifier
                 throw error(AbstractParser.message("expected.binding.identifier"), nameToken);
             } else {
-                importEntries.add(ImportEntry.importSpecifier(importName.getName()));
+                importEntries.add(ImportEntry.importSpecifier(importName));
             }
             if (type == COMMARIGHT) {
                 next();

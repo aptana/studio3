@@ -615,7 +615,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			JSIdentifierNode alias = null;
 			if (!StringUtil.isEmpty(as))
 			{
-				alias = new JSIdentifierNode(identifierSymbol(as));
+				alias = new JSIdentifierNode(identifierSymbol(entry.getLocalNameNode()));
 			}
 
 			if (Module.STAR_NAME.equals(name))
@@ -624,7 +624,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			}
 			else
 			{
-				JSIdentifierNode importedName = new JSIdentifierNode(identifierSymbol(name));
+				JSIdentifierNode importedName = new JSIdentifierNode(identifierSymbol(entry.getImportNameNode()));
 				if (alias == null)
 				{
 					node = new JSImportSpecifierNode(importedName);

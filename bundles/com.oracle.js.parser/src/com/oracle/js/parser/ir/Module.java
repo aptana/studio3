@@ -27,6 +27,8 @@ package com.oracle.js.parser.ir;
 
 import java.util.List;
 
+import com.oracle.js.parser.TokenType;
+
 /**
  * Module information.
  */
@@ -99,28 +101,28 @@ public final class Module {
 
     public static final class ImportEntry {
         private final String moduleRequest;
-        private final String importName;
-        private final String localName;
+        private final IdentNode importName;
+        private final IdentNode localName;
 
-        private ImportEntry(String moduleRequest, String importName, String localName) {
+        private ImportEntry(String moduleRequest, IdentNode importName, IdentNode localName) {
             this.moduleRequest = moduleRequest;
             this.importName = importName;
             this.localName = localName;
         }
 
-        public static ImportEntry importDefault(String localName) {
-            return new ImportEntry(null, DEFAULT_NAME, localName);
+        public static ImportEntry importDefault(IdentNode localName) {
+            return new ImportEntry(null, new IdentNode(TokenType.IDENT.ordinal(), 0, DEFAULT_NAME), localName);
         }
 
-        public static ImportEntry importStarAsNameSpaceFrom(String localNameSpace) {
-            return new ImportEntry(null, STAR_NAME, localNameSpace);
+        public static ImportEntry importStarAsNameSpaceFrom(IdentNode localNameSpace) {
+            return new ImportEntry(null, new IdentNode(TokenType.MUL.ordinal(), 0, STAR_NAME), localNameSpace);
         }
 
-        public static ImportEntry importSpecifier(String importName, String localName) {
+        public static ImportEntry importSpecifier(IdentNode importName, IdentNode localName) {
             return new ImportEntry(null, importName, localName);
         }
 
-        public static ImportEntry importSpecifier(String importName) {
+        public static ImportEntry importSpecifier(IdentNode importName) {
             return importSpecifier(importName, importName);
         }
 
@@ -133,17 +135,27 @@ public final class Module {
         }
 
         public String getImportName() {
-            return importName;
+            return importName.getName();
         }
 
         public String getLocalName() {
-            return localName;
+            return localName.getName();
         }
 
         @Override
         public String toString() {
             return "ImportEntry [moduleRequest=" + moduleRequest + ", importName=" + importName + ", localName=" + localName + "]";
         }
+
+		public IdentNode getLocalNameNode()
+		{
+			return localName;
+		}
+
+		public IdentNode getImportNameNode()
+		{
+			return importName;
+		}
     }
 
     private final List<String> requestedModules;
