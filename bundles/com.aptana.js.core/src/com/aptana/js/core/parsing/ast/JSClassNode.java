@@ -1,5 +1,7 @@
 package com.aptana.js.core.parsing.ast;
 
+import com.aptana.parsing.ast.IParseNode;
+
 public class JSClassNode extends JSNode
 {
 
@@ -74,5 +76,12 @@ public class JSClassNode extends JSNode
 		// second to last child
 		int count = getChildCount();
 		return (JSNode) getChild(count - 2);
+	}
+	
+	@Override
+	public boolean isExported()
+	{
+		IParseNode parent = getParent();
+		return parent != null && parent instanceof JSExportNode;
 	}
 }

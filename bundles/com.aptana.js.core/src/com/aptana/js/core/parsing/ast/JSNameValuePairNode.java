@@ -90,14 +90,4 @@ public class JSNameValuePairNode extends JSNode
 		}
 		return null;
 	}
-
-	public void setStatic()
-	{
-		IParseNode node = getLastChild();
-		if (node instanceof JSFunctionNode)
-		{
-			JSFunctionNode func = (JSFunctionNode) node;
-			func.setStatic();
-		}
-	}
 }

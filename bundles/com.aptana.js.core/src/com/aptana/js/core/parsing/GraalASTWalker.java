@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.eclipse.core.internal.utils.StringPool;
+import org.eclipse.core.runtime.Assert;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.JSLanguageConstants;
@@ -367,7 +368,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	public boolean enterVarNode(VarNode varNode)
 	{
 		// TODO Handle top-level default function export with a name!
-		if (!isDefaultNamedFunctionExport(varNode) && !varNode.isFunctionDeclaration() && !(varNode.getInit() instanceof ClassNode))
+		if (!isDefaultNamedFunctionExport(varNode) && !varNode.isFunctionDeclaration()
+				&& !(varNode.getInit() instanceof ClassNode))
 		{
 			// Need to search backwards for "var"/"let"/"const". No guarantee how much whitespace/comments are between
 			// the keyword and var name!
@@ -394,10 +396,11 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				// Look up the previous var decl in this scope and steal it's start offset!
 				IParseNode parent = getCurrentNode();
 				JSVarNode firstVar = (JSVarNode) parent.getFirstChild(); // due to hoisting, this should be a var...
-				if (firstVar != null) {
+				if (firstVar != null)
+				{
 					varStart = firstVar.getStartingOffset();
-//				} else {
-//					throw new IllegalStateException("Couldn't find first hoisted var to match up with!");
+					// } else {
+					// throw new IllegalStateException("Couldn't find first hoisted var to match up with!");
 				}
 			}
 			Symbol var = toSymbol(type, varStart, varStart + (keywordName.length() - 1));
@@ -431,16 +434,21 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		{
 			// class decl
 			IdentNode name = varNode.getName();
+			// FIXME Can name ever be null?
+			Assert.isNotNull(name);
 			ClassNode classNode = (ClassNode) varNode.getInit();
-			if (name != null && name.getName().equals(Module.DEFAULT_EXPORT_BINDING_NAME))
+
+			ExportedStatus exportStatus = getExportStatus(name);
+			JSClassNode jsClassNode = new JSClassNode(!name.getName().equals(Module.DEFAULT_EXPORT_BINDING_NAME),
+					classNode.getClassHeritage() != null);
+			if (exportStatus.isExported)
 			{
-				JSClassNode jsClassNode = new JSClassNode(false, classNode.getClassHeritage() != null);
-				addChildToParent(new JSExportNode(true, jsClassNode));
+				addChildToParent(new JSExportNode(exportStatus.isDefault, jsClassNode));
 				fNodeStack.push(jsClassNode);
 			}
 			else
 			{
-				addToParentAndPushNodeToStack(new JSClassNode(name != null, classNode.getClassHeritage() != null));
+				addToParentAndPushNodeToStack(jsClassNode);
 			}
 
 		}
@@ -450,7 +458,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 
 	private boolean isDefaultNamedFunctionExport(VarNode varNode)
 	{
-		return varNode.getInit() instanceof FunctionNode && fDefaultExportName != null && varNode.getName().getName().equals(fDefaultExportName);
+		return varNode.getInit() instanceof FunctionNode && fDefaultExportName != null
+				&& varNode.getName().getName().equals(fDefaultExportName);
 	}
 
 	@Override
@@ -570,7 +579,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			}
 			// Need to explicitly visit the params
 			int bodyStart = body.getStart();
-			if (body.isParameterBlock()) {
+			if (body.isParameterBlock())
+			{
 				// we have default args and the start position of the body is wrong. It points to the parameters!
 				Statement stmt = body.getLastStatement();
 				bodyStart = stmt.getStart();
@@ -578,10 +588,13 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			int lParen = findChar('(', ident.getFinish(), bodyStart);
 			int rParen;
 			// Arrow funcs with one param may have no parens
-			if (lParen == -1 && (funcNode instanceof JSArrowFunctionNode) && functionNode.getNumOfParams() == 1) {
+			if (lParen == -1 && (funcNode instanceof JSArrowFunctionNode) && functionNode.getNumOfParams() == 1)
+			{
 				lParen = functionNode.getParameter(0).getStart();
 				rParen = functionNode.getParameter(0).getFinish() - 1;
-			} else {
+			}
+			else
+			{
 				rParen = findLastChar(')', bodyStart);
 			}
 			addToParentAndPushNodeToStack(new JSParametersNode(lParen, rParen));
@@ -656,10 +669,12 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		{
 			addChildToParent(new JSExportNode(false, (Symbol) null, "'" + entry.getModuleRequest() + "'"));
 		}
-		
+
 		// Cache the default export name
-		for (Module.ExportEntry entry : module.getLocalExportEntries()) {
-			if (entry.getExportName().equals("default")) {
+		for (Module.ExportEntry entry : module.getLocalExportEntries())
+		{
+			if (entry.getExportName().equals("default"))
+			{
 				fDefaultExportName = entry.getLocalName();
 			}
 		}
@@ -1101,12 +1116,19 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			IParseNode parent = getCurrentNode();
 			int lBrace;
 			int rBrace;
-			if (parent instanceof JSArrowFunctionNode) {
-				// If this is the body of an arrow func, it may not be in {}! Let's take the offsets as the truth for now
+			if (parent instanceof JSArrowFunctionNode)
+			{
+				// If this is the body of an arrow func, it may not be in {}! Let's take the offsets as the truth for
+				// now
 				lBrace = block.getStart();
 				rBrace = block.getFinish() - 1;
-			} else {
-				lBrace = findChar('{', block.getStart(), block.getFinish()); // FIXME We need to only accept it if there's only whitespace (or comments) between the initial position and where we find the char!
+			}
+			else
+			{
+				lBrace = findChar('{', block.getStart(), block.getFinish()); // FIXME We need to only accept it if
+																				// there's only whitespace (or comments)
+																				// between the initial position and
+																				// where we find the char!
 				rBrace = findLastChar('}', block.getFinish() - 1);
 				// usually a close brace is at end of block, but search backwards in case it's trailed by a
 				// comment. In case of functions, the parser handles them specially as a way to reset parse state
@@ -1515,7 +1537,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		FunctionNode setter = propertyNode.getSetter();
 		if (getter != null || setter != null)
 		{
-			handleGetter(getter);
+			handleGetter(getter, propertyNode.isStatic());
 			handleSetter(setter);
 			return false;
 		}
@@ -1539,7 +1561,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		return super.enterPropertyNode(propertyNode);
 	}
 
-	private void handleGetter(FunctionNode getter)
+	private void handleGetter(FunctionNode getter, boolean isStatic)
 	{
 		if (getter == null)
 		{
@@ -1547,7 +1569,8 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		}
 
 		int getIndex = this.source.lastIndexOf("get", getter.getIdent().getStart());
-		addToParentAndPushNodeToStack(new JSGetterNode(getIndex, getter.getFinish() - 1));
+		// A getter property method may be static too
+		addToParentAndPushNodeToStack(new JSGetterNode(getIndex, getter.getFinish() - 1, isStatic));
 		String name = getter.getIdent().getName().substring(4); // drop leading "get "
 		addChildToParent(new JSIdentifierNode(identifierSymbol(getter.getIdent(), name)));
 		getter.accept(this); // function node
@@ -1586,9 +1609,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	@Override
 	public Node leavePropertyNode(PropertyNode propertyNode)
 	{
+		// This is for "typical" class methods
 		if (propertyNode.getValue() instanceof FunctionNode)
 		{
-			// FIXME Move to enterPropertyNode portion?
 			JSNameValuePairNode pairNode = (JSNameValuePairNode) getCurrentNode();
 			JSFunctionNode funcValue = (JSFunctionNode) pairNode.getValue();
 			if (propertyNode.isStatic())

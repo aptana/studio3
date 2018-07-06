@@ -206,4 +206,11 @@ public class JSFunctionNode extends JSNode
 	{
 		this._isStatic = true;
 	}
+	
+	@Override
+	public boolean isExported()
+	{
+		IParseNode parent = getParent();
+		return parent != null && parent instanceof JSExportNode;
+	}
 }

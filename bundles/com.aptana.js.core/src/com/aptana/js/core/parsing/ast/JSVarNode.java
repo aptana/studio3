@@ -48,4 +48,11 @@ public class JSVarNode extends JSNode
 	{
 		return (String) this._var.value;
 	}
+	
+	@Override
+	public boolean isExported()
+	{
+		IParseNode parent = getParent();
+		return parent != null && parent instanceof JSExportNode;
+	}
 }

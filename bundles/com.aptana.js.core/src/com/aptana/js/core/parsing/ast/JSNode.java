@@ -474,5 +474,15 @@ public class JSNode extends ParseNode
 
 		return walker.getText();
 	}
+	
+	public boolean isExported()
+	{
+		IParseNode parent = getParent();
+		if (parent == null || !(parent instanceof JSNode)) {
+			return false;
+		}
+		JSNode jsParent = (JSNode) parent;
+		return jsParent.isExported();
+	}
 
 }

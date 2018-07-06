@@ -60,5 +60,4 @@ public class JSExportNode extends JSNode
 	{
 		return _isDefault;
 	}
-
 }

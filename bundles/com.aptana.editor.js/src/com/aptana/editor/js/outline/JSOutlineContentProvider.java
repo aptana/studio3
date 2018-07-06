@@ -28,6 +28,7 @@ import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CommonOutlinePageInput;
 import com.aptana.editor.js.outline.JSOutlineItem.Type;
 import com.aptana.js.core.parsing.ast.IJSNodeTypes;
+import com.aptana.js.core.parsing.ast.JSClassNode;
 import com.aptana.js.core.parsing.ast.JSExportNode;
 import com.aptana.js.core.parsing.ast.JSImportNode;
 import com.aptana.js.core.parsing.ast.JSImportSpecifierNode;
@@ -212,6 +213,9 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 			case IJSNodeTypes.FUNCTION:
 				processFunction(elements, node, null);
 				break;
+			case IJSNodeTypes.CLASS:
+				processClass(elements, (JSClassNode) node);
+				break;
 			case IJSNodeTypes.GROUP:
 				if (node.getChildCount() > 0)
 				{
@@ -267,8 +271,22 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		}
 	}
 
+	private void processClass(Collection<JSOutlineItem> elements, JSClassNode node)
+	{
+		// TODO How do we handle classes? Like a function?
+		IParseNode nameNode = node.hasName() ? node.getFirstChild() : node;
+		String name = node.hasName() ? nameNode.getText() : "<anonymous>";
+		Reference reference = new Reference(node, nameNode, name, CONTAINER_TYPE);
+		IParseNode body = node.getBody();
+		String fullpath = reference.toString();
+		JSOutlineItem item = new JSOutlineItem(name, Type.CLASS, reference.getNameNode(), body, getChildrenCount(body));
+		fItemsByScope.put(fullpath, item);
+		elements.add(item);
+	}
+
 	private void processExport(Collection<JSOutlineItem> elements, JSExportNode node)
 	{
+		// TODO Mark the items as exported so we can overlay that on the outline!
 		processStatements(elements, node);
 	}
 
@@ -279,7 +297,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		for (IParseNode specifier : specifiers)
 		{
 			JSImportSpecifierNode spec = (JSImportSpecifierNode) specifier;
-			Reference reference = new Reference(node, spec.getLastChild(), spec.getLastChild().getText(),
+			Reference reference = new Reference(node, spec.getLastChild(), spec.getLastChild().getText() + " (from " + node.getFrom() + ")",
 					CONTAINER_TYPE);
 			addValue(elements, reference, spec, node);
 		}
@@ -662,6 +680,15 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		{
 			child = node.getChild(i);
 			if (child.getNodeType() == IJSNodeTypes.FUNCTION && child.getText().length() > 0)
+			{
+				processNode(elements, child);
+			}
+		}
+		// process classes
+		for (int i = 0; i < size; ++i)
+		{
+			child = node.getChild(i);
+			if (child.getNodeType() == IJSNodeTypes.CLASS)
 			{
 				processNode(elements, child);
 			}
