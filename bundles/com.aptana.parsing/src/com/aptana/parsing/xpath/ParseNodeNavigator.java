@@ -122,14 +122,19 @@ public class ParseNodeNavigator extends DefaultNavigator
 			{
 				protected IParseNode getFirstNode(IParseNode node)
 				{
-					return node.getChild(0);
+					return node.getFirstChild();
 				}
 
 				protected IParseNode getNextNode(IParseNode node)
 				{
 					int index = node.getIndex();
+					IParseNode parent = node.getParent();
+					final int childCount = parent.getChildCount();
+					if (index >= childCount - 1) {
+						return null;
+					}
 
-					return node.getParent().getChild(index + 1);
+					return parent.getChild(index + 1);
 				}
 			};
 		}

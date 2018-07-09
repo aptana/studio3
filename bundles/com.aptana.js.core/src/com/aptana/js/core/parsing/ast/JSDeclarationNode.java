@@ -7,24 +7,25 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSDeclarationNode extends JSNode
 {
 	private Symbol _equalSign;
 
 	/**
-	 * JSDeclarationNode
+	 * Used by ANTLR AST
 	 * 
-	 * @param children
+	 * @param equalSign
 	 */
-	public JSDeclarationNode(JSNode identifier, Symbol equalSign, JSNode value)
+	public JSDeclarationNode(int start, int end, Symbol equalSign)
 	{
-		super(IJSNodeTypes.DECLARATION, identifier, value);
+		super(IJSNodeTypes.DECLARATION);
 
 		this._equalSign = equalSign;
+		this.setLocation(start, end);
 	}
 
 	/*

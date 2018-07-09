@@ -30,9 +30,10 @@ import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.IndexPlugin;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.index.JSFileIndexingParticipant;
-import com.aptana.js.core.parsing.JSParser;
+import com.aptana.js.core.parsing.GraalJSParser;
 import com.aptana.js.core.parsing.ast.JSParseRootNode;
 import com.aptana.parsing.IParseState;
+import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -42,7 +43,7 @@ import com.aptana.testing.categories.PerformanceTests;
 public class JSIndexingPerformanceTest extends GlobalTimePerformanceTestCase
 {
 
-	private JSParser fParser;
+	private IParser fParser;
 
 	/**
 	 * getIndex
@@ -107,7 +108,7 @@ public class JSIndexingPerformanceTest extends GlobalTimePerformanceTestCase
 	{
 		super.setUp();
 
-		fParser = new JSParser();
+		fParser = new GraalJSParser();
 	}
 
 	/*

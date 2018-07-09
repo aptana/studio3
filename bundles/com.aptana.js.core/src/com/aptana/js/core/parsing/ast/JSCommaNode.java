@@ -7,16 +7,16 @@
  */
 package com.aptana.js.core.parsing.ast;
 
+import beaver.Symbol;
+
 public class JSCommaNode extends JSNode
 {
-	/**
-	 * JSCommaNode
-	 * 
-	 * @param children
-	 */
-	public JSCommaNode(JSNode... children)
+
+	public JSCommaNode(int start, int end, Symbol symbol)
 	{
-		super(IJSNodeTypes.COMMA, children);
+		super(IJSNodeTypes.COMMA);
+		// TODO Record comma location?
+		this.setLocation(start, end);
 	}
 
 	/*

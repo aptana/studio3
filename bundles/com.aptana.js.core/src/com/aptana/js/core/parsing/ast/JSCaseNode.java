@@ -7,29 +7,24 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSCaseNode extends JSNode
 {
 	private Symbol _colon;
 
 	/**
-	 * JSCaseNode
+	 * Used by ANTLR AST
 	 * 
-	 * @param children
+	 * @param colon
 	 */
-	public JSCaseNode(JSNode expression, Symbol colon, JSNode... children)
+	public JSCaseNode(int start, int end, Symbol colon)
 	{
-		super(IJSNodeTypes.CASE, expression);
-
-		for (JSNode child : children)
-		{
-			this.addChild(child);
-		}
-
+		super(IJSNodeTypes.CASE);
 		this._colon = colon;
+		this.setLocation(start, end);
 	}
 
 	/*

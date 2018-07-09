@@ -39,7 +39,7 @@ var ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 var dmFile = Cc["@mozilla.org/file/directory_service;1"].
              getService(Ci.nsIProperties).get("TmpD", Ci.nsIFile);
 dmFile.append("dm-ui-test.file");
-dmFile.createUnique(Ci.nsIFile.NORMAL_FILE_TYPE, 0666);
+dmFile.createUnique(Ci.nsIFile.NORMAL_FILE_TYPE, 0o666);
 var gTestPath = ios.newFileURI(dmFile).spec;
 
 // Downloads are sorted by endTime, so make sure the end times are distinct
@@ -134,7 +134,7 @@ function test()
   var stmt = Cc["@mozilla.org/storage/statement-wrapper;1"].
              createInstance(Ci.mozIStorageStatementWrapper)
   stmt.initialize(rawStmt);
-  for each (var dl in DownloadData) {
+  for (var dl in DownloadData) {
     for (var prop in dl)
       stmt.params[prop] = dl[prop];
     
@@ -158,7 +158,7 @@ function test()
     var win = wm.getMostRecentWindow("Download:Manager");
 
     // Now we can run our tests
-    for each (var t in testFuncs)
+    for (var t in testFuncs)
       t(win);
 
     win.close();

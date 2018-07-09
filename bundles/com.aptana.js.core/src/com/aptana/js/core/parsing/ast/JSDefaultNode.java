@@ -19,11 +19,12 @@ public class JSDefaultNode extends JSNode
 	 * @param start
 	 * @param end
 	 */
-	public JSDefaultNode(Symbol colon, JSNode... children)
+	public JSDefaultNode(int start, int end, Symbol colon)
 	{
-		super(IJSNodeTypes.DEFAULT, children);
+		super(IJSNodeTypes.DEFAULT);
 
 		this._colon = colon;
+		this.setLocation(start, end);
 	}
 
 	/*

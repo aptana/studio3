@@ -351,6 +351,38 @@ public class JSSourcePartitionScannerJFlexTest extends AbstractPartitionTestCase
 		}
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 57);
 	}
+	
+	@Test
+	public void testPartitioningOfNoSubstitutionTemplate()
+	{
+		String source ="`This template has no substitution.`\n";
+
+		assertContentType(JSSourceConfiguration.JS_TEMPLATE, source, 0);
+		assertContentType(JSSourceConfiguration.JS_TEMPLATE, source, 1);
+		assertContentType(JSSourceConfiguration.JS_TEMPLATE, source, 34);
+		assertContentType(JSSourceConfiguration.JS_TEMPLATE, source, 35);
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 36);
+	}
+	
+	@Test
+	public void testPartitioningOfSubstitutionTemplate()
+	{
+		String source ="`This template has ${ 1 } substitution.`\n";
+
+		assertContentType(JSSourceConfiguration.JS_TEMPLATE, source, 0);
+		assertContentType(JSSourceConfiguration.JS_TEMPLATE, source, 1);
+		assertContentType(JSSourceConfiguration.JS_TEMPLATE, source, 19);
+		assertContentType(JSSourceConfiguration.JS_TEMPLATE, source, 20);
+		// FIXME: Doesn't transition to default partition inside code blocks!
+//		assertContentType(JSSourceConfiguration.DEFAULT, source, 21);
+//		assertContentType(JSSourceConfiguration.DEFAULT, source, 22);
+//		assertContentType(JSSourceConfiguration.DEFAULT, source, 23);
+		assertContentType(JSSourceConfiguration.JS_TEMPLATE, source, 24);
+		assertContentType(JSSourceConfiguration.JS_TEMPLATE, source, 25);
+		assertContentType(JSSourceConfiguration.JS_TEMPLATE, source, 38);
+		assertContentType(JSSourceConfiguration.JS_TEMPLATE, source, 39);
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 40);
+	}
 
 	@Test
 	public void testFlexPartitioningOfCommentSpanningSingleLine2() throws BadLocationException

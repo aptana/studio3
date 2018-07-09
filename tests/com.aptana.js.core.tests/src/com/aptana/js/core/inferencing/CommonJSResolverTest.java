@@ -9,9 +9,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.aptana.core.util.FileUtil;
+import com.aptana.js.core.parsing.GraalJSParser;
 import com.aptana.js.core.parsing.JSParseState;
-import com.aptana.js.core.parsing.JSParser;
 import com.aptana.js.core.parsing.ast.JSStringNode;
+import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -79,7 +80,7 @@ public class CommonJSResolverTest
 	@Test
 	public void testGetModuleIdWithPathJoinInvokeInsideRequire() throws Exception
 	{
-		JSParser parser = new JSParser();
+		IParser parser = createParser();
 		JSParseState parseState = new JSParseState("require(path.join('path', 'to', 'file.js'));");
 		ParseResult pr = parser.parse(parseState);
 		IParseNode node = pr.getRootNode().getChild(0).getChild(1).getChild(0);
@@ -89,11 +90,15 @@ public class CommonJSResolverTest
 	@Test
 	public void testGetModuleIdWithPathJoinInvokeUsingDirNameReferenceInsideRequire() throws Exception
 	{
-		JSParser parser = new JSParser();
+		IParser parser = createParser();
 		JSParseState parseState = new JSParseState("require(path.join(__dirname, 'path', 'to', 'file.js'));");
 		ParseResult pr = parser.parse(parseState);
 		IParseNode node = pr.getRootNode().getChild(0).getChild(1).getChild(0);
 		assertEquals("./path/to/file.js", CommonJSResolver.getModuleId(node));
 	}
 
+	protected IParser createParser()
+	{
+		return new GraalJSParser();
+	}
 }

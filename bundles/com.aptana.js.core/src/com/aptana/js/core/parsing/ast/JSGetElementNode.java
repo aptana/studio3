@@ -14,15 +14,14 @@ public class JSGetElementNode extends JSBinaryOperatorNode
 	private Symbol _rightBracket;
 
 	/**
-	 * JSGetElementOperatorNode
+	 * Used by ANTLR AST.
 	 * 
-	 * @param left
-	 * @param right
+	 * @param lb
+	 * @param rb
 	 */
-	public JSGetElementNode(JSNode left, Symbol leftBracket, JSNode right, Symbol rightBracket)
+	public JSGetElementNode(int start, int end, Symbol leftBracket, Symbol rightBracket)
 	{
-		super(left, leftBracket, right);
-
+		super(start, end, leftBracket);
 		this._rightBracket = rightBracket;
 		this.setNodeType(IJSNodeTypes.GET_ELEMENT);
 	}

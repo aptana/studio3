@@ -21,6 +21,11 @@ public class JSTreeWalker
 		this.visitChildren(node);
 	}
 
+	public void visit(JSArrowFunctionNode node)
+	{
+		this.visitChildren(node);
+	}
+
 	public void visit(JSAssignmentNode node)
 	{
 		this.visitChildren(node);
@@ -51,7 +56,17 @@ public class JSTreeWalker
 		this.visitChildren(node);
 	}
 
+	public void visit(JSClassNode node)
+	{
+		this.visitChildren(node);
+	}
+
 	public void visit(JSCommaNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSComputedPropertyNameNode node)
 	{
 		this.visitChildren(node);
 	}
@@ -81,6 +96,11 @@ public class JSTreeWalker
 		this.visitChildren(node);
 	}
 
+	public void visit(JSDestructuringNode node)
+	{
+		this.visitChildren(node);
+	}
+
 	public void visit(JSDoNode node)
 	{
 		this.visitChildren(node);
@@ -106,6 +126,16 @@ public class JSTreeWalker
 		this.visitChildren(node);
 	}
 
+	public void visit(JSExportNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSExportSpecifierNode node)
+	{
+		this.visitChildren(node);
+	}
+
 	public void visit(JSFalseNode node)
 	{
 		// leaf
@@ -121,12 +151,22 @@ public class JSTreeWalker
 		this.visitChildren(node);
 	}
 
+	public void visit(JSForOfNode node)
+	{
+		this.visitChildren(node);
+	}
+
 	public void visit(JSForNode node)
 	{
 		this.visitChildren(node);
 	}
 
 	public void visit(JSFunctionNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSGeneratorFunctionNode node)
 	{
 		this.visitChildren(node);
 	}
@@ -152,6 +192,21 @@ public class JSTreeWalker
 	}
 
 	public void visit(JSIfNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSNamedImportsNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSImportNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSImportSpecifierNode node)
 	{
 		this.visitChildren(node);
 	}
@@ -273,6 +328,21 @@ public class JSTreeWalker
 	}
 
 	public void visit(JSWithNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSYieldNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSSpreadElementNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSRestElementNode node)
 	{
 		this.visitChildren(node);
 	}

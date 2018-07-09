@@ -11,16 +11,15 @@ import beaver.Symbol;
 
 public class JSGetPropertyNode extends JSBinaryOperatorNode
 {
-	/**
-	 * JSGetPropertyOperatorNode
-	 * 
-	 * @param left
-	 * @param right
-	 */
-	public JSGetPropertyNode(JSNode left, Symbol operator, JSIdentifierNode right)
-	{
-		super(left, operator, right);
 
+	/**
+	 * Used by ANTLR AST
+	 * 
+	 * @param operator
+	 */
+	public JSGetPropertyNode(int start, int end, Symbol operator)
+	{
+		super(start, end, operator);
 		this.setNodeType(IJSNodeTypes.GET_PROPERTY);
 	}
 

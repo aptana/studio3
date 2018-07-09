@@ -13,8 +13,9 @@ Require-Bundle: com.aptana.core;bundle-version="3.3.0";visibility:=reexport,
  com.aptana.buildpath.core;bundle-version="3.0.0";visibility:=reexport,
  org.eclipse.text;visibility:=reexport,
  com.aptana.core.io,
- org.eclipse.core.net
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+ org.eclipse.core.net,
+ com.oracle.js.parser;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.js.core,
  com.aptana.js.core.build,
@@ -32,3 +33,4 @@ Export-Package: com.aptana.js.core,
  com.aptana.js.internal.core.parsing.sdoc;x-friends:="com.appcelerator.hyperloop.core",
  com.aptana.js.internal.core.parsing.sdoc.model;x-friends:="com.appcelerator.hyperloop.core"
 Eclipse-ExtensibleAPI: true
+Bundle-ClassPath: .

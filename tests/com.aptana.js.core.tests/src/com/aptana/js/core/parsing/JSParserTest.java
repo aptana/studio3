@@ -10,6 +10,7 @@ package com.aptana.js.core.parsing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,12 +19,14 @@ import java.util.List;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.junit.Before;
+import org.junit.After;
 import org.junit.Test;
 
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.js.core.JSCorePlugin;
+import com.aptana.js.core.tests.ITestFiles;
+import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseError;
@@ -31,34 +34,19 @@ import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseNode;
 
-import beaver.Symbol;
-
-public class JSParserTest
+public abstract class JSParserTest
 {
 	private static final String EOL = FileUtil.NEW_LINE;
 
-	private JSParser fParser;
 	private ParseResult fParseResult;
 
-	@Before
-	public void setUp() throws Exception
+	@After
+	public void teardown() throws Exception
 	{
-		fParser = new JSParser();
+		fParseResult = null;
 	}
 
-	/**
-	 * getSource
-	 * 
-	 * @param resourceName
-	 * @return
-	 * @throws IOException
-	 */
-	private String getSource(String resourceName) throws IOException
-	{
-		InputStream stream = FileLocator.openStream(Platform.getBundle(JSCorePlugin.PLUGIN_ID), new Path(resourceName),
-				false);
-		return IOUtil.read(stream);
-	}
+	protected abstract IParser createParser();
 
 	@Test
 	public void testEmptyStatement() throws Exception
@@ -124,6 +112,12 @@ public class JSParserTest
 	public void testMultiplyAndAssign() throws Exception
 	{
 		assertParseResult("a *= 10;" + EOL); //$NON-NLS-1$
+	}
+
+	@Test
+	public void testExponentAndAssign() throws Exception
+	{
+		assertParseResult("a **= 10;" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -265,6 +259,12 @@ public class JSParserTest
 	}
 
 	@Test
+	public void testExponent() throws Exception
+	{
+		assertParseResult("abc ** 5;" + EOL); //$NON-NLS-1$
+	}
+
+	@Test
 	public void testShiftLeft() throws Exception
 	{
 		assertParseResult("abc << 5;" + EOL); //$NON-NLS-1$
@@ -351,7 +351,7 @@ public class JSParserTest
 	@Test
 	public void testTypeof1() throws Exception
 	{
-		assertParseResult("a = typeof(object);" + EOL); //$NON-NLS-1$
+		assertParseResult("a = typeof(object);" + EOL, "a = typeof object;" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -363,7 +363,7 @@ public class JSParserTest
 	@Test
 	public void testVoid() throws Exception
 	{
-		assertParseResult("void (true);" + EOL); //$NON-NLS-1$
+		assertParseResult("void (true);" + EOL, "void true;" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -489,6 +489,8 @@ public class JSParserTest
 	@Test
 	public void testWithInIfElse() throws Exception
 	{
+		// FIXME With not allowed in strict mode, which modules always are....
+		// see https://www.ecma-international.org/ecma-262/7.0/#sec-with-statement-static-semantics-early-errors
 		assertParseResult("if (true) with (abc) a++; else true;" + EOL); //$NON-NLS-1$
 	}
 
@@ -531,8 +533,8 @@ public class JSParserTest
 	@Test
 	public void testEmptyInIfElse() throws Exception
 	{
-		// TODO: should be a semicolon between (true) and else
-		assertParseResult("if (true)  else true;" + EOL); //$NON-NLS-1$
+		parse("if (true)  else true;" + EOL); //$NON-NLS-1$
+		assertParseErrors(mismatchedToken(1, 11, "else"));
 	}
 
 	@Test
@@ -652,13 +654,21 @@ public class JSParserTest
 	@Test
 	public void testConditional() throws Exception
 	{
-		assertParseResult("(abc) ? true : false;" + EOL); //$NON-NLS-1$
+		assertParseResult("(abc) ? true : false;" + EOL, "abc ? true : false;" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
 	public void testEmptyFunction() throws Exception
 	{
 		assertParseResult("function abc () {}" + EOL); //$NON-NLS-1$
+	}
+
+	@Test
+	public void testFunctionWithNoSpaceBetweenNameAndParens() throws Exception
+	{
+		assertParseResult("function Titanium_Facebook_LoginButton() {};" + EOL, //$NON-NLS-1$
+				"function Titanium_Facebook_LoginButton () {}" + EOL + ";" + EOL);
+		assertNoErrors();
 	}
 
 	@Test
@@ -682,7 +692,7 @@ public class JSParserTest
 	@Test
 	public void testElisionArray() throws Exception
 	{
-		assertParseResult("abc = [,,];" + EOL, "abc = [null, null, null];" + EOL); //$NON-NLS-1$
+		assertParseResult("abc = [,,];" + EOL, "abc = [null, null];" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -706,13 +716,44 @@ public class JSParserTest
 	@Test
 	public void testArrayLiteralTrailingComma() throws Exception
 	{
-		assertParseResult("abc = [1, 2, 3,];" + EOL, "abc = [1, 2, 3, null];" + EOL); //$NON-NLS-1$
+		// Trailing comma is NOT treated a elision
+		assertParseResult("abc = [1, 2, 3,];" + EOL, "abc = [1, 2, 3];" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
 	public void testArrayLiteralTrailingElision() throws Exception
 	{
-		assertParseResult("abc = [1, 2, 3,,,];" + EOL, "abc = [1, 2, 3, null, null, null];" + EOL); //$NON-NLS-1$
+		// Trailing comma is NOT treated a elision
+		assertParseResult("abc = [1, 2, 3,,,];" + EOL, "abc = [1, 2, 3, null, null];" + EOL); //$NON-NLS-1$
+	}
+
+	@Test
+	public void testArrowFunctionSingleParameterWithNoParens() throws Exception
+	{
+		assertParseResult("phrase => { phrase.split(''); }" + EOL, "(phrase) => {phrase.split('');};" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testArrowFunctionNoParameters() throws Exception
+	{
+		assertParseResult("() => { phrase.split(''); }" + EOL, "() => {phrase.split('');};" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testArrowFunctionMultipleParametersNoBraces() throws Exception
+	{
+		assertParseResult("(phrase, other) => phrase.split('');" + EOL, "(phrase, other) => {phrase.split('')};" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testArrowFunctionMultipleParametersNoBracesExplicitReturn() throws Exception
+	{
+		assertParseResult("(phrase, other) => { return phrase.split(''); }" + EOL,
+				"(phrase, other) => {return phrase.split('');};" + EOL);
+		assertNoErrors();
 	}
 
 	@Test
@@ -754,8 +795,8 @@ public class JSParserTest
 	@Test
 	public void testObjectLiteralWithTrailingComma() throws Exception
 	{
-		assertParseResult(
-				"abc = {name: \"Name\", index: 2, id: 10,};" + EOL, "abc = {name: \"Name\", index: 2, id: 10};" + EOL); //$NON-NLS-1$ //$NON-NLS-2$
+		assertParseResult("abc = {name: \"Name\", index: 2, id: 10,};" + EOL, //$NON-NLS-1$
+				"abc = {name: \"Name\", index: 2, id: 10};" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -881,7 +922,7 @@ public class JSParserTest
 	@Test
 	public void testDo() throws Exception
 	{
-		assertParseResult("do {a++;} while (a < 10);" + EOL); //$NON-NLS-1$
+		assertParseResult("do {a++;} while (a < 10);" + EOL, "do {a++;} while (a < 10)" + EOL); //$NON-NLS-1$
 	}
 
 	@Test
@@ -1017,6 +1058,18 @@ public class JSParserTest
 	}
 
 	@Test
+	public void testForLet() throws Exception
+	{
+		assertParseResult("for (let a = 0; a < 10; a++) {a;}" + EOL); //$NON-NLS-1$
+	}
+
+	@Test
+	public void testForConst() throws Exception
+	{
+		assertParseResult("for (const a = 0; a < 10; a++) {a;}" + EOL); //$NON-NLS-1$
+	}
+
+	@Test
 	public void testForIn() throws Exception
 	{
 		assertParseResult("for (a in obj) {a;}" + EOL);
@@ -1028,34 +1081,33 @@ public class JSParserTest
 		assertParseResult("for (var a in obj) {a;}" + EOL);
 	}
 
-	// bug and regression tests here
+	@Test
+	public void testForLetIn() throws Exception
+	{
+		assertParseResult("for (let a in obj) {a;}" + EOL);
+	}
 
 	@Test
-	public void testSDocComment() throws Exception
+	public void testForConstIn() throws Exception
 	{
-		JSFlexScanner scanner = new JSFlexScanner();
-		scanner.setSource("/**/");
-		fParser.parse(scanner);
-
-		List<Symbol> comments = scanner.getMultiLineComments();
-
-		assertEquals(1, comments.size());
+		assertParseResult("for (const a in obj) {a;}" + EOL);
 	}
 
 	@Test
 	public void testPlusNegativeNumber() throws Exception
 	{
-		assertParseResult("var x = 5 + -3" + EOL);
-		assertParseResult("var x = 5+ -3" + EOL, "var x = 5 + -3" + EOL);
-		assertParseResult("var x = 5 +-3" + EOL, "var x = 5 + -3" + EOL);
-		assertParseResult("var x = 5+-3" + EOL, "var x = 5 + -3" + EOL);
+		assertParseResult("var x = 5 + -3;" + EOL, "var x = 5 + (-3);" + EOL);
+		assertParseResult("var x = 5+ -3" + EOL, "var x = 5 + (-3);" + EOL);
+		assertParseResult("var x = 5 +-3" + EOL, "var x = 5 + (-3);" + EOL);
+		assertParseResult("var x = 5+-3" + EOL, "var x = 5 + (-3);" + EOL);
 	}
 
 	@Test
 	public void testPlusPositiveNumber() throws Exception
 	{
-		assertParseResult("var x = 5 + +3" + EOL);
-		assertParseResult("var x = 5+ +3" + EOL, "var x = 5 + +3" + EOL);
+		assertParseResult("var x = 5 + +3;" + EOL, "var x = 5 + (+3);" + EOL);
+		// Due to semicolon insertion recovery, the expected result will be terminated with a semicolon
+		assertParseResult("var x = 5+ +3" + EOL, "var x = 5 + (+3);" + EOL);
 
 		// NOTE: The following commented tests are currently failing
 		// parseTest("var x = 5 ++3" + EOL, "var x = 5 + +3" + EOL);
@@ -1065,8 +1117,8 @@ public class JSParserTest
 	@Test
 	public void testMinusNegativeNumber() throws Exception
 	{
-		assertParseResult("var x = 5 - -3" + EOL);
-		assertParseResult("var x = 5- -3" + EOL, "var x = 5 - -3" + EOL);
+		assertParseResult("var x = 5 - -3;" + EOL, "var x = 5 - (-3);" + EOL);
+		assertParseResult("var x = 5- -3" + EOL, "var x = 5 - (-3);" + EOL);
 
 		// NOTE: The following commented tests are currently failing
 		// parseTest("var x = 5 --3" + EOL, "var x = 5 - -3" + EOL);
@@ -1076,10 +1128,10 @@ public class JSParserTest
 	@Test
 	public void testMinusPositiveNumber() throws Exception
 	{
-		assertParseResult("var x = 5 - +3" + EOL);
-		assertParseResult("var x = 5- +3" + EOL, "var x = 5 - +3" + EOL);
-		assertParseResult("var x = 5 -+3" + EOL, "var x = 5 - +3" + EOL);
-		assertParseResult("var x = 5-+3" + EOL, "var x = 5 - +3" + EOL);
+		assertParseResult("var x = 5 - +3;" + EOL, "var x = 5 - (+3);" + EOL);
+		assertParseResult("var x = 5- +3" + EOL, "var x = 5 - (+3);" + EOL);
+		assertParseResult("var x = 5 -+3" + EOL, "var x = 5 - (+3);" + EOL);
+		assertParseResult("var x = 5-+3" + EOL, "var x = 5 - (+3);" + EOL);
 	}
 
 	// begin recovery strategy tests
@@ -1088,71 +1140,59 @@ public class JSParserTest
 	public void testMissingSemicolon() throws Exception
 	{
 		assertParseResult("abc", "abc;" + EOL);
-		assertParseErrors("Missing semicolon");
+		// assertParseErrors("Missing semicolon"); // FIXME This parser handles this fine
 	}
 
 	@Test
 	public void testMissingClosingParenthesis() throws Exception
 	{
-		assertParseResult("testing(", "testing();" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
+		parse("testing(");
+		assertParseErrors("filename.js:1:8 Expected an operand but found eof\n" + "testing(\n" + "        ^");
 	}
 
 	@Test
 	public void testMissingIdentifier() throws Exception
 	{
-		assertParseResult("var x =", "var x = " + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
+		parse("var x =");
+		assertParseErrors("filename.js:1:7 Expected an operand but found eof\n" + "var x =\n" + "       ^");
 	}
 
 	@Test
 	public void testMissingIdentifier2() throws Exception
 	{
-		assertParseResult("x.", "x.;" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
+		parse("x.");
+		assertParseErrors("filename.js:1:2 Expected ident but found eof\n" + "x.\n" + "  ^");
 	}
 
 	@Test
 	public void testMissingArg() throws Exception
 	{
-		assertParseResult("fun(a,);", "fun(a, );" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \")\"");
+		parse("fun(a,);");
+		assertParseErrors("filename.js:1:6 Expected an operand but found )\n" + "fun(a,);\n" + "      ^");
 	}
 
 	@Test
 	public void testMissingIdentifier3() throws Exception
 	{
-		assertParseResult("new", "new ;" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"end-of-file\"");
+		parse("new");
+		assertParseErrors("filename.js:1:3 Expected an operand but found eof\n" + "new\n" + "   ^");
 	}
 
 	@Test
 	public void testMissingPropertyValue() throws Exception
 	{
-		assertParseResult("var x = { t };", "var x = {t: };" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"}\"");
+		assertParseResult("var x = { t };", "var x = {t: t};" + EOL);
+		assertNoErrors();
 	}
 
 	@Test
 	public void testMissingPropertyValue2() throws Exception
 	{
-		assertParseResult("var x = { t: };", "var x = {t: };" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"}\"");
+		parse("var x = { t: };");
+		assertParseErrors(mismatchedToken(1, 13, "}"));
 	}
 
-	@Test
-	public void testSingleLineComment() throws Exception
-	{
-		String source = "// this is a single-line comment";
-
-		IParseRootNode root = parse(source);
-		IParseNode[] comments = root.getCommentNodes();
-		assertNotNull(comments);
-		assertEquals(1, comments.length);
-		IParseNode comment = comments[0];
-		assertEquals(0, comment.getStartingOffset());
-		assertEquals(source.length() - 1, comment.getEndingOffset());
-	}
+	protected abstract String mismatchedToken(int line, int offset, String token);
 
 	/**
 	 * Test fix for APSTUD-3214
@@ -1176,27 +1216,6 @@ public class JSParserTest
 	public void testFunctionWithoutBody() throws Exception
 	{
 		assertParseResult("function abc(s1, s2, s3)", "function abc (s1, s2, s3) {}" + EOL);
-	}
-
-	/**
-	 * Test APSTUD-4072
-	 * 
-	 * @throws IOException
-	 * @throws beaver.Parser.Exception
-	 */
-	@Test
-	public void testNodeOffsetsAtEOF() throws Exception
-	{
-		String source = "a.foo()\n// this is a comment";
-		IParseNode result = parse(source);
-
-		assertNotNull(result);
-		assertEquals(1, result.getChildCount());
-
-		IParseNode invokeNode = result.getFirstChild();
-		assertNotNull(invokeNode);
-		assertEquals(0, invokeNode.getStartingOffset());
-		assertEquals(6, invokeNode.getEndingOffset());
 	}
 
 	/**
@@ -1224,64 +1243,545 @@ public class JSParserTest
 	@Test
 	public void testUnclosedString() throws Exception
 	{
-		assertParseResult("var string = 'something", "var string = " + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"'\"");
+		parse("var string = 'something");
+		assertParseErrors(
+				"filename.js:1:23 Missing close quote\n" + "var string = 'something\n" + "                       ^");
 	}
 
 	@Test
 	public void testUnclosedComment() throws Exception
 	{
-		assertParseResult("var thing; /* comment", "var thing;" + EOL + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"/\"");
+		parse("var thing; /* comment");
+		assertParseErrors(
+				"filename.js:1:11 Expected an operand but found error\n" + "var thing; /* comment\n" + "           ^");
 	}
+
+	protected abstract String unexpectedToken(String token);
 
 	@Test
 	public void testUnclosedRegexp() throws Exception
 	{
-		assertParseResult("var regexp = /;", EOL);
-		assertParseErrors("Syntax Error: unexpected token \"/\"", "Syntax Error: unexpected token \";\"");
+		parse("var regexp = /;");
+		assertParseErrors(
+				"filename.js:1:13 Expected an operand but found /\n" + "var regexp = /;\n" + "             ^");
 	}
 
 	@Test
 	public void testReservedWordAsPropertyName() throws Exception
 	{
 		assertParseResult("this.default = 1;" + EOL);
-		assertTrue(fParseResult.getErrors().isEmpty());
+		assertNoErrors();
 	}
 
 	@Test
 	public void testReservedWordAsPropertyName2() throws Exception
 	{
 		assertParseResult("a[\"public\"] = 1;" + EOL);
-		assertTrue(fParseResult.getErrors().isEmpty());
+		assertNoErrors();
 	}
 
 	@Test
 	public void testReservedWordAsPropertyName3() throws Exception
 	{
 		assertParseResult("a = {default: \"test\"};" + EOL);
-		assertTrue(fParseResult.getErrors().isEmpty());
+		assertNoErrors();
 	}
 
 	@Test
 	public void testReservedWordAsFunctionName() throws Exception
 	{
 		parse("function import() {};" + EOL);
-		assertParseErrors("Syntax Error: unexpected token \"import\"");
+		assertParseErrors("filename.js:1:9 Expected ( but found import\n" + "function import() {};\n" + "         ^");
 	}
 
 	@Test
 	public void testGetterProperty() throws Exception
 	{
 		parse("Field.prototype = { get value() { return this._value; } };" + EOL);
-		assertTrue(fParseResult.getErrors().isEmpty());
+		assertNoErrors();
 	}
 
 	@Test
 	public void testSetterProperty() throws Exception
 	{
 		parse("Field.prototype = { set value(val) { this._value = val; } };" + EOL);
-		assertTrue(fParseResult.getErrors().isEmpty());
+		assertNoErrors();
+	}
+
+	@Test
+	public void testConstDeclaration() throws Exception
+	{
+		assertParseResult("const PI = 3.141593;" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testLetDeclaration() throws Exception
+	{
+		assertParseResult("let callbacks = [];" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testSpreadOperatorInArrayLiteral() throws Exception
+	{
+		assertParseResult("var other = [1, 2, ...params];" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testSpreadOperatorInFunctionParameters() throws Exception
+	{
+		assertParseResult("function f (x, y, ...a) {return (x + y) * a.length;}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testSpreadOperatorInFunctionCall() throws Exception
+	{
+		assertParseResult("f(1, 2, ...params) === 9;" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testDefaultParameters() throws Exception
+	{
+		assertParseResult("function f (x, y = 7, z = 42) {return x + y + z;}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testExportFunction() throws Exception
+	{
+		assertParseResult("export function sum (x, y) {return x + y;}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testExportVar() throws Exception
+	{
+		assertParseResult("export var pi = 3.141593;" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testExportStar() throws Exception
+	{
+		assertParseResult("export * from 'lib/math';" + EOL, "export * from 'lib/math'" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testExportDefault() throws Exception
+	{
+		assertParseResult("export default (x) => Math.exp(x);" + EOL, "export default (x) => {Math.exp(x)};" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testImportStarAs() throws Exception
+	{
+		// FIXME Not sure why the semicolon doesn't get printed out...
+		assertParseResult("import * as math from 'lib/math';" + EOL, "import * as math from 'lib/math'" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testImportBoundNames() throws Exception
+	{
+		assertParseResult("import { sum, pi } from 'lib/math';" + EOL, "import {sum, pi} from 'lib/math'" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testForLetOf() throws Exception
+	{
+		assertParseResult("for (let n of fibonacci) {console.log(n);}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testForConstOf() throws Exception
+	{
+		assertParseResult("for (const n of fibonacci) {console.log(n);}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testForVarOf() throws Exception
+	{
+		assertParseResult("for (var n of fibonacci) {console.log(n);}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testFunctionParameterArrayDestructuring() throws Exception
+	{
+		assertParseResult("function f ([name, val]) {console.log(name, val);}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testFunctionParameterObjectDestructuringWithAliases() throws Exception
+	{
+		assertParseResult("function g ({name: n, val: v}) {console.log(n, v);}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testFunctionParameterObjectDestructuring() throws Exception
+	{
+		assertParseResult("function h ({name, val}) {console.log(name, val);}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testArrayDestructuringAssignment() throws Exception
+	{
+		assertParseResult("var [ a, , b ] = list;" + EOL, "var [a, null, b] = list;" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testArrayDestructuringAssignmentSwappingVariables() throws Exception
+	{
+		assertParseResult("[ b, a ] = [ a, b ];" + EOL, "[b, a] = [a, b];" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testClassExpression() throws Exception
+	{
+		assertParseResult("export default class {}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testClassDeclarationWithNoProperties() throws Exception
+	{
+		assertParseResult("class Shape {}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testClassDefinitionWithConstructorMethod() throws Exception
+	{
+		assertParseResult("class Shape {constructor (id, x, y) {this.id = id;this.move(x, y);}}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testClassDefinitionWithStaticMethod() throws Exception
+	{
+		assertParseResult(
+				"class Rectangle {static defaultRectangle () {return new Rectangle('default', 0, 0, 100, 100);}}"
+						+ EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testClassDefinitionWithGetterMethod() throws Exception
+	{
+		assertParseResult("class Rectangle {get width() {return this._width;}}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testClassDefinitionWithSetterMethod() throws Exception
+	{
+		assertParseResult("class Rectangle {set width(width) {this._width = width;}}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testClassDefinitionWithSuperclass() throws Exception
+	{
+		assertParseResult("class Circle extends Shape {}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testClassDefinitionWithCallToSuper() throws Exception
+	{
+		assertParseResult("class Circle extends Shape {constructor (id, x, y, radius) {super(id, x, y);}}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testGeneratorFunction() throws Exception
+	{
+		assertParseResult(
+				"function* range (start, end, step) {while (start < end) {yield start;start += step;}}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testGeneratorMethodInsideClass() throws Exception
+	{
+		assertParseResult("class Clz {* bar () {}}" + EOL, "class Clz {* bar () {}}" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testGeneratorMethodInsideObject() throws Exception
+	{
+		assertParseResult("let Obj = {* foo () {}};" + EOL, "let Obj = {* foo () {}};" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testComputedPropertyNameInObjectLiteral() throws Exception
+	{
+		assertParseResult("let obj = {['baz' + quux()]: 42};" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testPropertyShorthandInObjectLiteral() throws Exception
+	{
+		assertParseResult("obj = {x: x, y: y};" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testInitializedPropertyInObjectLiteral() throws Exception
+	{
+		assertParseResult("obj = {x: x};" + EOL);
+		assertNoErrors();
+	}
+
+	// https://www.ecma-international.org/ecma-262/6.0/#sec-rules-of-automatic-semicolon-insertion
+	/**
+	 * <p>
+	 * The source
+	 * 
+	 * <pre>
+	 * <code>{ 1 2 } 3</code>
+	 * </pre>
+	 * 
+	 * is not a valid sentence in the ECMAScript grammar, even with the automatic semicolon insertion rules.
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion1() throws Exception
+	{
+		parse("{ 1 2 } 3" + EOL);
+		assertParseErrors("filename.js:1:4 Expected ; but found 2\n" + "{ 1 2 } 3\n" + "    ^");
+	}
+
+	/**
+	 * <p>
+	 * In contrast, the source
+	 * 
+	 * <pre>
+	 * <code>{ 1
+	 * 2 } 3</code>
+	 * </pre>
+	 * 
+	 * is also not a valid ECMAScript sentence, but is transformed by automatic semicolon insertion into the following:
+	 * 
+	 * <pre>
+	 * <code>{ 1 
+	 * ;2 ;} 3;</code>
+	 * </pre>
+	 * 
+	 * which is a valid ECMAScript sentence.
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion2() throws Exception
+	{
+		assertParseResult("{ 1" + EOL + "2 } 3" + EOL, "{1;2;}" + EOL + "3;" + EOL);
+		assertNoErrors();
+	}
+
+	/**
+	 * <p>
+	 * The source
+	 * 
+	 * <pre>
+	 * <code>for (a; b
+	 * )</code>
+	 * </pre>
+	 * 
+	 * is not a valid ECMAScript sentence and is not altered by automatic semicolon insertion because the semicolon is
+	 * needed for the header of a for statement. Automatic semicolon insertion never inserts one of the two semicolons
+	 * in the header of a for statement.
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion3() throws Exception
+	{
+		parse("for (a; b" + EOL + ")" + EOL);
+		assertParseErrors("filename.js:2:0 Expected ; but found )\n" + ")\n" + "^");
+	}
+
+	/**
+	 * <p>
+	 * The source
+	 * 
+	 * <pre>
+	 * <code>return
+	 * a + b</code>
+	 * </pre>
+	 * 
+	 * is transformed by automatic semicolon insertion into the following:
+	 * 
+	 * <pre>
+	 * <code>return;
+	 * a + b;</code>
+	 * </pre>
+	 * </p>
+	 * <p>
+	 * NOTE 1 The expression <code>a + b</code> is not treated as a value to be returned by the <code>return</code>
+	 * statement, because a LineTerminator separates it from the token return.
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion4() throws Exception
+	{
+		assertParseResult("return" + EOL + "a + b" + EOL, "return;" + EOL + "a + b;" + EOL);
+		assertNoErrors();
+	}
+
+	/**
+	 * <p>
+	 * The source
+	 * 
+	 * <pre>
+	 * <code>a = b
+	 * ++c</code>
+	 * </pre>
+	 * 
+	 * is transformed by automatic semicolon insertion into the following:
+	 * 
+	 * <pre>
+	 * <code>a = b;
+	 * ++c;</code>
+	 * </pre>
+	 * </p>
+	 * <p>
+	 * NOTE 2 The token <code>++</code> is not treated as a postfix operator applying to the variable <code>b</code>,
+	 * because a LineTerminator occurs between <code>b</code> and <code>++</code>.
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion5() throws Exception
+	{
+		assertParseResult("a = b" + EOL + "++c" + EOL, "a = b;" + EOL + "++c;" + EOL);
+		assertNoErrors();
+	}
+
+	/**
+	 * The source 'if (a > b) else c = d' is not a valid ECMAScript sentence and is not altered by automatic semicolon
+	 * insertion before the else token, even though no production of the grammar applies at that point, because an
+	 * automatically inserted semicolon would then be parsed as an empty statement.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion6() throws Exception
+	{
+		parse("if (a > b)" + EOL + "else c = d" + EOL);
+		assertParseErrors("filename.js:2:0 Expected an operand but found else\n" + "else c = d\n" + "^");
+	}
+
+	/**
+	 * The source a = b + c (d + e).print() is not transformed by automatic semicolon insertion, because the
+	 * parenthesized expression that begins the second line can be interpreted as an argument list for a function call:
+	 * a = b + c(d + e).print()
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testSemicolonInsertion7() throws Exception
+	{
+		assertParseResult("a = b + c" + EOL + "(d + e).print()" + EOL, "a = b + c(d + e).print();" + EOL);
+		assertNoErrors();
+	}
+
+	@Test
+	public void testDojo() throws Exception
+	{
+		for (String file : ITestFiles.DOJO_FILES)
+		{
+			parseFile(file);
+			assertNoErrors();
+		}
+	}
+
+	@Test
+	public void testTiMobile() throws Exception
+	{
+		for (String file : ITestFiles.TIMOBILE_FILES)
+		{
+			parseFile(file);
+			assertNoErrors();
+		}
+	}
+
+	@Test
+	public void testExtFiles() throws Exception
+	{
+		for (String file : ITestFiles.EXT_FILES)
+		{
+			parseFile(file);
+			assertNoErrors();
+		}
+	}
+
+	@Test
+	public void testTinyMCEFiles() throws Exception
+	{
+		for (String file : ITestFiles.TINY_MCE_FILES)
+		{
+			parseFile(file);
+			assertNoErrors();
+		}
+	}
+
+	@Test
+	public void testLotsofFunctionInvocations() throws IOException, Exception
+	{
+		parseFile("performance/jaxer/regress-155081-2.js");
+		assertNoErrors();
+	}
+
+	@Test
+	public void testJaxerFiles() throws Exception
+	{
+		for (String file : ITestFiles.JAXER_FILES)
+		{
+			parseFile(file);
+			assertNoErrors();
+		}
+	}
+
+	protected void assertNoErrors()
+	{
+		if (fParseResult.getErrors().isEmpty())
+		{
+			assertTrue(true);
+			return;
+		}
+		StringBuilder builder = new StringBuilder();
+		for (IParseError error : fParseResult.getErrors())
+		{
+			builder.append(error.toString());
+			builder.append("\n");
+		}
+		builder.deleteCharAt(builder.length() - 1); // remove extra newline at end
+		fail(builder.toString());
 	}
 
 	/**
@@ -1296,14 +1796,16 @@ public class JSParserTest
 //		ASTUtil.showBeforeAndAfterTrim(parse(parseState));
 //	}
 
-	private IParseRootNode parse(String source) throws Exception
+	protected IParseRootNode parse(String source) throws Exception
 	{
 		return parse(new ParseState(source));
 	}
 
 	private IParseRootNode parse(ParseState parseState) throws Exception
 	{
-		fParseResult = fParser.parse(parseState);
+		IParser parser = createParser();
+		fParseResult = parser.parse(parseState);
+		parser = null; // null out parser now
 		return fParseResult.getRootNode();
 	}
 
@@ -1316,7 +1818,12 @@ public class JSParserTest
 
 		for (int i = 0; i < messages.length; i++)
 		{
-			assertEquals(messages[i], errors.get(i).getMessage());
+			String msg = errors.get(i).getMessage();
+			// match prefix only. If no prefix match, give full diff in failure
+			if (msg == null || !msg.startsWith(messages[i]))
+			{
+				assertEquals(messages[i], msg);
+			}
 		}
 	}
 
@@ -1328,6 +1835,7 @@ public class JSParserTest
 	protected void assertParseResult(String source, String expected) throws Exception
 	{
 		IParseNode result = parse(source);
+		assertNotNull("Received no root parse node from parsing: " + source, result);
 		StringBuilder text = new StringBuilder();
 		IParseNode[] children = result.getChildren();
 		for (IParseNode child : children)
@@ -1335,5 +1843,25 @@ public class JSParserTest
 			text.append(child).append(EOL);
 		}
 		assertEquals(expected, text.toString());
+	}
+
+	/**
+	 * getSource
+	 * 
+	 * @param resourceName
+	 * @return
+	 * @throws IOException
+	 */
+	protected String getSource(String resourceName) throws IOException
+	{
+		InputStream stream = FileLocator.openStream(Platform.getBundle(JSCorePlugin.PLUGIN_ID), new Path(resourceName),
+				false);
+		return IOUtil.read(stream);
+	}
+
+	protected IParseRootNode parseFile(String resourceName) throws Exception
+	{
+		String src = getSource(resourceName);
+		return parse(new ParseState(src, resourceName));
 	}
 }

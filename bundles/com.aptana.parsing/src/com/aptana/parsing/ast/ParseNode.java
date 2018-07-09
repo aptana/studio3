@@ -85,6 +85,9 @@ public abstract class ParseNode extends Node implements IParseNode
 	 */
 	public void addChild(IParseNode child)
 	{
+		if (child == null) {
+			throw new IllegalStateException();
+		}
 		// makes sure our private buffer is large enough
 		int currentLength = fChildren.length;
 		int size = fChildrenCount + 1;
@@ -192,7 +195,9 @@ public abstract class ParseNode extends Node implements IParseNode
 		{
 			return fChildren[index];
 		}
-		return null;
+		// FIXME We should be more strict and throw an exception, but apparently a lot of code relies on getting null!
+		throw new ArrayIndexOutOfBoundsException(index);
+//		return null;
 	}
 
 	/*
@@ -669,31 +674,32 @@ public abstract class ParseNode extends Node implements IParseNode
 		// magnitude), then we consider the ending offset to be in error
 		if (diff < -1)
 		{
-			String source;
-
-			try
-			{
-				source = this.toString();
-			}
-			catch (Throwable t)
-			{
-				source = ""; //$NON-NLS-1$
-			}
-
-			// @formatter:off
-			String message = MessageFormat.format(
-				Messages.ParseNode_Bad_Ending_Offset,
-				start,
-				end,
-				this.getLanguage(),
-				this.getNodeType(),
-				source
-			);
-			// @formatter:on
-
-			IdeLog.logError(ParsingPlugin.getDefault(), message);
-
-			end = start - 1; // $codepro.audit.disable questionableAssignment
+			throw new IllegalArgumentException("Invalid range given: (" + start + ", " + end + ")");
+//			String source;
+//
+//			try
+//			{
+//				source = this.toString();
+//			}
+//			catch (Throwable t)
+//			{
+//				source = ""; //$NON-NLS-1$
+//			}
+//
+//			// @formatter:off
+//			String message = MessageFormat.format(
+//				Messages.ParseNode_Bad_Ending_Offset,
+//				start,
+//				end,
+//				this.getLanguage(),
+//				this.getNodeType(),
+//				source
+//			);
+//			// @formatter:on
+//
+//			IdeLog.logError(ParsingPlugin.getDefault(), message);
+//
+//			end = start - 1; // $codepro.audit.disable questionableAssignment
 		}
 
 		super.setLocation(start, end);

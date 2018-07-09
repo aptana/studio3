@@ -7,29 +7,27 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.js.core.parsing.JSTokenType;
+
+import beaver.Symbol;
 
 public class JSBinaryBooleanOperatorNode extends JSBinaryOperatorNode
 {
 	/**
 	 * JSBooleanOperatorNode
 	 * 
-	 * @param left
 	 * @param operator
-	 * @param right
 	 */
-	public JSBinaryBooleanOperatorNode(JSNode left, Symbol operator, JSNode right)
+	public JSBinaryBooleanOperatorNode(int start, int end, Symbol operator)
 	{
-		super(left, operator, right);
+		super(start, end, operator);
 
 		JSTokenType token = JSTokenType.get((String) operator.value);
 		short type;
 
 		switch (token)
 		{
-		// equality operators
+			// equality operators
 			case EQUAL_EQUAL:
 				type = IJSNodeTypes.EQUAL;
 				break;

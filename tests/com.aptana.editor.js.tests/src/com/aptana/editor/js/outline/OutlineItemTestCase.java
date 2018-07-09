@@ -24,7 +24,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.js.core.parsing.JSParser;
+import com.aptana.js.core.parsing.GraalJSParser;
+import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -33,12 +34,12 @@ import com.aptana.parsing.ast.IParseNode;
  */
 public abstract class OutlineItemTestCase
 {
-	private JSParser fParser;
+	private IParser fParser;
 
 	@Before
 	public void setUp() throws Exception
 	{
-		fParser = new JSParser();
+		fParser = new GraalJSParser();
 	}
 
 	protected IParseNode getParseResults(String source)

@@ -77,6 +77,7 @@ public class JSCodeScanner extends AbstractFlexTokenScanner
 
 	private enum State
 	{
+		// FIXME Handle being inside a class definition!
 		DEFAULT, FUNCTION_DECLARATION, FUNCTION_DECLARATION_INSIDE_PARENS,
 	}
 
@@ -118,6 +119,9 @@ public class JSCodeScanner extends AbstractFlexTokenScanner
 			case Terminals.DOT:
 				return PERIOD_TOKEN;
 
+			case Terminals.CLASS:
+			case Terminals.CONST:
+			case Terminals.LET:
 			case Terminals.VAR:
 			case Terminals.VOID:
 				return STORAGE_TOKEN;
@@ -171,6 +175,8 @@ public class JSCodeScanner extends AbstractFlexTokenScanner
 			case Terminals.WITH:
 			case Terminals.GET:
 			case Terminals.SET:
+			case Terminals.FROM:
+			case Terminals.AS:
 				return KEYWORD_OPERATOR_TOKEN;
 
 			case Terminals.FUNCTION:
@@ -230,7 +236,6 @@ public class JSCodeScanner extends AbstractFlexTokenScanner
 				return CONTROL_KEYWORD_TOKEN;
 
 			case Terminals.DEBUGGER:
-			case Terminals.CLASS:
 			case Terminals.ENUM:
 			case Terminals.EXPORT:
 			case Terminals.EXTENDS:
@@ -238,7 +243,6 @@ public class JSCodeScanner extends AbstractFlexTokenScanner
 			case Terminals.SUPER:
 			case Terminals.IMPLEMENTS:
 			case Terminals.INTERFACE:
-			case Terminals.LET:
 			case Terminals.PACKAGE:
 			case Terminals.PRIVATE:
 			case Terminals.PROTECTED:

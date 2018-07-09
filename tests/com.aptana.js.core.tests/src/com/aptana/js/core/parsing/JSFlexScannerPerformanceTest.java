@@ -49,6 +49,7 @@ public class JSFlexScannerPerformanceTest extends GlobalTimePerformanceTestCase
 	 * @return
 	 * @throws IOException
 	 */
+	@SuppressWarnings("resource")
 	private String getSource(String resourceName) throws IOException
 	{
 		InputStream stream = FileLocator.openStream(Platform.getBundle(JSCorePlugin.PLUGIN_ID), new Path(resourceName),
@@ -133,7 +134,7 @@ public class JSFlexScannerPerformanceTest extends GlobalTimePerformanceTestCase
 	 */
 	public void testJaxerFiles() throws Exception
 	{
-		assertScan(125, ITestFiles.JAXER_FILES);
+		assertScan(15, ITestFiles.JAXER_FILES);
 	}
 
 	/**
@@ -172,9 +173,6 @@ public class JSFlexScannerPerformanceTest extends GlobalTimePerformanceTestCase
 	 */
 	private void timeScan(String resourceName, String src, int numRuns) throws Exception
 	{
-		// apply to parse state
-		IParseState parseState = new ParseState(src);
-
 		for (int i = 0; i < numRuns; i++)
 		{
 			startMeasuring();

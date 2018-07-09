@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.aptana.editor.common.outline.CommonOutlineItem;
+import com.aptana.js.core.parsing.ast.JSFunctionNode;
+import com.aptana.js.core.parsing.ast.JSGetterNode;
+import com.aptana.js.core.parsing.ast.JSNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
@@ -19,7 +22,7 @@ public class JSOutlineItem extends CommonOutlineItem
 
 	public static enum Type
 	{
-		PROPERTY, ARRAY, BOOLEAN, FUNCTION, NULL, NUMBER, OBJECT_LITERAL, REGEX, STRING
+		PROPERTY, ARRAY, BOOLEAN, FUNCTION, NULL, NUMBER, OBJECT_LITERAL, REGEX, STRING, CLASS
 	}
 
 	private String fLabel;
@@ -106,5 +109,27 @@ public class JSOutlineItem extends CommonOutlineItem
 	public int hashCode()
 	{
 		return 31 * fLabel.hashCode() + getSourceRange().hashCode();
+	}
+
+	public boolean isExported()
+	{
+		IParseNode refNode = getReferenceNode().getParent();
+		if (refNode instanceof JSNode) {
+			JSNode jsNode = (JSNode) refNode;
+			return jsNode.isExported();
+		}
+		return false;
+	}
+
+	public boolean isStatic()
+	{
+		IParseNode refNode = getReferenceNode().getParent();
+		if (refNode instanceof JSGetterNode) {
+			return ((JSGetterNode) refNode).isStatic();
+		}
+		else if (refNode instanceof JSFunctionNode) {
+			return ((JSFunctionNode) refNode).isStatic();
+		}
+		return false;
 	}
 }

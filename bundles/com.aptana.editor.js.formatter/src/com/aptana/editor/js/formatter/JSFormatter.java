@@ -84,6 +84,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
@@ -93,6 +94,8 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.build.IProblem;
+import com.aptana.core.build.Problem;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.editor.common.util.EditorUtil;
 import com.aptana.editor.js.JSPlugin;
@@ -111,8 +114,10 @@ import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.ParseResult;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.ui.util.StatusLineMessageTimerManager;
@@ -247,8 +252,8 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		catch (Exception e)
 		{
-			StatusLineMessageTimerManager.setErrorMessage(e.getMessage()
-					+ " - " + FormatterMessages.Formatter_formatterErrorStatus, //$NON-NLS-1$
+			StatusLineMessageTimerManager.setErrorMessage(
+					e.getMessage() + " - " + FormatterMessages.Formatter_formatterErrorStatus, //$NON-NLS-1$
 					ERROR_DISPLAY_TIMEOUT, true);
 			IdeLog.logError(JSFormatterPlugin.getDefault(), e, IDebugScopes.DEBUG);
 			// In this case, we probably have a parse error. To avoid any code shifting, we try to maintain the
@@ -313,7 +318,18 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		IParseRootNode outputParseResult = null;
 		try
 		{
-			outputParseResult = parser.parse(parseState).getRootNode();
+			ParseResult result = parser.parse(parseState);
+
+			outputParseResult = result.getRootNode();
+			if (outputParseResult == null)
+			{
+				List<IParseError> errors = result.getErrors();
+				for (IParseError parseError : errors)
+				{
+					IdeLog.logError(JSFormatterPlugin.getDefault(), parseError.toString(), IDebugScopes.DEBUG);
+				}
+				return false;
+			}
 		}
 		catch (Exception e)
 		{
@@ -321,17 +337,14 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			return false;
 		}
 		checkinParser(parser);
-		if (outputParseResult == null)
-		{
-			return false;
-		}
+
 		// Flatten the AST's and do a string compare
 		// The toString() of the JSParseRootNode calls the JSFormatWalker,
 		// which should generate the same string for the input and the output.
 		String flattenOutputAST = outputParseResult.toString();
 		String flattenInputAST = inputParseResult.toString();
 		boolean equals = flattenOutputAST.equals(flattenInputAST);
-		if (!equals && FormatterPlugin.getDefault().isDebugging())
+		if (!equals)
 		{
 			FormatterUtils.logDiff(flattenInputAST, flattenOutputAST);
 		}
@@ -418,8 +431,8 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		// We just notify the user that there were errors in the JS file.
 		if (builder.hasErrors())
 		{
-			StatusLineMessageTimerManager.setErrorMessage(
-					FormatterMessages.Formatter_formatterErrorCompletedWithErrors, ERROR_DISPLAY_TIMEOUT, true);
+			StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorCompletedWithErrors,
+					ERROR_DISPLAY_TIMEOUT, true);
 		}
 		String output = writer.getOutput();
 		List<IRegion> offOnRegions = builder.getOffOnRegions();
@@ -494,7 +507,8 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 				IParseNode[] commentNodes = parseResult.getCommentNodes();
 				if (commentNodes != null)
 				{
-					LinkedHashMap<Integer, String> commentsMap = new LinkedHashMap<Integer, String>(commentNodes.length);
+					LinkedHashMap<Integer, String> commentsMap = new LinkedHashMap<Integer, String>(
+							commentNodes.length);
 					for (IParseNode comment : commentNodes)
 					{
 						int start = comment.getStartingOffset();
@@ -515,8 +529,8 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		catch (Exception e)
 		{
-			IdeLog.logError(FormatterPlugin.getDefault(),
-					"Error while computing the formatter's output OFF/ON regions", e, IDebugScopes.DEBUG); //$NON-NLS-1$
+			IdeLog.logError(FormatterPlugin.getDefault(), "Error while computing the formatter's output OFF/ON regions", //$NON-NLS-1$
+					e, IDebugScopes.DEBUG);
 		}
 		return onOffRegions;
 	}

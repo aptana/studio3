@@ -7,29 +7,27 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.js.core.parsing.JSTokenType;
+
+import beaver.Symbol;
 
 public class JSBinaryArithmeticOperatorNode extends JSBinaryOperatorNode
 {
 	/**
 	 * JSArithmeticOperatorNode
 	 * 
-	 * @param left
 	 * @param operator
-	 * @param right
 	 */
-	public JSBinaryArithmeticOperatorNode(JSNode left, Symbol operator, JSNode right)
+	public JSBinaryArithmeticOperatorNode(int start, int end, Symbol operator)
 	{
-		super(left, operator, right);
+		super(start, end, operator);
 
 		JSTokenType token = JSTokenType.get((String) operator.value);
 		short type;
 
 		switch (token)
 		{
-		// additive operators
+			// additive operators
 			case PLUS:
 				type = IJSNodeTypes.ADD;
 				break;
@@ -67,6 +65,10 @@ public class JSBinaryArithmeticOperatorNode extends JSBinaryOperatorNode
 			// multiplicative operators
 			case STAR:
 				type = IJSNodeTypes.MULTIPLY;
+				break;
+
+			case STAR_STAR:
+				type = IJSNodeTypes.EXPONENT;
 				break;
 
 			case FORWARD_SLASH:

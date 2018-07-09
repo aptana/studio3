@@ -52,10 +52,14 @@ js.formatter.spaces.after.key.value.operator=1
 js.formatter.brace.position.blocks=same.line
 ==CONTENT==
 function function_name(a) {
-  if(s)continue
+  while(true) {
+    if(s)continue
+  }
 }
 ==FORMATTED==
 function function_name(a) {
-    if(s)
-        continue
+    while(true) {
+        if(s)
+            continue
+    }
 }

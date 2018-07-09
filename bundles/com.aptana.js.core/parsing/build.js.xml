@@ -16,7 +16,7 @@
     </taskdef>
 
     <taskdef name="beaver" classname="beaver.comp.run.AntTask" classpath="../../beaver/bin"/>
-
+	
     <target name="build">
         <jflex 
             file="JS.flex" 
@@ -27,12 +27,6 @@
             file="SDoc.flex" 
             outdir="../src/com/aptana/js/internal/core/parsing/sdoc" 
             nobak="on"/>
-        
-        <beaver 
-            file             = "JS.grammar"
-            destdir          = "../src"
-            exportTerminals  = "yes"
-            useSwitch        = "yes"/>
         
         <beaver 
             file             = "SDoc.grammar"

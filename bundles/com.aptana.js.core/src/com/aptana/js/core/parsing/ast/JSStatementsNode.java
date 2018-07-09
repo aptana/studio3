@@ -9,14 +9,11 @@ package com.aptana.js.core.parsing.ast;
 
 public class JSStatementsNode extends JSNode
 {
-	/**
-	 * JSStatementsNode
-	 * 
-	 * @param children
-	 */
-	public JSStatementsNode(JSNode... children)
+
+	public JSStatementsNode(int start, int end)
 	{
-		super(IJSNodeTypes.STATEMENTS, children);
+		super(IJSNodeTypes.STATEMENTS);
+		this.setLocation(start, end);
 	}
 
 	/*

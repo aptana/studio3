@@ -140,5 +140,4 @@ public class JSParseState extends ParseState
 		IParseStateCacheKey cacheKey = super.getCacheKey(contentTypeId);
 		return new ParseStateCacheKeyWithComments(attachComments(), collectComments(), cacheKey);
 	}
-
 }

@@ -104,4 +104,20 @@ public interface IJSNodeTypes
 	public static final short VSDOC_COMMENT = 91;
 	public static final short SINGLE_LINE_COMMENT = 92;
 	public static final short MULTI_LINE_COMMENT = 93;
+	public static final short INITIALIZER = 94;
+	public static final short FOR_OF = 95;
+	public static final short SPREAD_ELEMENT = 96;
+	public static final short REST_ELEMENT = 97;
+	public static final short EXPORT = 98;
+	public static final short DESTRUCTURE = 99;
+	public static final short ARROW_FUNCTION = 100;
+	public static final short EXPORT_SPECIFIER = 101;
+	public static final short IMPORT_SPECIFIER = 102;
+	public static final short IMPORT = 103;
+	public static final short NAMED_IMPORTS = 104;
+	public static final short CLASS = 105;
+	public static final short YIELD = 106;
+	public static final short COMPUTED_PROPERTY = 107;
+	public static final short EXPONENT = 108;
+	public static final short EXPONENT_AND_ASSIGN = 109;
 }

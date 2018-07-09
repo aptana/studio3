@@ -35,6 +35,7 @@ import com.aptana.core.util.ResourceUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.parsing.ast.JSNode;
 import com.aptana.js.internal.core.parsing.sdoc.model.DocumentationBlock;
+import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.xpath.ParseNodeXPath;
@@ -44,12 +45,12 @@ import com.aptana.parsing.xpath.ParseNodeXPath;
  */
 public abstract class DocNodeAttachementTestCase
 {
-	private JSParser parser;
+	private IParser parser;
 
 	@Before
 	public void setUp() throws Exception
 	{
-		parser = new JSParser();
+		parser = new GraalJSParser();
 	}
 
 	@After

@@ -25,15 +25,15 @@ import com.aptana.parsing.ast.ParseNodeAttribute;
 public class JSFunctionNode extends JSNode
 {
 	private List<String> fReturnTypes;
+	private boolean _isStatic;
 
 	/**
-	 * JSFunctionNode
-	 * 
-	 * @param children
+	 * Used by ANTLR AST
 	 */
-	public JSFunctionNode(JSNode... children)
+	public JSFunctionNode(int start, int end)
 	{
-		super(IJSNodeTypes.FUNCTION, children);
+		super(IJSNodeTypes.FUNCTION);
+		this.setLocation(start, end);
 	}
 
 	/*
@@ -73,7 +73,7 @@ public class JSFunctionNode extends JSNode
 	 */
 	public IParseNode getBody()
 	{
-		return this.getChild(2);
+		return getLastChild();
 	}
 
 	/**
@@ -171,5 +171,46 @@ public class JSFunctionNode extends JSNode
 	public String getText()
 	{
 		return this.getName().getText();
+	}
+
+	/**
+	 * Determines if this function is actually a property of a class or an object literal (and therefore should be
+	 * printed differently than a typical function.)
+	 * 
+	 * @return
+	 */
+	public boolean isPropertyOfClassOrObject()
+	{
+		if (isStatic()) // if it's static, we know it's part of es6+ class definition.
+		{
+			return true;
+		}
+		IParseNode parent = getParent();
+		if (parent instanceof JSObjectNode)
+		{
+			return true;
+		}
+		if (parent instanceof JSStatementsNode)
+		{
+			return (parent.getParent() instanceof JSClassNode);
+		}
+		return false;
+	}
+
+	public boolean isStatic()
+	{
+		return this._isStatic;
+	}
+
+	public void setStatic()
+	{
+		this._isStatic = true;
+	}
+	
+	@Override
+	public boolean isExported()
+	{
+		IParseNode parent = getParent();
+		return parent != null && parent instanceof JSExportNode;
 	}
 }

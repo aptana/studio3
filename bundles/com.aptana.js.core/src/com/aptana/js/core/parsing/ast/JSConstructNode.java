@@ -11,14 +11,11 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSConstructNode extends JSNode
 {
-	/**
-	 * JSConstructNode
-	 * 
-	 * @param children
-	 */
-	public JSConstructNode(JSNode... children)
+
+	public JSConstructNode(int start, int end)
 	{
-		super(IJSNodeTypes.CONSTRUCT, children);
+		super(IJSNodeTypes.CONSTRUCT);
+		this.setLocation(start, end);
 	}
 
 	/*

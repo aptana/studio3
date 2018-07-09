@@ -7,9 +7,9 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSWhileNode extends JSNode
 {
@@ -17,16 +17,17 @@ public class JSWhileNode extends JSNode
 	private Symbol _rightParenthesis;
 
 	/**
-	 * JSWhileNode
+	 * Used by ANTLR AST
 	 * 
-	 * @param children
+	 * @param leftParenthesis
+	 * @param rightParenthesis
 	 */
-	public JSWhileNode(Symbol leftParenthesis, JSNode condition, Symbol rightParenthesis, JSNode body)
+	public JSWhileNode(int start, int end, Symbol leftParenthesis, Symbol rightParenthesis)
 	{
-		super(IJSNodeTypes.WHILE, condition, body);
-
+		super(IJSNodeTypes.WHILE);
 		this._leftParenthesis = leftParenthesis;
 		this._rightParenthesis = rightParenthesis;
+		this.setLocation(start, end);
 	}
 
 	/*

@@ -7,9 +7,9 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.js.core.JSLanguageConstants;
+
+import beaver.Symbol;
 
 public class JSFalseNode extends JSPrimitiveNode
 {
@@ -33,6 +33,7 @@ public class JSFalseNode extends JSPrimitiveNode
 	public JSFalseNode(Symbol identifier)
 	{
 		this();
+		this.setLocation(identifier.getStart(), identifier.getEnd());
 	}
 
 	/*

@@ -49,11 +49,12 @@ import com.aptana.js.core.index.JSFileIndexingParticipant;
 import com.aptana.js.core.index.JSIndexQueryHelper;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.TypeElement;
-import com.aptana.js.core.parsing.JSParser;
+import com.aptana.js.core.parsing.GraalJSParser;
 import com.aptana.js.core.parsing.ast.JSNode;
 import com.aptana.js.core.parsing.ast.JSParseRootNode;
 import com.aptana.js.internal.core.index.JSIndexReader;
 import com.aptana.js.internal.core.index.JSMetadataLoader;
+import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -277,7 +278,7 @@ public abstract class InferencingTestsBase
 	 */
 	protected IParseNode getParseRootNode(String source)
 	{
-		JSParser parser = new JSParser();
+		IParser parser = new GraalJSParser();
 		ParseState parseState = new ParseState(source);
 
 		try
@@ -311,8 +312,8 @@ public abstract class InferencingTestsBase
 	 */
 	protected List<String> getTypes(JSScope globals, JSNode node)
 	{
-		JSNodeTypeInferrer walker = new JSNodeTypeInferrer(globals, getIndex(), getLocation(), new JSIndexQueryHelper(
-				getIndex()));
+		JSNodeTypeInferrer walker = new JSNodeTypeInferrer(globals, getIndex(), getLocation(),
+				new JSIndexQueryHelper(getIndex()));
 
 		node.accept(walker);
 

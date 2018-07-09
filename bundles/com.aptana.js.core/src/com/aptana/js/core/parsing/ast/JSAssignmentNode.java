@@ -7,25 +7,24 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.js.core.parsing.JSTokenType;
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSAssignmentNode extends JSNode
 {
 	private Symbol _operator;
 
 	/**
-	 * JSAssignmentNode
+	 * JSAssignmentNode - used when we only have the operator and need to descend to add the left and right expressions as children later
 	 * 
-	 * @param left
 	 * @param assignOperator
-	 * @param right
 	 */
-	public JSAssignmentNode(JSNode left, Symbol assignOperator, JSNode right)
+	public JSAssignmentNode(int start, int end, Symbol assignOperator)
 	{
 		this._operator = assignOperator;
+		this.setLocation(start, end);
 
 		short type = DEFAULT_TYPE;
 		JSTokenType token = JSTokenType.get((String) assignOperator.value);
@@ -68,10 +67,12 @@ public class JSAssignmentNode extends JSNode
 			case MINUS_EQUAL:
 				type = IJSNodeTypes.SUBTRACT_AND_ASSIGN;
 				break;
+			case STAR_STAR_EQUAL:
+				type = IJSNodeTypes.EXPONENT_AND_ASSIGN;
+				break;
 		}
 
 		this.setNodeType(type);
-		this.setChildren(new JSNode[] { left, right });
 	}
 
 	/*

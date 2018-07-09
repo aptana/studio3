@@ -28,6 +28,10 @@ import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CommonOutlinePageInput;
 import com.aptana.editor.js.outline.JSOutlineItem.Type;
 import com.aptana.js.core.parsing.ast.IJSNodeTypes;
+import com.aptana.js.core.parsing.ast.JSClassNode;
+import com.aptana.js.core.parsing.ast.JSExportNode;
+import com.aptana.js.core.parsing.ast.JSImportNode;
+import com.aptana.js.core.parsing.ast.JSImportSpecifierNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.parsing.lexer.IRange;
@@ -197,11 +201,20 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		short type = node.getNodeType();
 		switch (type)
 		{
+			case IJSNodeTypes.EXPORT:
+				processExport(elements, (JSExportNode) node);
+				break;
+			case IJSNodeTypes.IMPORT:
+				processImport(elements, (JSImportNode) node);
+				break;
 			case IJSNodeTypes.ASSIGN:
 				processAssignment(elements, node.getChild(0), node.getChild(1));
 				break;
 			case IJSNodeTypes.FUNCTION:
 				processFunction(elements, node, null);
+				break;
+			case IJSNodeTypes.CLASS:
+				processClass(elements, (JSClassNode) node);
 				break;
 			case IJSNodeTypes.GROUP:
 				if (node.getChildCount() > 0)
@@ -255,6 +268,38 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 			case IJSNodeTypes.VAR:
 				processVar(elements, node);
 				break;
+		}
+	}
+
+	private void processClass(Collection<JSOutlineItem> elements, JSClassNode node)
+	{
+		// TODO How do we handle classes? Like a function?
+		IParseNode nameNode = node.hasName() ? node.getFirstChild() : node;
+		String name = node.hasName() ? nameNode.getText() : "<anonymous>";
+		Reference reference = new Reference(node, nameNode, name, CONTAINER_TYPE);
+		IParseNode body = node.getBody();
+		String fullpath = reference.toString();
+		JSOutlineItem item = new JSOutlineItem(name, Type.CLASS, reference.getNameNode(), body, getChildrenCount(body));
+		fItemsByScope.put(fullpath, item);
+		elements.add(item);
+	}
+
+	private void processExport(Collection<JSOutlineItem> elements, JSExportNode node)
+	{
+		// TODO Mark the items as exported so we can overlay that on the outline!
+		processStatements(elements, node);
+	}
+
+	private void processImport(Collection<JSOutlineItem> elements, JSImportNode node)
+	{
+		IParseNode[] specifiers = node.getChildren();
+		// How should we represent imports? <module name>.alias?
+		for (IParseNode specifier : specifiers)
+		{
+			JSImportSpecifierNode spec = (JSImportSpecifierNode) specifier;
+			Reference reference = new Reference(node, spec.getLastChild(), spec.getLastChild().getText() + " (from " + node.getFrom() + ")",
+					CONTAINER_TYPE);
+			addValue(elements, reference, spec, node);
 		}
 	}
 
@@ -549,15 +594,25 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 			if (args.getNodeType() == IJSNodeTypes.ARGUMENTS)
 			{
 				int count = args.getChildCount();
-				IParseNode node2;
-				for (int i = 0; i < count; ++i)
+				if (count > 0)
 				{
-					node2 = args.getChild(i);
+					IParseNode node2 = args.getLastChild();
 					if (node2.getNodeType() == IJSNodeTypes.FUNCTION)
 					{
+						// process the arguments preceding the callback and just spit them out
+						StringBuilder builder = new StringBuilder();
+						for (int i = 0; i < count - 1; i++)
+						{
+							IParseNode arg = args.getChild(i);
+							builder.append(arg.toString());
+							builder.append(", ");
+						}
+						// FIXME: Instead of sticking "<function>" for a callback, maybe gather the callbacks params?
 						processFunction(elements, node2,
-								new Reference(node2, node2, MessageFormat.format("{0}(@{1}:{2})", lhs.getText(), i, //$NON-NLS-1$
-										FUNCTION_LITERAL), StringUtil.EMPTY));
+								new Reference(node2, node2,
+										MessageFormat.format("{0}({1}{2})", lhs.getText(), builder.toString(), //$NON-NLS-1$
+												FUNCTION_LITERAL),
+										StringUtil.EMPTY));
 					}
 				}
 			}
@@ -597,13 +652,43 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 
 	private void processStatements(Collection<JSOutlineItem> elements, IParseNode node)
 	{
-		// processes named functions first
+
 		IParseNode child;
 		int size = node.getChildCount();
+		// processes imports first
+		// TODO Combine imports in some way?
+		for (int i = 0; i < size; ++i)
+		{
+			child = node.getChild(i);
+			if (child.getNodeType() == IJSNodeTypes.IMPORT)
+			{
+				processNode(elements, child);
+			}
+		}
+		// processes exports second
+		// TODO Combine exports in some way?
+		for (int i = 0; i < size; ++i)
+		{
+			child = node.getChild(i);
+			if (child.getNodeType() == IJSNodeTypes.EXPORT)
+			{
+				processNode(elements, child);
+			}
+		}
+		// processes named functions second
 		for (int i = 0; i < size; ++i)
 		{
 			child = node.getChild(i);
 			if (child.getNodeType() == IJSNodeTypes.FUNCTION && child.getText().length() > 0)
+			{
+				processNode(elements, child);
+			}
+		}
+		// process classes
+		for (int i = 0; i < size; ++i)
+		{
+			child = node.getChild(i);
+			if (child.getNodeType() == IJSNodeTypes.CLASS)
 			{
 				processNode(elements, child);
 			}
@@ -694,7 +779,8 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 					short lhsTypeIndex = lhs.getNodeType();
 					short rhsTypeIndex = rhs.getNodeType();
 
-					boolean identifierOrProperty = (lhsTypeIndex == IJSNodeTypes.IDENTIFIER || lhsTypeIndex == IJSNodeTypes.GET_PROPERTY);
+					boolean identifierOrProperty = (lhsTypeIndex == IJSNodeTypes.IDENTIFIER
+							|| lhsTypeIndex == IJSNodeTypes.GET_PROPERTY);
 					boolean ofInterest = (rhsTypeIndex == IJSNodeTypes.FUNCTION
 							|| rhsTypeIndex == IJSNodeTypes.OBJECT_LITERAL || rhsTypeIndex == IJSNodeTypes.INVOKE);
 					if (identifierOrProperty && ofInterest)

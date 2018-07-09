@@ -7,7 +7,6 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-
 public class JSInvokeNode extends JSNode
 {
 	/**
@@ -19,6 +18,15 @@ public class JSInvokeNode extends JSNode
 	public JSInvokeNode(JSNode expression, JSArgumentsNode args)
 	{
 		super(IJSNodeTypes.INVOKE, expression, args);
+	}
+
+	/**
+	 * Used by ANTLR AST
+	 */
+	public JSInvokeNode(int start, int end)
+	{
+		super(IJSNodeTypes.INVOKE);
+		this.setLocation(start, end);
 	}
 
 	/*

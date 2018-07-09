@@ -20,7 +20,7 @@
     <target name="build">
         <jflex 
             file="JSPartitioning.flex" 
-            outdir="../src/com/aptana/editor/js/parsing" 
+            outdir="../src/com/aptana/editor/js/text" 
             nobak="on"/>
     </target>
 </project>

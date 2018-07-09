@@ -29,6 +29,7 @@ public class JSNumberNode extends JSPrimitiveNode
 	public JSNumberNode(Symbol identifier)
 	{
 		this((String) identifier.value);
+		this.setLocation(identifier.getStart(), identifier.getEnd());
 	}
 
 	/*

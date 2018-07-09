@@ -29,9 +29,16 @@ public class FormatterTextNode extends AbstractFormatterNode implements IFormatt
 	public FormatterTextNode(IFormatterDocument document, int startOffset, int endOffset)
 	{
 		super(document);
+		if (startOffset < 0)
+		{
+			throw new IllegalArgumentException("Formatter error: startOffset < 0: " + startOffset); //$NON-NLS-1$
+		}
 		if (startOffset > endOffset)
 		{
 			throw new IllegalArgumentException("Formatter error: startOffset > endOffset"); //$NON-NLS-1$
+		}
+		if (endOffset > document.getLength()) {
+			throw new IllegalArgumentException("Formatter error: endOffset(" + endOffset + ") > document length (" + document.getLength() + ")"); //$NON-NLS-1$
 		}
 		this.startOffset = startOffset;
 		this.endOffset = endOffset;

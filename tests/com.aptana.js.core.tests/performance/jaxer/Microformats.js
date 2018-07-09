@@ -3,13 +3,6 @@ var EXPORTED_SYMBOLS = ["Microformats", "adr", "tag", "hCard", "hCalendar", "geo
 var Microformats = {
   /* When a microformat is added, the name is placed in this list */
   list: [],
-  /* Custom iterator so that microformats can be enumerated as */
-  /* for (i in Microformats) */
-  __iterator__: function () {
-    for (let i=0; i < this.list.length; i++) {
-      yield this.list[i];
-    }
-  },
   /**
    * Retrieves microformats objects of the given type from a document
    * 

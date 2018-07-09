@@ -28,17 +28,18 @@ import com.aptana.core.tests.GlobalTimePerformanceTestCase;
 import com.aptana.core.util.IOUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.tests.ITestFiles;
+import com.aptana.parsing.IParser;
 import com.aptana.testing.categories.PerformanceTests;
 
 @Category({ PerformanceTests.class })
-public class JSParserPerformanceTest extends GlobalTimePerformanceTestCase
+public abstract class JSParserPerformanceTest extends GlobalTimePerformanceTestCase
 {
 
-	private JSParser fParser;
+	private IParser fParser;
 
 	/**
 	 * assertLocalFiles
-	 * 
+	 *
 	 * @param root
 	 * @throws Exception
 	 */
@@ -68,7 +69,7 @@ public class JSParserPerformanceTest extends GlobalTimePerformanceTestCase
 
 	/**
 	 * assertParse
-	 * 
+	 *
 	 * @param resourceName
 	 * @throws Exception
 	 */
@@ -93,7 +94,7 @@ public class JSParserPerformanceTest extends GlobalTimePerformanceTestCase
 
 	/**
 	 * collectFiles
-	 * 
+	 *
 	 * @param root
 	 * @return
 	 */
@@ -129,7 +130,7 @@ public class JSParserPerformanceTest extends GlobalTimePerformanceTestCase
 
 	/**
 	 * getSource
-	 * 
+	 *
 	 * @param stream
 	 * @return
 	 * @throws IOException
@@ -141,7 +142,7 @@ public class JSParserPerformanceTest extends GlobalTimePerformanceTestCase
 
 	/**
 	 * getSource
-	 * 
+	 *
 	 * @param resourceName
 	 * @return
 	 * @throws IOException
@@ -161,8 +162,10 @@ public class JSParserPerformanceTest extends GlobalTimePerformanceTestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		fParser = new JSParser();
+		fParser = createParser();
 	}
+
+	protected abstract IParser createParser();
 
 	/*
 	 * (non-Javadoc)
@@ -177,7 +180,7 @@ public class JSParserPerformanceTest extends GlobalTimePerformanceTestCase
 
 	/**
 	 * testDojo
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public void testDojo() throws Exception
@@ -192,27 +195,27 @@ public class JSParserPerformanceTest extends GlobalTimePerformanceTestCase
 
 	/**
 	 * testExt
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public void testExt() throws Exception
 	{
-		assertParse(15, ITestFiles.EXT_FILES);
+		assertParse(150, ITestFiles.EXT_FILES);
 	}
 
 	/**
 	 * testJaxerFiles
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public void testJaxerFiles() throws Exception
 	{
-		assertParse(50, ITestFiles.JAXER_FILES);
+		assertParse(150, ITestFiles.JAXER_FILES);
 	}
 
 	/**
 	 * testTiMobile
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public void testTiMobile() throws Exception
@@ -222,7 +225,7 @@ public class JSParserPerformanceTest extends GlobalTimePerformanceTestCase
 
 	/**
 	 * testTinyMce
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public void testTinyMce() throws Exception
@@ -232,7 +235,7 @@ public class JSParserPerformanceTest extends GlobalTimePerformanceTestCase
 
 	/**
 	 * time
-	 * 
+	 *
 	 * @param resourceName
 	 * @param numRuns
 	 * @throws Exception
@@ -244,7 +247,7 @@ public class JSParserPerformanceTest extends GlobalTimePerformanceTestCase
 
 	/**
 	 * time
-	 * 
+	 *
 	 * @param resourceName
 	 * @throws Exception
 	 */
@@ -262,7 +265,8 @@ public class JSParserPerformanceTest extends GlobalTimePerformanceTestCase
 			}
 			catch (Exception e)
 			{
-				fail(e.getMessage());
+				e.printStackTrace();
+				fail("Failed to parse '" + resourceName + "': " + e.getMessage());
 			}
 			stopMeasuring();
 		}

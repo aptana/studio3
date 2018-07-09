@@ -7,31 +7,39 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.parsing.ast.IParseNode;
 
-public class JSForNode extends JSNode
+import beaver.Symbol;
+
+public class JSForNode extends JSAbstractForNode
 {
-	private Symbol _leftParenthesis;
 	private Symbol _semicolon1;
 	private Symbol _semicolon2;
-	private Symbol _rightParenthesis;
 
 	/**
-	 * JSForNode
+	 * Used by ANTLR AST
 	 * 
-	 * @param children
+	 * @param leftParenthesis
+	 * @param semicolon1
+	 * @param semicolon2
+	 * @param rightParenthesis
 	 */
-	public JSForNode(Symbol leftParenthesis, JSNode initializer, Symbol semicolon1, JSNode condition,
-			Symbol semicolon2, JSNode advance, Symbol rightParenthesis, JSNode body)
+	public JSForNode(int start, int end, Symbol leftParenthesis, Symbol semicolon1, Symbol semicolon2, Symbol rightParenthesis)
 	{
-		super(IJSNodeTypes.FOR, initializer, condition, advance, body);
+		super(IJSNodeTypes.FOR, start, end, leftParenthesis, rightParenthesis);
 
-		this._leftParenthesis = leftParenthesis;
 		this._semicolon1 = semicolon1;
 		this._semicolon2 = semicolon2;
-		this._rightParenthesis = rightParenthesis;
+	}
+	
+	@Override
+	public void replaceInit(JSNode combinedVarDecls)
+	{
+		super.replaceInit(combinedVarDecls);
+		// Fix the first semicolon!
+		int semi1 = combinedVarDecls.getEnd() + 1;
+		Symbol newSemi1 = new Symbol(_semicolon1.getId(), semi1, semi1, _semicolon1.value);
+		this._semicolon1 = newSemi1;
 	}
 
 	/*
@@ -82,26 +90,6 @@ public class JSForNode extends JSNode
 	public IParseNode getInitializer()
 	{
 		return this.getChild(0);
-	}
-
-	/**
-	 * getLeftParenthesis
-	 * 
-	 * @return
-	 */
-	public Symbol getLeftParenthesis()
-	{
-		return this._leftParenthesis;
-	}
-
-	/**
-	 * getRightParenthesis
-	 * 
-	 * @return
-	 */
-	public Symbol getRightParenthesis()
-	{
-		return this._rightParenthesis;
 	}
 
 	/**

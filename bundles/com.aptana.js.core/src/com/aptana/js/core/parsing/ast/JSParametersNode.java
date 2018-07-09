@@ -9,20 +9,13 @@ package com.aptana.js.core.parsing.ast;
 
 public class JSParametersNode extends JSNode
 {
-	/**
-	 * JSParametersNode
-	 * 
-	 * @param children
-	 */
-	public JSParametersNode(JSNode... children)
+
+	public JSParametersNode(int lParen, int rParen)
 	{
-		super(IJSNodeTypes.PARAMETERS, children);
+		super(IJSNodeTypes.PARAMETERS);
+		this.setLocation(lParen, rParen);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
-	 */
 	@Override
 	public void accept(JSTreeWalker walker)
 	{

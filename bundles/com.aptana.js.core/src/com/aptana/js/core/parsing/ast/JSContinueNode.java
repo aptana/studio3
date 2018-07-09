@@ -14,9 +14,10 @@ public class JSContinueNode extends JSLabelStatementNode
 	/**
 	 * JSContinueNode
 	 */
-	public JSContinueNode()
+	public JSContinueNode(int start, int end)
 	{
 		super(IJSNodeTypes.CONTINUE);
+		this.setLocation(start, end);
 	}
 
 	/**
@@ -24,9 +25,10 @@ public class JSContinueNode extends JSLabelStatementNode
 	 * 
 	 * @param label
 	 */
-	public JSContinueNode(Symbol label)
+	public JSContinueNode(int start, int end, Symbol label)
 	{
 		super(IJSNodeTypes.CONTINUE, label);
+		this.setLocation(start, end);
 	}
 
 	/*

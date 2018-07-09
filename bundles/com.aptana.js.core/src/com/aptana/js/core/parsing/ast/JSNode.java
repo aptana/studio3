@@ -455,7 +455,10 @@ public class JSNode extends ParseNode
 	 */
 	public void setSemicolonIncluded(boolean included)
 	{
-		typeFlags |= (included ? 0x1 : 0x0);
+		boolean wasIncluded = getSemicolonIncluded();
+		if (wasIncluded == included) return; // no change
+
+		typeFlags ^= 0x1; // toggle first bit
 		fHash = -1;
 	}
 
@@ -470,6 +473,16 @@ public class JSNode extends ParseNode
 		this.accept(walker);
 
 		return walker.getText();
+	}
+	
+	public boolean isExported()
+	{
+		IParseNode parent = getParent();
+		if (parent == null || !(parent instanceof JSNode)) {
+			return false;
+		}
+		JSNode jsParent = (JSNode) parent;
+		return jsParent.isExported();
 	}
 
 }

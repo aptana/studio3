@@ -7,69 +7,52 @@
  */
 package com.aptana.js.core.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.parsing.ast.IParseNode;
+
+import beaver.Symbol;
 
 public class JSVarNode extends JSNode
 {
 	private Symbol _var;
 
-	/**
-	 * JSVarNode
-	 * 
-	 * @param children
-	 */
-	public JSVarNode(Symbol var, JSNode... children)
+	public JSVarNode(int start, int end, Symbol var)
 	{
-		super(IJSNodeTypes.VAR, children);
+		super(IJSNodeTypes.VAR);
 
 		this._var = var;
-
-		// NOTE: we set the range here to simplify JSParser, specifically when
-		// var-declarations are used within for-declarations. This is not needed
-		// for statement level var-declarations, but it doesn't hurt to do this
-		// in those cases too.
-		if (var != null)
-		{
-			if (children != null && children.length > 0)
-			{
-				this.setLocation(var.getStart(), children[children.length - 1].getEndingOffset());
-			}
-			else
-			{
-				this.setLocation(var.getStart(), var.getEnd());
-			}
-		}
+		this.setLocation(start, end);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
-	 */
 	@Override
 	public void accept(JSTreeWalker walker)
 	{
 		walker.visit(this);
 	}
 
-	/**
-	 * getDeclarations
-	 * 
-	 * @return
-	 */
 	public IParseNode[] getDeclarations()
 	{
 		return this.getChildren();
 	}
 
-	/**
-	 * getVar
-	 * 
-	 * @return
-	 */
 	public Symbol getVar()
 	{
 		return this._var;
+	}
+
+	/**
+	 * "let", "const", or "var"
+	 * 
+	 * @return
+	 */
+	public String getVariableType()
+	{
+		return (String) this._var.value;
+	}
+	
+	@Override
+	public boolean isExported()
+	{
+		IParseNode parent = getParent();
+		return parent != null && parent instanceof JSExportNode;
 	}
 }

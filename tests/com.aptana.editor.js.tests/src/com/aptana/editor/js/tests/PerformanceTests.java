@@ -15,7 +15,6 @@ import com.aptana.editor.js.contentassist.JSBuildPerformanceTest;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessorPerformanceTest;
 import com.aptana.editor.js.contentassist.JSIndexingPerformanceTest;
 import com.aptana.editor.js.tests.performance.JSParserValidatorPerformanceTest;
-import com.aptana.editor.js.tests.performance.JSStyleValidatorPerformanceTest;
 import com.aptana.editor.js.tests.performance.OpenJSEditorTest;
 import com.aptana.editor.js.text.JSCodeScannerPerformanceTest;
 import com.aptana.editor.js.text.JSSourcePartitionScannerPerformanceTest;
@@ -24,7 +23,7 @@ import com.aptana.editor.js.text.JSSourcePartitionScannerPerformanceTest;
 @SuiteClasses({ JSBuildPerformanceTest.class, JSContentAssistProcessorPerformanceTest.class,
 		JSIndexingPerformanceTest.class, JSCodeScannerPerformanceTest.class,
 		JSSourcePartitionScannerPerformanceTest.class,
-		JSParserValidatorPerformanceTest.class, JSStyleValidatorPerformanceTest.class, OpenJSEditorTest.class, })
+		JSParserValidatorPerformanceTest.class, OpenJSEditorTest.class, })
 public class PerformanceTests
 {
 }

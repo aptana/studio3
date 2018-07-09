@@ -9,43 +9,43 @@ package com.aptana.js.core.parsing.ast;
 
 import com.aptana.parsing.ast.IParseNode;
 
+import beaver.Symbol;
+
 public class JSCatchNode extends JSNode
 {
-	/**
-	 * JSCatchNode
-	 * 
-	 * @param children
-	 */
-	public JSCatchNode(JSNode... children)
+
+	private Symbol _leftParenthesis;
+	private Symbol _rightParenthesis;
+
+	public JSCatchNode(int start, int end, Symbol leftParenthesis, Symbol rightParenthesis)
 	{
-		super(IJSNodeTypes.CATCH, children);
+		super(IJSNodeTypes.CATCH);
+		this.setLocation(start, end);
+		this._leftParenthesis = leftParenthesis;
+		this._rightParenthesis = rightParenthesis;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
-	 */
+	public Symbol getLeftParenthesis()
+	{
+		return this._leftParenthesis;
+	}
+
+	public Symbol getRightParenthesis()
+	{
+		return this._rightParenthesis;
+	}
+
 	@Override
 	public void accept(JSTreeWalker walker)
 	{
 		walker.visit(this);
 	}
 
-	/**
-	 * getBody
-	 * 
-	 * @return
-	 */
 	public IParseNode getBody()
 	{
 		return this.getChild(1);
 	}
 
-	/**
-	 * getIdentifier
-	 * 
-	 * @return
-	 */
 	public IParseNode getIdentifier()
 	{
 		return this.getChild(0);
