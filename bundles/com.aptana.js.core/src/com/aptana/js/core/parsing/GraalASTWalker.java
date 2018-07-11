@@ -2,6 +2,7 @@ package com.aptana.js.core.parsing;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -395,7 +396,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			{
 				// Look up the previous var decl in this scope and steal it's start offset!
 				IParseNode parent = getCurrentNode();
-				JSVarNode firstVar = (JSVarNode) parent.getFirstChild(); // due to hoisting, this should be a var...
+				JSVarNode firstVar = getVarNode(parent); // due to hoisting, this should be a var...
 				if (firstVar != null)
 				{
 					varStart = firstVar.getStartingOffset();
@@ -460,6 +461,19 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 	{
 		return varNode.getInit() instanceof FunctionNode && fDefaultExportName != null
 				&& varNode.getName().getName().equals(fDefaultExportName);
+	}
+
+	private JSVarNode getVarNode(IParseNode parent)
+	{
+		IParseNode[] children = parent.getChildren();
+		for (int i = 0; i < children.length; i++)
+		{
+			if (children[i] instanceof JSVarNode)
+			{
+				return (JSVarNode) children[i];
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -1220,17 +1234,17 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 		Set<IParseNode> toRemove = mergeVarNodesByOffset(startOffsetToListToMerge);
 
 		// Now copy children, skipping the ones we want to remove
-		IParseNode[] newChildren = new IParseNode[children.length - toRemove.size()];
-		int x = 0;
+		Collection<IParseNode> newChildren = new ArrayList<IParseNode>();
 		for (int i = 0; i < children.length; i++)
 		{
 			if (!toRemove.contains(children[i]))
 			{
-				newChildren[x++] = children[i];
+				newChildren.add(children[i]);
 			}
 		}
+
 		// replace with modified listing!
-		statements.setChildren(newChildren);
+		statements.setChildren(newChildren.toArray(new IParseNode[newChildren.size()]));
 	}
 
 	private Map<Integer, List<JSVarNode>> gatherVarNodesToMergeByStartOffset(IParseNode[] children)

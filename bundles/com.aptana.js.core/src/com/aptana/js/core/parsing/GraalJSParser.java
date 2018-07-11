@@ -17,8 +17,10 @@ import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseError;
+import com.aptana.parsing.util.ParseUtil;
 import com.oracle.js.parser.ErrorManager;
 import com.oracle.js.parser.Parser;
+import com.oracle.js.parser.ParserException;
 import com.oracle.js.parser.ScriptEnvironment;
 import com.oracle.js.parser.Source;
 import com.oracle.js.parser.TokenType;
@@ -41,13 +43,27 @@ public class GraalJSParser extends AbstractParser
 
 		try
 		{
-			FunctionNode graalAST = parse(filename, parseState.getStartingOffset(), source, working);
-			IParseRootNode ast = convertAST(source, graalAST);
+			FunctionNode graalAST = parse(filename, 0, source, working);
+			JSParseRootNode ast = (JSParseRootNode) convertAST(source, graalAST);
 			if (ast != null)
 			{
-				((JSParseRootNode) ast).setCommentNodes(fParser.getCommentNodes());
+				ast.setCommentNodes(fParser.getCommentNodes());
+
+				// update node offsets
+				int start = parseState.getStartingOffset();
+				int length = source.length();
+				
+				// align root with zero-based offset
+				ast.setLocation(0, length - 1);
+				
+				if (start != 0)
+				{
+					// shift all offsets to the correct position
+					ParseUtil.addOffset(ast, start);
+				}
+				working.setParseResult(ast);
 			}
-			working.setParseResult(ast);
+
 		}
 		catch (Exception e)
 		{
@@ -91,9 +107,9 @@ public class GraalJSParser extends AbstractParser
 		ErrorManager errorManager = new ErrorManager()
 		{
 			@Override
-			public void error(String message)
+			public void error(final ParserException e)
 			{
-				working.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, -1, -1, message, Severity.ERROR));
+				working.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, e.getLineNumber(), e.getMessage(), Severity.ERROR));
 			}
 		};
 		// Subclass and collect comments too

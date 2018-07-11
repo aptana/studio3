@@ -39,7 +39,7 @@ public class ParseError extends Problem implements IParseError
 
 	public ParseError(String language, int line, String message, Severity severity)
 	{
-		super(severity == null ? Severity.WARNING.intValue() : severity.intValue(), message, -1, -1, line, null);
+		super(severity == null ? Severity.WARNING.intValue() : severity.intValue(), message, -1, 0, line, null);
 		fLanguage = language;
 	}
 

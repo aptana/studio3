@@ -306,7 +306,7 @@ public class FormatterUtils
 		start = Math.max(0, offset - 10);
 		end = Math.min(offset + 40, output.length());
 		message.append(output.substring(start, end));
-		IdeLog.logError(FormatterPlugin.getDefault(), message.toString());
+		IdeLog.logWarning(FormatterPlugin.getDefault(), message.toString());
 	}
 
 	/**

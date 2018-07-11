@@ -53,6 +53,6 @@ public abstract class JSBinaryOperatorNode extends JSNode
 	 */
 	public IParseNode getRightHandSide()
 	{
-		return this.getChild(1);
+		return this.getChild(1); //TODO: NPE
 	}
 }

@@ -59,11 +59,13 @@ public class JSParserValidatorTest extends AbstractValidatorTestCase
 		String text = "var foo = function() {\nhello(\n};";
 
 		List<IProblem> items = getParseErrors(text);
-		assertEquals(1, items.size());
+		assertEquals(2, items.size());
 		IProblem item = items.get(0);
 
 		assertEquals("Error was not found on expected line", 3, item.getLineNumber());
-		assertEquals("Error message did not match expected error message", "Syntax Error: unexpected token \"}\"",
+		assertEquals("Error message did not match expected error message", "Syntax Error:3:0 Expected an operand but found }\n" + 
+				"};\n" + 
+				"^",
 				item.getMessage());
 	}
 
@@ -87,11 +89,7 @@ public class JSParserValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertEquals(1, items.size());
-		IProblem problem = items.get(0);
-		assertEquals("Error was not found on expected line", 1, problem.getLineNumber());
-		assertEquals("Error message did not match expected error message", "Missing semicolon", problem.getMessage());
-		assertEquals(IProblem.Severity.WARNING, problem.getSeverity());
+		assertEquals(0, items.size());
 	}
 
 	@Test
