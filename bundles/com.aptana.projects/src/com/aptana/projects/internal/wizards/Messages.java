@@ -35,6 +35,7 @@ public class Messages extends NLS
 	public static String AbstractNewProjectWizard_ProjectListener_TaskName;
 
 	public static String AbstractNewProjectWizard_ProjectListenerErrorTitle;
+	public static String AbstractNewProjectWizard_ProjectListenerSessionExpired;
 
 	public static String OverwriteFilesSelectionDialog_overwriteFilesTitle;
 

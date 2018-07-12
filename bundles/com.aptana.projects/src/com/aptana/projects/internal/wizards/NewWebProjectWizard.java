@@ -49,6 +49,11 @@ public class NewWebProjectWizard extends AbstractNewProjectWizard
 	{
 		return "project.create.web"; //$NON-NLS-1$
 	}
+	
+	protected boolean isCLISessionInvalid(String errorMessage)
+	{
+		return false;
+	}
 
 	/*
 	 * (non-Javadoc)
