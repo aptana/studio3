@@ -63,7 +63,7 @@ public class JSParserValidatorTest extends AbstractValidatorTestCase
 		IProblem item = items.get(0);
 
 		assertEquals("Error was not found on expected line", 3, item.getLineNumber());
-		assertEquals("Error message did not match expected error message", "Syntax Error:3:0 Expected an operand but found }\n" + 
+		assertEquals("Error message did not match expected error message", "filename.js:3:0 Expected an operand but found }\n" + 
 				"};\n" + 
 				"^",
 				item.getMessage());
