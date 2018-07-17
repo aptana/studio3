@@ -2387,6 +2387,9 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 					case IJSNodeTypes.CATCH:
 						JSCatchNode catchNode = (JSCatchNode) parent;
 						return (catchNode.getLeftParenthesis().getStart() != startIndex);
+					case IJSNodeTypes.SWITCH:
+						JSSwitchNode switchNode = (JSSwitchNode) parent;
+						return (switchNode.getLeftParenthesis().getStart() != startIndex);
 
 					case IJSNodeTypes.GROUP:
 					case IJSNodeTypes.ARGUMENTS:
