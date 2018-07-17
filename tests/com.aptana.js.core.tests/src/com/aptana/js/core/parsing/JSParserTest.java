@@ -50,6 +50,15 @@ public abstract class JSParserTest
 	protected abstract IParser createParser();
 
 	@Test
+	public void testReferenceError() throws Exception
+	{
+		parse("'string' = 2;" + EOL);
+		assertParseErrors("ReferenceError:1:1 Invalid left hand side for assignment\n" + 
+				"'string' = 2;\n" + 
+				" ^");
+	}
+	
+	@Test
 	public void testEmptyStatement() throws Exception
 	{
 		assertParseResult(";" + EOL);
