@@ -151,7 +151,7 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 //		};
 //		^
 		assertEquals("Error was not found on expected line", 2, item.getLineNumber());
-		assertEquals("Error message did not match expected error message", "filename.js:4:0 Expected an operand but found }\n" + 
+		assertEquals("Error message did not match expected error message", "SyntaxError:4:0 Expected an operand but found }\n" + 
 				"};\n" + 
 				"^",
 				item.getMessage());

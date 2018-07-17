@@ -1148,35 +1148,35 @@ public abstract class JSParserTest
 	public void testMissingClosingParenthesis() throws Exception
 	{
 		parse("testing(");
-		assertParseErrors("filename.js:1:8 Expected an operand but found eof\n" + "testing(\n" + "        ^");
+		assertParseErrors("SyntaxError:1:8 Expected an operand but found eof\n" + "testing(\n" + "        ^");
 	}
 
 	@Test
 	public void testMissingIdentifier() throws Exception
 	{
 		parse("var x =");
-		assertParseErrors("filename.js:1:7 Expected an operand but found eof\n" + "var x =\n" + "       ^");
+		assertParseErrors("SyntaxError:1:7 Expected an operand but found eof\n" + "var x =\n" + "       ^");
 	}
 
 	@Test
 	public void testMissingIdentifier2() throws Exception
 	{
 		parse("x.");
-		assertParseErrors("filename.js:1:2 Expected ident but found eof\n" + "x.\n" + "  ^");
+		assertParseErrors("SyntaxError:1:2 Expected ident but found eof\n" + "x.\n" + "  ^");
 	}
 
 	@Test
 	public void testMissingArg() throws Exception
 	{
 		parse("fun(a,);");
-		assertParseErrors("filename.js:1:6 Expected an operand but found )\n" + "fun(a,);\n" + "      ^");
+		assertParseErrors("SyntaxError:1:6 Expected an operand but found )\n" + "fun(a,);\n" + "      ^");
 	}
 
 	@Test
 	public void testMissingIdentifier3() throws Exception
 	{
 		parse("new");
-		assertParseErrors("filename.js:1:3 Expected an operand but found eof\n" + "new\n" + "   ^");
+		assertParseErrors("SyntaxError:1:3 Expected an operand but found eof\n" + "new\n" + "   ^");
 	}
 
 	@Test
@@ -1246,7 +1246,7 @@ public abstract class JSParserTest
 	{
 		parse("var string = 'something");
 		assertParseErrors(
-				"filename.js:1:23 Missing close quote\n" + "var string = 'something\n" + "                       ^");
+				"SyntaxError:1:23 Missing close quote\n" + "var string = 'something\n" + "                       ^");
 	}
 
 	@Test
@@ -1254,7 +1254,7 @@ public abstract class JSParserTest
 	{
 		parse("var thing; /* comment");
 		assertParseErrors(
-				"filename.js:1:11 Expected an operand but found error\n" + "var thing; /* comment\n" + "           ^");
+				"SyntaxError:1:11 Expected an operand but found error\n" + "var thing; /* comment\n" + "           ^");
 	}
 
 	protected abstract String unexpectedToken(String token);
@@ -1264,7 +1264,7 @@ public abstract class JSParserTest
 	{
 		parse("var regexp = /;");
 		assertParseErrors(
-				"filename.js:1:13 Expected an operand but found /\n" + "var regexp = /;\n" + "             ^");
+				"SyntaxError:1:13 Expected an operand but found /\n" + "var regexp = /;\n" + "             ^");
 	}
 
 	@Test
@@ -1292,7 +1292,7 @@ public abstract class JSParserTest
 	public void testReservedWordAsFunctionName() throws Exception
 	{
 		parse("function import() {};" + EOL);
-		assertParseErrors("filename.js:1:9 Expected ( but found import\n" + "function import() {};\n" + "         ^");
+		assertParseErrors("SyntaxError:1:9 Expected ( but found import\n" + "function import() {};\n" + "         ^");
 	}
 
 	@Test
@@ -1569,7 +1569,7 @@ public abstract class JSParserTest
 	public void testSemicolonInsertion1() throws Exception
 	{
 		parse("{ 1 2 } 3" + EOL);
-		assertParseErrors("filename.js:1:4 Expected ; but found 2\n" + "{ 1 2 } 3\n" + "    ^");
+		assertParseErrors("SyntaxError:1:4 Expected ; but found 2\n" + "{ 1 2 } 3\n" + "    ^");
 	}
 
 	/**
@@ -1620,7 +1620,7 @@ public abstract class JSParserTest
 	public void testSemicolonInsertion3() throws Exception
 	{
 		parse("for (a; b" + EOL + ")" + EOL);
-		assertParseErrors("filename.js:2:0 Expected ; but found )\n" + ")\n" + "^");
+		assertParseErrors("SyntaxError:2:0 Expected ; but found )\n" + ")\n" + "^");
 	}
 
 	/**
@@ -1650,7 +1650,7 @@ public abstract class JSParserTest
 	public void testSemicolonInsertion4() throws Exception
 	{
 		assertParseResult("return" + EOL + "a + b" + EOL, "a + b;" + EOL);
-//		assertNoErrors(); //java.lang.AssertionError: problem ERROR: null line=-1 offset=-1 length=-1 filename.js:1:0 Invalid return statement
+//		assertNoErrors(); //java.lang.AssertionError: problem ERROR: null line=-1 offset=-1 length=-1 SyntaxError:1:0 Invalid return statement
 	}
 
 	/**
@@ -1694,7 +1694,7 @@ public abstract class JSParserTest
 	public void testSemicolonInsertion6() throws Exception
 	{
 		parse("if (a > b)" + EOL + "else c = d" + EOL);
-		assertParseErrors("filename.js:2:0 Expected an operand but found else\n" + "else c = d\n" + "^");
+		assertParseErrors("SyntaxError:2:0 Expected an operand but found else\n" + "else c = d\n" + "^");
 	}
 
 	/**
