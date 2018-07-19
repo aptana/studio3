@@ -27,7 +27,7 @@ public class StudioAnalytics implements IStudioAnalytics
 	 */
 	public void sendEvent(AnalyticsEvent event)
 	{
-		if (Platform.inDevelopmentMode() && !EclipseUtil.isTesting() && !isUsageAnalyticsEnabled())
+		if (Platform.inDevelopmentMode() || EclipseUtil.isTesting() || !isUsageAnalyticsEnabled())
 		{
 			return;
 		}
