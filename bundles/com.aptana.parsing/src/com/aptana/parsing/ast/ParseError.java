@@ -7,10 +7,9 @@
  */
 package com.aptana.parsing.ast;
 
-import beaver.Symbol;
-
-import com.aptana.core.build.IProblem.Severity;
 import com.aptana.core.build.Problem;
+
+import beaver.Symbol;
 
 /**
  * @author cwilliams

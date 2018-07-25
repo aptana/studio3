@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.aptana.core.build.IProblem.Severity;
+import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.IJSConstants;
 import com.aptana.js.core.parsing.ast.IJSNodeTypes;
 import com.aptana.js.core.parsing.ast.JSCommentNode;
@@ -30,6 +31,7 @@ import com.oracle.js.parser.ir.LexicalContext;
 public class GraalJSParser extends AbstractParser
 {
 
+	private static final String DEFAULT_FILENAME = "filename.js"; //$NON-NLS-1$
 	private CommentCollectingParser fParser;
 
 	protected void parse(IParseState parseState, final WorkingParseResult working) throws Exception
@@ -38,7 +40,7 @@ public class GraalJSParser extends AbstractParser
 		String filename = parseState.getFilename();
 		if (filename == null)
 		{
-			filename = "filename.js"; //$NON-NLS-1$
+			filename = DEFAULT_FILENAME;
 		}
 
 		try
@@ -52,10 +54,10 @@ public class GraalJSParser extends AbstractParser
 				// update node offsets
 				int start = parseState.getStartingOffset();
 				int length = source.length();
-				
+
 				// align root with zero-based offset
 				ast.setLocation(0, length - 1);
-				
+
 				if (start != 0)
 				{
 					// shift all offsets to the correct position
@@ -109,7 +111,13 @@ public class GraalJSParser extends AbstractParser
 			@Override
 			public void error(final ParserException e)
 			{
-				working.addError(new ParseError(IJSConstants.CONTENT_TYPE_JS, e.getLineNumber(), e.getMessage(), Severity.ERROR));
+				String message = e.getMessage();
+				if (!StringUtil.isEmpty(message) && message.contains(DEFAULT_FILENAME))
+				{
+					message = message.replace(DEFAULT_FILENAME, e.getErrorType().name());
+				}
+				working.addError(
+						new ParseError(IJSConstants.CONTENT_TYPE_JS, e.getLineNumber(), message, Severity.ERROR));
 			}
 		};
 		// Subclass and collect comments too
