@@ -12,12 +12,12 @@
             name="%portalBrowser.name">
       </editor>
    </extension>
-   <extension
+ <!--  <extension
          point="org.eclipse.ui.startup">
       <startup
             class="com.aptana.portal.ui.internal.startup.PortalStartup">
       </startup>
-   </extension>
+   </extension> -->
    <extension
          point="com.aptana.configurations.configurationProcessors">
       <processor
