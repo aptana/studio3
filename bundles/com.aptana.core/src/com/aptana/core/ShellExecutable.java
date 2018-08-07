@@ -283,7 +283,7 @@ public final class ShellExecutable
 				{
 					try
 					{
-						IStatus status = ProcessUtil.processResult(run(envCommand, workingDirectory, null));
+						IStatus status = ProcessUtil.processResultWithTimeout(run(envCommand, workingDirectory, null), 10000);
 						if (status.isOK())
 						{
 							result = buildEnvironment(status.getMessage());
