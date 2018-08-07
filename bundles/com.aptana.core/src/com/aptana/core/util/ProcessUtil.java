@@ -201,4 +201,18 @@ public class ProcessUtil
 		}
 		return exitcode;
 	}
+
+	/**
+	 * reads the stdout and stderr from process, returns an IStatus with the exit code, and results. Cast to
+	 * ProcessStatus to get at each stream's output separately.
+	 * 
+	 * @param process
+	 * @return status
+	 * @deprecated Use {@link IProcessRunner#processResult(Process)}
+	 */
+	public static IStatus processResultWithTimeout(Process process, long timeOut)
+	{
+		// Supply timeOut in seconds
+		return new ProcessRunner().processResultWithTimeout(process, timeOut);
+	}
 }
