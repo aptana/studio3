@@ -1501,8 +1501,8 @@ public class DiskIndex
 				default:
 					throw new UTFDataFormatException(
 							MessageFormat
-									.format("Unexpected byte value ''{0}'' at index {1}, reading string of length {2}. Read so far: ''{3}''. Possibly corrupt index file: ''{4}''", //$NON-NLS-1$
-											b, i, length, new String(word), indexFile.getAbsolutePath()));
+									.format("Unexpected byte value ''{0}'' at index {1}, reading string of length {2}. Possibly corrupt index file: ''{3}''", //$NON-NLS-1$
+											b, i, length, indexFile.getAbsolutePath()));
 			}
 		}
 
