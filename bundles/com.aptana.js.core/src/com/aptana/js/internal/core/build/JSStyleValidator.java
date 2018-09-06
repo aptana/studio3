@@ -1086,7 +1086,7 @@ public class JSStyleValidator extends AbstractBuildParticipant
 
 	private void checkForEmptyBody(IParseNode body, int offset, int length)
 	{
-		if (body instanceof JSStatementsNode && body.getChildCount() == 0)
+		if (body instanceof JSStatementsNode && (body.getChildCount() == 0 || body.getChild(0) instanceof JSEmptyNode))
 		{
 			problems.add(createWarning(Messages.JSStyleValidator_EmptyBlock, body.getEndingOffset() + offset, length));
 		}

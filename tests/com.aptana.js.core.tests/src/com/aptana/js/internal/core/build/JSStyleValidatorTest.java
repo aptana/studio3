@@ -196,7 +196,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 9);
+		assertProblemExists(items, "ReferenceError:1:1 Invalid left hand side for assignment\n'string' = 2;\n ^", 1, IMarker.SEVERITY_ERROR, 0);
 	}
 
 	@Test
@@ -240,7 +240,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 6);
+		assertProblemExists(items, "ReferenceError:1:0 Invalid left hand side for assignment\n/sdf/ = 1;\n^", 1, IMarker.SEVERITY_ERROR, 0);
 	}
 
 	@Test
@@ -1052,7 +1052,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// This isn't a "bad_wrap", it's a "move_invocation"
 		assertDoesntContain(items, "Do not wrap function literals in parens unless they are to be immediately invoked.");
 		assertProblemExists(items, "Move the invocation into the parens that contain the function.", 4,
-				IMarker.SEVERITY_WARNING, 80);
+				IMarker.SEVERITY_WARNING, 79);
 	}
 
 	@Test
@@ -1448,7 +1448,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Unreachable 'var' after 'break'.", 2, IMarker.SEVERITY_WARNING, 7);
+		assertProblemExists(items, "SyntaxError:1:0 Illegal break statement\nbreak;\n^", 1, IMarker.SEVERITY_ERROR, 0);
 	}
 
 	@Test
@@ -1460,7 +1460,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Unreachable 'var' after 'continue'.", 2, IMarker.SEVERITY_WARNING, 10);
+		assertProblemExists(items, "SyntaxError:1:0 Illegal continue statement\ncontinue;\n^", 1, IMarker.SEVERITY_ERROR, 0);
 	}
 
 	@Test
@@ -1505,7 +1505,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 16);
+		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 21);
 	}
 
 	@Test
@@ -1685,7 +1685,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 0);
+		assertProblemExists(items, "SyntaxError:1:0 Illegal break statement\nbreak;\n^", 1, IMarker.SEVERITY_ERROR, 0);
 	}
 
 	@Test
@@ -1696,7 +1696,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 0);
+		assertProblemExists(items, "SyntaxError:1:0 Illegal continue statement\ncontinue;\n^", 1, IMarker.SEVERITY_ERROR, 0);
 	}
 
 	@Test
@@ -1707,7 +1707,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 0);
+		assertProblemExists(items, "SyntaxError:1:0 Invalid return statement\nreturn;\n^", 1, IMarker.SEVERITY_ERROR, 0);
 	}
 
 	@Test
