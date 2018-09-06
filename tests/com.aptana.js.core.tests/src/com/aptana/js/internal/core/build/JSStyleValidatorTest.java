@@ -1016,7 +1016,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		String text = "new Array";
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Missing '()'.", 1, IMarker.SEVERITY_WARNING, 4);
+		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 9);
 	}
 
 	@Test
@@ -1288,9 +1288,9 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Expected to see a statement and instead saw a block.", 3, IMarker.SEVERITY_WARNING,
-				46);
-		assertCountOfProblems(items, 1, "Expected to see a statement and instead saw a block.");
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2, IMarker.SEVERITY_WARNING,
+				24);
+		assertCountOfProblems(items, 1, "Expected a conditional expression and instead saw an assignment.");
 	}
 
 	@Test
