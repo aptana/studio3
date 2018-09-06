@@ -1472,7 +1472,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Unreachable 'var' after 'return'.", 2, IMarker.SEVERITY_WARNING, 10);
+		assertProblemExists(items, "SyntaxError:1:0 Invalid return statement\nreturn 1;\n^", 1, IMarker.SEVERITY_ERROR, 0);
 	}
 
 	@Test

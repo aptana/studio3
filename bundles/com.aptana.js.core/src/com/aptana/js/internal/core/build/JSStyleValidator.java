@@ -28,11 +28,11 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 
-import beaver.Symbol;
-
 import com.aptana.core.IFilter;
+import com.aptana.core.IMap;
 import com.aptana.core.build.AbstractBuildParticipant;
 import com.aptana.core.build.IProblem;
+import com.aptana.core.build.Problem;
 import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.ArrayUtil;
 import com.aptana.core.util.CollectionsUtil;
@@ -73,9 +73,12 @@ import com.aptana.js.core.parsing.ast.JSSwitchNode;
 import com.aptana.js.core.parsing.ast.JSThrowNode;
 import com.aptana.js.core.parsing.ast.JSVarNode;
 import com.aptana.js.core.parsing.ast.JSWhileNode;
+import com.aptana.parsing.ast.IParseError;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.util.ParseUtil;
+
+import beaver.Symbol;
 
 public class JSStyleValidator extends AbstractBuildParticipant
 {
@@ -506,6 +509,34 @@ public class JSStyleValidator extends AbstractBuildParticipant
 					MessageFormat.format("Failed to parse {0} for JS Style Validation", sourcePath), e); //$NON-NLS-1$
 		}
 
+		// Add parse errors...
+		Collection<IParseError> parseErrors = context.getParseErrors();
+		if (!CollectionsUtil.isEmpty(parseErrors))
+		{
+			problems.addAll(CollectionsUtil.map(parseErrors, new IMap<IParseError, IProblem>()
+			{
+
+				public IProblem map(IParseError parseError)
+				{
+					int offset = parseError.getOffset();
+					int lineno = parseError.getLineNumber();
+					if (offset < 0 && lineno > 0)
+					{
+						try
+						{
+							offset = doc.getLineOffset(lineno - 1);
+						}
+						catch (BadLocationException e)
+						{
+							// ignore
+						}
+					}
+					return new Problem(parseError.getSeverity().intValue(), parseError.getMessage(), offset,
+							parseError.getLength(), parseError.getLineNumber(), sourcePath);
+				}
+			}));
+		}
+		
 		// Wipe the intermediate fields
 		this.doc = null;
 		this.sourcePath = null;
