@@ -44,8 +44,8 @@
       </image>
       <image
             commandId="com.aptana.samples.ui.commands.collapseall"
-            disabledIcon="platform:/plugin/org.eclipse.ui.ide/icons/full/dlcl16/collapseall.gif"
-            icon="platform:/plugin/org.eclipse.ui.ide/icons/full/elcl16/collapseall.gif">
+            disabledIcon="platform:/plugin/org.eclipse.ui.ide/icons/full/dlcl16/collapseall.png"
+            icon="platform:/plugin/org.eclipse.ui.ide/icons/full/elcl16/collapseall.png">
       </image>
       <image
             commandId="com.aptana.samples.ui.commands.preview"
