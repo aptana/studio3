@@ -1384,7 +1384,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "eval is evil.", 2, IMarker.SEVERITY_WARNING, 16);
+		assertProblemExists(items, "eval is evil.", 2, IMarker.SEVERITY_WARNING, 16); //TODO: AST is building wrong for this source. eval node is getting ignored in the tree.
 	}
 
 	@Test

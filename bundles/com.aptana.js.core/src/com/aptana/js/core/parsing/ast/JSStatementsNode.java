@@ -25,4 +25,10 @@ public class JSStatementsNode extends JSNode
 	{
 		walker.visit(this);
 	}
+	
+	@Override
+	public boolean hasChildren()
+	{
+		return super.hasChildren() && !(getChild(0) instanceof JSEmptyNode); //as we are adding JSEmptyNode when there is no children
+	}
 }
