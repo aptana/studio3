@@ -186,6 +186,10 @@ public class SendPingJob extends Job
 				try
 				{
 					IProject project = event.getResource().getProject();
+					if (project == null ||  !project.isOpen())
+					{
+						return; //Don't send the project delete events for the project which is closed since project.getDescription() won't be available!
+					}
 					IProjectDescription description = project.getDescription();
 					String[] natures = description.getNatureIds();
 					if (!ArrayUtil.isEmpty(natures))
