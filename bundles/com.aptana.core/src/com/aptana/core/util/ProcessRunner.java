@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -309,7 +310,7 @@ public class ProcessRunner implements IProcessRunner
 			// Wait until the process exits to start reading from the redirected output file.
 			inputStream = new FileInputStream(outputFile);
 			errorStream = new FileInputStream(errorFile);
-			return processData(inputStream, errorStream, null, null, process, true);
+			return processData(inputStream, errorStream, null, null, process, true, -1);
 		}
 		catch (FileNotFoundException e)
 		{
@@ -344,11 +345,11 @@ public class ProcessRunner implements IProcessRunner
 	private IStatus processData(Process process, String input)
 	{
 		return processData(process.getInputStream(), process.getErrorStream(), process.getOutputStream(), input,
-				process, false);
+				process, false, -1);
 	}
 
 	private IStatus processData(InputStream inputStream, InputStream errorStream, OutputStream outputStream,
-			String input, Process process, boolean earlyWait)
+			String input, Process process, boolean earlyWait, long timeOut)
 	{
 		String lineSeparator = ResourceUtil.getLineSeparatorValue(null);
 		InputStreamGobbler readerGobbler = null;
@@ -380,8 +381,20 @@ public class ProcessRunner implements IProcessRunner
 			errorGobbler.start();
 			if (!earlyWait)
 			{
-				// This will wait till the process is done.
-				exitValue = process.waitFor();
+				if(timeOut > 0)
+				{
+					boolean waitFor = process.waitFor(timeOut, TimeUnit.MILLISECONDS);
+					if (!waitFor)
+					{
+						exitValue = -1;
+						process.destroy();
+					}
+				}
+				else
+				{
+					// This will wait till the process is done.
+					exitValue = process.waitFor();
+				}
 			}
 			if (writerThread != null)
 			{
@@ -467,5 +480,11 @@ public class ProcessRunner implements IProcessRunner
 			return null;
 		}
 		return result.getMessage();
+	}
+
+	public IStatus processResultWithTimeout(Process process, long timeOut)
+	{
+		return processData(process.getInputStream(), process.getErrorStream(), process.getOutputStream(), null, process,
+				false, timeOut);
 	}
 }
