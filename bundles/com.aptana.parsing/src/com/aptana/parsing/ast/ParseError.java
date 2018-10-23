@@ -7,9 +7,9 @@
  */
 package com.aptana.parsing.ast;
 
-import beaver.Symbol;
-
 import com.aptana.core.build.Problem;
+
+import beaver.Symbol;
 
 /**
  * @author cwilliams
@@ -33,6 +33,12 @@ public class ParseError extends Problem implements IParseError
 	public ParseError(String language, int offset, int length, String message, Severity severity)
 	{
 		super(severity == null ? Severity.WARNING.intValue() : severity.intValue(), message, offset, length, -1, null);
+		fLanguage = language;
+	}
+
+	public ParseError(String language, int line, String message, Severity severity)
+	{
+		super(severity == null ? Severity.WARNING.intValue() : severity.intValue(), message, -1, 0, line, null);
 		fLanguage = language;
 	}
 

@@ -344,6 +344,7 @@ public class JSParser extends Parser implements IParser {
 	protected synchronized void parse(IParseState parseState, WorkingParseResult working) throws java.lang.Exception
 	{
 		fWorking = working;
+		
 		String severity = Platform.getPreferencesService().getString(JSCorePlugin.PLUGIN_ID, IPreferenceConstants.PREF_MISSING_SEMICOLON_SEVERITY, null, null);
 		fSemicolonSeverity = IProblem.Severity.create(severity);
 
@@ -376,7 +377,7 @@ public class JSParser extends Parser implements IParser {
 			{
 				// parse
 				result = (JSParseRootNode) parse(fScanner);
-
+				System.out.println("Result Beaver:"+ result);
 				if (attachComments)
 				{
 					attachComments(source, result);
@@ -396,7 +397,16 @@ public class JSParser extends Parser implements IParser {
 					fScanner = null;
 				}
 			}
+			
+			System.out.println("errors...:"+ working.getErrors());
 
+			//clear beaver parser working result errors
+			working.getErrors().clear();
+			
+			//collect errors from the GraalJS Parser
+			GraalJSParser graalJSParser = new GraalJSParser();
+			graalJSParser.parse(parseState, working);
+			
 			// update node offsets
 			int start = parseState.getStartingOffset();
 			int length = source.length();
@@ -409,14 +419,14 @@ public class JSParser extends Parser implements IParser {
 				// shift all offsets to the correct position
 				ParseUtil.addOffset(result, start);
 			}
-
-			// store results in the parse state
+			
+			System.out.println("GraalJS parser errors:"+ working.getErrors());
 			fWorking.setParseResult(result);
 		}
 		finally
 		{
 			fWorking = null;
-		}
+		} 
 	}
 
 	
