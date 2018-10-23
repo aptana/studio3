@@ -144,11 +144,13 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 		assertEquals(0, htmlProblems.size());
 
 		List<IProblem> jsProblems = getParseErrors(text, IJSConstants.JS_PROBLEM_MARKER_TYPE);
-		assertEquals(1, jsProblems.size());
+		assertEquals(2, jsProblems.size());
 		IProblem item = jsProblems.get(0);
 
-		assertEquals("Error was not found on expected line", 5, item.getLineNumber());
-		assertEquals("Error message did not match expected error message", "Syntax Error: unexpected token \"}\"",
+		assertEquals("Error was not found on expected line", 2, item.getLineNumber());
+		assertEquals("Error message did not match expected error message", "SyntaxError:4:0 Expected an operand but found }\n" + 
+				"};\n" + 
+				"^",
 				item.getMessage());
 	}
 
