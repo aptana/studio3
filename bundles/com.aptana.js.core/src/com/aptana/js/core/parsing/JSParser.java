@@ -377,7 +377,6 @@ public class JSParser extends Parser implements IParser {
 			{
 				// parse
 				result = (JSParseRootNode) parse(fScanner);
-				System.out.println("Result Beaver:"+ result);
 				if (attachComments)
 				{
 					attachComments(source, result);
@@ -398,8 +397,6 @@ public class JSParser extends Parser implements IParser {
 				}
 			}
 			
-			System.out.println("errors...:"+ working.getErrors());
-
 			//clear beaver parser working result errors
 			working.getErrors().clear();
 			
@@ -420,7 +417,6 @@ public class JSParser extends Parser implements IParser {
 				ParseUtil.addOffset(result, start);
 			}
 			
-			System.out.println("GraalJS parser errors:"+ working.getErrors());
 			fWorking.setParseResult(result);
 		}
 		finally
