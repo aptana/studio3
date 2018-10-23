@@ -101,6 +101,7 @@
     <module>org.jruby</module>
     <module>org.json.simple</module>
     <module>org.w3c.css</module>
+    <module>com.oracle.js.parser</module>
   </modules>
   <build>
     <plugins>
