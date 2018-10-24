@@ -1285,6 +1285,204 @@ public class JSParserTest
 		assertTrue(fParseResult.getErrors().isEmpty());
 	}
 
+	@Test
+	public void testES6Let() throws Exception
+	{
+		String source = "let foo = [\"Hello\", \"World\"];";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testES6Arrow() throws Exception
+	{
+		String source = "let bar = foo.map(x => x.length);";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testES6Export() throws Exception
+	{
+		String source = "export const pi = 3.14;";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testES6ExportFunction() throws Exception
+	{
+		String source = "export function add(x, y){\n" + 
+				"    return x + y;\n" + 
+				"}";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testES6Const() throws Exception
+	{
+		String source = "const i=10;";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testES6ArrayIncludes() throws Exception
+	{
+		String source = "[1, 2, 3].includes(2);";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testES6Class() throws Exception
+	{
+		String source = "class Animal { \n" + 
+				"  constructor(type, sound) {\n" + 
+				"    this.type = type;\n" + 
+				"    this.sound = sound;\n" + 
+				"  }\n" + 
+				"  \n" + 
+				"  makeNoise() {\n" + 
+				"    return ('The ' + this.type + ' goes ' + this.sound);\n" + 
+				"  }\n" + 
+				"}\n" + 
+				"\n" + 
+				"var simone = new Animal(\"cat\", \"meow\");\n" + 
+				"\n" + 
+				"simone.makeNoise(); // returns \"The cat goes meow\"\n" + 
+				"";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	
+	@Test
+	public void testES6Promise() throws Exception
+	{
+		String source = "var foo = new Promise(function (resolve, reject) {\n" + 
+				"  if (Date.now() % 2 === 0) {\n" + 
+				"    resolve(200);\n" + 
+				"  } else {\n" + 
+				"    reject(404);\n" + 
+				"  }\n" + 
+				"});";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testES6Proxy() throws Exception
+	{
+		String source = "let target = {\n" + 
+				"  guest: \"Welcome, Guest\"\n" + 
+				"};\n" + 
+				"\n" + 
+				"let proxy = new Proxy(target, {\n" + 
+				"  get (obj, prop, val) {\n" + 
+				"      return val in obj ? obj[val] : 'Howdy, ${val}'\n" + 
+				"  },\n" + 
+				"  set (obj, prop, val){\n" + 
+				"    if(prop === 'password'){\n" + 
+				"      if(val.length<8){\n" + 
+				"        throw new TypeError('The length of password should be greater than 8');\n" + 
+				"      } else {\n" + 
+				"        obj[prop] = val;\n" + 
+				"      }\n" + 
+				"    } else {\n" + 
+				"      obj[prop] = val;\n" + 
+				"    }\n" + 
+				"  }\n" + 
+				"});\n" + 
+				"";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	
+	@Test
+	public void testES6Restparams() throws Exception
+	{
+		String source = "function foo(...x){\n" + 
+				"  return x.length;\n" + 
+				"}\n" + 
+				"\n" + 
+				"foo(1, 2, 3, 4);";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testES6Set() throws Exception
+	{
+		String source = "var foo = new Set();\n" + 
+				"foo.add(1);";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testES6Spread() throws Exception
+	{
+		String source = "var list = [1, 2, 3, 4];\n" + 
+				"function foo(i, j, k, l){\n" + 
+				"    return i*j*k*l;\n" + 
+				"}\n" + 
+				"foo(...list);";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testES6Symbol() throws Exception
+	{
+		String source = "var foo = Symbol();\n" + 
+				"var bar = Symbol(\"foo\");";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testES6TemplateString() throws Exception
+	{
+		String source = "var x = \"foo\";\n" + 
+				"var y = \"bar\";\n" + 
+				"var join = `${x} ${y}`; // foo bar";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testES6WeakMaps() throws Exception
+	{
+		String source = "var x = {};\n" + 
+				"var w = new WeakMap();\n" + 
+				"w.set(x, \"bar\");";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testES6WeakSets() throws Exception
+	{
+		String source = "var x = {};\n" + 
+				"var ws = new WeakSet();\n" + 
+				"ws.add(x);";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
+	@Test
+	public void testES6Default() throws Exception
+	{
+		String source = "function foo(msg=\"I am default\"){\n" + 
+				"  return msg;\n" + 
+				"}";
+		parse(source + EOL);
+		assertTrue(fParseResult.getErrors().isEmpty());
+	}
+	
 	/**
 	 * This method is not being used for formal testing, but it's useful to determine how effective
 	 * {@link ParseNode#trimToSize()} is.
