@@ -184,7 +184,7 @@ public abstract class AbstractFoldingComputer implements IFoldingComputer
 				if (add)
 				{
 					end = Math.min(getDocument().getLength(), end);
-					if (start <= end)
+					if (start >= 0 && start <= end)
 					{
 						newPositions.put(initialReconcile ? new ProjectionAnnotation(isCollapsed(child))
 								: new ProjectionAnnotation(), new Position(start, end - start));

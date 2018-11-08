@@ -24,6 +24,7 @@ import com.oracle.js.parser.Parser;
 import com.oracle.js.parser.ParserException;
 import com.oracle.js.parser.ScriptEnvironment;
 import com.oracle.js.parser.Source;
+import com.oracle.js.parser.Token;
 import com.oracle.js.parser.TokenType;
 import com.oracle.js.parser.ir.FunctionNode;
 import com.oracle.js.parser.ir.LexicalContext;
@@ -199,6 +200,40 @@ public class GraalJSParser extends AbstractParser
 		public IParseNode[] getCommentNodes()
 		{
 			return this.comments.toArray(new IParseNode[comments.size()]);
+		}
+
+		@Override
+		protected void expectDontAdvance(TokenType expected) throws ParserException
+		{
+			if (type != expected)
+			{
+				switch (expected)
+				{
+					case IDENT:
+						expected = TokenType.IDENTIFIER;
+					case RBRACE:
+					case LBRACE:
+					case RBRACKET:
+					case LBRACKET:
+						insertToken(expected);
+						break;
+					default:
+						super.expectDontAdvance(expected);
+						break;
+				}
+			}
+		}
+
+		private void insertToken(TokenType expectedTokenType)
+		{
+			long expectedNewToken = Token.toDesc(expectedTokenType, linePosition,
+					expectedTokenType.getName() != null ? expectedTokenType.getLength() : -1);
+
+			// insert the token that is expected before the unexpected token
+			stream.insert(k, expectedNewToken);
+			token = expectedNewToken;
+			k--;
+
 		}
 
 	}

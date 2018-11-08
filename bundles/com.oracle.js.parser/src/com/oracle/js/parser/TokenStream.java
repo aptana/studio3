@@ -210,4 +210,31 @@ public class TokenStream {
     void reset() {
         in = out = count = base = 0;
     }
+	
+	/**
+	 * Insert a new token at the specified index
+	 * 
+	 * @param currentTokenIndex
+	 * @param newToken
+	 */
+	public void insert(int currentTokenIndex, long newToken)
+	{
+		 // Allocate new buffer.
+        final long[] newBuffer = new long[buffer.length *2];
+       
+        System.arraycopy(buffer, 0, newBuffer, 0, currentTokenIndex);
+     	newBuffer[currentTokenIndex] = newToken;
+     	System.arraycopy(buffer, currentTokenIndex, newBuffer, currentTokenIndex+1, in-currentTokenIndex);
+        count++;
+        
+        // Update buffer.
+        buffer = newBuffer;
+        
+	}
+	
+	public void rewind()
+	{
+		out = 0;
+	}
+
 }

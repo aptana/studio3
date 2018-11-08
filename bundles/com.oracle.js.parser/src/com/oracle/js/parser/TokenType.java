@@ -47,6 +47,7 @@ public enum TokenType {
     EOF                  (SPECIAL,  null),
     EOL                  (SPECIAL,  null),
     COMMENT              (SPECIAL,  null),
+    IDENTIFIER           (SPECIAL,  ""),
     // comments of the form //@ foo=bar or //# foo=bar
     // These comments are treated as special instructions
     // to the lexer, parser or codegenerator.

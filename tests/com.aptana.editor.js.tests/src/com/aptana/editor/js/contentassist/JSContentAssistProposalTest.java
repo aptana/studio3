@@ -408,7 +408,7 @@ public class JSContentAssistProposalTest extends JSEditorBasedTestCase
 		{
 			// note template is before true proposal, as we are ordering by trigger prefix
 			this.checkProposals("contentAssist/f-prefix.js", true, true, "false", "finally", "focus", "for", "forward",
-					"frames", "function", "FunctionTemplate", "Function");
+					"frames", "from", "function", "FunctionTemplate", "Function"); //'from' keyword added in ES6 for import usage
 		}
 		finally
 		{
