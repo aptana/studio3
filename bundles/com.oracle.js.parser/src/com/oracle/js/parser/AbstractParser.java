@@ -506,7 +506,7 @@ public abstract class AbstractParser {
             // Create IDENT node.
             return createIdentNode(identToken, finish, ident);
         } else {
-        		expect(IDENT);
+        		expectDontAdvance(IDENT);
         		
         		// Fake out identifier.
             final long identToken = Token.recast(token, IDENTIFIER);
