@@ -144,7 +144,7 @@ public class HTMLParseErrorValidatorTest extends AbstractValidatorTestCase
 		assertEquals(0, htmlProblems.size());
 
 		List<IProblem> jsProblems = getParseErrors(text, IJSConstants.JS_PROBLEM_MARKER_TYPE);
-		assertEquals(1, jsProblems.size());
+		assertEquals(2, jsProblems.size());
 		IProblem item = jsProblems.get(0);
 
 		assertEquals("Error was not found on expected line", 2, item.getLineNumber());

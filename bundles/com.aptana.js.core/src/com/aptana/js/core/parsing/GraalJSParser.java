@@ -106,12 +106,20 @@ public class GraalJSParser extends AbstractParser
 	{
 		Source src = Source.sourceFor(filename, source);
 
+		final Boolean inRecoveryMode[] = new Boolean[] { false };
+
 		ScriptEnvironment env = ScriptEnvironment.builder().es6(true).strict(false).emptyStatements(true).build();
 		ErrorManager errorManager = new ErrorManager()
 		{
 			@Override
 			public void error(final ParserException e)
 			{
+				// Ignore the errors in recovery mode
+				if (inRecoveryMode[0])
+				{
+					return;
+				}
+
 				String message = e.getMessage();
 				if (!StringUtil.isEmpty(message) && message.contains(DEFAULT_FILENAME))
 				{
@@ -136,6 +144,17 @@ public class GraalJSParser extends AbstractParser
 			fParser = new CommentCollectingParser(env, src, errorManager);
 			result = fParser.parse(filename, startOffset, source.length() - startOffset, false);
 		}
+
+		// Any errors? If yes, can we recover
+		if (result == null || !working.getErrors().isEmpty())
+		{
+			// run in recovery mode and see if we can build better IR by inserting tokens. Parse errors won't be
+			// considered in the recovery mode
+			inRecoveryMode[0] = true;
+			fParser = new CommentCollectingParser(env, src, errorManager, true);
+			result = fParser.parse(filename, startOffset, source.length() - startOffset, false);
+
+		}
 		return result;
 	}
 
@@ -144,10 +163,18 @@ public class GraalJSParser extends AbstractParser
 		private static final int DIDNT_SEE_COMMENT = -1;
 		private final List<IParseNode> comments = new ArrayList<IParseNode>();
 		private int fLastCommentStart = DIDNT_SEE_COMMENT;
+		private boolean inRecoveryMode;
 
 		public CommentCollectingParser(ScriptEnvironment env, Source src, ErrorManager errorManager)
 		{
 			super(env, src, errorManager);
+		}
+
+		public CommentCollectingParser(ScriptEnvironment env, Source src, ErrorManager errorManager,
+				final boolean inRecoveryMode)
+		{
+			super(env, src, errorManager);
+			this.inRecoveryMode = inRecoveryMode;
 		}
 
 		@Override
@@ -205,6 +232,12 @@ public class GraalJSParser extends AbstractParser
 		@Override
 		protected void expectDontAdvance(TokenType expected) throws ParserException
 		{
+			if (!inRecoveryMode)
+			{
+				super.expectDontAdvance(expected);
+				return;
+			}
+
 			if (type != expected)
 			{
 				switch (expected)
@@ -227,7 +260,7 @@ public class GraalJSParser extends AbstractParser
 		private void insertToken(TokenType expectedTokenType)
 		{
 			long expectedNewToken = Token.toDesc(expectedTokenType, linePosition,
-					expectedTokenType.getName() != null ? expectedTokenType.getLength() : -1);
+					expectedTokenType.getName() != null ? expectedTokenType.getLength() : 0);
 
 			// insert the token that is expected before the unexpected token
 			stream.insert(k, expectedNewToken);

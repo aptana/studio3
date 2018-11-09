@@ -231,10 +231,4 @@ public class TokenStream {
         buffer = newBuffer;
         
 	}
-	
-	public void rewind()
-	{
-		out = 0;
-	}
-
 }
