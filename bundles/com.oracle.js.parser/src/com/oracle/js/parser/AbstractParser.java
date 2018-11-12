@@ -30,7 +30,6 @@ import static com.oracle.js.parser.TokenType.DIRECTIVE_COMMENT;
 import static com.oracle.js.parser.TokenType.EOF;
 import static com.oracle.js.parser.TokenType.EOL;
 import static com.oracle.js.parser.TokenType.IDENT;
-import static com.oracle.js.parser.TokenType.IDENTIFIER;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -509,8 +508,8 @@ public abstract class AbstractParser {
         		expectDontAdvance(IDENT);
         		
         		// Fake out identifier.
-            final long identToken = Token.recast(token, IDENTIFIER);
-            return createIdentNode(identToken, finish, IDENTIFIER.getName());
+            final long identToken = Token.recast(token, IDENT);
+            return createIdentNode(identToken, finish, "");
         }
     }
 

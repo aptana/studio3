@@ -237,18 +237,16 @@ public class GraalJSParser extends AbstractParser
 				super.expectDontAdvance(expected);
 				return;
 			}
-
 			if (type != expected)
 			{
 				switch (expected)
 				{
 					case IDENT:
-						expected = TokenType.IDENTIFIER;
 					case RBRACE:
 					case LBRACE:
 					case RBRACKET:
 					case LBRACKET:
-						insertToken(expected);
+//						insertToken(expected);
 						break;
 					default:
 						super.expectDontAdvance(expected);
