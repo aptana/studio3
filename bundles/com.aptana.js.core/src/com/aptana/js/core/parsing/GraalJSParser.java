@@ -145,7 +145,7 @@ public class GraalJSParser extends AbstractParser
 			result = fParser.parse(filename, startOffset, source.length() - startOffset, false);
 		}
 
-		// Any errors? If yes, can we recover
+		// If any errors found, will run in a simple recovery mode where will assume basic expected tokens({, },IDENT, (,)) are available and proceed with the parse without failing.
 		if (result == null || !working.getErrors().isEmpty())
 		{
 			// run in recovery mode and see if we can build better IR by inserting tokens. Parse errors won't be
