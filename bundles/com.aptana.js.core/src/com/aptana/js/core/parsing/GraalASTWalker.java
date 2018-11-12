@@ -418,7 +418,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			}
 			else
 			{
-				node.setSemicolonIncluded(true);
+				node.setSemicolonIncluded(true); //semicolon added for var statement
 				addToParentAndPushNodeToStack(node);
 			}
 			// There may be an assignment (or not)
@@ -1151,11 +1151,12 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 				if (parent instanceof JSFunctionNode)
 				{
 					int maybeRBrace = findChar('}', block.getFinish());
-					if (maybeRBrace != -1)
+					if (maybeRBrace == -1) // '}' doesn't exist in the source but we have built the IR for the content proposals which are dependent on AST
 					{
-						rBrace = maybeRBrace;
-						((JSFunctionNode) parent).setLocation(parent.getStartingOffset(), rBrace);
+						maybeRBrace =  block.getFinish() - 1;
 					}
+					rBrace = maybeRBrace;
+					((JSFunctionNode) parent).setLocation(parent.getStartingOffset(), rBrace);
 				}
 			}
 

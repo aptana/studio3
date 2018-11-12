@@ -61,6 +61,7 @@ import com.aptana.js.core.parsing.ast.JSWithNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
+import com.oracle.js.parser.TokenType;
 
 public class JSLocationIdentifier extends JSTreeWalker
 {
@@ -176,6 +177,11 @@ public class JSLocationIdentifier extends JSTreeWalker
 				((JSParseRootNode) ast).accept(rangeWalker);
 
 				this._replaceRange = rangeWalker.getRange();
+				
+				if (_targetNode instanceof JSGetPropertyNode && _targetNode.getFirstChild().getText().equals(TokenType.THIS.getName()))
+				{
+					this._type = LocationType.IN_THIS;
+				}
 			}
 		}
 
@@ -1371,7 +1377,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 	public void visit(JSVarNode node)
 	{
 		// @formatter:off
-		if (node.contains(this._offset) && (this._offset != node.getEndingOffset() || !node.getSemicolonIncluded()))
+		if (node.contains(this._offset) /**&& (this._offset != node.getEndingOffset() || !node.getSemicolonIncluded()) **/)
 		// @formatter:on
 		{
 			IParseNode firstDeclaration = node.getFirstChild();

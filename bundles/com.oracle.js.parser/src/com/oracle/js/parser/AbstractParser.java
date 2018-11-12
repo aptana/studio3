@@ -350,7 +350,7 @@ public abstract class AbstractParser {
      *
      * @throws ParserException on unexpected token type
      */
-    protected final void expectDontAdvance(final TokenType expected) throws ParserException {
+    protected void expectDontAdvance(final TokenType expected) throws ParserException {
         if (type != expected) {
             throw error(expectMessage(expected));
         }
@@ -505,8 +505,11 @@ public abstract class AbstractParser {
             // Create IDENT node.
             return createIdentNode(identToken, finish, ident);
         } else {
-            expect(IDENT);
-            return null;
+        		expectDontAdvance(IDENT);
+        		
+        		// Fake out identifier.
+            final long identToken = Token.recast(token, IDENT);
+            return createIdentNode(identToken, finish, "");
         }
     }
 

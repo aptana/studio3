@@ -15,6 +15,7 @@ import com.aptana.js.core.parsing.ast.JSAssignmentNode;
 import com.aptana.js.core.parsing.ast.JSFunctionNode;
 import com.aptana.js.core.parsing.ast.JSTreeWalker;
 import com.aptana.parsing.ast.IParseNode;
+import com.oracle.js.parser.TokenType;
 
 /**
  * ThisAssignmentCollector
@@ -42,7 +43,7 @@ public class ThisAssignmentCollector extends JSTreeWalker
 	{
 		IParseNode lhs = node.getLeftHandSide();
 
-		if (lhs.getNodeType() == IJSNodeTypes.GET_PROPERTY && lhs.getFirstChild().getNodeType() == IJSNodeTypes.THIS)
+		if (lhs.getNodeType() == IJSNodeTypes.GET_PROPERTY && (lhs.getFirstChild().getNodeType() == IJSNodeTypes.THIS || lhs.getFirstChild().getText().equals(TokenType.THIS.getName()))) //TODO: create JSThisNode directly while building AST
 		{
 			assignments.add(node);
 		}

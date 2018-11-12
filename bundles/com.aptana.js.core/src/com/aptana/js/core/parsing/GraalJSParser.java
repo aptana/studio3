@@ -24,6 +24,7 @@ import com.oracle.js.parser.Parser;
 import com.oracle.js.parser.ParserException;
 import com.oracle.js.parser.ScriptEnvironment;
 import com.oracle.js.parser.Source;
+import com.oracle.js.parser.Token;
 import com.oracle.js.parser.TokenType;
 import com.oracle.js.parser.ir.FunctionNode;
 import com.oracle.js.parser.ir.LexicalContext;
@@ -105,12 +106,20 @@ public class GraalJSParser extends AbstractParser
 	{
 		Source src = Source.sourceFor(filename, source);
 
+		final Boolean inRecoveryMode[] = new Boolean[] { false };
+
 		ScriptEnvironment env = ScriptEnvironment.builder().es6(true).strict(false).emptyStatements(true).build();
 		ErrorManager errorManager = new ErrorManager()
 		{
 			@Override
 			public void error(final ParserException e)
 			{
+				// Ignore the errors in recovery mode
+				if (inRecoveryMode[0])
+				{
+					return;
+				}
+
 				String message = e.getMessage();
 				if (!StringUtil.isEmpty(message) && message.contains(DEFAULT_FILENAME))
 				{
@@ -135,6 +144,17 @@ public class GraalJSParser extends AbstractParser
 			fParser = new CommentCollectingParser(env, src, errorManager);
 			result = fParser.parse(filename, startOffset, source.length() - startOffset, false);
 		}
+
+		// If any errors found, will run in a simple recovery mode where will assume basic expected tokens({, },IDENT, (,)) are available and proceed with the parse without failing.
+		if (result == null || !working.getErrors().isEmpty())
+		{
+			// run in recovery mode and see if we can build better IR by inserting tokens. Parse errors won't be
+			// considered in the recovery mode
+			inRecoveryMode[0] = true;
+			fParser = new CommentCollectingParser(env, src, errorManager, true);
+			result = fParser.parse(filename, startOffset, source.length() - startOffset, false);
+
+		}
 		return result;
 	}
 
@@ -143,10 +163,18 @@ public class GraalJSParser extends AbstractParser
 		private static final int DIDNT_SEE_COMMENT = -1;
 		private final List<IParseNode> comments = new ArrayList<IParseNode>();
 		private int fLastCommentStart = DIDNT_SEE_COMMENT;
+		private boolean inRecoveryMode;
 
 		public CommentCollectingParser(ScriptEnvironment env, Source src, ErrorManager errorManager)
 		{
 			super(env, src, errorManager);
+		}
+
+		public CommentCollectingParser(ScriptEnvironment env, Source src, ErrorManager errorManager,
+				final boolean inRecoveryMode)
+		{
+			super(env, src, errorManager);
+			this.inRecoveryMode = inRecoveryMode;
 		}
 
 		@Override
@@ -199,6 +227,44 @@ public class GraalJSParser extends AbstractParser
 		public IParseNode[] getCommentNodes()
 		{
 			return this.comments.toArray(new IParseNode[comments.size()]);
+		}
+
+		@Override
+		protected void expectDontAdvance(TokenType expected) throws ParserException
+		{
+			if (!inRecoveryMode)
+			{
+				super.expectDontAdvance(expected);
+				return;
+			}
+			if (type != expected)
+			{
+				switch (expected)
+				{
+					case IDENT:
+					case RBRACE:
+					case LBRACE:
+					case RBRACKET:
+					case LBRACKET:
+//						insertToken(expected);
+						break;
+					default:
+						super.expectDontAdvance(expected);
+						break;
+				}
+			}
+		}
+
+		private void insertToken(TokenType expectedTokenType)
+		{
+			long expectedNewToken = Token.toDesc(expectedTokenType, linePosition,
+					expectedTokenType.getName() != null ? expectedTokenType.getLength() : 0);
+
+			// insert the token that is expected before the unexpected token
+			stream.insert(k, expectedNewToken);
+			token = expectedNewToken;
+			k--;
+
 		}
 
 	}
