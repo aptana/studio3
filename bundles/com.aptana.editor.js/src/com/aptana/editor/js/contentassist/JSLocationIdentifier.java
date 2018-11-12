@@ -1377,7 +1377,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 	public void visit(JSVarNode node)
 	{
 		// @formatter:off
-		if (node.contains(this._offset) && (this._offset != node.getEndingOffset() || !node.getSemicolonIncluded()))
+		if (node.contains(this._offset) /**&& (this._offset != node.getEndingOffset() || !node.getSemicolonIncluded()) **/)
 		// @formatter:on
 		{
 			IParseNode firstDeclaration = node.getFirstChild();
