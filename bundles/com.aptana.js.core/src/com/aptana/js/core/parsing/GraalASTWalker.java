@@ -1824,7 +1824,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 
 		// FIXME: prefer start of first arg as last index to search!
 		int lParen = findChar('(', getNodeEnd(callNode.getFunction()), finish);
-		int rParen = findLastChar(')', finish);
+		int rParen = findLastChar(')', callNode.getFinish());
 		// Could be no args, as in "var whatever = new Date"! Therefore no parens!
 		if (lParen == -1 || rParen == -1)
 		{
