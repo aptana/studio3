@@ -7,20 +7,17 @@
  */
 package com.aptana.parsing.ast;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import beaver.spec.ast.Node;
-import beaver.spec.ast.TreeWalker;
-
-import com.aptana.core.logging.IdeLog;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
-import com.aptana.parsing.ParsingPlugin;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
+
+import beaver.spec.ast.Node;
+import beaver.spec.ast.TreeWalker;
 
 public abstract class ParseNode extends Node implements IParseNode
 {
