@@ -5118,7 +5118,7 @@ loop:
                 module.addImportEntry(importEntries.get(i).withFrom(moduleSpecifier));
             }
         }
-        expect(SEMICOLON);
+        endOfLine();
     }
 
     /**
@@ -5238,7 +5238,7 @@ loop:
                         module.addLocalExportEntry(exportEntries.get(i));
                     }
                 }
-                expect(SEMICOLON);
+                endOfLine();
                 break;
             }
             case DEFAULT:
@@ -5275,7 +5275,7 @@ loop:
                     ident = createIdentNode(Token.recast(rhsToken, IDENT), finish, Module.DEFAULT_EXPORT_BINDING_NAME);
                     lc.appendStatementToCurrentNode(new VarNode(lineNumber, Token.recast(rhsToken, LET), finish, ident, assignmentExpression));
                     if (!declaration) {
-                        expect(SEMICOLON);
+                        endOfLine();
                     }
                     module.addLocalExportEntry(ExportEntry.exportDefault());
                 }
