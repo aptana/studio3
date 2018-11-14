@@ -1,26 +1,42 @@
 /*
- * Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
- * This code is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * The Universal Permissive License (UPL), Version 1.0
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * version 2 for more details (a copy is included in the LICENSE file that
- * accompanied this code).
+ * Subject to the condition set forth below, permission is hereby granted to any
+ * person obtaining a copy of this software, associated documentation and/or
+ * data (collectively the "Software"), free of charge and under any and all
+ * copyright rights in the Software, and any and all patent rights owned or
+ * freely licensable by each licensor hereunder covering either (i) the
+ * unmodified Software as contributed to or provided by such licensor, or (ii)
+ * the Larger Works (as defined below), to deal in both
  *
- * You should have received a copy of the GNU General Public License version
- * 2 along with this work; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * (a) the Software, and
  *
- * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
- * or visit www.oracle.com if you need additional information or have any
- * questions.
+ * (b) any piece of software and/or hardware listed in the lrgrwrks.txt file if
+ * one is included with the Software each a "Larger Work" to which the Software
+ * is contributed by such licensors),
+ *
+ * without restriction, including without limitation the rights to copy, create
+ * derivative works of, display, perform, and distribute the Software and make,
+ * use, sell, offer for sale, import, export, have made, and have sold the
+ * Software and the Larger Work(s), and to sublicense the foregoing rights on
+ * either these or other terms.
+ *
+ * This license is subject to the following condition:
+ *
+ * The above copyright notice and either this complete permission notice or at a
+ * minimum a reference to the UPL must be included in all copies or substantial
+ * portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package com.oracle.js.parser.ir;
 
@@ -42,8 +58,6 @@ import com.oracle.js.parser.Source;
  */
 public class LexicalContext {
     private LexicalContextNode[] stack;
-
-    private int[] flags;
     private int sp;
 
     /**
@@ -51,39 +65,6 @@ public class LexicalContext {
      */
     public LexicalContext() {
         stack = new LexicalContextNode[16];
-        flags = new int[16];
-    }
-
-    /**
-     * Get the flags for a lexical context node on the stack.
-     *
-     * @param node node
-     *
-     * @return the flags for the node
-     */
-    public int getFlags(final LexicalContextNode node) {
-        for (int i = sp - 1; i >= 0; i--) {
-            if (stack[i] == node) {
-                return flags[i];
-            }
-        }
-        throw new AssertionError("flag node not on context stack");
-    }
-
-    /**
-     * Get the function body of a function node on the lexical context
-     * stack. This will trigger an assertion if node isn't present.
-     *
-     * @param functionNode function node
-     * @return body of function node
-     */
-    public Block getFunctionBody(final FunctionNode functionNode) {
-        for (int i = sp - 1; i >= 0; i--) {
-            if (stack[i] == functionNode) {
-                return (Block) stack[i + 1];
-            }
-        }
-        throw new AssertionError(functionNode.getName() + " not on context stack");
     }
 
     /**
@@ -118,15 +99,9 @@ public class LexicalContext {
             final LexicalContextNode[] newStack = new LexicalContextNode[sp * 2];
             System.arraycopy(stack, 0, newStack, 0, sp);
             stack = newStack;
-
-            final int[] newFlags = new int[sp * 2];
-            System.arraycopy(flags, 0, newFlags, 0, sp);
-            flags = newFlags;
-
         }
-        stack[sp] = node;
-        flags[sp] = 0;
 
+        stack[sp] = node;
         sp++;
 
         return node;
@@ -139,13 +114,6 @@ public class LexicalContext {
      */
     public boolean isEmpty() {
         return sp == 0;
-    }
-
-    /**
-     * @return the depth of the lexical context.
-     */
-    public int size() {
-        return sp;
     }
 
     /**
@@ -163,20 +131,8 @@ public class LexicalContext {
         --sp;
         final LexicalContextNode popped = stack[sp];
         stack[sp] = null;
-        if (popped instanceof Flags) {
-            return (T) ((Flags<?>) popped).setFlag(this, flags[sp]);
-        }
 
         return (T) popped;
-    }
-
-    /**
-     * Return the top element in the context.
-     *
-     * @return the node that was pushed last
-     */
-    public LexicalContextNode peek() {
-        return stack[sp - 1];
     }
 
     /**
@@ -237,6 +193,16 @@ public class LexicalContext {
     }
 
     /**
+     * Returns an iterator over all of the current function's blocks in the context,
+     * with the top block (innermost lexical context) first.
+     *
+     * @return an iterator over all blocks in the context.
+     */
+    public Iterator<Block> getBlocksInCurrentFunction() {
+        return new NodeIterator<>(Block.class, getCurrentFunction());
+    }
+
+    /**
      * Get the parent block for the current lexical context block
      *
      * @return parent block
@@ -260,76 +226,6 @@ public class LexicalContext {
         }
         final LexicalContextNode parent = stack[sp - 2];
         return parent instanceof LabelNode ? (LabelNode) parent : null;
-    }
-
-    /**
-     * Returns an iterator over all ancestors block of the given block, with its
-     * parent block first.
-     *
-     * @param block the block whose ancestors are returned
-     * @return an iterator over all ancestors block of the given block.
-     */
-    public Iterator<Block> getAncestorBlocks(final Block block) {
-        final Iterator<Block> iter = getBlocks();
-        while (iter.hasNext()) {
-            final Block b = iter.next();
-            if (block == b) {
-                return iter;
-            }
-        }
-        throw new AssertionError("Block is not on the current lexical context stack");
-    }
-
-    /**
-     * Returns an iterator over a block and all its ancestors blocks, with the
-     * block first.
-     *
-     * @param block the block that is the starting point of the iteration.
-     * @return an iterator over a block and all its ancestors.
-     */
-    public Iterator<Block> getBlocks(final Block block) {
-        final Iterator<Block> iter = getAncestorBlocks(block);
-        return new Iterator<Block>() {
-            boolean blockReturned = false;
-
-            @Override
-            public boolean hasNext() {
-                return iter.hasNext() || !blockReturned;
-            }
-
-            @Override
-            public Block next() {
-                if (blockReturned) {
-                    return iter.next();
-                }
-                blockReturned = true;
-                return block;
-            }
-        };
-    }
-
-    /**
-     * Get the function for this block.
-     *
-     * @param block block for which to get function
-     *
-     * @return function for block
-     */
-    public FunctionNode getFunction(final Block block) {
-        final Iterator<LexicalContextNode> iter = new NodeIterator<>(LexicalContextNode.class);
-        while (iter.hasNext()) {
-            final LexicalContextNode next = iter.next();
-            if (next == block) {
-                while (iter.hasNext()) {
-                    final LexicalContextNode next2 = iter.next();
-                    if (next2 instanceof FunctionNode) {
-                        return (FunctionNode) next2;
-                    }
-                }
-            }
-        }
-        assert false;
-        return null;
     }
 
     /**
@@ -360,26 +256,6 @@ public class LexicalContext {
         return getParentBlock() == null;
     }
 
-    /**
-     * Get the parent function for a function in the lexical context.
-     *
-     * @param functionNode function for which to get parent
-     *
-     * @return parent function of functionNode or {@code null} if none (e.g., if
-     *         functionNode is the program).
-     */
-    public FunctionNode getParentFunction(final FunctionNode functionNode) {
-        final Iterator<FunctionNode> iter = new NodeIterator<>(FunctionNode.class);
-        while (iter.hasNext()) {
-            final FunctionNode next = iter.next();
-            if (next == functionNode) {
-                return iter.hasNext() ? iter.next() : null;
-            }
-        }
-        assert false;
-        return null;
-    }
-
     private BreakableNode getBreakable() {
         for (final NodeIterator<BreakableNode> iter = new NodeIterator<>(BreakableNode.class, getCurrentFunction()); iter.hasNext();) {
             final BreakableNode next = iter.next();
@@ -388,15 +264,6 @@ public class LexicalContext {
             }
         }
         return null;
-    }
-
-    /**
-     * Check whether the lexical context is currently inside a loop.
-     *
-     * @return {@code true} if inside a loop
-     */
-    public boolean inLoop() {
-        return getCurrentLoop() != null;
     }
 
     /**
@@ -496,6 +363,17 @@ public class LexicalContext {
             }
         }
         return false;
+    }
+
+    public FunctionNode getCurrentNonArrowFunction() {
+        final Iterator<FunctionNode> iter = getFunctions();
+        while (iter.hasNext()) {
+            final FunctionNode fn = iter.next();
+            if (fn.getKind() != FunctionNode.Kind.ARROW) {
+                return fn;
+            }
+        }
+        return null;
     }
 
     @Override

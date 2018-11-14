@@ -1,26 +1,42 @@
 /*
- * Copyright (c) 2015, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
- * This code is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * The Universal Permissive License (UPL), Version 1.0
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * version 2 for more details (a copy is included in the LICENSE file that
- * accompanied this code).
+ * Subject to the condition set forth below, permission is hereby granted to any
+ * person obtaining a copy of this software, associated documentation and/or
+ * data (collectively the "Software"), free of charge and under any and all
+ * copyright rights in the Software, and any and all patent rights owned or
+ * freely licensable by each licensor hereunder covering either (i) the
+ * unmodified Software as contributed to or provided by such licensor, or (ii)
+ * the Larger Works (as defined below), to deal in both
  *
- * You should have received a copy of the GNU General Public License version
- * 2 along with this work; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * (a) the Software, and
  *
- * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
- * or visit www.oracle.com if you need additional information or have any
- * questions.
+ * (b) any piece of software and/or hardware listed in the lrgrwrks.txt file if
+ * one is included with the Software each a "Larger Work" to which the Software
+ * is contributed by such licensors),
+ *
+ * without restriction, including without limitation the rights to copy, create
+ * derivative works of, display, perform, and distribute the Software and make,
+ * use, sell, offer for sale, import, export, have made, and have sold the
+ * Software and the Larger Work(s), and to sublicense the foregoing rights on
+ * either these or other terms.
+ *
+ * This license is subject to the following condition:
+ *
+ * The above copyright notice and either this complete permission notice or at a
+ * minimum a reference to the UPL must be included in all copies or substantial
+ * portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package com.oracle.js.parser.ir.visitor;
@@ -34,22 +50,33 @@ import com.oracle.js.parser.ir.CallNode;
 import com.oracle.js.parser.ir.CaseNode;
 import com.oracle.js.parser.ir.CatchNode;
 import com.oracle.js.parser.ir.ClassNode;
+import com.oracle.js.parser.ir.BlockExpression;
 import com.oracle.js.parser.ir.ContinueNode;
 import com.oracle.js.parser.ir.DebuggerNode;
 import com.oracle.js.parser.ir.EmptyNode;
 import com.oracle.js.parser.ir.ErrorNode;
+import com.oracle.js.parser.ir.ExportClauseNode;
+import com.oracle.js.parser.ir.ExportNode;
+import com.oracle.js.parser.ir.ExportSpecifierNode;
 import com.oracle.js.parser.ir.ExpressionStatement;
 import com.oracle.js.parser.ir.ForNode;
+import com.oracle.js.parser.ir.FromNode;
 import com.oracle.js.parser.ir.FunctionNode;
 import com.oracle.js.parser.ir.IdentNode;
 import com.oracle.js.parser.ir.IfNode;
+import com.oracle.js.parser.ir.ImportClauseNode;
+import com.oracle.js.parser.ir.ImportNode;
+import com.oracle.js.parser.ir.ImportSpecifierNode;
 import com.oracle.js.parser.ir.IndexNode;
 import com.oracle.js.parser.ir.JoinPredecessorExpression;
 import com.oracle.js.parser.ir.LabelNode;
 import com.oracle.js.parser.ir.LexicalContext;
 import com.oracle.js.parser.ir.LiteralNode;
+import com.oracle.js.parser.ir.NameSpaceImportNode;
+import com.oracle.js.parser.ir.NamedImportsNode;
 import com.oracle.js.parser.ir.Node;
 import com.oracle.js.parser.ir.ObjectNode;
+import com.oracle.js.parser.ir.ParameterNode;
 import com.oracle.js.parser.ir.PropertyNode;
 import com.oracle.js.parser.ir.ReturnNode;
 import com.oracle.js.parser.ir.RuntimeNode;
@@ -220,6 +247,18 @@ public abstract class TranslatorNodeVisitor<T extends LexicalContext, R> {
         return enterDefault(errorNode);
     }
 
+    public R enterExportClauseNode(final ExportClauseNode exportClauseNode) {
+        return enterDefault(exportClauseNode);
+    }
+
+    public R enterExportNode(final ExportNode exportNode) {
+        return enterDefault(exportNode);
+    }
+
+    public R enterExportSpecifierNode(final ExportSpecifierNode exportSpecifierNode) {
+        return enterDefault(exportSpecifierNode);
+    }
+
     /**
      * Callback for entering an ExpressionStatement
      *
@@ -248,6 +287,10 @@ public abstract class TranslatorNodeVisitor<T extends LexicalContext, R> {
      */
     public R enterForNode(final ForNode forNode) {
         return enterDefault(forNode);
+    }
+
+    public R enterFromNode(final FromNode fromNode) {
+        return enterDefault(fromNode);
     }
 
     /**
@@ -280,6 +323,18 @@ public abstract class TranslatorNodeVisitor<T extends LexicalContext, R> {
         return enterDefault(ifNode);
     }
 
+    public R enterImportClauseNode(final ImportClauseNode importClauseNode) {
+        return enterDefault(importClauseNode);
+    }
+
+    public R enterImportNode(final ImportNode importNode) {
+        return enterDefault(importNode);
+    }
+
+    public R enterImportSpecifierNode(final ImportSpecifierNode importSpecifierNode) {
+        return enterDefault(importSpecifierNode);
+    }
+
     /**
      * Callback for entering an IndexNode
      *
@@ -308,6 +363,14 @@ public abstract class TranslatorNodeVisitor<T extends LexicalContext, R> {
      */
     public R enterLiteralNode(final LiteralNode<?> literalNode) {
         return enterDefault(literalNode);
+    }
+
+    public R enterNameSpaceImportNode(final NameSpaceImportNode nameSpaceImportNode) {
+        return enterDefault(nameSpaceImportNode);
+    }
+
+    public R enterNamedImportsNode(final NamedImportsNode namedImportsNode) {
+        return enterDefault(namedImportsNode);
     }
 
     /**
@@ -413,7 +476,7 @@ public abstract class TranslatorNodeVisitor<T extends LexicalContext, R> {
     /**
      * Callback for entering a VarNode
      *
-     * @param  varNode   the node
+     * @param  varNode the node
      * @return true if traversal should continue and node children be traversed, false otherwise
      */
     public R enterVarNode(final VarNode varNode) {
@@ -433,7 +496,7 @@ public abstract class TranslatorNodeVisitor<T extends LexicalContext, R> {
     /**
      * Callback for entering a WithNode
      *
-     * @param  withNode  the node
+     * @param  withNode the node
      * @return true if traversal should continue and node children be traversed, false otherwise
      */
     public R enterWithNode(final WithNode withNode) {
@@ -443,10 +506,29 @@ public abstract class TranslatorNodeVisitor<T extends LexicalContext, R> {
     /**
      * Callback for entering a ClassNode
      *
-     * @param  classNode  the node
+     * @param  classNode the node
      * @return true if traversal should continue and node children be traversed, false otherwise
      */
     public R enterClassNode(ClassNode classNode) {
         return enterDefault(classNode);
+    }
+
+    /**
+     * Callback for entering a BlockExpression
+     *
+     * @param  blockExpression the node
+     * @return true if traversal should continue and node children be traversed, false otherwise
+     */
+    public R enterBlockExpression(BlockExpression blockExpression) {
+        return enterDefault(blockExpression);
+    }
+
+    /**
+     * Callback for entering a ParameterNode
+     *
+     * @param  paramNode the node
+     */
+    public R enterParameterNode(final ParameterNode paramNode) {
+        return enterDefault(paramNode);
     }
 }

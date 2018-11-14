@@ -1,35 +1,58 @@
 /*
- * Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
- * This code is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * The Universal Permissive License (UPL), Version 1.0
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * version 2 for more details (a copy is included in the LICENSE file that
- * accompanied this code).
+ * Subject to the condition set forth below, permission is hereby granted to any
+ * person obtaining a copy of this software, associated documentation and/or
+ * data (collectively the "Software"), free of charge and under any and all
+ * copyright rights in the Software, and any and all patent rights owned or
+ * freely licensable by each licensor hereunder covering either (i) the
+ * unmodified Software as contributed to or provided by such licensor, or (ii)
+ * the Larger Works (as defined below), to deal in both
  *
- * You should have received a copy of the GNU General Public License version
- * 2 along with this work; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * (a) the Software, and
  *
- * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
- * or visit www.oracle.com if you need additional information or have any
- * questions.
+ * (b) any piece of software and/or hardware listed in the lrgrwrks.txt file if
+ * one is included with the Software each a "Larger Work" to which the Software
+ * is contributed by such licensors),
+ *
+ * without restriction, including without limitation the rights to copy, create
+ * derivative works of, display, perform, and distribute the Software and make,
+ * use, sell, offer for sale, import, export, have made, and have sold the
+ * Software and the Larger Work(s), and to sublicense the foregoing rights on
+ * either these or other terms.
+ *
+ * This license is subject to the following condition:
+ *
+ * The above copyright notice and either this complete permission notice or at a
+ * minimum a reference to the UPL must be included in all copies or substantial
+ * portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 package com.oracle.js.parser;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import com.oracle.js.parser.ir.Block;
+import com.oracle.js.parser.ir.Expression;
+import com.oracle.js.parser.ir.ExpressionStatement;
 import com.oracle.js.parser.ir.FunctionNode;
 import com.oracle.js.parser.ir.IdentNode;
 import com.oracle.js.parser.ir.Module;
+import com.oracle.js.parser.ir.ParameterNode;
+import com.oracle.js.parser.ir.VarNode;
 
 /**
  * ParserContextNode that represents a function that is currently being parsed
@@ -48,13 +71,13 @@ class ParserContextFunctionNode extends ParserContextBaseNode {
     /** Line number for function declaration */
     private final int line;
 
-    /**
-     * Function node kind, see FunctionNode.Kind
-     */
+    /** Function node kind, see FunctionNode.Kind */
     private final FunctionNode.Kind kind;
 
-    /** List of parameter identifiers for function */
+    /** List of parameter identifiers (for simple and rest parameters). */
     private List<IdentNode> parameters;
+    /** Optional parameter initialization block (replaces parameter list). */
+    private ParserContextBlockNode parameterBlock;
 
     /** Token for function start */
     private final long token;
@@ -65,9 +88,12 @@ class ParserContextFunctionNode extends ParserContextBaseNode {
     /** Opaque node for parser end state, see {@link Parser} */
     private Object endParserState;
 
+    private int length;
+    private int parameterCount;
     private HashSet<String> parameterBoundNames;
     private IdentNode duplicateParameterBinding;
     private boolean simpleParameterList = true;
+    private boolean containsDefaultParameter;
 
     private Module module;
 
@@ -81,7 +107,7 @@ class ParserContextFunctionNode extends ParserContextBaseNode {
      * @param parameters The parameters of the function
      */
     ParserContextFunctionNode(final long token, final IdentNode ident, final String name, final Namespace namespace, final int line, final FunctionNode.Kind kind,
-                    final List<IdentNode> parameters) {
+                    final List<IdentNode> parameters, final int length) {
         this.ident = ident;
         this.namespace = namespace;
         this.line = line;
@@ -89,6 +115,9 @@ class ParserContextFunctionNode extends ParserContextBaseNode {
         this.name = name;
         this.parameters = parameters;
         this.token = token;
+        this.length = length;
+        this.parameterCount = parameters == null ? 0 : parameters.size();
+        assert calculateLength(parameters) == length;
     }
 
     /**
@@ -166,6 +195,9 @@ class ParserContextFunctionNode extends ParserContextBaseNode {
      * @return The parameters of the function
      */
     public List<IdentNode> getParameters() {
+        if (parameters == null) {
+            return Collections.emptyList();
+        }
         return parameters;
     }
 
@@ -229,7 +261,53 @@ class ParserContextFunctionNode extends ParserContextBaseNode {
         return getFlag(FunctionNode.IS_SUBCLASS_CONSTRUCTOR) != 0;
     }
 
-    boolean addParameterBinding(IdentNode bindingIdentifier) {
+    public int getLength() {
+        return length;
+    }
+
+    public int getParameterCount() {
+        return parameterCount;
+    }
+
+    /**
+     * Add simple or rest parameter.
+     */
+    public void addParameter(IdentNode param) {
+        addParameterBinding(param);
+        if (parameterBlock != null) {
+            addParameterInit(param, getParameterCount());
+        } else {
+            if (parameters == null) {
+                parameters = new ArrayList<>();
+            }
+            parameters.add(param);
+        }
+        recordParameter(false, param.isRestParameter(), false);
+    }
+
+    /**
+     * Update number of parameters, length, and simple parameter list flag.
+     */
+    private void recordParameter(boolean isDefault, boolean isRest, boolean isPattern) {
+        if (!isDefault && !isRest) {
+            if (!containsDefaultParameter) {
+                length++;
+            }
+        } else {
+            containsDefaultParameter = true;
+        }
+        if ((isDefault || isRest || isPattern) && simpleParameterList) {
+            recordNonSimpleParameterList();
+        }
+        parameterCount++;
+    }
+
+    private void recordNonSimpleParameterList() {
+        this.simpleParameterList = false;
+        setFlag(FunctionNode.HAS_NON_SIMPLE_PARAMETER_LIST);
+    }
+
+    private boolean addParameterBinding(IdentNode bindingIdentifier) {
         if (Parser.isArguments(bindingIdentifier)) {
             setFlag(FunctionNode.DEFINES_ARGUMENTS);
         }
@@ -253,15 +331,82 @@ class ParserContextFunctionNode extends ParserContextBaseNode {
         return simpleParameterList;
     }
 
-    public void setSimpleParameterList(boolean simpleParameterList) {
-        this.simpleParameterList = simpleParameterList;
-    }
-
     public Module getModule() {
         return module;
     }
 
     public void setModule(Module module) {
         this.module = module;
+    }
+
+    public boolean isAsync() {
+        return getFlag(FunctionNode.IS_ASYNC) != 0;
+    }
+
+    public ParserContextBlockNode getParameterBlock() {
+        return parameterBlock;
+    }
+
+    public void addDefaultParameter(VarNode varNode) {
+        ensureParameterBlock();
+        parameterBlock.appendStatement(varNode);
+        addParameterBinding(varNode.getName());
+        recordParameter(true, false, false);
+    }
+
+    public void addParameterBindingDeclaration(VarNode varNode) {
+        ensureParameterBlock();
+        parameterBlock.appendStatement(varNode);
+        addParameterBinding(varNode.getName());
+    }
+
+    public void addParameterInitialization(int lineNumber, Expression assignment, boolean isDefault) {
+        ensureParameterBlock();
+        parameterBlock.appendStatement(new ExpressionStatement(lineNumber, assignment.getToken(), assignment.getFinish(), assignment));
+        recordParameter(isDefault, false, true);
+    }
+
+    private void ensureParameterBlock() {
+        if (parameterBlock == null) {
+            initParameterBlock();
+        }
+    }
+
+    private void initParameterBlock() {
+        parameterBlock = new ParserContextBlockNode(token);
+        parameterBlock.setFlag(Block.IS_PARAMETER_BLOCK);
+
+        if (parameters != null) {
+            for (int i = 0; i < parameters.size(); i++) {
+                IdentNode paramIdent = parameters.get(i);
+                addParameterInit(paramIdent, i);
+            }
+        }
+        parameters = Collections.emptyList();
+    }
+
+    private void addParameterInit(IdentNode param, int index) {
+        long paramToken = param.getToken();
+        int paramFinish = param.getFinish();
+        ParameterNode paramValue;
+        if (param.isRestParameter()) {
+            paramValue = new ParameterNode(paramToken, paramFinish, index, true);
+        } else {
+            paramValue = new ParameterNode(paramToken, paramFinish, index);
+        }
+        parameterBlock.appendStatement(new VarNode(line, Token.recast(paramToken, TokenType.LET), paramFinish, param, paramValue, VarNode.IS_LET));
+    }
+
+    private static int calculateLength(final List<IdentNode> parameters) {
+        int length = 0;
+        if (parameters != null) {
+            for (IdentNode param : parameters) {
+                if (param.isRestParameter()) {
+                    break;
+                }
+                length++;
+            }
+        }
+        return length;
     }
 }

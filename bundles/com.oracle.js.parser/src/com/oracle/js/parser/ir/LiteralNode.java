@@ -1,26 +1,42 @@
 /*
- * Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
- * This code is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * The Universal Permissive License (UPL), Version 1.0
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * version 2 for more details (a copy is included in the LICENSE file that
- * accompanied this code).
+ * Subject to the condition set forth below, permission is hereby granted to any
+ * person obtaining a copy of this software, associated documentation and/or
+ * data (collectively the "Software"), free of charge and under any and all
+ * copyright rights in the Software, and any and all patent rights owned or
+ * freely licensable by each licensor hereunder covering either (i) the
+ * unmodified Software as contributed to or provided by such licensor, or (ii)
+ * the Larger Works (as defined below), to deal in both
  *
- * You should have received a copy of the GNU General Public License version
- * 2 along with this work; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * (a) the Software, and
  *
- * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
- * or visit www.oracle.com if you need additional information or have any
- * questions.
+ * (b) any piece of software and/or hardware listed in the lrgrwrks.txt file if
+ * one is included with the Software each a "Larger Work" to which the Software
+ * is contributed by such licensors),
+ *
+ * without restriction, including without limitation the rights to copy, create
+ * derivative works of, display, perform, and distribute the Software and make,
+ * use, sell, offer for sale, import, export, have made, and have sold the
+ * Software and the Larger Work(s), and to sublicense the foregoing rights on
+ * either these or other terms.
+ *
+ * This license is subject to the following condition:
+ *
+ * The above copyright notice and either this complete permission notice or at a
+ * minimum a reference to the UPL must be included in all copies or substantial
+ * portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package com.oracle.js.parser.ir;
@@ -42,7 +58,7 @@ import com.oracle.js.parser.ir.visitor.TranslatorNodeVisitor;
  *
  * @param <T> the literal type
  */
-public abstract class LiteralNode<T> extends Expression implements PropertyKey {
+public abstract class LiteralNode<T> extends Expression {
     /** Literal value */
     protected final T value;
 
@@ -79,29 +95,12 @@ public abstract class LiteralNode<T> extends Expression implements PropertyKey {
     }
 
     /**
-     * Initialization setter, if required for immutable state. This is used for things like
-     * ArrayLiteralNodes that need to carry state for the splitter. Default implementation is just a
-     * nop.
-     *
-     * @param lc lexical context
-     * @return new literal node with initialized state, or same if nothing changed
-     */
-    public LiteralNode<?> initialize(final LexicalContext lc) {
-        return this;
-    }
-
-    /**
      * Check if the literal value is null
      *
      * @return true if literal value is null
      */
     public boolean isNull() {
         return value == null;
-    }
-
-    @Override
-    public String getPropertyName() {
-        throw new UnsupportedOperationException();
     }
 
     /**
@@ -265,7 +264,7 @@ public abstract class LiteralNode<T> extends Expression implements PropertyKey {
      *
      * @param <T> the literal type
      */
-    public static class PrimitiveLiteralNode<T> extends LiteralNode<T> {
+    public static class PrimitiveLiteralNode<T> extends LiteralNode<T> implements PropertyKey {
         private PrimitiveLiteralNode(final long token, final int finish, final T value) {
             super(token, finish, value);
         }
@@ -378,10 +377,6 @@ public abstract class LiteralNode<T> extends Expression implements PropertyKey {
             super(Token.recast(token, TokenType.STRING), finish, value);
         }
 
-        private StringLiteralNode(final StringLiteralNode literalNode) {
-            super(literalNode);
-        }
-
         @Override
         public void toString(final StringBuilder sb, final boolean printType) {
             sb.append('\"');
@@ -400,7 +395,9 @@ public abstract class LiteralNode<T> extends Expression implements PropertyKey {
      * @return the new literal node
      */
     public static LiteralNode<String> newInstance(final long token, final int finish, final String value) {
-        return new StringLiteralNode(token, finish, value);
+        long tokenWithDelimiter = Token.withDelimiter(token);
+        int newFinish = Token.descPosition(tokenWithDelimiter) + Token.descLength(tokenWithDelimiter);
+        return new StringLiteralNode(tokenWithDelimiter, newFinish, value);
     }
 
     private static final class LexerTokenLiteralNode extends LiteralNode<LexerToken> {
@@ -443,59 +440,9 @@ public abstract class LiteralNode<T> extends Expression implements PropertyKey {
      * Array literal node class.
      */
     public static final class ArrayLiteralNode extends LiteralNode<Expression[]> implements LexicalContextNode {
-        /**
-         * Sub units with indexes ranges, in which to split up code generation, for large literals
-         */
-        private final List<ArrayUnit> units;
-
         private final boolean hasSpread;
         private final boolean hasTrailingComma;
-
-        /**
-         * An ArrayUnit is a range in an ArrayLiteral. ArrayLiterals can be split if they are too
-         * large, for bytecode generation reasons
-         */
-        public static final class ArrayUnit {
-            /** postsets range associated with the unit (hi not inclusive). */
-            private final int lo;
-            private final int hi;
-
-            /**
-             * Constructor
-             *
-             * @param lo lowest array index in unit
-             * @param hi highest array index in unit + 1
-             */
-            public ArrayUnit(final int lo, final int hi) {
-                this.lo = lo;
-                this.hi = hi;
-            }
-
-            /**
-             * Get the high index position of the ArrayUnit (non inclusive)
-             *
-             * @return high index position
-             */
-            public int getHi() {
-                return hi;
-            }
-
-            /**
-             * Get the low index position of the ArrayUnit (inclusive)
-             *
-             * @return low index position
-             */
-            public int getLo() {
-                return lo;
-            }
-        }
-
-        private static final class ArrayLiteralInitializer {
-
-            static ArrayLiteralNode initialize(final ArrayLiteralNode node) {
-                return new ArrayLiteralNode(node, node.value, node.units);
-            }
-        }
+        private final boolean hasCoverInitializedName;
 
         /**
          * Constructor
@@ -505,7 +452,7 @@ public abstract class LiteralNode<T> extends Expression implements PropertyKey {
          * @param value array literal value, a Node array
          */
         protected ArrayLiteralNode(final long token, final int finish, final Expression[] value) {
-            this(token, finish, value, false, false);
+            this(token, finish, value, false, false, false);
         }
 
         /**
@@ -517,11 +464,11 @@ public abstract class LiteralNode<T> extends Expression implements PropertyKey {
          * @param hasSpread true if the array has a spread element
          * @param hasTrailingComma true if the array literal has a comma after the last element
          */
-        protected ArrayLiteralNode(final long token, final int finish, final Expression[] value, boolean hasSpread, boolean hasTrailingComma) {
+        protected ArrayLiteralNode(final long token, final int finish, final Expression[] value, boolean hasSpread, boolean hasTrailingComma, boolean hasCoverInitializedName) {
             super(Token.recast(token, TokenType.ARRAY), finish, value);
-            this.units = null;
             this.hasSpread = hasSpread;
             this.hasTrailingComma = hasTrailingComma;
+            this.hasCoverInitializedName = hasCoverInitializedName;
         }
 
         /**
@@ -529,11 +476,11 @@ public abstract class LiteralNode<T> extends Expression implements PropertyKey {
          *
          * @param node source array literal node
          */
-        private ArrayLiteralNode(final ArrayLiteralNode node, final Expression[] value, final List<ArrayUnit> units) {
+        private ArrayLiteralNode(final ArrayLiteralNode node, final Expression[] value) {
             super(node, value);
-            this.units = units;
             this.hasSpread = node.hasSpread;
             this.hasTrailingComma = node.hasTrailingComma;
+            this.hasCoverInitializedName = node.hasCoverInitializedName;
         }
 
         @Override
@@ -549,6 +496,10 @@ public abstract class LiteralNode<T> extends Expression implements PropertyKey {
             return hasTrailingComma;
         }
 
+        public boolean hasCoverInitializedName() {
+            return hasCoverInitializedName;
+        }
+
         /**
          * Returns a list of array element expressions. Note that empty array elements manifest
          * themselves as null.
@@ -560,36 +511,14 @@ public abstract class LiteralNode<T> extends Expression implements PropertyKey {
             return Collections.unmodifiableList(Arrays.asList(value));
         }
 
-        /**
-         * Setter that initializes all code generation meta data for an ArrayLiteralNode. This acts
-         * a setter, so the return value may return a new node and must be handled
-         *
-         * @param lc lexical context
-         * @return new array literal node with postsets, presets and element types initialized
-         */
-        @Override
-        public ArrayLiteralNode initialize(final LexicalContext lc) {
-            return Node.replaceInLexicalContext(lc, this, ArrayLiteralInitializer.initialize(this));
-        }
-
-        /**
-         * Get the array units that make up this ArrayLiteral
-         *
-         * @see ArrayUnit
-         * @return list of array units
-         */
-        public List<ArrayUnit> getUnits() {
-            return units == null ? null : Collections.unmodifiableList(units);
-        }
-
         @Override
         public Node accept(final NodeVisitor<? extends LexicalContext> visitor) {
-            return Acceptor.accept(this, visitor);
+            return LexicalContextNode.super.accept(visitor);
         }
 
         @Override
         public <R> R accept(TranslatorNodeVisitor<? extends LexicalContext, R> visitor) {
-            return Acceptor.accept(this, visitor);
+            return LexicalContextNode.super.accept(visitor);
         }
 
         @Override
@@ -611,7 +540,7 @@ public abstract class LiteralNode<T> extends Expression implements PropertyKey {
             if (this.value == value) {
                 return this;
             }
-            return Node.replaceInLexicalContext(lc, this, new ArrayLiteralNode(this, value, units));
+            return Node.replaceInLexicalContext(lc, this, new ArrayLiteralNode(this, value));
         }
 
         private ArrayLiteralNode setValue(final LexicalContext lc, final List<Expression> value) {
@@ -662,8 +591,8 @@ public abstract class LiteralNode<T> extends Expression implements PropertyKey {
      *
      * @return the new literal node
      */
-    public static LiteralNode<Expression[]> newInstance(final long token, final int finish, final List<Expression> value, boolean hasSpread, boolean hasTrailingComma) {
-        return new ArrayLiteralNode(token, finish, valueToArray(value), hasSpread, hasTrailingComma);
+    public static LiteralNode<Expression[]> newInstance(long token, int finish, List<Expression> value, boolean hasSpread, boolean hasTrailingComma, boolean hasCoverInitializedName) {
+        return new ArrayLiteralNode(token, finish, valueToArray(value), hasSpread, hasTrailingComma, hasCoverInitializedName);
     }
 
     /**
