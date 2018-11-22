@@ -190,9 +190,22 @@ public class JSFunctionNode extends JSNode
 		{
 			return true;
 		}
-		if (parent instanceof JSStatementsNode)
+		else if (parent instanceof JSStatementsNode)
 		{
 			return (parent.getParent() instanceof JSClassNode);
+		}
+		return hasParentOfClassOrObjectNode(parent);
+	}
+
+	private boolean hasParentOfClassOrObjectNode(IParseNode node)
+	{
+		while (node != null)
+		{
+			if (node instanceof JSClassNode || node instanceof JSObjectNode)
+			{
+				return true;
+			}
+			node = node.getParent();
 		}
 		return false;
 	}
@@ -206,7 +219,7 @@ public class JSFunctionNode extends JSNode
 	{
 		this._isStatic = true;
 	}
-	
+
 	@Override
 	public boolean isExported()
 	{
