@@ -1767,7 +1767,7 @@ public abstract class JSParserTest
 		assertNoErrors();
 	}
 
-	@Test @Ignore ("wil fix this later")
+	@Test
 	public void testJaxerFiles() throws Exception
 	{
 		for (String file : ITestFiles.JAXER_FILES)
