@@ -1820,7 +1820,7 @@ class GraalASTWalker extends NodeVisitor<LexicalContext>
 			finish -= 1;
 		}
 		// push our equivalent of the call node
-		addToParentAndPushNodeToStack(new JSInvokeNode(start, finish));
+		addToParentAndPushNodeToStack(new JSInvokeNode(callNode.getStart(), callNode.getFinish()-1));
 
 		// FIXME: prefer start of first arg as last index to search!
 		int lParen = findChar('(', getNodeEnd(callNode.getFunction()), finish);
