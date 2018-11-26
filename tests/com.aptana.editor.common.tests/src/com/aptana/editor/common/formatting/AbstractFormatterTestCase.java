@@ -14,7 +14,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
-import org.eclipse.ui.views.markers.FiltersContributionParameters;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
