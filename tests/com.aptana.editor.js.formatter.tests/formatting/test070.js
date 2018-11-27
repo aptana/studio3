@@ -53,9 +53,6 @@ js.formatter.brace.position.blocks=same.line
 ==CONTENT==
 //noformat
 //format
-/**
- * 
- */
 			var i;
 /*
  * 
@@ -63,9 +60,6 @@ js.formatter.brace.position.blocks=same.line
 ==FORMATTED==
 //noformat
 //format
-/**
- *
- */
 var i;
 /*
  *

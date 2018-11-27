@@ -51,6 +51,6 @@ js.formatter.brace.position.function.declaration=same.line
 js.formatter.spaces.after.key.value.operator=1
 js.formatter.brace.position.blocks=same.line
 ==CONTENT==
-var Ob = ((Ua = Za[Hb >>> 12]) == -1) ? Jb(Hb) : Ra[Hb ^ Ua];
+var Ob =((Ua = Za[Hb >>> 12]) == -1) ? Jb(Hb) : Ra[Hb ^ Ua];
 ==FORMATTED==
 var Ob = (( Ua = Za[Hb >>> 12]) == -1) ? Jb(Hb) : Ra[Hb ^ Ua];

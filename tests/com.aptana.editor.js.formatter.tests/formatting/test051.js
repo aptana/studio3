@@ -51,12 +51,12 @@ js.formatter.brace.position.function.declaration=same.line
 js.formatter.spaces.after.key.value.operator=1
 js.formatter.brace.position.blocks=same.line
 ==CONTENT==
-if (!configLoaded) // load the config (if  not already loaded when processing the project)
+if (!configLoaded) // load the config, if  not already loaded when processing the project
 {
 	var currentPath = file.parentFile.absolutePath;
 }
 ==FORMATTED==
-if(!configLoaded)// load the config (if  not already loaded when processing the project)
+if(!configLoaded)// load the config, if  not already loaded when processing the project
 {
     var currentPath = file.parentFile.absolutePath;
 }

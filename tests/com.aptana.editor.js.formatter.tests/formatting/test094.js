@@ -55,7 +55,7 @@ function Mb(Ga, Nb) {
 	var base, ha, Ob, Pb;
 	switch ((Ga & 7) | ((Ga >> 3) & 0x18)) {
 		case 0x04:
-			Ob = ((Ua = Za[Hb >>> 12]) == -1) ? Jb(Hb) : Ra[Hb ^ Ua];
+			Ob =((Ua = Za[Hb >>> 12]) == -1) ? Jb(Hb) : Ra[Hb ^ Ua];
 			Hb++; ;
 			base = Ob & 7;
 			if (base == 5)
@@ -74,9 +74,9 @@ function Mb(Ga, Nb) {
 			}
 			break;
 		case 0x0c:
-			Ob = ((Ua = Za[Hb >>> 12]) == -1) ? Jb(Hb) : Ra[Hb ^ Ua];
+			Ob =((Ua = Za[Hb >>> 12]) == -1) ? Jb(Hb) : Ra[Hb ^ Ua];
 			Hb++; ;
-			ha = ((((Ua = Za[Hb >>> 12]) == -1) ? Jb(Hb) : Ra[Hb ^ Ua]) << 24) >> 24;
+			ha =((((Ua = Za[Hb >>> 12]) == -1) ? Jb(Hb) : Ra[Hb ^ Ua]) << 24) >> 24;
 			Hb++; ;
 			base = Ob & 7;
 			ha = (ha + za[base]) & -1;
