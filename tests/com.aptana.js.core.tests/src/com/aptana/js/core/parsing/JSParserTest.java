@@ -787,6 +787,7 @@ public abstract class JSParserTest
 	@Test
 	public void testConstructConstruct() throws Exception
 	{
+		//FIXME: Graal Parser IR is returning a = new new Thing()() - it's building 2 CallNode's which shouldn't happen to avoid this issue
 		assertParseResult("a = new new Thing();" + EOL); //$NON-NLS-1$
 	}
 
@@ -1191,6 +1192,7 @@ public abstract class JSParserTest
 	@Test
 	public void testMissingPropertyValue() throws Exception
 	{
+		//FIXME I think we should fix this in Graal Parser, why it appends missing property value?
 		assertParseResult("var x = { t };", "var x = {t: t};" + EOL);
 		assertNoErrors();
 	}
@@ -1225,6 +1227,7 @@ public abstract class JSParserTest
 	@Test
 	public void testFunctionWithoutBody() throws Exception
 	{
+		//FIXME: Requires changes in parser recovery - need to insert LRBRACE and RBRACE tokens
 		assertParseResult("function abc(s1, s2, s3)", "function abc (s1, s2, s3) {}" + EOL);
 	}
 
@@ -1236,6 +1239,7 @@ public abstract class JSParserTest
 	@Test
 	public void testSwitchWithoutExpression() throws Exception
 	{
+		//FIXME: Need to implement recovery strategy - we need to add an identifier inside the PARENS. Example: switch (IDENT) {}
 		assertParseResult("switch () {}" + EOL);
 	}
 
@@ -1247,6 +1251,8 @@ public abstract class JSParserTest
 	@Test
 	public void testCaseWithPartialIdentifier() throws Exception
 	{
+		//FIXME: Requires changes in parser recovery - I think we should insert IDENT and COLON to recover the AST
+		//switch (id) {case Ti.IDENT:}
 		assertParseResult("switch (id) {case Ti.}", "switch (id) {case Ti.: }" + EOL);
 	}
 
@@ -1384,6 +1390,7 @@ public abstract class JSParserTest
 	@Test
 	public void testExportDefault() throws Exception
 	{
+		//FIXME AST: (x) => {Math.exp(x)} *default*
 		assertParseResult("export default (x) => Math.exp(x);" + EOL, "export default (x) => {Math.exp(x)};" + EOL);
 		assertNoErrors();
 	}
@@ -1399,6 +1406,8 @@ public abstract class JSParserTest
 	@Test
 	public void testImportBoundNames() throws Exception
 	{
+		//FIXME Graal AST has two different import entity objects - can we club together if they are from the same source module?
+		//[ImportEntry [moduleRequest=lib/math, importName=sum, localName=sum], ImportEntry [moduleRequest=lib/math, importName=pi, localName=pi]]
 		assertParseResult("import { sum, pi } from 'lib/math';" + EOL, "import {sum, pi} from 'lib/math'" + EOL);
 		assertNoErrors();
 	}
@@ -1434,6 +1443,7 @@ public abstract class JSParserTest
 	@Test
 	public void testFunctionParameterObjectDestructuringWithAliases() throws Exception
 	{
+		//FIXME function g = function g(arguments[0]);
 		assertParseResult("function g ({name: n, val: v}) {console.log(n, v);}" + EOL);
 		assertNoErrors();
 	}
@@ -1448,6 +1458,9 @@ public abstract class JSParserTest
 	@Test
 	public void testArrayDestructuringAssignment() throws Exception
 	{
+		//FIXME var a, b [a, null, b] = list; 
+		//Graal IR has different interpretation for var array declaration. 
+		//<Var Node> <Var Node> <Expression Statement>
 		assertParseResult("var [ a, , b ] = list;" + EOL, "var [a, null, b] = list;" + EOL);
 		assertNoErrors();
 	}
@@ -1767,7 +1780,7 @@ public abstract class JSParserTest
 		assertNoErrors();
 	}
 
-	@Test @Ignore ("wil fix this later")
+	@Test
 	public void testJaxerFiles() throws Exception
 	{
 		for (String file : ITestFiles.JAXER_FILES)

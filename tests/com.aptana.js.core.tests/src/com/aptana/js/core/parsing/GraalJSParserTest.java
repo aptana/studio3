@@ -20,7 +20,6 @@ public class GraalJSParserTest extends JSParserTest
 	@Override
 	protected String unexpectedToken(String token)
 	{
-		// TODO token-generated method stub
 		return token;
 	}
 

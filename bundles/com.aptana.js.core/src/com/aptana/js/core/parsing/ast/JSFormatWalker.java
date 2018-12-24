@@ -833,6 +833,11 @@ public class JSFormatWalker extends JSTreeWalker
 			this.formatNode(node.getValue());
 			this.addSemicolon(node);
 		}
+		else
+		{
+			this.formatNode(node.getValue());
+			this.addSemicolon(node);
+		}
 	}
 
 	@Override
