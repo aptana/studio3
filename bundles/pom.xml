@@ -102,14 +102,4 @@
     <module>org.json.simple</module>
     <module>org.w3c.css</module>
   </modules>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-maven-plugin</artifactId>
-        <version>1.0.0</version>
-        <extensions>true</extensions>
-      </plugin>
-    </plugins>
-  </build>
 </project>
