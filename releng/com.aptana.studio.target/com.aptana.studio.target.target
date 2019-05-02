@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="com.aptana.studio.target" sequenceNumber="25">
-<locations>
-<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
-<unit id="com.fasterxml.jackson.core.jackson-annotations" version="2.9.2.v20180207-1730"/>
-<unit id="com.fasterxml.jackson.core.jackson-core" version="2.9.2.v20180207-1730"/>
-<unit id="com.fasterxml.jackson.core.jackson-databind" version="2.9.2.v20180207-1730"/>
-<unit id="org.apache.commons.lang3" version="3.1.0.v201403281430"/>
-<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20180905201904/repository"/>
-</location>
-<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
-<unit id="org.eclipse.platform.ide" version="4.9.0.I20180906-0745"/>
-<unit id="org.eclipse.rcp.feature.group" version="4.9.0.v20180906-1121"/>
-<unit id="org.eclipse.test.feature.group" version="3.7.400.v20180822-0818"/>
-<repository location="http://download.eclipse.org/eclipse/updates/4.9/R-4.9-201809060745/"/>
-</location>
-</locations>
-<targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+<?pde version="3.8"?>
+<target name="com.aptana.studio.target" sequenceNumber="25">
+	<locations>
+		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
+			<unit id="com.fasterxml.jackson.core.jackson-annotations" version="2.9.2.v20180207-1730"/>
+			<unit id="com.fasterxml.jackson.core.jackson-core" version="2.9.2.v20180207-1730"/>
+			<unit id="com.fasterxml.jackson.core.jackson-databind" version="2.9.2.v20180207-1730"/>
+			<unit id="org.apache.commons.lang3" version="3.1.0.v201403281430"/>
+			<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20180905201904/repository"/>
+		</location>
+		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
+			<unit id="org.eclipse.platform.ide" version="4.10.0.I20181206-0815"/>
+			<unit id="org.eclipse.rcp.feature.group" version="4.10.0.v20181206-0815"/>
+			<repository location="http://download.eclipse.org/releases/2018-12/"/>
+		</location>
+		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
+			<unit id="org.eclipse.test.feature.group" version="3.7.400.v20180822-0818"/>
+			<repository location="http://download.eclipse.org/eclipse/updates/4.9/R-4.9-201809060745/"/>
+		</location>
+	</locations>
+	<targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 </target>
