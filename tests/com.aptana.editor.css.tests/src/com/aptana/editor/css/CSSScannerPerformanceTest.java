@@ -27,7 +27,7 @@ public class CSSScannerPerformanceTest extends GlobalTimePerformanceTestCase
 	private CSSScanner fScanner;
 
 	@Override
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		super.setUp();
 		fScanner = new CSSScanner();

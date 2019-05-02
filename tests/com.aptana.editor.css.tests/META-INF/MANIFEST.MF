@@ -12,8 +12,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.filesystem,
  org.eclipse.ui.ide,
  org.eclipse.test.performance;bundle-version="3.4.0",
- com.aptana.testing.libraries;bundle-version="1.0.0"
+ com.aptana.testing.libraries;bundle-version="1.0.0",
+ com.aptana.testing.utils;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: com.aptana.editor.css.tests
-Import-Package: com.aptana.core.tests,
- com.aptana.editor.common.tests

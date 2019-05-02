@@ -33,7 +33,7 @@ public class JSParserValidatorPerformanceTest extends GlobalTimePerformanceTestC
 	private TestProject project;
 
 	@Override
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		super.setUp();
 
