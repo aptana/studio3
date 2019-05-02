@@ -15,4 +15,3 @@ Export-Package: com.aptana.editor.html.core,
  com.aptana.editor.html.core.preferences,
  com.aptana.editor.html.parsing,
  com.aptana.editor.html.parsing.ast
-Eclipse-ExtensibleAPI: true

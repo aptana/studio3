@@ -15,4 +15,3 @@ Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.configurations,
  com.aptana.configurations.configurator,
  com.aptana.configurations.processor
-Eclipse-ExtensibleAPI: true

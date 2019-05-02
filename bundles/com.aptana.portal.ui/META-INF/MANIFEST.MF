@@ -35,4 +35,3 @@ Export-Package: com.aptana.portal.ui,
  com.aptana.portal.ui.internal.startpage;x-internal:=true,
  com.aptana.portal.ui.internal.startup;x-internal:=true,
  com.aptana.portal.ui.propertyTesters
-Eclipse-ExtensibleAPI: true

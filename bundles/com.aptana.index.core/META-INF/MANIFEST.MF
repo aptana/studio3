@@ -16,4 +16,3 @@ Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.index.core,
  com.aptana.index.core.build,
  com.aptana.index.core.filter
-Eclipse-ExtensibleAPI: true

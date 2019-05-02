@@ -13,4 +13,3 @@ Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.json.core,
  com.aptana.json.core.parsing,
  com.aptana.json.core.parsing.ast
-Eclipse-ExtensibleAPI: true

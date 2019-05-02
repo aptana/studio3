@@ -50,5 +50,4 @@ Export-Package: com.aptana.editor.common,
  com.aptana.editor.common.text.rules,
  com.aptana.editor.common.util,
  com.aptana.editor.common.viewer
-Eclipse-ExtensibleAPI: true
 Bundle-ClassPath: .
