@@ -11,6 +11,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.junit;bundle-version="4.8.0",
  org.eclipse.test.performance,
  org.eclipse.jface,
- com.aptana.testing.libraries;bundle-version="1.0.0"
+ com.aptana.testing.libraries;bundle-version="1.0.0",
+ com.aptana.testing.utils;bundle-version="1.0.0"
 Export-Package: com.aptana.scripting.tests
-Import-Package: com.aptana.core.tests
