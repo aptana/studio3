@@ -26,4 +26,3 @@ Bundle-Localization: plugin
 Export-Package: com.aptana.explorer,
  com.aptana.explorer.navigator.actions,
  com.aptana.explorer.ui.filter
-Eclipse-ExtensibleAPI: true

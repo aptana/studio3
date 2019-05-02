@@ -17,4 +17,3 @@ Export-Package: com.aptana.xml.core,
  com.aptana.xml.core.model,
  com.aptana.xml.core.parsing,
  com.aptana.xml.core.parsing.ast
-Eclipse-ExtensibleAPI: true

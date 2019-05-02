@@ -22,5 +22,4 @@ Export-Package: com.aptana.json,
  org.jaxen
 Bundle-ClassPath: libs/jaxen-1.1.2.jar,
  .
-Eclipse-ExtensibleAPI: true
 Eclipse-BundleShape: dir

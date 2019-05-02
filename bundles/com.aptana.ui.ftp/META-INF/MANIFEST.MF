@@ -22,4 +22,3 @@ Export-Package: com.aptana.ui.ftp.actions,
  com.aptana.ui.ftp.dialogs,
  com.aptana.ui.ftp.internal;x-friends:="com.aptana.ui.secureftp",
  com.aptana.ui.ftp.preferences
-Eclipse-ExtensibleAPI: true

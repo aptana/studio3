@@ -36,4 +36,3 @@ Export-Package: com.aptana.ide.syncing.ui,
  com.aptana.ide.syncing.ui.preferences,
  com.aptana.ide.syncing.ui.properties,
  com.aptana.ide.syncing.ui.views
-Eclipse-ExtensibleAPI: true

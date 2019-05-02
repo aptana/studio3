@@ -19,4 +19,3 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.css.formatter
-Eclipse-ExtensibleAPI: true
