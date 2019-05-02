@@ -21,7 +21,6 @@ import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.IDocument;
 import org.junit.Test;
 
-import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategyTest;
 import com.aptana.editor.js.JSSourceConfiguration;
 
 /**
@@ -29,8 +28,25 @@ import com.aptana.editor.js.JSSourceConfiguration;
  * 
  * @author Ingo Muschenetz
  */
-public class JSAutoIndentStrategyTest extends RubyRegexpAutoIndentStrategyTest
+public class JSAutoIndentStrategyTest
 {
+	protected DocumentCommand createNewlineCommand(int offset)
+	{
+		return createTextCommand(offset, "\n");
+	}
+
+	protected DocumentCommand createTextCommand(int offset, String text)
+	{
+		DocumentCommand command = new DocumentCommand()
+		{
+		};
+		command.text = text;
+		command.offset = offset;
+		command.caretOffset = offset;
+		command.doit = true;
+		return command;
+	}
+
 	@Test
 	public void testIsComment()
 	{

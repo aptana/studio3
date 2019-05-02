@@ -11,5 +11,3 @@ Require-Bundle: org.junit,
  com.aptana.testing.utils;bundle-version="1.0.0",
  com.aptana.testing.libraries;bundle-version="1.0.0"
 Export-Package: com.aptana.css.core.tests
-Import-Package: com.aptana.buildpath.core.tests,
- com.aptana.core.tests

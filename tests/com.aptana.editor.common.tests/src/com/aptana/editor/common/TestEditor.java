@@ -1,4 +1,4 @@
-package com.aptana.editor.common.tests;
+package com.aptana.editor.common;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 

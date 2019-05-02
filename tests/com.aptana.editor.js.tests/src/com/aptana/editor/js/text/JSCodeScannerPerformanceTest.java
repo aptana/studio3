@@ -32,7 +32,7 @@ public class JSCodeScannerPerformanceTest extends GlobalTimePerformanceTestCase
 	private ITokenScanner fScanner;
 
 	@Override
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		super.setUp();
 

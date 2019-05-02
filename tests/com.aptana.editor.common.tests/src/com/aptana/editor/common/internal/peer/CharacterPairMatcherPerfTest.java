@@ -32,7 +32,7 @@ public class CharacterPairMatcherPerfTest extends GlobalTimePerformanceTestCase
 	private ICharacterPairMatcher matcher;
 
 	@Override
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		matcher = new CharacterPairMatcher(pairs);
 		super.setUp();

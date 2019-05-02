@@ -7,5 +7,5 @@ Bundle-Vendor: %providerName
 Fragment-Host: com.aptana.core.io
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.junit,
- com.aptana.testing.mocks;bundle-version="1.0.0"
-Export-Package: com.aptana.core.io.tests
+ com.aptana.testing.mocks;bundle-version="1.0.0",
+ com.aptana.testing.utils;bundle-version="1.0.0"
