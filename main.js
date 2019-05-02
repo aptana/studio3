@@ -10,6 +10,16 @@ async function main() {
 	const xml = fs.readFileSync(targetPath, 'utf8');
 	const json = parser.toJson(xml, { object: true });
 	const locations = json.target.locations.location;
+	// Add plugins/features useful for Eclipse development
+	locations.unshift({
+		repository: {
+			location: 'http://repo1.maven.org/maven2/.m2e/connectors/m2eclipse-tycho/0.8.1/N/0.8.1.201704211436/'
+		},
+		unit: {
+			id: 'org.sonatype.tycho.m2e.feature.feature.group',
+			version: '0.8.1.201704211436'
+		}
+	});
 	// MUST RUN SERIALLY!
 	for (const l of locations) {
 		await installUnits(l);
