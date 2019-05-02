@@ -11,8 +11,3 @@ Require-Bundle: org.junit;bundle-version="4.8.0",
  org.eclipse.test.performance;bundle-version="3.4.0",
  com.aptana.testing.utils;bundle-version="1.0.0",
  com.aptana.testing.libraries;bundle-version="1.0.0"
-Export-Package: com.aptana.editor.common.formatting,
- com.aptana.editor.common.tests,
- com.aptana.editor.common.tests.util,
- com.aptana.editor.epl.tests
-Import-Package: com.aptana.core.tests

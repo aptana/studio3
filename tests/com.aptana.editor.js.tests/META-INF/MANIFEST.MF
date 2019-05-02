@@ -20,5 +20,3 @@ Require-Bundle: org.eclipse.core.runtime,
  com.oracle.js.parser;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: com.aptana.editor.js.tests
-Import-Package: com.aptana.core.tests,
- com.aptana.editor.common.tests

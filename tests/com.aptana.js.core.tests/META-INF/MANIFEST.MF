@@ -12,5 +12,3 @@ Require-Bundle: org.junit,
  com.aptana.testing.mocks,
  com.aptana.testing.utils;bundle-version="1.0.0"
 Export-Package: com.aptana.js.core.tests
-Import-Package: com.aptana.core.tests,
- com.aptana.buildpath.core.tests

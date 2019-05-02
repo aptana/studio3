@@ -10,7 +10,7 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="com.aptana.editor.common.tests.TestEditor"
+            class="com.aptana.editor.common.TestEditor"
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
             extensions="test"
