@@ -27,4 +27,3 @@ Export-Package: com.aptana.core,
  com.aptana.core.util,
  com.aptana.core.util.replace,
  com.aptana.plist
-Eclipse-ExtensibleAPI: true

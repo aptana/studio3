@@ -14,7 +14,6 @@ Require-Bundle: com.aptana.core;bundle-version="3.0.0",
  com.aptana.ui;bundle-version="3.0.0",
  com.aptana.js.debug.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Eclipse-ExtensibleAPI: true
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.formatter,
  com.aptana.formatter.epl,

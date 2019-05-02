@@ -9,4 +9,3 @@ Require-Bundle: org.eclipse.core.filesystem,
  com.aptana.core
 Bundle-Activator: com.aptana.filesystem.http.HttpFilesystemPlugin
 Bundle-ActivationPolicy: lazy
-Eclipse-ExtensibleAPI: true

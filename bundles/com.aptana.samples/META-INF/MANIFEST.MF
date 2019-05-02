@@ -14,4 +14,3 @@ Export-Package: com.aptana.samples,
  com.aptana.samples.handlers,
  com.aptana.samples.model
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Eclipse-ExtensibleAPI: true

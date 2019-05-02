@@ -18,5 +18,4 @@ Bundle-Localization: plugin
 Export-Package: com.aptana.git.core,
  com.aptana.git.core.github,
  com.aptana.git.core.model
-Eclipse-ExtensibleAPI: true
 Eclipse-BundleShape: dir

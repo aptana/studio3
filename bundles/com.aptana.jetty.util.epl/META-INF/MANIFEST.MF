@@ -13,4 +13,3 @@ Export-Package: com.aptana.jetty.util.epl,
  com.aptana.jetty.util.epl.ajax
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
-Eclipse-ExtensibleAPI: true

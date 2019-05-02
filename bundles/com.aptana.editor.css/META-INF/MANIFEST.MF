@@ -23,4 +23,3 @@ Export-Package: com.aptana.editor.css,
  com.aptana.editor.css.outline,
  com.aptana.editor.css.parsing,
  com.aptana.editor.css.text
-Eclipse-ExtensibleAPI: true

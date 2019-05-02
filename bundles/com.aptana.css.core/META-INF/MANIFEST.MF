@@ -20,5 +20,4 @@ Export-Package: com.aptana.css.core,
  com.aptana.css.core.parsing,
  com.aptana.css.core.parsing.ast,
  com.aptana.css.core.preferences
-Eclipse-ExtensibleAPI: true
 Eclipse-RegisterBuddy: org.w3c.css
