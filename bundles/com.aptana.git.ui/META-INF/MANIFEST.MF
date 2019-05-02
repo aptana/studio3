@@ -26,4 +26,3 @@ Bundle-Localization: plugin
 Export-Package: com.aptana.git.ui,
  com.aptana.git.ui.actions,
  com.aptana.git.ui.dialogs
-Eclipse-ExtensibleAPI: true

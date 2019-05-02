@@ -23,4 +23,3 @@ Export-Package: com.aptana.samples.ui.portal.actionController,
  com.aptana.samples.ui.project,
  com.aptana.samples.ui.views
 Bundle-ActivationPolicy: lazy
-Eclipse-ExtensibleAPI: true

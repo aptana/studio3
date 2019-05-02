@@ -16,4 +16,3 @@ Eclipse-LazyStart: true
 Export-Package: com.aptana.filesystem.ftp,
  com.aptana.filesystem.ftp.internal;x-friends:="com.aptana.filesystem.secureftp",
  com.aptana.filesystem.ftp.preferences
-Eclipse-ExtensibleAPI: true

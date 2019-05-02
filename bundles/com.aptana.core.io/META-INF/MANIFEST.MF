@@ -21,4 +21,3 @@ Export-Package: com.aptana.core.io.efs,
  com.aptana.ide.core.io.downloader,
  com.aptana.ide.core.io.events,
  com.aptana.ide.core.io.preferences
-Eclipse-ExtensibleAPI: true

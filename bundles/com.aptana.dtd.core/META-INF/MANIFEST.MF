@@ -14,4 +14,3 @@ Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.dtd.core,
  com.aptana.dtd.core.parsing,
  com.aptana.dtd.core.parsing.ast
-Eclipse-ExtensibleAPI: true

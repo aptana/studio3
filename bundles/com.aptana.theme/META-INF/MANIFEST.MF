@@ -28,4 +28,3 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.theme,
  com.aptana.theme.preferences
-Eclipse-ExtensibleAPI: true

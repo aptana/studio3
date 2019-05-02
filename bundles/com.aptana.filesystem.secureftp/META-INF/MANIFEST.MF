@@ -17,4 +17,3 @@ Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
 Bundle-Localization: plugin
 Export-Package: com.aptana.filesystem.secureftp
-Eclipse-ExtensibleAPI: true

@@ -18,4 +18,3 @@ Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
 Export-Package: com.aptana.console,
  com.aptana.console.process
-Eclipse-ExtensibleAPI: true

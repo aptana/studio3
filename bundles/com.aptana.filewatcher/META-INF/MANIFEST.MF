@@ -13,4 +13,3 @@ Export-Package: com.aptana.filewatcher,
  net.contentobjects.jnotify
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: com.aptana.filewatcher.FileWatcherPlugin
-Eclipse-ExtensibleAPI: true

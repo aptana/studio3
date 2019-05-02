@@ -12,4 +12,3 @@ Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.deploy,
  com.aptana.deploy.preferences,
  com.aptana.deploy.util
-Eclipse-ExtensibleAPI: true

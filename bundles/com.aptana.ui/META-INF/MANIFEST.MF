@@ -31,4 +31,3 @@ Export-Package: com.aptana.ui,
  com.aptana.ui.preferences,
  com.aptana.ui.util,
  com.aptana.ui.widgets
-Eclipse-ExtensibleAPI: true
