@@ -15,4 +15,3 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
 Export-Package: com.aptana.ui.io.epl
-Eclipse-ExtensibleAPI: true

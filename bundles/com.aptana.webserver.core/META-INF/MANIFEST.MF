@@ -26,4 +26,3 @@ Import-Package: org.apache.http;version="4.2.2",
  org.apache.http.nio.reactor;version="4.2.2",
  org.apache.http.params;version="4.2.2",
  org.apache.http.protocol;version="4.2.2"
-Eclipse-ExtensibleAPI: true

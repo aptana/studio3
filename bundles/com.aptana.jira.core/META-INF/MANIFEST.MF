@@ -11,7 +11,6 @@ Require-Bundle: org.eclipse.equinox.security,
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.jira.core
-Eclipse-ExtensibleAPI: true
 Bundle-ClassPath: .
 Import-Package: org.apache.http;version="4.0.0",
  org.apache.http.auth;version="4.0.0",

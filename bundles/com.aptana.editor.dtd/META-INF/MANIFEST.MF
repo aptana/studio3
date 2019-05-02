@@ -21,4 +21,3 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.editor.dtd,
  com.aptana.editor.dtd.text.rules;x-friends:="com.aptana.editor.xml"
-Eclipse-ExtensibleAPI: true

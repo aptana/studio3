@@ -15,4 +15,3 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.deploy.ui,
  com.aptana.deploy.ui.wizard
-Eclipse-ExtensibleAPI: true

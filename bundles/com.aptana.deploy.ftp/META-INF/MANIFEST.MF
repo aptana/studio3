@@ -23,4 +23,3 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.syncing.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Eclipse-ExtensibleAPI: true

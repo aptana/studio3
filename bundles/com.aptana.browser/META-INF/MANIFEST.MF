@@ -13,4 +13,3 @@ Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.browser,
  com.aptana.browser.parts,
  com.aptana.browser.support
-Eclipse-ExtensibleAPI: true

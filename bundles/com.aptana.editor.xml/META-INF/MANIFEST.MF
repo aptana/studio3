@@ -23,4 +23,3 @@ Export-Package: com.aptana.editor.xml,
  com.aptana.editor.xml.text.rules
 Bundle-Activator: com.aptana.editor.xml.XMLPlugin
 Bundle-ActivationPolicy: lazy
-Eclipse-ExtensibleAPI: true
