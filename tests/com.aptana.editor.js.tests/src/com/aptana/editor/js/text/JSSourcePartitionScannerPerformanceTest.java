@@ -36,7 +36,7 @@ public class JSSourcePartitionScannerPerformanceTest extends GlobalTimePerforman
 	private IPartitioningConfiguration configuration;
 
 	@Override
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		super.setUp();
 

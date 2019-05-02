@@ -30,7 +30,7 @@ public abstract class GlobalTimePerformanceTestCase extends PerformanceTestCase
 		super(name);
 	}
 
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		super.setUp();
 		tagAsGlobalSummary(Performance.getDefault().getDefaultScenarioId(this), Dimension.ELAPSED_PROCESS);

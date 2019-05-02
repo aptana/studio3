@@ -26,7 +26,7 @@ public class XMLParserScannerPerformanceTest extends GlobalTimePerformanceTestCa
 	private XMLScanner fScanner;
 
 	@Override
-	protected void setUp() throws Exception
+	public void setUp() throws Exception
 	{
 		super.setUp();
 		fScanner = new XMLScanner();

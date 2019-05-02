@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.aptana.editor.common.tests.SingleEditorTestCase;
+import com.aptana.editor.common.scripting.SingleEditorTestCase;
 
 public class TextEditorUtilsTest extends SingleEditorTestCase
 {

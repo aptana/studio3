@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
-import com.aptana.editor.common.tests.SingleEditorTestCase;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
