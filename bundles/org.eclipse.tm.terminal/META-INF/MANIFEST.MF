@@ -11,8 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text;bundle-version="3.0.0"
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
-Bundle-RequiredExecutionEnvironment: J2SE-1.4,
- CDC-1.1/Foundation-1.1
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: .
 Export-Package: org.eclipse.tm.internal.terminal.connector;x-friends:="org.eclipse.tm.terminal.test",
  org.eclipse.tm.internal.terminal.control;x-friends:="com.aptana.terminal",
