@@ -16,9 +16,9 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.ListCrossProduct;
 import com.aptana.js.core.model.PropertyElement;
 import com.aptana.js.core.model.UserAgentElement;
+import com.aptana.testing.utils.ListCrossProduct;
 
 /**
  * JSUserAgentCachingTests

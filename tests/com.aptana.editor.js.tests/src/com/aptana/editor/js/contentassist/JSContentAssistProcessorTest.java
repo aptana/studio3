@@ -27,7 +27,7 @@ import org.junit.Test;
 import com.aptana.buildpath.core.BuildPathManager;
 import com.aptana.buildpath.core.IBuildPathEntry;
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.editor.common.EditorContentAssistBasedTests;
+import com.aptana.editor.common.tests.EditorContentAssistBasedTests;
 import com.aptana.editor.common.tests.TextViewer;
 import com.aptana.editor.js.tests.JSEditorBasedTestCase;
 import com.aptana.index.core.FileStoreBuildContext;

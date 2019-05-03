@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.common;
+package com.aptana.editor.common.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -26,6 +26,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.ui.IEditorInput;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.ui.util.UIUtils;
 
 public abstract class EditorContentAssistBasedTests<T extends CommonContentAssistProcessor> extends EditorBasedTests

@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.osgi.framework.Bundle;
 
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.EditorBasedTests;
+import com.aptana.editor.common.tests.EditorBasedTests;
 import com.aptana.ui.util.UIUtils;
 
 /**

@@ -20,8 +20,8 @@ import beaver.Scanner.Exception;
 import beaver.Symbol;
 
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.ListCrossProduct;
 import com.aptana.core.util.StringUtil;
+import com.aptana.testing.utils.ListCrossProduct;
 
 public class JSFlexScannerTest
 {

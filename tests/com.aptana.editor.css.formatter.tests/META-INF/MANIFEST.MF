@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.aptana.editor.css.formatter.tests
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: %providerName
 Fragment-Host: com.aptana.editor.css.formatter;bundle-version="3.0.0"
-Require-Bundle: org.junit
+Require-Bundle: org.junit,
+ com.aptana.testing.utils
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: com.aptana.editor.css.formatter.tests;uses:="com.aptana.editor.common.formatting,junit.framework"
-Import-Package: com.aptana.editor.common.formatting

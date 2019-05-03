@@ -16,7 +16,7 @@ import org.osgi.framework.Bundle;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.FileUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.EditorBasedTests;
+import com.aptana.editor.common.tests.EditorBasedTests;
 import com.aptana.scripting.model.CommandElement;
 
 public class ExpandSnippetVerifyKeyListenerTest extends EditorBasedTests
