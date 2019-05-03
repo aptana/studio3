@@ -20,6 +20,7 @@ import com.aptana.core.util.ListCrossProduct;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.tests.ITestFiles;
+import com.aptana.testing.utils.ListCrossProduct;
 
 import beaver.Scanner.Exception;
 import beaver.Symbol;
