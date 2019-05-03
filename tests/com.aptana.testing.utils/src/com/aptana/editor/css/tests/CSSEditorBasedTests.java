@@ -11,7 +11,7 @@ import org.osgi.framework.Bundle;
 
 import com.aptana.css.core.index.CSSFileIndexingParticipant;
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.EditorContentAssistBasedTests;
+import com.aptana.editor.common.tests.EditorContentAssistBasedTests;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
 import com.aptana.index.core.IFileStoreIndexingParticipant;

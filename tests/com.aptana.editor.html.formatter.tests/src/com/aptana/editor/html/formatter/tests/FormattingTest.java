@@ -7,7 +7,7 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.aptana.editor.common.formatting.AbstractFormatterTestCase;
+import com.aptana.editor.common.formatting.tests.AbstractFormatterTestCase;
 import com.aptana.editor.html.HTMLPlugin;
 
 public class FormattingTest extends AbstractFormatterTestCase

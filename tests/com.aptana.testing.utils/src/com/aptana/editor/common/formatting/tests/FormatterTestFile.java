@@ -1,4 +1,4 @@
-package com.aptana.editor.common.formatting;
+package com.aptana.editor.common.formatting.tests;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

@@ -10,7 +10,7 @@ package com.aptana.editor.js.tests;
 import org.osgi.framework.Bundle;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.EditorContentAssistBasedTests;
+import com.aptana.editor.common.tests.EditorContentAssistBasedTests;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
 

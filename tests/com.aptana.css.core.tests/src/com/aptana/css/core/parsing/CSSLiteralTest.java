@@ -13,8 +13,8 @@ import java.util.Random;
 import org.junit.Test;
 
 import com.aptana.core.util.CollectionsUtil;
-import com.aptana.core.util.ListCrossProduct;
 import com.aptana.core.util.StringUtil;
+import com.aptana.testing.utils.ListCrossProduct;
 
 public class CSSLiteralTest extends CSSTokensTest
 {

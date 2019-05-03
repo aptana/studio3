@@ -1,4 +1,4 @@
-package com.aptana.editor.common.formatting;
+package com.aptana.editor.common.formatting.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
