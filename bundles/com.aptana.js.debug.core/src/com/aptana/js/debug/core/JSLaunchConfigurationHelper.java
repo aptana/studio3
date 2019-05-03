@@ -242,13 +242,13 @@ public final class JSLaunchConfigurationHelper
 				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,
 						IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false, scopes));
 		configuration.setAttribute(
-				ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS,
+				ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS,
 				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,
-						IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS, false, scopes));
+						IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS, false, scopes));
 		configuration.setAttribute(
-				ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS,
+				ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS,
 				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,
-						IJSDebugPreferenceNames.SUSPEND_ON_ERRORS, false, scopes));
+						IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS, false, scopes));
 		configuration.setAttribute(
 				ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS,
 				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,
@@ -335,11 +335,11 @@ public final class JSLaunchConfigurationHelper
 			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE, Boolean
 					.toString(configuration.getAttribute(
 							ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE, false)));
-			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS, Boolean
+			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS, Boolean
 					.toString(configuration.getAttribute(
-							ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS, false)));
-			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS, Boolean
-					.toString(configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS,
+							ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS, false)));
+			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS, Boolean
+					.toString(configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS,
 							false)));
 			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS, Boolean
 					.toString(configuration.getAttribute(
@@ -353,13 +353,13 @@ public final class JSLaunchConfigurationHelper
 					Boolean.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,
 							IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false, scopes)));
 			launch.setAttribute(
-					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS,
+					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS,
 					Boolean.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,
-							IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS, false, scopes)));
+							IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS, false, scopes)));
 			launch.setAttribute(
-					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS,
+					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS,
 					Boolean.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,
-							IJSDebugPreferenceNames.SUSPEND_ON_ERRORS, false, scopes)));
+							IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS, false, scopes)));
 			launch.setAttribute(
 					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS,
 					Boolean.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID,

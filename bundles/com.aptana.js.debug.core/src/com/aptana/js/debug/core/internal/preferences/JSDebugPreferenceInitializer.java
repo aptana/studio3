@@ -27,8 +27,8 @@ public class JSDebugPreferenceInitializer extends AbstractPreferenceInitializer 
 
 		// default preferences
 		node.putBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false);
-		node.putBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS, true);
-		node.putBoolean(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS, false);
+		node.putBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS, false);
+		node.putBoolean(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS, false);
 		node.putBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, true);
 	}
 }
