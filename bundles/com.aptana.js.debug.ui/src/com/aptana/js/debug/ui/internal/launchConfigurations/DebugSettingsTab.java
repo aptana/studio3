@@ -43,8 +43,8 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab
 
 	private Button overridePrefs;
 	private Button suspendOnFirstLine;
-	private Button suspendOnExceptions;
-	private Button suspendOnErrors;
+	private Button suspendOnAllExceptions;
+	private Button suspendOnUncaughtExceptions;
 	private Button suspendOnDebuggerKeyword;
 
 	private ILaunchConfiguration launchConfiguration;
@@ -72,10 +72,10 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab
 		// Check boxes
 		suspendOnFirstLine = new Button(suspendOptionsGroup, SWT.CHECK);
 		suspendOnFirstLine.setText(Messages.DebugSettingsTab_SuspendAtStart);
-		suspendOnExceptions = new Button(suspendOptionsGroup, SWT.CHECK);
-		suspendOnExceptions.setText(Messages.DebugSettingsTab_SuspendOnExceptions);
-		suspendOnErrors = new Button(suspendOptionsGroup, SWT.CHECK);
-		suspendOnErrors.setText(Messages.DebugSettingsTab_SuspendOnErrors);
+		suspendOnAllExceptions = new Button(suspendOptionsGroup, SWT.CHECK);
+		suspendOnAllExceptions.setText(com.aptana.js.debug.ui.internal.preferences.Messages.JSDebugPreferencePage_SuspendOnAllExceptions);
+		suspendOnUncaughtExceptions = new Button(suspendOptionsGroup, SWT.CHECK);
+		suspendOnUncaughtExceptions.setText(com.aptana.js.debug.ui.internal.preferences.Messages.JSDebugPreferencePage_SuspendOnUncaughtExceptions);
 		suspendOnDebuggerKeyword = new Button(suspendOptionsGroup, SWT.CHECK);
 		suspendOnDebuggerKeyword.setText(Messages.DebugSettingsTab_SuspendOnDebuggerKeyword);
 
@@ -97,8 +97,8 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab
 			}
 		});
 		suspendOnFirstLine.addListener(SWT.Selection, dirtyListener);
-		suspendOnExceptions.addListener(SWT.Selection, dirtyListener);
-		suspendOnErrors.addListener(SWT.Selection, dirtyListener);
+		suspendOnAllExceptions.addListener(SWT.Selection, dirtyListener);
+		suspendOnUncaughtExceptions.addListener(SWT.Selection, dirtyListener);
 		suspendOnDebuggerKeyword.addListener(SWT.Selection, dirtyListener);
 
 		setControl(composite);
@@ -108,8 +108,8 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab
 	{
 		boolean enableOverride = overridePrefs.getSelection();
 		suspendOnFirstLine.setEnabled(enableOverride);
-		suspendOnExceptions.setEnabled(enableOverride);
-		suspendOnErrors.setEnabled(enableOverride);
+		suspendOnAllExceptions.setEnabled(enableOverride);
+		suspendOnUncaughtExceptions.setEnabled(enableOverride);
 		suspendOnDebuggerKeyword.setEnabled(enableOverride);
 		try
 		{
@@ -134,8 +134,8 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab
 		{
 			IPreferenceStore preferences = (IPreferenceStore) object;
 			suspendOnFirstLine.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE));
-			suspendOnExceptions.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS));
-			suspendOnErrors.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS));
+			suspendOnAllExceptions.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS));
+			suspendOnUncaughtExceptions.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS));
 			suspendOnDebuggerKeyword.setSelection(preferences
 					.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD));
 		}
@@ -144,10 +144,10 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab
 			ILaunchConfiguration configuration = (ILaunchConfiguration) object;
 			suspendOnFirstLine.setSelection(configuration.getAttribute(
 					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE, false));
-			suspendOnExceptions.setSelection(configuration.getAttribute(
-					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS, false));
-			suspendOnErrors.setSelection(configuration.getAttribute(
-					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS, false));
+			suspendOnAllExceptions.setSelection(configuration.getAttribute(
+					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS, false));
+			suspendOnUncaughtExceptions.setSelection(configuration.getAttribute(
+					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS, false));
 			suspendOnDebuggerKeyword.setSelection(configuration.getAttribute(
 					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS, false));
 		}
@@ -194,10 +194,10 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab
 		{
 			configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE,
 					suspendOnFirstLine.getSelection());
-			configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS,
-					suspendOnExceptions.getSelection());
-			configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS,
-					suspendOnErrors.getSelection());
+			configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS,
+					suspendOnAllExceptions.getSelection());
+			configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS,
+					suspendOnUncaughtExceptions.getSelection());
 			configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS,
 					suspendOnDebuggerKeyword.getSelection());
 		}

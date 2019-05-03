@@ -28,12 +28,12 @@ public interface IJSDebugPreferenceNames {
 	/**
 	 * suspend on errors preference key
 	 */
-	String SUSPEND_ON_ERRORS = PREFIX + ".suspend_on_errors"; //$NON-NLS-1$
+	String SUSPEND_ON_UNCAUGHT_EXCEPTIONS = PREFIX + ".suspend_on_uncaught_exceptions"; //$NON-NLS-1$
 
 	/**
 	 * suspend on exceptions preference key
 	 */
-	String SUSPEND_ON_EXCEPTIONS = PREFIX + ".suspend_on_exceptions"; //$NON-NLS-1$
+	String SUSPEND_ON_ALL_EXCEPTIONS = PREFIX + ".suspend_on_all_exceptions"; //$NON-NLS-1$
 
 	/**
 	 * suspend on "debugger" keyword preference key

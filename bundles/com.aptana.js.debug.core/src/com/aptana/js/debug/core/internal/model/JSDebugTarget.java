@@ -1213,11 +1213,11 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		{
 			setOption(SUSPEND_ON_FIRST_LINE, Boolean.toString(boolValue));
 		}
-		else if (ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS.equals(key))
+		else if (ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS.equals(key))
 		{
 			setOption(SUSPEND_ON_EXCEPTIONS, Boolean.toString(boolValue));
 		}
-		else if (ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS.equals(key))
+		else if (ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS.equals(key))
 		{
 			setOption(SUSPEND_ON_ERRORS, Boolean.toString(boolValue));
 		}
@@ -1304,8 +1304,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			}
 
 			handleAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE);
-			handleAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS);
-			handleAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS);
+			handleAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS);
+			handleAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS);
 			handleAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS);
 
 			setOption(BYPASS_CONSTRUCTORS, Boolean.toString(isFilterConstructors()));
