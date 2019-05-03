@@ -114,11 +114,11 @@ public class JSDebugTargetTest
 				will(returnValue(Boolean.TRUE.toString()));
 				oneOf(connection).sendCommandAndWait("option*suspendOnFirstLine*true");
 
-				oneOf(launch).getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS);
+				oneOf(launch).getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS);
 				will(returnValue(Boolean.TRUE.toString()));
 				oneOf(connection).sendCommandAndWait("option*suspendOnExceptions*true");
 
-				oneOf(launch).getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS);
+				oneOf(launch).getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS);
 				will(returnValue(Boolean.TRUE.toString()));
 				oneOf(connection).sendCommandAndWait("option*suspendOnErrors*true");
 
