@@ -256,6 +256,9 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 							e.getTargetException()));
 				}
 
+				// Exit the flow, if project doesn't exist.
+				if (!newProject.exists())
+					return;
 				// Allow the project contributors to do work
 				ProjectWizardContributionManager projectWizardContributionManager = ProjectsPlugin.getDefault()
 						.getProjectWizardContributionManager();
@@ -263,20 +266,30 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 						subMonitor.newChild(1));
 				if (contributorStatus != null && !contributorStatus.isOK())
 				{
+					final String[] message = new String[1];
+					message[0] = contributorStatus.getMessage();
+					final boolean isUserAccError = isCLISessionInvalid(message[0]);
 					// FIXME This UI code shouldn't be here, throw an exception up and handle it!
 					// Show the error. Should we cancel project creation?
 					UIUtils.getDisplay().syncExec(new Runnable()
 					{
 						public void run()
 						{
+							if (isUserAccError)
+							{
+								message[0] = Messages.AbstractNewProjectWizard_ProjectListenerSessionExpired;
+								// Delete Project
+								deleteProject();
+							}
 							MessageDialog.openError(UIUtils.getActiveWorkbenchWindow().getShell(),
-									Messages.AbstractNewProjectWizard_ProjectListenerErrorTitle,
-									contributorStatus.getMessage());
+									Messages.AbstractNewProjectWizard_ProjectListenerErrorTitle, message[0]);
 						}
 					});
 				}
 
-				// Perform post project hooks
+				// Perform post project hooks, if created project still exists
+				if (!newProject.exists())
+					return;
 
 				IStudioProjectListener[] projectListeners = new IStudioProjectListener[0];
 				IProjectDescription description = newProject.getDescription();
@@ -449,6 +462,8 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	}
 
 	protected abstract String getProjectCreateEventName();
+	
+	protected abstract boolean isCLISessionInvalid(String errorMessage);
 
 	protected void sendProjectCreateEvent()
 	{
@@ -742,6 +757,21 @@ public abstract class AbstractNewProjectWizard extends BasicNewResourceWizard im
 	protected IPath getDestinationPath()
 	{
 		return destPath;
+	}
+
+	private void deleteProject()
+	{
+		if(newProject.exists())
+		{
+			try
+			{
+				newProject.delete(true, null);
+			}
+			catch (CoreException e)
+			{
+				IdeLog.logTrace(ProjectsPlugin.getDefault(), "Failed to delete Project", e, "Delete Project"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
 	}
 
 	/**
