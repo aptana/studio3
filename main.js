@@ -1,10 +1,10 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const spawn = require('child_process').spawn;
 
 const eclipsePath = '/Applications/Eclipse.app';
 
-async function main() {
+async function installEclipseDependencies() {
 	const targetPath = path.join(__dirname, 'releng/com.aptana.studio.target/com.aptana.studio.target.target');
 	const parser = require('xml2json');
 	const xml = fs.readFileSync(targetPath, 'utf8');
@@ -50,10 +50,43 @@ async function installUnits(location) {
 	});
 }
 
-main().then(() => {
+/**
+ * Updates the .project name to match the directory name it's within for all bundles, tests, features
+ */
+async function setProjectNames() {
+	const dirs = [ 'bundles', 'features', 'tests' ];
+	return Promise.all(dirs.map(async d => {
+		const subdir = path.join(__dirname, d);
+		const projects = await fs.readdir(subdir);
+		return Promise.all(projects.map(projectDir => updateDotProjectName(subdir, projectDir)));
+	}));
+}
+
+async function updateDotProjectName(bundlesDir, dir) {
+	if (dir.startsWith('.')) {
+		return;
+	}
+
+	const dirPath = path.join(bundlesDir, dir);
+	if (!(await fs.stat(dirPath)).isDirectory()) {
+		return;
+	}
+
+	const dotProject = path.join(dirPath, '.project');
+	const contents = await fs.readFile(dotProject, 'utf8');
+	return fs.writeFile(dotProject, contents.replace(/name>.+?<\/name>/, `name>${dir}</name>`), 'utf8');
+}
+
+async function main() {
+	await setProjectNames();
+	console.log('Updated .project names');
+	await installEclipseDependencies();
 	console.log('Installed target plugins/features into Eclipse');
-	process.exit(0);
-}).catch(err => {
+}
+
+main()
+.then(() => process.exit(0))
+.catch(err => {
 	console.error(err);
 	process.exit(1);
 });
