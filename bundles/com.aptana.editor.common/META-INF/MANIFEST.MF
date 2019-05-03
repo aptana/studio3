@@ -6,7 +6,7 @@ Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.editor.common.CommonEditorPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.jruby,
- com.aptana.core;bundle-version="3.0.4",
+ com.aptana.core;bundle-version="[3.0.4,4.0.0)",
  com.aptana.buildpath.core;visibility:=reexport,
  com.aptana.scripting,
  org.eclipse.ui.editors;visibility:=reexport,
