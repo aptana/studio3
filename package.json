@@ -1,7 +1,9 @@
 {
 	"name": "studio3",
 	"version": "1.0.0",
-	"dependencies": {
+	"dependencies": {},
+	"devDependencies": {
+		"fs-extra": "^7.0.1",
 		"xml2json": "^0.11.2"
 	}
 }
