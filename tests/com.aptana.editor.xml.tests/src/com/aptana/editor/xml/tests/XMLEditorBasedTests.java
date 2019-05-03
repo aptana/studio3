@@ -11,7 +11,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.osgi.framework.Bundle;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.EditorContentAssistBasedTests;
+import com.aptana.editor.common.tests.EditorContentAssistBasedTests;
 import com.aptana.editor.xml.XMLPlugin;
 import com.aptana.editor.xml.contentassist.XMLContentAssistProcessor;
 import com.aptana.index.core.IFileStoreIndexingParticipant;

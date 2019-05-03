@@ -18,9 +18,9 @@ import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 import org.junit.After;
 import org.junit.Test;
 
-import com.aptana.editor.common.AbstractPartitionTestCase;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
+import com.aptana.editor.common.tests.AbstractPartitionTestCase;
 
 public class CSSSourcePartitionScannerFlexTest extends AbstractPartitionTestCase
 {

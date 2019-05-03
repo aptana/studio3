@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.aptana.editor.common.formatting.AbstractFormatterTestCase;
+import com.aptana.editor.common.formatting.tests.AbstractFormatterTestCase;
 import com.aptana.editor.css.formatter.CSSFormatterFactory;
 
 public class FormattingTest extends AbstractFormatterTestCase

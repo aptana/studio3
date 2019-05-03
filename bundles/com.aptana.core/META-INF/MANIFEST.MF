@@ -13,8 +13,8 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  com.aptana.libraries,
  com.ibm.icu,
  org.eclipse.debug.core,
- com.fasterxml.jackson.core.jackson-databind;bundle-version="2.5.0";visibility:=reexport,
- com.fasterxml.jackson.core.jackson-core;bundle-version="2.5.0";visibility:=reexport
+ com.fasterxml.jackson.core.jackson-databind;bundle-version="[2.5.0,3.0.0)";visibility:=reexport,
+ com.fasterxml.jackson.core.jackson-core;bundle-version="[2.5.0,3.0.0)";visibility:=reexport
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.core,

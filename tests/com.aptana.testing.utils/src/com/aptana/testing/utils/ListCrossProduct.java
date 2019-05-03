@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.core.util;
+package com.aptana.testing.utils;
 
 import java.util.ArrayList;
 import java.util.Iterator;

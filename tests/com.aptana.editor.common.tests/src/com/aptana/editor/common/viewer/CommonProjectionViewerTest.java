@@ -25,9 +25,9 @@ import org.osgi.framework.Bundle;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
-import com.aptana.editor.common.EditorBasedTests;
 import com.aptana.editor.common.ICommonConstants;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.tests.EditorBasedTests;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 
 public class CommonProjectionViewerTest extends EditorBasedTests
