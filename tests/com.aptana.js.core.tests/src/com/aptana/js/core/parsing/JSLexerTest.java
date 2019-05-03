@@ -16,7 +16,6 @@ import org.junit.Test;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.IOUtil;
-import com.aptana.core.util.ListCrossProduct;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.tests.ITestFiles;
