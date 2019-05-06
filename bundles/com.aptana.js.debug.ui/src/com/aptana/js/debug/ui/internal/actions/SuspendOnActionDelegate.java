@@ -15,6 +15,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 
+import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.model.IJSDebugTarget;
 
 /**
@@ -65,6 +66,12 @@ public class SuspendOnActionDelegate implements IViewActionDelegate {
 
 	private String getActionOption(IAction action) {
 		String id = action.getId();
+		if ("com.aptana.js.debug.ui.actions.suspendOnExceptions".equals(id)) {
+			return ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS;
+		}
+		if ("com.aptana.js.debug.ui.actions.suspendOnErrors".equals(id)) {
+			return ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS;
+		}
 		int index = id.lastIndexOf('.');
 		if (index > 0) {
 			id = id.substring(index + 1);
