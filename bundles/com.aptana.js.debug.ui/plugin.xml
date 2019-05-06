@@ -805,5 +805,47 @@
             processType="javascript">
       </consoleColorProvider>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.js.debug.ui.internal.actions.SuspendOnAllExceptionsHandler"
+            id="com.aptana.js.debug.ui.suspendOnAllExceptions"
+            name="%suspendOnExceptions.label">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.js.debug.ui.internal.actions.SuspendOnUncaughtExceptionsHandler"
+            id="com.aptana.js.debug.ui.suspendOnUncaughtExceptions"
+            name="%suspendOnErrors.label">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.debug.ui.BreakpointView?before=additions">
+         <command
+               commandId="com.aptana.js.debug.ui.suspendOnAllExceptions"
+               disabledIcon="icons/full/dlcl16/suspend_onexception.gif"
+               icon="icons/full/elcl16/suspend_onexception.gif"
+               style="toggle">
+         </command>
+         <command
+               commandId="com.aptana.js.debug.ui.suspendOnUncaughtExceptions"
+               disabledIcon="icons/full/dlcl16/suspend_onerror.gif"
+               icon="icons/full/elcl16/suspend_onerror.gif"
+               style="toggle">
+         </command>
+      </menuContribution>
+   </extension>
 
 </plugin>
