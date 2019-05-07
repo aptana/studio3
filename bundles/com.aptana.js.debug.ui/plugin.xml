@@ -98,42 +98,6 @@
                menubarPath="debug"/>
       </viewerContribution>
      <viewerContribution
-           id="com.aptana.js.debug.ui.debugViewerContribution"
-           targetID="org.eclipse.debug.ui.DebugView">
-        <action
-              class="com.aptana.js.debug.ui.internal.actions.SuspendOnActionDelegate"
-              enablesFor="1"
-              icon="icons/full/elcl16/suspend_ondebugger.gif"
-              id="com.aptana.js.debug.ui.actions.suspendOnDebuggerKeywords"
-              label="%suspendOnDebuggerKeywords.label"
-              menubarPath="additions"
-              state="false"
-              style="toggle"/>
-        <action
-              class="com.aptana.js.debug.ui.internal.actions.SuspendOnActionDelegate"
-              enablesFor="1"
-              icon="icons/full/elcl16/suspend_onerror.gif"
-              id="com.aptana.js.debug.ui.actions.suspendOnErrors"
-              label="%suspendOnErrors.label"
-              menubarPath="additions"
-              state="false"
-              style="toggle"/>
-        <action
-              class="com.aptana.js.debug.ui.internal.actions.SuspendOnActionDelegate"
-              enablesFor="1"
-              icon="icons/full/elcl16/suspend_onexception.gif"
-              id="com.aptana.js.debug.ui.actions.suspendOnExceptions"
-              label="%suspendOnExceptions.label"
-              menubarPath="additions"
-              state="false"
-              style="toggle"/>
-        <visibility>
-           <systemProperty
-                 name="com.aptana.js.debug.core.debuggerActive"
-                 value="true"/>
-        </visibility>
-     </viewerContribution>
-     <viewerContribution
            id="com.aptana.js.debug.ui.ContextPopupActions"
            targetID="com.aptana.editor.html">
          <action

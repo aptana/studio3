@@ -10,9 +10,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.handlers.RegistryToggleState;
 
-import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSDebugPlugin;
-import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.js.debug.core.preferences.IJSDebugPreferenceNames;
 
 public class SuspendOnUncaughtExceptionsHandler extends AbstractSuspendHandler
@@ -24,18 +22,7 @@ public class SuspendOnUncaughtExceptionsHandler extends AbstractSuspendHandler
 	{
 		Command command = event.getCommand();
 		HandlerUtil.toggleCommandState(command);
-		IEvaluationContext evaluationContext = (IEvaluationContext) event.getApplicationContext();
-		IJSDebugTarget jsDebugTarget = getDebugTarget(evaluationContext);
-		// Try toggling on current debug target....
-		if (jsDebugTarget != null)
-		{
-			boolean current = Boolean.valueOf(jsDebugTarget
-					.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS));
-			jsDebugTarget.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS,
-					Boolean.toString(!current));
-			return !current;
-		}
-		// If we couldn't, toggle in preferences
+		// toggle in preferences
 		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(JSDebugPlugin.PLUGIN_ID);
 		boolean current = prefs.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS, false);
 		prefs.putBoolean(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS, !current);
@@ -52,11 +39,8 @@ public class SuspendOnUncaughtExceptionsHandler extends AbstractSuspendHandler
 		if (evaluationContext instanceof IEvaluationContext)
 		{
 			IEvaluationContext context = (IEvaluationContext) evaluationContext;
-			allExceptionsEnabled = getDebugTargetAttributeOrPreference(context,
-					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS,
-					IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS);
-			uncaughtExceptionsEnabled = getDebugTargetAttributeOrPreference(context,
-					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS,
+			allExceptionsEnabled = getPreferenceValue(context, IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS);
+			uncaughtExceptionsEnabled = getPreferenceValue(context,
 					IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS);
 
 			// set toggle value to match boolean value

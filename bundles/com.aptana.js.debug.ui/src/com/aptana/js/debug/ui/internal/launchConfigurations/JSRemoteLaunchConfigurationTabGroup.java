@@ -27,7 +27,7 @@ public class JSRemoteLaunchConfigurationTabGroup extends AbstractLaunchConfigura
 		ILaunchConfigurationTab[] tabs;
 		if (ILaunchManager.DEBUG_MODE.equals(mode)) {
 			tabs = new ILaunchConfigurationTab[] { new LaunchServerSettingsTab(), new HttpSettingsTab(),
-					new DebugSettingsTab(), new CommonTab() };
+					new CommonTab() };
 		} else {
 			tabs = new ILaunchConfigurationTab[] { new LaunchServerSettingsTab(), new HttpSettingsTab(),
 					new AdvancedSettingsTab(), new CommonTab() };

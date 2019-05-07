@@ -40,6 +40,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -92,12 +96,13 @@ import com.aptana.js.debug.core.model.IJSScriptElement;
 import com.aptana.js.debug.core.model.JSDebugModel;
 import com.aptana.js.debug.core.model.provisional.IJSWatchpoint;
 import com.aptana.js.debug.core.model.xhr.IXHRService;
+import com.aptana.js.debug.core.preferences.IJSDebugPreferenceNames;
 
 /**
  * @author Max Stepanov
  */
-public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBreakpointManagerListener,
-		IDetailFormattersChangeListener
+public class JSDebugTarget extends JSDebugElement
+		implements IJSDebugTarget, IBreakpointManagerListener, IDetailFormattersChangeListener
 {
 
 	private static final String UPDATE = "update"; //$NON-NLS-1$
@@ -225,7 +230,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private int protocolVersion;
 	private ISourceMap sourceMap;
 
-	private Job updateContentJob = new Job("Debugger Content Update") { //$NON-NLS-1$
+	private Job updateContentJob = new Job("Debugger Content Update") //$NON-NLS-1$
+	{
 		{
 			setPriority(Job.INTERACTIVE);
 			EclipseUtil.setSystemForJob(this);
@@ -268,6 +274,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	};
 	private boolean debugMode;
 	private String mode;
+	private IPreferenceChangeListener fPreferenceChangeListener;
 
 	/**
 	 * JSDebugTarget
@@ -299,8 +306,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @param debugMode
 	 * @throws CoreException
 	 */
-	public JSDebugTarget(ILaunch launch, String label, IProcess process, IURIMapper uriMapper,
-			IJSConnection connection, String mode, boolean debugMode) throws CoreException
+	public JSDebugTarget(ILaunch launch, String label, IProcess process, IURIMapper uriMapper, IJSConnection connection,
+			String mode, boolean debugMode) throws CoreException
 	{
 		super(null);
 		this.launch = launch;
@@ -350,8 +357,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		ISourceMapRegistry sourceMapRegistry = getSourceMapRegistry();
 		try
 		{
-			String projectName = launch.getLaunchConfiguration().getAttribute(
-					ILaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
+			String projectName = launch.getLaunchConfiguration()
+					.getAttribute(ILaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
 			if (projectName != null)
 			{
 				IProject project = getWorkspaceRoot().getProject(projectName);
@@ -390,8 +397,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		}
 		try
 		{
-			IResource resource = getWorkspaceRoot()
-					.findMember(Path.fromOSString(generatedLocation.getPath()));
+			IResource resource = getWorkspaceRoot().findMember(Path.fromOSString(generatedLocation.getPath()));
 			return sourceMap.getOriginalMapping(resource, sourceLine);
 		}
 		catch (Exception e)
@@ -445,8 +451,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			{
 				public InputStream getContents(URI uri) throws CoreException
 				{
-					String[] args = connection.sendCommandAndWait(MessageFormat.format(GET_SOURCE_0,
-							Util.encodeData(uri.toString())));
+					String[] args = connection
+							.sendCommandAndWait(MessageFormat.format(GET_SOURCE_0, Util.encodeData(uri.toString())));
 					if (args != null && SUCCESS.equals(args[1]))
 					{
 						return new ByteArrayInputStream(Util.decodeData(args[2]).getBytes());
@@ -495,7 +501,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			}
 			text = sb.toString();
 		}
-		if (!text.endsWith("\n")) { //$NON-NLS-1$
+		if (!text.endsWith("\n")) //$NON-NLS-1$
+		{
 			text += "\n"; //$NON-NLS-1$
 		}
 		try
@@ -724,7 +731,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				}
 				String source = Util.decodeData(subargs[j++]);
 				if (source.length() == 0 || "[Eval-script]".equals(source) //$NON-NLS-1$
-						|| source.startsWith("javascript:")) { //$NON-NLS-1$ 
+						|| source.startsWith("javascript:")) //$NON-NLS-1$
+				{
 					continue;
 				}
 				URI fileName = resolveSourceFile(source);
@@ -938,6 +946,11 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			return;
 		}
 		connection.sendCommand(TERMINATE);
+		if (fPreferenceChangeListener != null)
+		{
+			getPreferences().removePreferenceChangeListener(fPreferenceChangeListener);
+			fPreferenceChangeListener = null;
+		}
 	}
 
 	/**
@@ -1189,42 +1202,6 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	public void setAttribute(String key, String value)
 	{
 		getLaunch().setAttribute(key, value);
-		try
-		{
-			handleAttribute(key);
-		}
-		catch (DebugException e)
-		{
-			JSDebugPlugin.log(e);
-		}
-	}
-
-	/**
-	 * handleAttribute
-	 * 
-	 * @param key
-	 * @throws DebugException
-	 */
-	private void handleAttribute(String key) throws DebugException
-	{
-		String value = getAttribute(key);
-		boolean boolValue = Boolean.valueOf(value).booleanValue();
-		if (ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE.equals(key))
-		{
-			setOption(SUSPEND_ON_FIRST_LINE, Boolean.toString(boolValue));
-		}
-		else if (ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS.equals(key))
-		{
-			setOption(SUSPEND_ON_EXCEPTIONS, Boolean.toString(boolValue));
-		}
-		else if (ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS.equals(key))
-		{
-			setOption(SUSPEND_ON_ERRORS, Boolean.toString(boolValue));
-		}
-		else if (ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS.equals(key))
-		{
-			setOption(SUSPEND_ON_KEYWORDS, Boolean.toString(boolValue));
-		}
 	}
 
 	/**
@@ -1250,8 +1227,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private void handleDetailFormattersChange() throws DebugException
 	{
 		StringBuffer sb = new StringBuffer(DETAIL_FORMATTERS);
-		for (DetailFormatter detailFormatter : getDebugOptionsManager()
-				.getDetailFormatters())
+		for (DetailFormatter detailFormatter : getDebugOptionsManager().getDetailFormatters())
 		{
 			if (!detailFormatter.isEnabled())
 			{
@@ -1303,10 +1279,55 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				fireChangeEvent(DebugEvent.CONTENT);
 			}
 
-			handleAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE);
-			handleAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS);
-			handleAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS);
-			handleAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS);
+			// react to preferences changes around suspend options
+			IEclipsePreferences prefs = getPreferences();
+			fPreferenceChangeListener = new IPreferenceChangeListener()
+			{
+
+				public void preferenceChange(PreferenceChangeEvent event)
+				{
+					String key = event.getKey();
+					String newValue = (String) event.getNewValue();
+					if (newValue == null)
+					{
+						newValue = Boolean.FALSE.toString();
+					}
+
+					try
+					{
+						if (key.equals(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE))
+						{
+							setOption(SUSPEND_ON_FIRST_LINE, newValue);
+						}
+						else if (key.equals(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS))
+						{
+							setOption(SUSPEND_ON_EXCEPTIONS, newValue);
+						}
+						else if (key.equals(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS))
+						{
+							setOption(SUSPEND_ON_ERRORS, newValue);
+						}
+						else if (key.equals(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD))
+						{
+							setOption(SUSPEND_ON_KEYWORDS, newValue);
+						}
+					}
+					catch (DebugException e)
+					{
+						// ignore
+					}
+				}
+			};
+			prefs.addPreferenceChangeListener(fPreferenceChangeListener);
+
+			setOption(SUSPEND_ON_FIRST_LINE,
+					Boolean.toString(prefs.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false)));
+			setOption(SUSPEND_ON_EXCEPTIONS,
+					Boolean.toString(prefs.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS, false)));
+			setOption(SUSPEND_ON_ERRORS,
+					Boolean.toString(prefs.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS, false)));
+			setOption(SUSPEND_ON_KEYWORDS,
+					Boolean.toString(prefs.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, false)));
 
 			setOption(BYPASS_CONSTRUCTORS, Boolean.toString(isFilterConstructors()));
 			setOption(STEP_FILTERS_ENABLED2, Boolean.toString(isStepFiltersEnabled()));
@@ -1325,8 +1346,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			if (ILaunchManager.DEBUG_MODE.equals(mode))
 			{
 				/* restore breakpoints */
-				for (IBreakpoint breakpoint : getBreakpointManager()
-						.getBreakpoints(getModelIdentifier()))
+				for (IBreakpoint breakpoint : getBreakpointManager().getBreakpoints(getModelIdentifier()))
 				{
 					breakpointAdded(breakpoint);
 				}
@@ -1338,6 +1358,11 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 
 			connection.sendCommandAndWait(ENABLE);
 		}
+	}
+
+	protected IEclipsePreferences getPreferences()
+	{
+		return InstanceScope.INSTANCE.getNode(JSDebugPlugin.PLUGIN_ID);
 	}
 
 	protected DebugOptionsManager getDebugOptionsManager()
@@ -1375,10 +1400,10 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		}
 		if ((protoVersion < PROTOCOL_VERSION_MIN) || (protoVersion > PROTOCOL_VERSION_MAX))
 		{
-			throwDebugException(MessageFormat.format(
-					"Incompatible debugger extension protocol version {0} for [{1},{2}]", //$NON-NLS-1$
-					Integer.toString(protoVersion), Integer.toString(PROTOCOL_VERSION_MIN),
-					Integer.toString(PROTOCOL_VERSION_MAX)));
+			throwDebugException(
+					MessageFormat.format("Incompatible debugger extension protocol version {0} for [{1},{2}]", //$NON-NLS-1$
+							Integer.toString(protoVersion), Integer.toString(PROTOCOL_VERSION_MIN),
+							Integer.toString(PROTOCOL_VERSION_MAX)));
 		}
 		protocolVersion = protoVersion;
 		if (checkUpdate)
@@ -1401,8 +1426,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 					{
 						try
 						{
-							if (Integer.parseInt(pluginVersion.substring(index + 1)) > Integer.parseInt(version
-									.substring(index + 1)))
+							if (Integer.parseInt(pluginVersion.substring(index + 1)) > Integer
+									.parseInt(version.substring(index + 1)))
 							{
 								update = true;
 							}
@@ -1547,8 +1572,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 */
 	public void breakpointManagerEnablementChanged(boolean enabled)
 	{
-		for (IBreakpoint breakpoint : getBreakpointManager()
-				.getBreakpoints(getModelIdentifier()))
+		for (IBreakpoint breakpoint : getBreakpointManager().getBreakpoints(getModelIdentifier()))
 		{
 			if (enabled)
 			{
@@ -1575,8 +1599,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			return new IVariable[0];
 		}
 		List<IVariable> list = new ArrayList<IVariable>();
-		String[] args = connection.sendCommandAndWait(MessageFormat.format(protocolVersion >= 2 ? VARIABLES_0_V2
-				: VARIABLES_0, threadId, Util.encodeData(qualifier)));
+		String[] args = connection.sendCommandAndWait(MessageFormat
+				.format(protocolVersion >= 2 ? VARIABLES_0_V2 : VARIABLES_0, threadId, Util.encodeData(qualifier)));
 		if (args != null)
 		{
 			for (int i = 1; i < args.length; ++i)
@@ -1863,9 +1887,10 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 					ISourceMapResult generatedMapping = getGeneratedMapping(resource, lineNumber);
 					if (generatedMapping != null)
 					{
-						IdeLog.logInfo(DebugCorePlugin.getDefault(), MessageFormat.format(
-								"Generated mapping while adding breakpoint for {0}:{1} is {2}:{3}", resource,
-								lineNumber, generatedMapping.getFile(), generatedMapping.getLineNumber()),
+						IdeLog.logInfo(DebugCorePlugin.getDefault(),
+								MessageFormat.format("Generated mapping while adding breakpoint for {0}:{1} is {2}:{3}",
+										resource, lineNumber, generatedMapping.getFile(),
+										generatedMapping.getLineNumber()),
 								com.aptana.debug.core.IDebugScopes.DEBUG);
 						IResource mappedResource = getWorkspaceRoot()
 								.findMember(resource.getProject().getFullPath().append(generatedMapping.getFile()));
@@ -1886,7 +1911,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			{
 				try
 				{
-					if ("dbgsource".equals(fileName.getScheme())) { //$NON-NLS-1$
+					if ("dbgsource".equals(fileName.getScheme())) //$NON-NLS-1$
+					{
 						uri = fileName;
 						// url = new URL(null, fileName.toString(), DbgSourceURLStreamHandler.getDefault());
 					}
@@ -1925,9 +1951,12 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			}
 			int hitCount = marker.getAttribute(IJSDebugConstants.BREAKPOINT_HIT_COUNT, 0);
 			boolean conditionEnabled = marker.getAttribute(IJSDebugConstants.BREAKPOINT_CONDITION_ENABLED, false);
-			String condition = conditionEnabled ? marker.getAttribute(IJSDebugConstants.BREAKPOINT_CONDITION,
-					StringUtil.EMPTY) : StringUtil.EMPTY;
-			String suspendOnTrue = marker.getAttribute(IJSDebugConstants.BREAKPOINT_CONDITION_SUSPEND_ON_TRUE, true) ? "1" : "0"; //$NON-NLS-1$ //$NON-NLS-2$
+			String condition = conditionEnabled
+					? marker.getAttribute(IJSDebugConstants.BREAKPOINT_CONDITION, StringUtil.EMPTY)
+					: StringUtil.EMPTY;
+			String suspendOnTrue = marker.getAttribute(IJSDebugConstants.BREAKPOINT_CONDITION_SUSPEND_ON_TRUE, true)
+					? "1" //$NON-NLS-1$
+					: "0"; //$NON-NLS-1$
 			properties = MessageFormat.format("*{0}*{1}*{2}*{3}", //$NON-NLS-1$
 					enabled ? "1" : "0", Integer.toString(hitCount), Util.encodeData(condition), suspendOnTrue); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -2004,8 +2033,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		enabled = !REMOVE.equals(operation);
 		try
 		{
-			String[] args = connection.sendCommandAndWait(MessageFormat.format(EXCEPTION_0_1, operation,
-					exceptionTypeName));
+			String[] args = connection
+					.sendCommandAndWait(MessageFormat.format(EXCEPTION_0_1, operation, exceptionTypeName));
 			if (enabled && (args == null || !(operation + 'd').equals(args[1])))
 			{
 				breakpoint.setEnabled(false);
@@ -2066,8 +2095,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		}
 		try
 		{
-			String[] args = connection.sendCommandAndWait(MessageFormat.format(WATCHPOINT_0_1_2, operation,
-					Util.encodeData(variableName), kind));
+			String[] args = connection.sendCommandAndWait(
+					MessageFormat.format(WATCHPOINT_0_1_2, operation, Util.encodeData(variableName), kind));
 			if (enabled && (args == null || args.length < 2 || !(operation + 'd').equals(args[1])))
 			{
 				watchpoint.setEnabled(false);
@@ -2089,8 +2118,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 */
 	protected IBreakpoint findBreakpointAt(URI fileName, int lineNumber)
 	{
-		IBreakpoint[] breakpoints = getBreakpointManager()
-				.getBreakpoints(getModelIdentifier());
+		IBreakpoint[] breakpoints = getBreakpointManager().getBreakpoints(getModelIdentifier());
 		IBreakpoint breakpoint = findBreakpointIn(fileName, lineNumber, breakpoints);
 		if (breakpoint != null)
 		{
@@ -2131,8 +2159,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 						}
 						else if (marker.getResource() instanceof IWorkspaceRoot)
 						{
-							URI breakpointURI = URI.create((String) marker
-									.getAttribute(IJSDebugConstants.BREAKPOINT_LOCATION));
+							URI breakpointURI = URI
+									.create((String) marker.getAttribute(IJSDebugConstants.BREAKPOINT_LOCATION));
 							fileMatched = /* new URI(Util.fixupURI( */fileName/* )) */.equals(breakpointURI);
 						}
 						else
