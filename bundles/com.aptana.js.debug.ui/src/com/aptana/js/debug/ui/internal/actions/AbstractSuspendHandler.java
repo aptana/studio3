@@ -3,8 +3,12 @@ package com.aptana.js.debug.ui.internal.actions;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
@@ -24,9 +28,24 @@ abstract class AbstractSuspendHandler extends AbstractHandler
 		{
 			IStructuredSelection structuredSelection = (IStructuredSelection) debugContext;
 			Object target = structuredSelection.getFirstElement();
+			if (target instanceof IAdaptable) {
+				IAdaptable adaptable = (IAdaptable) target;
+				target = adaptable.getAdapter(IDebugTarget.class);
+			}
 			if (target instanceof IJSDebugTarget)
 			{
 				return (IJSDebugTarget) target;
+			}
+		} else
+		{
+			ILaunchManager launchmanager = DebugPlugin.getDefault().getLaunchManager();
+			IDebugTarget[] targets = launchmanager.getDebugTargets();
+			if (targets.length == 1) {
+				IDebugTarget target = targets[0];
+				if (target instanceof IJSDebugTarget)
+				{
+					return (IJSDebugTarget) target;
+				}
 			}
 		}
 		return null;
