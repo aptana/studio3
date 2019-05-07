@@ -9,6 +9,8 @@ import static org.junit.Assert.fail;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.ILaunch;
@@ -35,6 +37,7 @@ import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.model.IJSConnection;
 import com.aptana.js.debug.core.model.IJSDebugConnectionHandler;
+import com.aptana.js.debug.core.preferences.IJSDebugPreferenceNames;
 
 public class JSDebugTargetTest
 {
@@ -53,6 +56,7 @@ public class JSDebugTargetTest
 	private IProject project;
 	private ISourceMap sourceMap;
 	private JSDebugThread thread;
+	private IEclipsePreferences prefs;
 
 	@Before
 	public void setUp() throws Exception
@@ -76,11 +80,15 @@ public class JSDebugTargetTest
 		project = context.mock(IProject.class);
 		sourceMap = context.mock(ISourceMap.class);
 		thread = context.mock(JSDebugThread.class);
+		prefs = context.mock(IEclipsePreferences.class);
 		context.checking(new Expectations()
 		{
 			{
 				allowing(launch).getLaunchConfiguration();
 				will(returnValue(launchConfig));
+
+				allowing(prefs).addPreferenceChangeListener(with(any(IPreferenceChangeListener.class)));
+				allowing(prefs).removePreferenceChangeListener(with(any(IPreferenceChangeListener.class)));
 
 				oneOf(launchConfig).getAttribute(ILaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
 				will(returnValue("projectName"));
@@ -110,19 +118,19 @@ public class JSDebugTargetTest
 
 				oneOf(connection).sendCommandAndWait("option*monitorXHR*true");
 
-				oneOf(launch).getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE);
+				oneOf(prefs).getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false);
 				will(returnValue(Boolean.TRUE.toString()));
 				oneOf(connection).sendCommandAndWait("option*suspendOnFirstLine*true");
 
-				oneOf(launch).getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS);
+				oneOf(prefs).getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS, false);
 				will(returnValue(Boolean.TRUE.toString()));
 				oneOf(connection).sendCommandAndWait("option*suspendOnExceptions*true");
 
-				oneOf(launch).getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS);
+				oneOf(prefs).getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS, false);
 				will(returnValue(Boolean.TRUE.toString()));
 				oneOf(connection).sendCommandAndWait("option*suspendOnErrors*true");
 
-				oneOf(launch).getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS);
+				oneOf(prefs).getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, false);
 				will(returnValue(Boolean.TRUE.toString()));
 				oneOf(connection).sendCommandAndWait("option*suspendOnKeywords*true");
 
@@ -177,6 +185,12 @@ public class JSDebugTargetTest
 			{
 				return thread;
 			}
+
+			@Override
+			protected IEclipsePreferences getPreferences()
+			{
+				return prefs;
+			}
 		};
 		test.become("fully-set-up");
 	}
@@ -190,6 +204,7 @@ public class JSDebugTargetTest
 		process = null;
 		uriMapper = null;
 		context = null;
+		prefs = null;
 	}
 
 	@Test
