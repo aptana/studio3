@@ -119,19 +119,19 @@ public class JSDebugTargetTest
 				oneOf(connection).sendCommandAndWait("option*monitorXHR*true");
 
 				oneOf(prefs).getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false);
-				will(returnValue(Boolean.TRUE.toString()));
+				will(returnValue(true));
 				oneOf(connection).sendCommandAndWait("option*suspendOnFirstLine*true");
 
 				oneOf(prefs).getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS, false);
-				will(returnValue(Boolean.TRUE.toString()));
+				will(returnValue(true));
 				oneOf(connection).sendCommandAndWait("option*suspendOnExceptions*true");
 
 				oneOf(prefs).getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS, false);
-				will(returnValue(Boolean.TRUE.toString()));
+				will(returnValue(true));
 				oneOf(connection).sendCommandAndWait("option*suspendOnErrors*true");
 
 				oneOf(prefs).getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, false);
-				will(returnValue(Boolean.TRUE.toString()));
+				will(returnValue(true));
 				oneOf(connection).sendCommandAndWait("option*suspendOnKeywords*true");
 
 				oneOf(connection).sendCommandAndWait("option*bypassConstructors*false");
@@ -609,45 +609,6 @@ public class JSDebugTargetTest
 			}
 		});
 		assertEquals("value", target.getAttribute("key"));
-		context.assertIsSatisfied();
-	}
-
-	@Test
-	public void testSetAttribute() throws DebugException
-	{
-		context.checking(new Expectations()
-		{
-			{
-				oneOf(launch).setAttribute("key", "value");
-
-				oneOf(launch).getAttribute("key");
-				will(returnValue("value"));
-
-				never(connection).sendCommandAndWait("option*key*value");
-			}
-		});
-		target.setAttribute("key", "value");
-		context.assertIsSatisfied();
-	}
-
-	@Test
-	public void testSetAttributeWithSpecificAttributes() throws DebugException
-	{
-		context.checking(new Expectations()
-		{
-			{
-				oneOf(launch).setAttribute("suspendOnFirstLine", "false");
-
-				oneOf(launch).getAttribute("suspendOnFirstLine");
-				will(returnValue("false"));
-
-				oneOf(connection).isConnected();
-				will(returnValue(true));
-
-				oneOf(connection).sendCommandAndWait("option*suspendOnFirstLine*false");
-			}
-		});
-		target.setAttribute("suspendOnFirstLine", "false");
 		context.assertIsSatisfied();
 	}
 
