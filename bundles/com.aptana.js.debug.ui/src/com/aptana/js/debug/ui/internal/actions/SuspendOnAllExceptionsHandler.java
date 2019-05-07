@@ -13,9 +13,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.handlers.RegistryToggleState;
 import org.eclipse.ui.services.IEvaluationService;
 
-import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSDebugPlugin;
-import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.js.debug.core.preferences.IJSDebugPreferenceNames;
 
 public class SuspendOnAllExceptionsHandler extends AbstractSuspendHandler
@@ -28,17 +26,7 @@ public class SuspendOnAllExceptionsHandler extends AbstractSuspendHandler
 		Command command = event.getCommand();
 		HandlerUtil.toggleCommandState(command);
 		IEvaluationContext evaluationContext = (IEvaluationContext) event.getApplicationContext();
-		IJSDebugTarget jsDebugTarget = getDebugTarget(evaluationContext);
-		// Try toggling on current debug target....
-		if (jsDebugTarget != null)
-		{
-			boolean current = Boolean.valueOf(
-					jsDebugTarget.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS));
-			jsDebugTarget.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS,
-					Boolean.toString(!current));
-			return !current;
-		}
-		// If we couldn't, toggle in preferences
+		// toggle in preferences
 		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(JSDebugPlugin.PLUGIN_ID);
 		boolean current = prefs.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS, false);
 		prefs.putBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS, !current);
@@ -68,9 +56,7 @@ public class SuspendOnAllExceptionsHandler extends AbstractSuspendHandler
 		if (evaluationContext instanceof IEvaluationContext)
 		{
 			IEvaluationContext context = (IEvaluationContext) evaluationContext;
-			allExceptionsEnabled = getDebugTargetAttributeOrPreference(context,
-					ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS,
-					IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS);
+			allExceptionsEnabled = getPreferenceValue(context, IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS);
 
 			// set toggle value to match boolean value
 			Command command = getCommand(COMMAND_ID, context);

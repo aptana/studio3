@@ -174,8 +174,6 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 			}
 		}
 
-		JSLaunchConfigurationHelper.initializeLaunchAttributes(configuration, launch);
-
 		boolean debugCompatible = BrowserUtil.isBrowserDebugCompatible(browserExecutable);
 		boolean debugAvailable = false;
 		boolean advancedRun = configuration.getAttribute(
