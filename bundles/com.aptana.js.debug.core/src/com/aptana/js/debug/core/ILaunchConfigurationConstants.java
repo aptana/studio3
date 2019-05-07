@@ -39,13 +39,6 @@ public interface ILaunchConfigurationConstants
 	String CONFIGURATION_HTTP_POST_DATA = "httpPostData"; //$NON-NLS-1$
 	String CONFIGURATION_HTTP_POST_CONTENT_TYPE = "httpPostContentType"; //$NON-NLS-1$
 
-	String CONFIGURATION_OVERRIDE_DEBUG_PREFERENCES = "overrideDebugPreferences"; //$NON-NLS-1$
-
-	String CONFIGURATION_SUSPEND_ON_FIRST_LINE = "suspendOnFirstLine"; //$NON-NLS-1$
-	String CONFIGURATION_SUSPEND_ON_ALL_EXCEPTIONS = "suspendOnAllExceptions"; //$NON-NLS-1$
-	String CONFIGURATION_SUSPEND_ON_UNCAUGHT_EXCEPTIONS = "suspendOnUncaughtExceptions"; //$NON-NLS-1$
-	String CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS = "suspendOnDebuggerKeywords"; //$NON-NLS-1$
-
 	String CONFIGURATION_ADVANCED_RUN_ENABLED = "advancedRunEnabled"; //$NON-NLS-1$
 
 	int SERVER_INTERNAL = 1;
