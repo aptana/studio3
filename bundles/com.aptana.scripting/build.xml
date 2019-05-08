@@ -5,6 +5,9 @@
 	<property name="cache.generator.script" location="${scripting.plugin.dir}/bundles/studio3-sdk/tools/bundle_cache_generator/main.rb"/>
 	<property name="ruby.executable" value="ruby"/>
 	<property name="scs.branch.name" value="stable"/>
+	<condition property="isWindows">
+		<os family="windows" />
+	</condition>
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
@@ -18,18 +21,39 @@
 		or else the qualifier we insert into build.properties is ignored.  -->
 
 		<!-- Find latest commit date between this plugin and every bundle and use that as the build qualifier! -->
-		<exec executable="/bin/bash" dir="${scripting.plugin.dir}" append="true" output="${bundle.timestamps.file}">
-			<arg value="-c" />
-			<arg value="git log --max-count=1 --pretty=format:'%ct,' ." />
-		</exec>
+		<if>
+			<equals arg1="${isWindows}" arg2="true" />
+			<then>
+				<exec executable="cmd" dir="${scripting.plugin.dir}" append="true" output="${bundle.timestamps.file}">
+					<arg line="/c git log --max-count=1 --pretty=format:%ct, ." />
+				</exec>
+			</then>
+			<else>
+				<exec executable="/bin/bash" dir="${scripting.plugin.dir}" append="true" output="${bundle.timestamps.file}">
+					<arg value="-c" />
+					<arg value="git log --max-count=1 --pretty=format:'%ct,' ." />
+				</exec>
+			</else>
+		</if>
 
 		<!-- Pull down the cache pre-generation scripts -->
 		<delete dir="${scripting.plugin.dir}/bundles/studio3-sdk" failonerror="true" />
 		<echo message="git clone git://github.com/aptana/studio3-sdk.git" />
-		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles" failonerror="true">
-			<arg value="-c" />
-			<arg value="git clone git://github.com/aptana/studio3-sdk.git --depth 1" />
-		</exec>
+		<if>
+			<equals arg1="${isWindows}" arg2="true" />
+			<then>
+				<exec executable="cmd" dir="${scripting.plugin.dir}/bundles" failonerror="true">
+					<arg value="/c" />
+					<arg value="git clone https://github.com/aptana/studio3-sdk.git --depth 1" />
+				</exec>
+			</then>
+			<else>
+				<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles" failonerror="true">
+					<arg value="-c" />
+					<arg value="git clone git://github.com/aptana/studio3-sdk.git --depth 1" />
+				</exec>
+			</else>
+		</if>
 
 		<!-- TODO Checkout the correct branch of the generator scripts... -->
 
@@ -127,23 +151,58 @@
 	<target name="clone-bundle">
 		<delete dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}" failonerror="true" />
 		<echo message="git clone git://github.com/aptana/${bundle.name}.git ${bundle.dir.name}" level="info" />
-		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles" failonerror="true">
-			<arg value="-c" />
-			<arg value="git clone git://github.com/aptana/${bundle.name}.git --depth 1 ${bundle.dir.name} -b ${bundle.branch}" />
-		</exec>
+
+		<if>
+			<equals arg1="${isWindows}" arg2="true" />
+			<then>
+				<exec executable="cmd" dir="${scripting.plugin.dir}/bundles" failonerror="true">
+					<arg value="/c" />
+					<arg value="git clone git://github.com/aptana/${bundle.name}.git --depth 1 ${bundle.dir.name} -b ${bundle.branch}" />
+				</exec>
+			</then>
+			<else>
+				<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles" failonerror="true">
+					<arg value="-c" />
+					<arg value="git clone git://github.com/aptana/${bundle.name}.git --depth 1 ${bundle.dir.name} -b ${bundle.branch}" />
+				</exec>
+			</else>
+		</if>
+
 		<!-- Grab lastmod and append it to file containing all of the lastmods for each packaged ruble -->
-		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}" append="true" output="${bundle.timestamps.file}" failonerror="true">
-			<arg value="-c" />
-			<arg value="git log --max-count=1 --pretty=format:'%ct,' ." />
-		</exec>
+		<if>
+			<equals arg1="${isWindows}" arg2="true" />
+			<then>
+				<exec executable="cmd" dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}" append="true" output="${bundle.timestamps.file}" failonerror="true">
+					<arg value="/c" />
+					<arg value="git log --max-count=1 --pretty=format:%ct, ." />
+				</exec>
+			</then>
+			<else>
+				<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}" append="true" output="${bundle.timestamps.file}" failonerror="true">
+					<arg value="-c" />
+					<arg value="git log --max-count=1 --pretty=format:'%ct,' ." />
+				</exec>
+			</else>
+		</if>
 
 		<!-- Now remove the .git subdirectory -->
 		<delete dir="${scripting.plugin.dir}/bundles/${bundle.dir.name}/.git" quiet="true" />
 
 		<!-- Now pre-generate the cache files! -->
-		<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles/studio3-sdk/tools/bundle_cache_generator" failonerror="true">
-			<arg value="-c" />
-			<arg value="${ruby.executable} -KU ${cache.generator.script} ${scripting.plugin.dir}/bundles/${bundle.dir.name}" />
-		</exec>
+		<if>
+			<equals arg1="${isWindows}" arg2="true" />
+			<then>
+				<exec executable="cmd" dir="${scripting.plugin.dir}/bundles/studio3-sdk/tools/bundle_cache_generator" failonerror="true">
+					<arg value="/c" />
+					<arg value="${ruby.executable} -KU ${cache.generator.script} ${scripting.plugin.dir}/bundles/${bundle.dir.name}" />
+				</exec>
+			</then>
+			<else>
+				<exec executable="/bin/bash" dir="${scripting.plugin.dir}/bundles/studio3-sdk/tools/bundle_cache_generator" failonerror="true">
+					<arg value="-c" />
+					<arg value="${ruby.executable} -KU ${cache.generator.script} ${scripting.plugin.dir}/bundles/${bundle.dir.name}" />
+				</exec>
+			</else>
+		</if>
 	</target>
 </project>
