@@ -83,6 +83,13 @@ public class VersionUtilTest
 		assertVersion(2, 0, 0, VersionUtil.parseVersion("2.0"));
 		assertVersion(2, 10, 0, VersionUtil.parseVersion("2.10"));
 	}
+	
+	@Test
+	public void testParseVersionWithMajor()
+	{
+		assertVersion(10, 0, 0, VersionUtil.parseVersion("10"));
+		assertVersion(9, 0, 0, VersionUtil.parseVersion("9"));
+	}
 
 	@Test
 	public void testParseVersionWithMajorMinorQualifierWithNoSeparator()

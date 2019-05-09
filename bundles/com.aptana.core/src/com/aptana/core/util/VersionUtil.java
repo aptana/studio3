@@ -26,7 +26,7 @@ import com.aptana.core.logging.IdeLog;
 public final class VersionUtil
 {
 	// Match x.y and x.y.z
-	private static final String VERSION_SPLIT_PATTERN = "(\\d+)\\.(\\d+)(([a-zA-Z0-9_\\-]+)|(\\.(\\d+)(\\.?[a-zA-Z0-9_\\-]+)?))?"; //$NON-NLS-1$
+	private static final String VERSION_SPLIT_PATTERN = "(\\d+)(\\.(\\d+)(([a-zA-Z0-9_\\-]+)|(\\.(\\d+)(\\.?[a-zA-Z0-9_\\-]+)?))?)?"; //$NON-NLS-1$
 	/**
 	 * This pattern will help to match the patterns related to ">=24 <=20", or ">24", or "<=20" and helps to parse the
 	 * min or max version referenced in SDK configuration (package.json) files.
@@ -221,19 +221,22 @@ public final class VersionUtil
 		if (matcher.find())
 		{
 			String major = matcher.group(1);
-			String minor = matcher.group(2);
-			String micro;
+			String minor = matcher.group(3);
+			if (minor == null)
+			{
+				minor = "0"; //$NON-NLS-1$
+			}
+			String micro = "0"; //$NON-NLS-1$
 			String qualifier;
-			if (matcher.group(5) != null)
+			if (matcher.group(6) != null)
 			{
 				// We have 3 parts with an optional qualifier
-				micro = matcher.group(6);
-				qualifier = matcher.group(7);
+				micro = matcher.group(7);
+				qualifier = matcher.group(8);
 			}
 			else
 			{ // We have a major and minor with optional qualifier
-				qualifier = matcher.group(4);
-				micro = "0"; //$NON-NLS-1$
+				qualifier = matcher.group(5);
 			}
 			String version = major + '.' + minor + '.' + micro;
 			if (!StringUtil.isEmpty(qualifier))
