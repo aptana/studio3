@@ -60,8 +60,11 @@ public class SuspendOnAllExceptionsHandler extends AbstractSuspendHandler
 
 			// set toggle value to match boolean value
 			Command command = getCommand(COMMAND_ID, context);
-			State state = command.getState(RegistryToggleState.STATE_ID);
-			state.setValue(allExceptionsEnabled);
+			if (command != null)
+			{
+				State state = command.getState(RegistryToggleState.STATE_ID);
+				state.setValue(allExceptionsEnabled);
+			}
 		}
 		super.setEnabled(evaluationContext);
 	}

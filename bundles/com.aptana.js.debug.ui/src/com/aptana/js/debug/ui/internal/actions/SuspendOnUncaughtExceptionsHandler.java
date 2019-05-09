@@ -45,8 +45,11 @@ public class SuspendOnUncaughtExceptionsHandler extends AbstractSuspendHandler
 
 			// set toggle value to match boolean value
 			Command command = getCommand(COMMAND_ID, context);
-			State state = command.getState(RegistryToggleState.STATE_ID);
-			state.setValue(uncaughtExceptionsEnabled);
+			if (command != null)
+			{
+				State state = command.getState(RegistryToggleState.STATE_ID);
+				state.setValue(uncaughtExceptionsEnabled);
+			}
 		}
 
 		// disable this if all exceptions enabled
