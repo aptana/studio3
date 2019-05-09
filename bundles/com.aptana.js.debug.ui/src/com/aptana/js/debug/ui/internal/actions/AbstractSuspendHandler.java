@@ -16,12 +16,12 @@ abstract class AbstractSuspendHandler extends AbstractHandler
 
 	protected ICommandService getCommandService(IEvaluationContext context)
 	{
-		IWorkbenchSite site = (IWorkbenchSite) context.getVariable(ISources.ACTIVE_SITE_NAME);
-		if (site == null)
+		Object possibleSite = context.getVariable(ISources.ACTIVE_SITE_NAME);
+		if (!(possibleSite instanceof IWorkbenchSite))
 		{
 			return null;
 		}
-		return (ICommandService) site.getService(ICommandService.class);
+		return (ICommandService) ((IWorkbenchSite) possibleSite).getService(ICommandService.class);
 	}
 
 	protected Command getCommand(String id, IEvaluationContext context)
