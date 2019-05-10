@@ -1,4 +1,4 @@
-[![Build Status](https://jenkins.appcelerator.org/buildStatus/icon?job=aptana-studio/studio3/development)](https://jenkins.appcelerator.org/job/aptana-studio/job/studio3/job/development/)
+[![Build Status](https://jenkins.appcelerator.org/buildStatus/icon?job=aptana-studio/studio3/release)](https://jenkins.appcelerator.org/job/aptana-studio/job/studio3/job/release/)
 
 Aptana Studio 3 Core
 ========================
@@ -22,15 +22,16 @@ How to Contribute
 
 Setting up an Eclipse Development Environment
 ----------------------------------------------
- 2. [Download Eclipse](http://eclipse.org/downloads/)
- 3. Install the m2eclipse feature into eclipse from the update site: [https://www.eclipse.org/m2e/](https://www.eclipse.org/m2e/)
- 4. Then import the features, plugins, and test plugins into your workspace. _File > Import > Maven > Existing Maven Projects_. Select the directory this repo was cloned into.
- 5. Make your changes on your fork, then submit a Pull Request.
+ 2. [Download Eclipse 4.9 for RCP Developers](https://www.eclipse.org/downloads/packages/release/2018-09/r#node-52369) and install it
+ 3. Install npm packages for our dependency installer script: ```npm ci```
+ 4. Install the dependencies from the target platform into eclipse ```node main.js```
+ 5. Then import the features, plugins, and test plugins into your workspace. _File > Import > General > Existing Projects Into Workspace_. Select the directory this repo was cloned into.
+ 6. Make your changes on your fork, then submit a Pull Request.
 
 License
 -------
 
-    This program Copyright (c) 2005-2018 by Appcelerator, Inc. This program is distributed under the GNU General Public license. This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License, Version 3, as published by the Free Software Foundation.
+    This program Copyright (c) 2005-2019 by Appcelerator, Inc. This program is distributed under the GNU General Public license. This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License, Version 3, as published by the Free Software Foundation.
 
     Any modifications must keep this entire license intact.
 
