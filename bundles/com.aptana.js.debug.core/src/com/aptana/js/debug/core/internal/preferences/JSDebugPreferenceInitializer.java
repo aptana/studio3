@@ -17,18 +17,18 @@ import com.aptana.js.debug.core.preferences.IJSDebugPreferenceNames;
 /**
  * @author Max Stepanov
  */
-public class JSDebugPreferenceInitializer extends AbstractPreferenceInitializer {
+public class JSDebugPreferenceInitializer extends AbstractPreferenceInitializer
+{
 
 	/*
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
 	 */
-	public void initializeDefaultPreferences() {
+	public void initializeDefaultPreferences()
+	{
 		IEclipsePreferences node = DefaultScope.INSTANCE.getNode(JSDebugPlugin.PLUGIN_ID);
 
 		// default preferences
-		node.putBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false);
 		node.putBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS, false);
 		node.putBoolean(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS, false);
-		node.putBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, true);
 	}
 }

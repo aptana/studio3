@@ -37,16 +37,11 @@ import com.aptana.js.debug.ui.internal.IJSDebugUIConstants;
  */
 public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchPreferencePage
 {
-	private Button suspendOnFirstLine;
+
 	private Button suspendOnAllExceptions;
 	private Button suspendOnUncaughtExceptions;
-	private Button suspendOnDebuggerKeyword;
-
 	private Button confirmExitDebugger;
 
-	/**
-	 * 
-	 */
 	public JSDebugPreferencePage()
 	{
 		super();
@@ -70,8 +65,6 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 		debugGroup.setText(Messages.JSDebugPreferencePage_JavascriptDebugOptions);
 
 		// Check boxes
-		suspendOnFirstLine = new Button(debugGroup, SWT.CHECK);
-		suspendOnFirstLine.setText(Messages.JSDebugPreferencePage_SuspendAtStart);
 		suspendOnAllExceptions = new Button(debugGroup, SWT.CHECK);
 		suspendOnAllExceptions.setText(Messages.JSDebugPreferencePage_SuspendOnAllExceptions);
 		suspendOnAllExceptions.addSelectionListener(new SelectionAdapter()
@@ -85,8 +78,6 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 		});
 		suspendOnUncaughtExceptions = new Button(debugGroup, SWT.CHECK);
 		suspendOnUncaughtExceptions.setText(Messages.JSDebugPreferencePage_SuspendOnUncaughtExceptions);
-		suspendOnDebuggerKeyword = new Button(debugGroup, SWT.CHECK);
-		suspendOnDebuggerKeyword.setText(Messages.JSDebugPreferencePage_SuspendOnDebuggerKeyword);
 
 		confirmExitDebugger = new Button(composite, SWT.CHECK);
 		confirmExitDebugger.setText(Messages.JSDebugPreferencePage_ConfirmExitWhenDebuggerActive);
@@ -121,12 +112,10 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 
 	private void setInitialValues()
 	{
-		suspendOnFirstLine.setSelection(getPreferenceStore().getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE));
 		suspendOnUncaughtExceptions
 				.setSelection(getPreferenceStore().getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS));
-		suspendOnAllExceptions.setSelection(getPreferenceStore().getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS));
-		suspendOnDebuggerKeyword.setSelection(getPreferenceStore().getBoolean(
-				IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD));
+		suspendOnAllExceptions
+				.setSelection(getPreferenceStore().getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS));
 
 		IPreferenceStore uiStore = JSDebugUIPlugin.getDefault().getPreferenceStore();
 		if (!uiStore.contains(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER))
@@ -143,13 +132,10 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 
 	private void setDefaultValues()
 	{
-		suspendOnFirstLine.setSelection(getPreferenceStore().getDefaultBoolean(
-				IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE));
-		suspendOnUncaughtExceptions.setSelection(getPreferenceStore().getDefaultBoolean(
-				IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS));
-		suspendOnAllExceptions.setSelection(getPreferenceStore().getDefaultBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS));
-		suspendOnDebuggerKeyword.setSelection(getPreferenceStore().getDefaultBoolean(
-				IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD));
+		suspendOnUncaughtExceptions.setSelection(
+				getPreferenceStore().getDefaultBoolean(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS));
+		suspendOnAllExceptions.setSelection(
+				getPreferenceStore().getDefaultBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS));
 
 		IPreferenceStore uiStore = JSDebugUIPlugin.getDefault().getPreferenceStore();
 		confirmExitDebugger.setSelection(uiStore.getDefaultBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER));
@@ -157,12 +143,10 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 
 	private void setValues()
 	{
-		getPreferenceStore().setValue(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, suspendOnFirstLine.getSelection());
-		getPreferenceStore()
-				.setValue(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS, suspendOnUncaughtExceptions.getSelection());
-		getPreferenceStore().setValue(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS, suspendOnAllExceptions.getSelection());
-		getPreferenceStore().setValue(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD,
-				suspendOnDebuggerKeyword.getSelection());
+		getPreferenceStore().setValue(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS,
+				suspendOnUncaughtExceptions.getSelection());
+		getPreferenceStore().setValue(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS,
+				suspendOnAllExceptions.getSelection());
 
 		IPreferenceStore uiStore = JSDebugUIPlugin.getDefault().getPreferenceStore();
 		uiStore.setValue(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER, confirmExitDebugger.getSelection());

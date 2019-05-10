@@ -118,10 +118,6 @@ public class JSDebugTargetTest
 
 				oneOf(connection).sendCommandAndWait("option*monitorXHR*true");
 
-				oneOf(prefs).getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false);
-				will(returnValue(true));
-				oneOf(connection).sendCommandAndWait("option*suspendOnFirstLine*true");
-
 				oneOf(prefs).getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS, false);
 				will(returnValue(true));
 				oneOf(connection).sendCommandAndWait("option*suspendOnExceptions*true");
@@ -129,10 +125,6 @@ public class JSDebugTargetTest
 				oneOf(prefs).getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS, false);
 				will(returnValue(true));
 				oneOf(connection).sendCommandAndWait("option*suspendOnErrors*true");
-
-				oneOf(prefs).getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, false);
-				will(returnValue(true));
-				oneOf(connection).sendCommandAndWait("option*suspendOnKeywords*true");
 
 				oneOf(connection).sendCommandAndWait("option*bypassConstructors*false");
 				oneOf(connection).sendCommandAndWait("option*stepFiltersEnabled*false");
