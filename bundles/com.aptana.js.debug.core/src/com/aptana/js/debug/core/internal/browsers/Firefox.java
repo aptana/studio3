@@ -12,13 +12,11 @@ import java.io.File;
 /**
  * @author Max Stepanov
  */
-public final class Firefox {
+public final class Firefox
+{
 
-	public static final String NAME = "Firefox"; //$NON-NLS-1$
-	public static final String NEW_WINDOW = "-new-window"; //$NON-NLS-1$
-	public static final String NEW_TAB = "-new-tab"; //$NON-NLS-1$
-
-	private Firefox() {
+	private Firefox()
+	{
 	}
 
 	/**
@@ -27,9 +25,11 @@ public final class Firefox {
 	 * @param browserExecutable
 	 * @return boolean
 	 */
-	public static boolean isBrowserExecutable(String browserExecutable) {
+	public static boolean isBrowserExecutable(String browserExecutable)
+	{
 		String name = new File(browserExecutable).getName();
-		if (name.toLowerCase().indexOf("firefox") != -1) { //$NON-NLS-1$
+		if (name.toLowerCase().indexOf("firefox") != -1) //$NON-NLS-1$
+		{
 			return true;
 		}
 		return false;
