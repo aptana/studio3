@@ -21,11 +21,6 @@ public interface IJSDebugPreferenceNames {
 	String PREFIX = JSDebugPlugin.PLUGIN_ID;
 
 	/**
-	 * suspend on first line preference key
-	 */
-	String SUSPEND_ON_FIRST_LINE = PREFIX + ".suspend_on_first_line"; //$NON-NLS-1$
-
-	/**
 	 * suspend on errors preference key
 	 */
 	String SUSPEND_ON_UNCAUGHT_EXCEPTIONS = PREFIX + ".suspend_on_uncaught_exceptions"; //$NON-NLS-1$
@@ -34,11 +29,6 @@ public interface IJSDebugPreferenceNames {
 	 * suspend on exceptions preference key
 	 */
 	String SUSPEND_ON_ALL_EXCEPTIONS = PREFIX + ".suspend_on_all_exceptions"; //$NON-NLS-1$
-
-	/**
-	 * suspend on "debugger" keyword preference key
-	 */
-	String SUSPEND_ON_DEBUGGER_KEYWORD = PREFIX + ".suspend_on_debugger_keyword"; //$NON-NLS-1$
 
 	/**
 	 * List of defined detail formatters.A String containing a comma separated list of fully qualified type names, the

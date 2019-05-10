@@ -12,13 +12,16 @@ import org.eclipse.osgi.util.NLS;
 /**
  * @author Ingo Muschenetz
  */
-public final class Messages extends NLS {
+public final class Messages extends NLS
+{
 	private static final String BUNDLE_NAME = "com.aptana.js.debug.ui.internal.preferences.messages"; //$NON-NLS-1$
 
-	private Messages() {
+	private Messages()
+	{
 	}
 
-	static {
+	static
+	{
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
@@ -37,10 +40,9 @@ public final class Messages extends NLS {
 	public static String JSDetailFormattersPreferencePage_EditSelectedDetailFormatter;
 	public static String JSDetailFormattersPreferencePage_Remove;
 	public static String JSDetailFormattersPreferencePage_RemoveAllSelectedDetailFormatters;
+
 	public static String JSDebugPreferencePage_JavascriptDebugOptions;
-	public static String JSDebugPreferencePage_SuspendAtStart;
 	public static String JSDebugPreferencePage_SuspendOnUncaughtExceptions;
 	public static String JSDebugPreferencePage_SuspendOnAllExceptions;
-	public static String JSDebugPreferencePage_SuspendOnDebuggerKeyword;
 	public static String JSDebugPreferencePage_ConfirmExitWhenDebuggerActive;
 }
