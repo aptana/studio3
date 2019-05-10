@@ -17,9 +17,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.js.debug.core.internal.browsers.BrowserUtil;
 import com.aptana.js.debug.core.internal.browsers.Firefox;
-import com.aptana.js.debug.core.internal.browsers.InternetExplorer;
 
 /**
  * @author Max Stepanov
@@ -174,15 +172,6 @@ public final class JSLaunchConfigurationHelper
 							break;
 						}
 					}
-					/* IE */
-					if (INTERNET_EXPLORER.equals(nature) || (nature == null))
-					{
-						if (InternetExplorer.isBrowserExecutable(path))
-						{
-							browser = path;
-							break;
-						}
-					}
 					/* Safari */
 					if (SAFARI.equals(nature) || (nature == null))
 					{
@@ -243,22 +232,6 @@ public final class JSLaunchConfigurationHelper
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_HTTP_POST_DATA, StringUtil.EMPTY);
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_HTTP_POST_CONTENT_TYPE,
 				StringUtil.EMPTY);
-	}
-
-	/**
-	 * isBrowserDebugCompatible
-	 * 
-	 * @param browser
-	 * @return boolean
-	 */
-	public static boolean isBrowserDebugCompatible(String browser)
-	{
-		if (browser != null && BrowserUtil.isBrowserDebugCompatible(browser))
-		{
-			return new File(browser).exists();
-		}
-
-		return false;
 	}
 
 	/**

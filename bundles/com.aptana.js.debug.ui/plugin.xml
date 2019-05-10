@@ -465,19 +465,6 @@
   </page>
    </extension>
    <extension
-         point="org.eclipse.debug.core.statusHandlers">
-      <statusHandler
-            class="com.aptana.js.debug.ui.internal.InstallDebuggerPromptStatusHandler"
-            code="301"
-            id="com.aptana.js.debug.ui.installDebuggerPromptStatusHandler"
-            plugin="com.aptana.js.debug.core"/>
-      <statusHandler
-            class="com.aptana.js.debug.ui.internal.LaunchDebuggerPromptStatusHandler"
-            code="302"
-            id="com.aptana.js.debug.ui.launchBrowserPromptStatusHandler"
-            plugin="com.aptana.js.debug.core"/>
-   </extension>
-   <extension
          point="org.eclipse.ui.views">
       <view
             allowMultiple="false"
