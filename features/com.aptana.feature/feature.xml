@@ -499,15 +499,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.js.debug.core.ie"
-         os="win32"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.js.debug.ui"
          download-size="0"
          install-size="0"
