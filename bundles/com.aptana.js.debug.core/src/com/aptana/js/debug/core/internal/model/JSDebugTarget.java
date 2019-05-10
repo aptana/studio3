@@ -1295,21 +1295,13 @@ public class JSDebugTarget extends JSDebugElement
 
 					try
 					{
-						if (key.equals(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE))
-						{
-							setOption(SUSPEND_ON_FIRST_LINE, newValue);
-						}
-						else if (key.equals(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS))
+						if (key.equals(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS))
 						{
 							setOption(SUSPEND_ON_EXCEPTIONS, newValue);
 						}
 						else if (key.equals(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS))
 						{
 							setOption(SUSPEND_ON_ERRORS, newValue);
-						}
-						else if (key.equals(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD))
-						{
-							setOption(SUSPEND_ON_KEYWORDS, newValue);
 						}
 					}
 					catch (DebugException e)
@@ -1320,14 +1312,10 @@ public class JSDebugTarget extends JSDebugElement
 			};
 			prefs.addPreferenceChangeListener(fPreferenceChangeListener);
 
-			setOption(SUSPEND_ON_FIRST_LINE,
-					Boolean.toString(prefs.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false)));
 			setOption(SUSPEND_ON_EXCEPTIONS,
 					Boolean.toString(prefs.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS, false)));
 			setOption(SUSPEND_ON_ERRORS,
 					Boolean.toString(prefs.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS, false)));
-			setOption(SUSPEND_ON_KEYWORDS,
-					Boolean.toString(prefs.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, false)));
 
 			setOption(BYPASS_CONSTRUCTORS, Boolean.toString(isFilterConstructors()));
 			setOption(STEP_FILTERS_ENABLED2, Boolean.toString(isStepFiltersEnabled()));
