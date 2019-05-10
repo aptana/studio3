@@ -29,7 +29,7 @@
       <launchConfigurationType
             delegate="com.aptana.js.debug.core.JSLaunchConfigurationDelegate"
             id="com.aptana.js.debug.core.webbrowserLaunchConfigurationType"
-            modes="run,debug"
+            modes="run"
             name="%launchConfigurationType.webbrowser.name"
             public="true"
             sourceLocatorId="com.aptana.js.debug.core.sourceLookupDirector"

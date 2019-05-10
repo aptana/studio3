@@ -10,8 +10,6 @@ package com.aptana.js.debug.core;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -32,24 +30,15 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.core.IStatusHandler;
-import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 
 import com.aptana.core.IURIMapper;
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.debug.core.IActiveResourcePathGetterAdapter;
 import com.aptana.debug.core.internal.Util;
-import com.aptana.debug.core.util.DebugUtil;
-import com.aptana.js.debug.core.internal.ProtocolLogger;
-import com.aptana.js.debug.core.internal.browsers.BrowserUtil;
-import com.aptana.js.debug.core.internal.browsers.Firefox;
-import com.aptana.js.debug.core.internal.browsers.InternetExplorer;
-import com.aptana.js.debug.core.internal.model.DebugConnection;
-import com.aptana.js.debug.core.internal.model.JSDebugProcess;
-import com.aptana.js.debug.core.internal.model.JSDebugTarget;
 import com.aptana.webserver.core.IServer;
 import com.aptana.webserver.core.IServer.State;
 import com.aptana.webserver.core.SimpleWebServer;
@@ -87,56 +76,9 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
 			throws CoreException
 	{
-
-		IStatusHandler prompter = DebugPlugin.getDefault().getStatusHandler(promptStatus);
-		boolean debug = ILaunchManager.DEBUG_MODE.equals(mode);
-
-		// TODO remove when multiple debug targets supported
-		if (debug)
-		{
-			IDebugTarget activeSession = null;
-			for (IDebugTarget target : DebugPlugin.getDefault().getLaunchManager().getDebugTargets())
-			{
-				if (IJSDebugConstants.ID_DEBUG_MODEL.equals(target.getModelIdentifier()))
-				{
-					if (!target.isTerminated())
-					{
-						activeSession = target;
-						break;
-					}
-				}
-			}
-			if (activeSession != null)
-			{
-				Object result = prompter.handleStatus(launchBrowserPromptStatus, null);
-				if ((result instanceof Boolean) && (((Boolean) result).booleanValue()))
-				{
-					activeSession.terminate();
-					while (!monitor.isCanceled() && !activeSession.isTerminated())
-					{
-						try
-						{
-							Thread.sleep(250);
-						}
-						catch (InterruptedException ignore)
-						{
-						}
-					}
-
-				}
-				else
-				{
-					String errorMessage = Messages.JSLaunchConfigurationDelegate_MultipleJavaScriptDebugNotSupported
-							+ Messages.JSLaunchConfigurationDelegate_PleaseTerminateActiveSession;
-					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, Status.ERROR,
-							errorMessage, null));
-				}
-			}
-		}
-
 		/* Check browser */
-		String browserExecutable = configuration.getAttribute(
-				ILaunchConfigurationConstants.CONFIGURATION_BROWSER_EXECUTABLE, (String) null);
+		String browserExecutable = configuration
+				.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_BROWSER_EXECUTABLE, (String) null);
 		if (browserExecutable == null || !new File(browserExecutable).exists())
 		{
 			boolean found = false;
@@ -168,44 +110,22 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 			}
 			if (!found)
 			{
-				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
-						MessageFormat.format(Messages.JSLaunchConfigurationDelegate_WebBrowserDoesNotExist,
-								browserExecutable), null));
+				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK, MessageFormat
+						.format(Messages.JSLaunchConfigurationDelegate_WebBrowserDoesNotExist, browserExecutable),
+						null));
 			}
 		}
 
-		boolean debugCompatible = BrowserUtil.isBrowserDebugCompatible(browserExecutable);
-		boolean debugAvailable = false;
-		boolean advancedRun = configuration.getAttribute(
-				ILaunchConfigurationConstants.CONFIGURATION_ADVANCED_RUN_ENABLED, false);
-
-		if (debugCompatible && (debug || advancedRun))
-		{
-			monitor.subTask(Messages.JSLaunchConfigurationDelegate_CheckingBrowserForDebugger);
-			debugAvailable = BrowserUtil.isBrowserDebugAvailable(browserExecutable);
-			if (!debugAvailable)
-			{
-				if (!BrowserUtil.installDebugExtension(browserExecutable, prompter, monitor))
-				{
-					monitor.setCanceled(true);
-					return;
-				}
-				debugAvailable = BrowserUtil.isBrowserDebugAvailable(browserExecutable);
-			}
-			if (debug && !debugAvailable)
-			{
-				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
-						Messages.JSLaunchConfigurationDelegate_DebuggerExtensionNotInstalled, null));
-			}
-		}
+		boolean advancedRun = configuration
+				.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_ADVANCED_RUN_ENABLED, false);
 
 		/* Initialize launch URL, optionally start local HTTP server */
 		int serverType = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_TYPE,
 				ILaunchConfigurationConstants.DEFAULT_SERVER_TYPE);
 		int startActionType = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_ACTION_TYPE,
 				ILaunchConfigurationConstants.DEFAULT_START_ACTION_TYPE);
-		boolean appendProjectName = configuration.getAttribute(
-				ILaunchConfigurationConstants.CONFIGURATION_APPEND_PROJECT_NAME, false);
+		boolean appendProjectName = configuration
+				.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_APPEND_PROJECT_NAME, false);
 
 		URL launchURL = null;
 		IURIMapper urlMapper = null;
@@ -232,8 +152,8 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 					}
 					break;
 				case ILaunchConfigurationConstants.START_ACTION_SPECIFIC_PAGE:
-					String resourcePath = configuration.getAttribute(
-							ILaunchConfigurationConstants.CONFIGURATION_START_PAGE_PATH, (String) null);
+					String resourcePath = configuration
+							.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_PAGE_PATH, (String) null);
 					if (resourcePath != null && resourcePath.length() > 0)
 					{
 						startResource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(resourcePath));
@@ -251,19 +171,11 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 						Messages.JSLaunchConfigurationDelegate_LaunchURLNotDefined, null));
 			}
 
-			if (launchURL != null)
-			{
-				// XXX: temporary solution for IE
-				if (launchURL.toExternalForm().endsWith(".js") && InternetExplorer.isBrowserExecutable(browserExecutable)) { //$NON-NLS-1$
-					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, Status.ERROR,
-							Messages.JSLaunchConfigurationDelegate_Cannot_Debug_JS_File, null));
-				}
-			}
-			else if (serverType == ILaunchConfigurationConstants.SERVER_INTERNAL)
+			if (serverType == ILaunchConfigurationConstants.SERVER_INTERNAL)
 			{
 				IServer server = WebServerCorePlugin.getDefault().getBuiltinWebServer();
-				((SimpleWebServer) server).setDocumentRoot(EFSUtils.getFileStore(
-						ResourcesPlugin.getWorkspace().getRoot()).toURI());
+				((SimpleWebServer) server)
+						.setDocumentRoot(EFSUtils.getFileStore(ResourcesPlugin.getWorkspace().getRoot()).toURI());
 				startServerIfNecessary(server, mode, monitor);
 				urlMapper = server;
 			}
@@ -279,9 +191,8 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 				}
 				if (urlMapper == null)
 				{
-					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
-							MessageFormat.format(Messages.JSLaunchConfigurationDelegate_ServerNotFound0_Error,
-									serverName), null));
+					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK, MessageFormat
+							.format(Messages.JSLaunchConfigurationDelegate_ServerNotFound0_Error, serverName), null));
 				}
 				if (startResource != null)
 				{
@@ -290,8 +201,9 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 			}
 			else if (serverType == ILaunchConfigurationConstants.SERVER_EXTERNAL)
 			{
-				String externalBaseUrl = configuration.getAttribute(
-						ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, StringUtil.EMPTY).trim();
+				String externalBaseUrl = configuration
+						.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, StringUtil.EMPTY)
+						.trim();
 				if (StringUtil.isEmpty(externalBaseUrl))
 				{
 					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
@@ -303,8 +215,8 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 				}
 				if (startResource != null)
 				{
-					IFileStore rootFileStore = EFSUtils.getFileStore(appendProjectName ? ResourcesPlugin.getWorkspace()
-							.getRoot() : startResource.getProject());
+					IFileStore rootFileStore = EFSUtils.getFileStore(
+							appendProjectName ? ResourcesPlugin.getWorkspace().getRoot() : startResource.getProject());
 					urlMapper = new URLtoURIMapper(new URL(externalBaseUrl), rootFileStore.toURI());
 				}
 			}
@@ -339,8 +251,8 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 						Messages.JSLaunchConfigurationDelegate_LaunchURLNotDefined, null));
 			}
-			String httpGetQuery = configuration.getAttribute(
-					ILaunchConfigurationConstants.CONFIGURATION_HTTP_GET_QUERY, StringUtil.EMPTY);
+			String httpGetQuery = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_HTTP_GET_QUERY,
+					StringUtil.EMPTY);
 			if (httpGetQuery != null && httpGetQuery.length() > 0 && launchURL.getQuery() == null
 					&& launchURL.getRef() == null)
 			{
@@ -350,8 +262,8 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 				}
 				launchURL = new URL(launchURL, launchURL.getFile() + httpGetQuery);
 			}
-			launchURL = new URL(launchURL, URLEncoder.encode(launchURL.getPath(), launchURL.getQuery(),
-					launchURL.getRef()));
+			launchURL = new URL(launchURL,
+					URLEncoder.encode(launchURL.getPath(), launchURL.getQuery(), launchURL.getRef()));
 		}
 		catch (MalformedURLException e)
 		{
@@ -362,11 +274,12 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 		monitor.subTask(Messages.JSLaunchConfigurationDelegate_LaunchingBrowser);
 		Process process = null;
 		ArrayList<String> browserArgs = new ArrayList<String>();
-		String browserCmdLine = configuration.getAttribute(
-				ILaunchConfigurationConstants.CONFIGURATION_BROWSER_COMMAND_LINE, StringUtil.EMPTY);
+		String browserCmdLine = configuration
+				.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_BROWSER_COMMAND_LINE, StringUtil.EMPTY);
 		if (browserCmdLine != null && browserCmdLine.length() > 0)
 		{
-			for (String arg : browserCmdLine.split(" ")) { //$NON-NLS-1$
+			for (String arg : browserCmdLine.split(" ")) //$NON-NLS-1$
+			{
 				if (arg.trim().length() > 0)
 				{
 					browserArgs.add(arg.trim());
@@ -375,137 +288,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 		}
 		ArrayList<String> args = new ArrayList<String>();
 
-		if (debugAvailable)
-		{
-
-			int port = DebugUtil.getDebuggerPort();
-			ServerSocket listenSocket = null;
-			try
-			{
-				listenSocket = DebugUtil.allocateServerSocket(port);
-			}
-			catch (IOException e)
-			{
-				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
-						Messages.JSLaunchConfigurationDelegate_SocketConnectionError, e));
-			}
-
-			String debuggerLaunchUrl = BrowserUtil.DEBUGGER_LAUNCH_URL + Integer.toString(port);
-			try
-			{
-				if (Platform.OS_MACOSX.equals(Platform.getOS()))
-				{
-					args.add("/usr/bin/open"); //$NON-NLS-1$
-					args.add("-b"); //$NON-NLS-1$
-					args.add(BrowserUtil.getMacOSXApplicationIdentifier(browserExecutable));
-					args.add(debuggerLaunchUrl);
-
-				}
-				else if (InternetExplorer.isBrowserExecutable(browserExecutable))
-				{
-					args.add(browserExecutable);
-					args.add(debuggerLaunchUrl);
-				}
-				else
-				{
-					args.add(browserExecutable);
-					args.add(debuggerLaunchUrl);
-				}
-				if ("true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
-					args = null;
-				}
-
-				if (args != null)
-				{
-					args.addAll(browserArgs);
-					process = Runtime.getRuntime().exec((String[]) args.toArray(new String[args.size()]));
-				}
-			}
-			catch (IOException e)
-			{
-				if (listenSocket != null)
-				{
-					try
-					{
-						listenSocket.close();
-					}
-					catch (IOException ignore)
-					{
-					}
-					listenSocket = null;
-				}
-				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
-						Messages.JSLaunchConfigurationDelegate_LaunchProcessError, e));
-			}
-
-			// TODO: use separate thread
-			Socket socket = null;
-			try
-			{
-				monitor.subTask(MessageFormat.format(Messages.JSLaunchConfigurationDelegate_OpeningSocketOnPort, port));
-				socket = listenSocket.accept();
-			}
-			catch (IOException e)
-			{
-				BrowserUtil.resetBrowserCache(browserExecutable);
-				if (debug && !monitor.isCanceled())
-				{
-					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
-							Messages.JSLaunchConfigurationDelegate_SocketConnectionError, e));
-				}
-			}
-			finally
-			{
-				if (listenSocket != null)
-				{
-					try
-					{
-						listenSocket.close();
-					}
-					catch (IOException ignore)
-					{
-					}
-				}
-			}
-			if (socket != null)
-			{
-				monitor.subTask(Messages.JSLaunchConfigurationDelegate_InitializingDebugger);
-				JSDebugTarget debugTarget = null;
-				try
-				{
-					JSDebugProcess debugProcess = new JSDebugProcess(launch, browserExecutable, null);
-					DebugConnection controller = DebugConnection.createConnection(socket, new ProtocolLogger(
-							"jsdebugger", JSDebugPlugin.PLUGIN_ID)); //$NON-NLS-1$
-					debugTarget = new JSDebugTarget(launch, debugProcess, urlMapper, controller, mode);
-					monitor.subTask(MessageFormat.format(Messages.JSLaunchConfigurationDelegate_OpeningPage, launchURL));
-					debugTarget.openURL(launchURL);
-				}
-				catch (CoreException e)
-				{
-					JSDebugPlugin.log(e);
-					if (debugTarget != null)
-					{
-						debugTarget.terminate();
-					}
-					else
-					{
-						try
-						{
-							socket.close();
-						}
-						catch (IOException ignore)
-						{
-						}
-					}
-					throw e;
-				}
-			}
-			else
-			{
-				DebugPlugin.newProcess(launch, process, browserExecutable);
-			}
-		}
-		else if (ILaunchManager.RUN_MODE.equals(mode))
+		if (ILaunchManager.RUN_MODE.equals(mode))
 		{
 			try
 			{
@@ -514,34 +297,12 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 				{
 					args.add("/usr/bin/open"); //$NON-NLS-1$
 					args.add("-b"); //$NON-NLS-1$
-					args.add(BrowserUtil.getMacOSXApplicationIdentifier(browserExecutable));
+					args.add(PlatformUtil.getApplicationInfo(browserExecutable, "CFBundleIdentifier")); //$NON-NLS-1$
 					args.add(launchPage);
 				}
 				else
 				{
 					args.add(browserExecutable);
-					if (debugCompatible && Firefox.isBrowserExecutable(browserExecutable))
-					{
-						if (advancedRun)
-						{
-							args.add(Firefox.NEW_WINDOW);
-							browserArgs.remove(Firefox.NEW_WINDOW);
-							browserArgs.remove(Firefox.NEW_TAB);
-						}
-						else
-						{
-							if (browserArgs.contains(Firefox.NEW_WINDOW))
-							{
-								args.add(Firefox.NEW_WINDOW);
-							}
-							else
-							{
-								args.add(Firefox.NEW_TAB);
-							}
-							browserArgs.remove(Firefox.NEW_WINDOW);
-							browserArgs.remove(Firefox.NEW_TAB);
-						}
-					}
 					args.add(launchPage);
 				}
 
@@ -562,7 +323,8 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 			throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 					MessageFormat.format(
 							Messages.JSLaunchConfigurationDelegate_ConfiguredBrowserDoesNotSupportDebugging,
-							browserExecutable), null));
+							browserExecutable),
+					null));
 		}
 	}
 
@@ -581,7 +343,8 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 
 	protected IResource getCurrentEditorResource() throws MalformedURLException
 	{
-		IActiveResourcePathGetterAdapter adapter = (IActiveResourcePathGetterAdapter) getContributedAdapter(IActiveResourcePathGetterAdapter.class);
+		IActiveResourcePathGetterAdapter adapter = (IActiveResourcePathGetterAdapter) getContributedAdapter(
+				IActiveResourcePathGetterAdapter.class);
 		if (adapter != null)
 		{
 			return adapter.getActiveResource();
@@ -591,7 +354,8 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 
 	protected IPath getCurrentEditorPath() throws MalformedURLException
 	{
-		IActiveResourcePathGetterAdapter adapter = (IActiveResourcePathGetterAdapter) getContributedAdapter(IActiveResourcePathGetterAdapter.class);
+		IActiveResourcePathGetterAdapter adapter = (IActiveResourcePathGetterAdapter) getContributedAdapter(
+				IActiveResourcePathGetterAdapter.class);
 		if (adapter != null)
 		{
 			return adapter.getActiveResourcePath();
@@ -601,7 +365,8 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate
 
 	protected URL getCurrentEditorURL() throws MalformedURLException
 	{
-		IActiveResourcePathGetterAdapter adapter = (IActiveResourcePathGetterAdapter) getContributedAdapter(IActiveResourcePathGetterAdapter.class);
+		IActiveResourcePathGetterAdapter adapter = (IActiveResourcePathGetterAdapter) getContributedAdapter(
+				IActiveResourcePathGetterAdapter.class);
 		if (adapter != null)
 		{
 			return adapter.getActiveResourceURL();
