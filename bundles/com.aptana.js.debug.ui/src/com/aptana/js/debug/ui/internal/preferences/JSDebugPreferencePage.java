@@ -116,6 +116,7 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 				.setSelection(getPreferenceStore().getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS));
 		suspendOnAllExceptions
 				.setSelection(getPreferenceStore().getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS));
+		suspendOnUncaughtExceptions.setEnabled(!suspendOnAllExceptions.getSelection());
 
 		IPreferenceStore uiStore = JSDebugUIPlugin.getDefault().getPreferenceStore();
 		if (!uiStore.contains(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER))
@@ -136,6 +137,7 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 				getPreferenceStore().getDefaultBoolean(IJSDebugPreferenceNames.SUSPEND_ON_UNCAUGHT_EXCEPTIONS));
 		suspendOnAllExceptions.setSelection(
 				getPreferenceStore().getDefaultBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS));
+		suspendOnUncaughtExceptions.setEnabled(!suspendOnAllExceptions.getSelection());
 
 		IPreferenceStore uiStore = JSDebugUIPlugin.getDefault().getPreferenceStore();
 		confirmExitDebugger.setSelection(uiStore.getDefaultBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER));
@@ -147,6 +149,7 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 				suspendOnUncaughtExceptions.getSelection());
 		getPreferenceStore().setValue(IJSDebugPreferenceNames.SUSPEND_ON_ALL_EXCEPTIONS,
 				suspendOnAllExceptions.getSelection());
+		suspendOnUncaughtExceptions.setEnabled(!suspendOnAllExceptions.getSelection());
 
 		IPreferenceStore uiStore = JSDebugUIPlugin.getDefault().getPreferenceStore();
 		uiStore.setValue(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER, confirmExitDebugger.getSelection());
