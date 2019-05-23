@@ -41,6 +41,17 @@ public class CommentScannerTest extends AbstractTokenScannerTestCase
 		assertEOF();
 	}
 
+	@Test
+	public void testNonZeroOffset()
+	{
+		String src = "var i - 0;\n// THIS is some long text, man test something or other\n";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 11, 55);
+
+		assertToken(defaultToken, 11, 55);
+		assertEOF();
+	}
+
 	protected void assertEOF()
 	{
 		IToken next = scanner.nextToken();
