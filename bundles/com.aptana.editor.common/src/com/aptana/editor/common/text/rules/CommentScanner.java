@@ -79,7 +79,7 @@ public class CommentScanner extends QueuedTokenScanner
 			}
 			// If we have space between end of last task tag and end of region, queue up default token!
 			int lastMatchEnd = currentOffset + offset;
-			int lastTokenLength = length - lastMatchEnd;
+			int lastTokenLength = (length + offset) - lastMatchEnd;
 			if (lastTokenLength > 0)
 			{
 				queueToken(fDefaultToken, lastMatchEnd, lastTokenLength);
