@@ -47,6 +47,7 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.core.logging.IdeLog;
+import com.aptana.core.resources.UniformResourceStorage;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -257,6 +258,13 @@ public class EditorUtil
 					IStorage storage = storageEditorInput.getStorage();
 					if (storage != null)
 					{
+						if (storage instanceof UniformResourceStorage) {
+							UniformResourceStorage uniform = (UniformResourceStorage) storage;
+							URI uri = uniform.getURI();
+							if (uri != null) {
+								return uri;
+							}
+						}
 						IPath path = storage.getFullPath();
 						if (path != null)
 						{
