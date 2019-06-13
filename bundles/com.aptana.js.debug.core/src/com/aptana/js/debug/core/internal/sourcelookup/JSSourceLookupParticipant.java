@@ -39,10 +39,14 @@ public class JSSourceLookupParticipant extends RemoteContentSourceLookupParticip
 		}
 		else if (object instanceof IJSScriptElement)
 		{
-			URI uri = ((IJSScriptElement) object).getLocation();
+			URI uri = ((IJSScriptElement) object).getSourceURL();
 			if (uri == null)
 			{
-				return null;
+				uri = ((IJSScriptElement) object).getURL();
+				if (uri == null)
+				{
+					return null;
+				}
 			}
 			return uri.toString();
 		}
