@@ -53,7 +53,7 @@ public class OpenScriptSourceAction extends SelectionProviderAction {
 			Object element = selection.getFirstElement();
 			if (element instanceof IJSScriptElement) {
 				scriptElement = (IJSScriptElement) element;
-				URI location = scriptElement.getLocation();
+				URI location = scriptElement.getURL();
 				if (location != null) {
 					setEnabled(true);
 					int lineNumber = scriptElement.getBaseLine();
@@ -85,7 +85,7 @@ public class OpenScriptSourceAction extends SelectionProviderAction {
 				return;
 			}
 		}
-		URI location = scriptElement.getLocation();
+		URI location = scriptElement.getURL();
 		if (location == null) {
 			return;
 		}

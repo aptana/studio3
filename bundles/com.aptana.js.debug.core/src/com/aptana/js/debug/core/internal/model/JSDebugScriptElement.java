@@ -19,7 +19,8 @@ import com.aptana.js.debug.core.model.IJSScriptElement;
 /**
  * @author Max Stepanov
  */
-public class JSDebugScriptElement extends JSDebugElement implements IJSScriptElement {
+public class JSDebugScriptElement extends JSDebugElement implements IJSScriptElement
+{
 
 	private static final IJSScriptElement[] EMPTY = new IJSScriptElement[0];
 
@@ -37,7 +38,8 @@ public class JSDebugScriptElement extends JSDebugElement implements IJSScriptEle
 	 * @param baseLine
 	 * @param lineExtent
 	 */
-	public JSDebugScriptElement(IDebugTarget target, String name, int baseLine, int lineExtent) {
+	public JSDebugScriptElement(IDebugTarget target, String name, int baseLine, int lineExtent)
+	{
 		super(target);
 		this.name = name;
 		this.baseLine = baseLine;
@@ -47,22 +49,26 @@ public class JSDebugScriptElement extends JSDebugElement implements IJSScriptEle
 	/*
 	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getName()
 	 */
-	public String getName() {
+	public String getName()
+	{
 		return name;
 	}
 
 	/*
-	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getLocation()
+	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getURL()
 	 */
-	public URI getLocation() {
-		return getParent().getLocation();
+	public URI getURL()
+	{
+		return getParent().getURL();
 	}
 
 	/*
 	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getChildren()
 	 */
-	public IJSScriptElement[] getChildren() {
-		if (children.size() > 0) {
+	public IJSScriptElement[] getChildren()
+	{
+		if (children.size() > 0)
+		{
 			return (IJSScriptElement[]) children.toArray(new IJSScriptElement[children.size()]);
 		}
 		return EMPTY;
@@ -71,31 +77,49 @@ public class JSDebugScriptElement extends JSDebugElement implements IJSScriptEle
 	/*
 	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getParent()
 	 */
-	public IJSScriptElement getParent() {
+	public IJSScriptElement getParent()
+	{
 		return parent;
+	}
+
+	public URI getSourceMapURL()
+	{
+		return null;
+	}
+
+	public URI getSourceURL()
+	{
+		return null;
 	}
 
 	/*
 	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getBaseLine()
 	 */
-	public int getBaseLine() {
+	public int getBaseLine()
+	{
 		return baseLine;
 	}
 
 	/*
 	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getLineExtent()
 	 */
-	public int getLineExtent() {
+	public int getLineExtent()
+	{
 		return lineExtent;
 	}
 
-	/* package */void insertElement(JSDebugScriptElement scriptElement) {
-		for (IJSScriptElement i : children) {
+	/* package */void insertElement(JSDebugScriptElement scriptElement)
+	{
+		for (IJSScriptElement i : children)
+		{
 			JSDebugScriptElement element = (JSDebugScriptElement) i;
-			if (element.isScriptElementInside(scriptElement)) {
+			if (element.isScriptElementInside(scriptElement))
+			{
 				element.insertElement(scriptElement);
 				return;
-			} else if (scriptElement.isScriptElementInside(element)) {
+			}
+			else if (scriptElement.isScriptElementInside(element))
+			{
 				children.remove(element);
 				scriptElement.insertElement(element);
 				break;
@@ -105,20 +129,24 @@ public class JSDebugScriptElement extends JSDebugElement implements IJSScriptEle
 		scriptElement.setParent(this);
 	}
 
-	/* package */void removeElement(JSDebugScriptElement scriptElement) {
+	/* package */void removeElement(JSDebugScriptElement scriptElement)
+	{
 		/* TODO: remove element */
 	}
 
-	/* package */boolean isScriptElementInside(JSDebugScriptElement element) {
+	/* package */boolean isScriptElementInside(JSDebugScriptElement element)
+	{
 		return baseLine < /* ! */element.getBaseLine()
 				&& (element.getBaseLine() + element.getLineExtent()) <= (baseLine + lineExtent);
 	}
 
-	/* package */void setParent(IJSScriptElement parent) {
+	/* package */void setParent(IJSScriptElement parent)
+	{
 		this.parent = parent;
 	}
 
-	/* package */void setName(String name) {
+	/* package */void setName(String name)
+	{
 		this.name = name;
 	}
 }
