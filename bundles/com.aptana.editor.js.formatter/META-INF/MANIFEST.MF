@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.aptana.editor.js.formatter;singleton:=true
-Bundle-Version: 3.0.3.qualifier
+Bundle-Version: 4.0.0.qualifier
 Bundle-Activator: com.aptana.editor.js.formatter.JSFormatterPlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
@@ -10,7 +10,7 @@ Require-Bundle: org.eclipse.core.runtime,
  beaver,
  com.aptana.core;bundle-version="3.0.4",
  com.aptana.parsing,
- com.aptana.js.core;bundle-version="3.0.0",
+ com.aptana.js.core;bundle-version="4.0.0",
  org.eclipse.jface.text,
  org.eclipse.ui,
  org.eclipse.ui.editors,
