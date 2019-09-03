@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.aptana.js.core;singleton:=true
-Bundle-Version: 3.0.0.qualifier
+Bundle-Version: 4.0.0.qualifier
 Bundle-Activator: com.aptana.js.core.JSCorePlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: com.aptana.core;bundle-version="3.3.0";visibility:=reexport,
