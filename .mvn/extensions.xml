@@ -2,6 +2,6 @@
   <extension>
     <groupId>org.eclipse.tycho.extras</groupId>
     <artifactId>tycho-pomless</artifactId>
-    <version>1.0.0</version>
+    <version>1.5.0</version>
   </extension>
 </extensions>
