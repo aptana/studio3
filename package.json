@@ -5,5 +5,10 @@
 	"devDependencies": {
 		"fs-extra": "^7.0.1",
 		"xml2js": "^0.4.19"
+	},
+	"scripts": {
+		"eclipse": "main.js",
+		"build": "mvn build",
+		"test": "mvn verify"
 	}
 }
