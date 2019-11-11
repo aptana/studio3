@@ -13,9 +13,8 @@
 	swt-tab-outline: #a2a2a2;
 	swt-outer-keyline-color: #a2a2a2;
 	swt-unselected-tabs-color: #e7e7e7 #e7e7e7 #f1f1f1 99% 100%;
-	swt-shadow-visible: true;
+	swt-shadow-visible: false;
 	swt-selected-tab-fill: #f1f1f1;
-	swt-shadow-color: #cccccc;
 	swt-mru-visible: true;
 	swt-corner-radius: 6px;
 	swt-unselected-close-visible: true; /* let user close unselected tabs by showing close image on hover */
