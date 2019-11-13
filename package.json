@@ -8,7 +8,7 @@
 	},
 	"scripts": {
 		"eclipse": "main.js",
-		"build": "mvn build",
+		"build": "mvn compile",
 		"test": "mvn verify"
 	}
 }
