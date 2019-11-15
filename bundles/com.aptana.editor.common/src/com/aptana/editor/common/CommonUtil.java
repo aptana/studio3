@@ -103,10 +103,6 @@ public final class CommonUtil
 							{
 								IDE.setDefaultEditor(selectedFile, CommonEditorPlugin.TI_APP_EDITOR_ID);
 							}
-							else if (selectedFile.getName().equals(CommonEditorPlugin.TIAPP_XML))
-							{
-								IDE.setDefaultEditor(selectedFile, CommonEditorPlugin.TI_APP_EDITOR_ID);
-							}
 							else
 							{
 								IDE.setDefaultEditor(selectedFile, CommonEditorPlugin.ALLOY_EDITOR_ID);
