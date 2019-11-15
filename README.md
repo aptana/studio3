@@ -22,9 +22,9 @@ How to Contribute
 
 Setting up an Eclipse Development Environment
 ----------------------------------------------
- 2. [Download Eclipse 4.9 for RCP Developers](https://www.eclipse.org/downloads/packages/release/2018-09/r#node-52369) and install it
+ 2. [Download Eclipse 4.13 for RCP Developers](https://www.eclipse.org/downloads/packages/release/2019-09/r#node-55605) and install it
  3. Install npm packages for our dependency installer script: ```npm ci```
- 4. Install the dependencies from the target platform into eclipse ```node main.js```
+ 4. Install the dependencies from the target platform into eclipse ```npm run eclipse```
  5. Then import the features, plugins, and test plugins into your workspace. _File > Import > General > Existing Projects Into Workspace_. Select the directory this repo was cloned into.
  6. Make your changes on your fork, then submit a Pull Request.
 
