@@ -4,7 +4,7 @@ properties([buildDiscarder(logRotator(numToKeepStr: '15', artifactNumToKeepStr: 
 // Set after copying upstream artifacts
 // Tells maven where to assume a p2 repo holding the sftp libraries would be
 def sftpURL = ''
-def targetBranch = 'release'
+def targetBranch = 'master'
 def isPR = false
 
 timestamps {
