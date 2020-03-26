@@ -109,6 +109,13 @@
             id="com.appcelerator.theme.dark"
             label="Dark Studio"
             os="macosx">
+      </theme>
+      <theme
+            basestylesheeturi="css/e4-dark_mac.css"
+            id="org.eclipse.e4.ui.css.theme.e4_dark"
+            label="Dark"
+            os="macosx"
+            os_version="10.15">
       </theme>     
    </extension>
 </plugin>
