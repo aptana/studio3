@@ -1,3 +1,10 @@
+@import url("platform:/plugin/org.eclipse.ui.themes/css/dark/e4-dark_basestyle.css");
+@import url("platform:/plugin/org.eclipse.ui.themes/css/dark/e4-dark_globalstyle.css"); /* Remove this to have ONLY the main IDE shell dark */
+@import url("platform:/plugin/org.eclipse.ui.themes/css/dark/e4-dark_partstyle.css");
+/* @import url("platform:/plugin/org.eclipse.ui.themes/css/dark/e4-dark_tabstyle.css"); */
+
+/* ########################### Original dark part styles ################ */
+
 .MTrimmedWindow.topLevel {
 	margin-top: 2px;
 	margin-bottom: 2px;
@@ -21,10 +28,14 @@
 	swt-unselected-close-visible: true; /* let user close unselected tabs by showing close image on hover */
 	color: #ffffff;
 }
+CTabItem,
+CTabItem CLabel,
 .MPartStack.active > CTabItem,
 .MPartStack.active > CTabItem CLabel {
     color: #939399;
 }
+CTabItem:selected,
+CTabItem:selected CLabel,
 .MPartStack.active > CTabItem:selected,
 .MPartStack.active > CTabItem:selected CLabel {
     color: #ffffff;
@@ -67,21 +78,6 @@
 /**
  * 	Fix up form editors to use white FG, black BG, even for it's own tabs
  */
-/* FIXME The labels in form editor headers are set to correct colors, but really background needs to be transparent! */
-#org-eclipse-ui-editorss .MPartStack .MPart Tree,
-#org-eclipse-ui-editorss .MPartStack .MPart Table,
-#org-eclipse-ui-editorss .MPartStack .MPart Control,
-#org-eclipse-ui-editorss .MPartStack .MPart Label {
-  color: #242424;
-  background-color: #ffffff;
-}
-#org-eclipse-ui-editorss .MPartStack CTabFolder {
-	swt-unselected-tabs-color: #f1f1f1 #f1f1f1 #242424 99% 100%;
-}
-#org-eclipse-ui-editorss .MPartStack CTabFolder.active {
-	swt-unselected-tabs-color: #ffffff #ffffff #242424 99% 100%;
-}
-
 /* Empty editor - let's basically hide it by making its colors match window BG and hiding minimize/maximize */
 .MPartStack.empty {
 	swt-unselected-tabs-color: #2d2d30 #2d2d30 #2d2d30 99% 100%;
@@ -127,14 +123,27 @@ CTabFolder.MArea .MPartStack, CTabFolder.MArea .MPartStack.active {
 	handle-image: none;
 }
 
-/** STATUS BAR **/
-
-/* Bottom status bar */
-.MTrimBar {
-	background-color: #2d2d30;
-	color: #ffffff;
+/* Try to reset color of toolbar items in package/project explorer */
+CTabFolder ToolBar.MToolBar {
+  background-color: #242424; /* FIXME: This is not picking up down arrow icon in outline view! */
+  /* This results in a weird drawing artifact on Outline/Console! */
 }
-/* Text in Status bar */
-.MTrimBar CLabel, .MTrimBar .MToolControl {
-	color: #ffffff;
+
+/* #################### Bottom Status Bar ######################## */
+
+#org-eclipse-ui-StatusLine,
+#org-eclipse-ui-ProgressBar,
+#org-eclipse-ui-ProgressBar Canvas {
+    color: #CCCCCC;
+}
+#org-eclipse-ui-StatusLine CLabel {
+    color: #BDBAB7;
+}
+
+StatusLine, ImageBasedFrame{
+    color: #BDBAB7;
+}
+
+Composite.MPartSashContainer {
+    background-color: #2d2d30;
 }
