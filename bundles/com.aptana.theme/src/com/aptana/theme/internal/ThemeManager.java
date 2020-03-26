@@ -18,6 +18,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -119,8 +121,8 @@ public class ThemeManager implements IThemeManager
 										@Override
 										public IStatus runInUIThread(IProgressMonitor monitor)
 										{
-											ThemeRule rule = getCurrentTheme().getRuleForSelector(
-													new ScopeSelector(scopeSelector));
+											ThemeRule rule = getCurrentTheme()
+													.getRuleForSelector(new ScopeSelector(scopeSelector));
 											if (rule != null)
 											{
 												getCurrentTheme().remove(rule);
@@ -564,16 +566,21 @@ public class ThemeManager implements IThemeManager
 			// if it looks like the byte array was not Base64 decoded, try decoding and then running it through
 			if (!props.containsKey(Theme.THEME_NAME_PROP_KEY)) // anything else we can check for this?
 			{
-				IdeLog.logWarning(
-						ThemePlugin.getDefault(),
-						MessageFormat
-								.format("User theme {0} de-serialized, but was left Base64 encoded. Manually decoding and trying to load.", //$NON-NLS-1$
-										themeName));
+				IdeLog.logWarning(ThemePlugin.getDefault(), MessageFormat.format(
+						"User theme {0} de-serialized, but was left Base64 encoded. Manually decoding and trying to load.", //$NON-NLS-1$
+						themeName));
 				byteStream = new ByteArrayInputStream(Base64.decode(array));
 				props = new OrderedProperties();
 				props.load(byteStream);
 			}
-			return new Theme(ThemePlugin.getDefault().getColorManager(), props);
+			Map<String, String> propMap = convertPropertiesToMap(props);
+			// do a sanity check. For some reason user themes for the builtins are getting loaded with NO rules.
+			// Let's assume one with no rules is invalid and fall back. We need name, the major 6 colors used for selection/caret/etc
+			// so if we have 7+ entries, it means it should have at least one rule
+			if (getBuiltinThemeNames().contains(themeName) && propMap.size() < 7) {
+				return null;
+			}
+			return new Theme(ThemePlugin.getDefault().getColorManager(), propMap);
 		}
 		catch (IllegalArgumentException iae)
 		{
@@ -589,7 +596,7 @@ public class ThemeManager implements IThemeManager
 					Properties props = new OrderedProperties();
 					props.loadFromXML(stream);
 					// Now store it as byte array explicitly so we don't run into this!
-					Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
+					Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), convertPropertiesToMap(props));
 					theme.save();
 					return theme;
 				}
@@ -634,7 +641,7 @@ public class ThemeManager implements IThemeManager
 		return null;
 	}
 
-	private OrderedProperties getBuiltinThemeProperties(String themeName)
+	private Map<String, String> getBuiltinThemeProperties(String themeName)
 	{
 		Collection<URL> urls = getBuiltinThemeURLs();
 		if (CollectionsUtil.isEmpty(urls))
@@ -650,38 +657,37 @@ public class ThemeManager implements IThemeManager
 				InputStream stream = FileLocator.toFileURL(url).openStream();
 				try
 				{
-					OrderedProperties props = new OrderedProperties();
+					Properties props = new OrderedProperties();
 					props.load(stream);
 					String loadedName = props.getProperty(Theme.THEME_NAME_PROP_KEY);
 					if (!themeName.equals(loadedName))
 					{
 						continue;
 					}
+					Map<String, String> propsMap = convertPropertiesToMap(props);
 
-					String multipleThemeExtends = props.getProperty(Theme.THEME_EXTENDS_PROP_KEY);
+					String multipleThemeExtends = propsMap.remove(Theme.THEME_EXTENDS_PROP_KEY);
 					// If we extend one or more other themes, recursively load their properties...
 					if (multipleThemeExtends != null)
 					{
-						OrderedProperties newProperties = new OrderedProperties();
+						LinkedHashMap<String, String> newProperties = new LinkedHashMap<String, String>();
 						String[] pieces = multipleThemeExtends.split(","); //$NON-NLS-1$
 						for (String themeExtends : pieces)
 						{
-							Properties extended = getBuiltinThemeProperties(themeExtends);
+							Map<String, String> extended = getBuiltinThemeProperties(themeExtends);
 							if (extended == null)
 							{
-								throw new IllegalStateException(MessageFormat.format(
-										Messages.ThemeManager_ERR_NoThemeFound, themeExtends, loadedName));
+								throw new IllegalStateException(MessageFormat
+										.format(Messages.ThemeManager_ERR_NoThemeFound, themeExtends, loadedName));
 							}
 							newProperties.putAll(extended);
 						}
-						newProperties.putAll(props);
-						// We don't want the final extends props in the properties.
-						newProperties.remove(Theme.THEME_EXTENDS_PROP_KEY);
+						newProperties.putAll(propsMap);
 						// Sanity check
 						Assert.isTrue(newProperties.get(Theme.THEME_NAME_PROP_KEY).equals(themeName));
 						return newProperties;
 					}
-					return props;
+					return propsMap;
 				}
 				finally
 				{
@@ -703,6 +709,16 @@ public class ThemeManager implements IThemeManager
 		return null;
 	}
 
+	public static Map<String, String> convertPropertiesToMap(Properties props)
+	{
+		Map<String, String> mapOfProperties = new LinkedHashMap<String, String>();
+		for (String key : props.stringPropertyNames())
+		{
+			mapOfProperties.put(key, props.getProperty(key));
+		}
+		return mapOfProperties;
+	}
+
 	private synchronized Set<String> getBuiltinThemeNames()
 	{
 		if (fBuiltins == null)
@@ -721,7 +737,7 @@ public class ThemeManager implements IThemeManager
 				{
 					// Try forcing the file to be extracted out from zip before we try to read it
 					stream = FileLocator.toFileURL(url).openStream();
-					OrderedProperties props = new OrderedProperties();
+					Properties props = new OrderedProperties();
 					props.load(stream);
 					String loadedName = props.getProperty(Theme.THEME_NAME_PROP_KEY);
 					// Don't include the abstract themes in the list, they're meant just for extending
@@ -777,7 +793,7 @@ public class ThemeManager implements IThemeManager
 
 	public Theme loadBuiltinTheme(String themeName)
 	{
-		OrderedProperties properties = getBuiltinThemeProperties(themeName);
+		Map<String, String> properties = getBuiltinThemeProperties(themeName);
 		if (properties == null)
 		{
 			return null;
@@ -785,7 +801,7 @@ public class ThemeManager implements IThemeManager
 		return loadBuiltinTheme(properties);
 	}
 
-	private Theme loadBuiltinTheme(Properties props)
+	private Theme loadBuiltinTheme(Map<String, String> props)
 	{
 		try
 		{
