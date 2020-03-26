@@ -9,14 +9,13 @@ package com.aptana.theme;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.StringTokenizer;
 
 import com.aptana.core.logging.IdeLog;
 import com.aptana.plist.PListParserFactory;
-import com.aptana.theme.internal.OrderedProperties;
 
 /**
  * An importer to bring in Textmate themes to our theme system. This is not guaranteed to work 100% because we don't
@@ -52,7 +51,7 @@ public class TextmateImporter
 	{
 		try
 		{
-			return new Theme(getColorManager(), convertToProperties(file));
+			return new Theme(getColorManager(), convertToOrderedMap(file));
 		}
 		catch (Exception e)
 		{
@@ -67,18 +66,18 @@ public class TextmateImporter
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Properties convertToProperties(File file) throws IOException
+	private static Map<String, String> convertToOrderedMap(File file) throws IOException
 	{
 		Map<String, Object> plistProperties = parse(file);
 		List<Map<String, Object>> tokenList = (List<Map<String, Object>>) plistProperties.get(SETTINGS);
 		Map<String, Object> globals = (Map<String, Object>) tokenList.get(0).get(SETTINGS);
-		Properties radRailsProps = new OrderedProperties();
+		Map<String, String> radRailsProps = new LinkedHashMap<String, String>();
 		for (Map.Entry<String, Object> entry : globals.entrySet())
 		{
 			// FIXME Skip invisibles
-			radRailsProps.put(entry.getKey(), entry.getValue());
+			radRailsProps.put(entry.getKey(), entry.getValue().toString());
 		}
-		radRailsProps.put(Theme.THEME_NAME_PROP_KEY, plistProperties.get(NAME));
+		radRailsProps.put(Theme.THEME_NAME_PROP_KEY, plistProperties.get(NAME).toString());
 
 		tokenList.remove(0);
 		for (Map<String, Object> token : tokenList)
@@ -99,7 +98,7 @@ public class TextmateImporter
 			}
 			else if (colors.containsKey(BACKGROUND) || colors.containsKey(FONT_STYLE))
 			{
-				value.append(radRailsProps.getProperty(Theme.FOREGROUND_PROP_KEY));
+				value.append(radRailsProps.get(Theme.FOREGROUND_PROP_KEY));
 			}
 
 			if (colors.containsKey(BACKGROUND))
