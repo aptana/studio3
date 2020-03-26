@@ -10,8 +10,6 @@ package com.aptana.theme;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -22,7 +20,6 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -36,9 +33,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
-import com.aptana.core.util.StringUtil;
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ISelectorNode;
 import com.aptana.scope.ScopeSelector;
@@ -90,7 +85,7 @@ public class Theme
 	 */
 	private ThemeGetTextAttribute themeGetTextAttribute;
 
-	public Theme(ColorManager colormanager, Properties props)
+	public Theme(ColorManager colormanager, Map<String, String> props)
 	{
 		this.colorManager = colormanager;
 		coloringRules = new ArrayList<ThemeRule>();
@@ -107,34 +102,22 @@ public class Theme
 		return themeGetTextAttribute;
 	}
 
-	private void parseProps(Properties props)
+	private void parseProps(Map<String, String> props)
 	{
-		name = (String) props.remove(THEME_NAME_PROP_KEY);
+		// This map is assumed to be in a specific order so that we can retain that order
+		// for what reason?! I think to re-save in the same order
+		final int startSize = props.size();
+		name = props.remove(THEME_NAME_PROP_KEY);
+		final int afterSize = props.size();
+		if (afterSize != startSize - 1)
+		{
+			throw new IllegalStateException("Removing a value from the properties map messed up the map. Uh oh!");
+		}
 		if (name == null)
 		{
 			// Log the properties
-			String properties = StringUtil.EMPTY;
-			PrintWriter pw = null;
-			try
-			{
-				StringWriter sw = new StringWriter(); // $codepro.audit.disable closeWhereCreated
-				pw = new PrintWriter(sw);
-				props.list(pw);
-				properties = sw.toString();
-			}
-			catch (Exception e)
-			{
-				// ignore
-			}
-			finally
-			{
-				if (pw != null)
-				{
-					pw.close();
-				}
-			}
 			throw new IllegalStateException(
-					"Invalid theme properties. No theme 'name' provided. Properties may be corrupted: " + properties); //$NON-NLS-1$
+					"Invalid theme properties. No theme 'name' provided. Properties may be corrupted: " +  props.toString()); //$NON-NLS-1$
 		}
 		// The general editor colors
 		// FIXME Add fallback rgb colors to use! black on white, etc.
@@ -144,14 +127,13 @@ public class Theme
 		selection = parseHexRGBa((String) props.remove(SELECTION_PROP_KEY));
 		caret = parseHexRGB((String) props.remove(CARET_PROP_KEY), true);
 
-		Set<Object> propertyNames = props.keySet();
-		for (Object key : propertyNames)
+		for (Map.Entry<String, String> e : props.entrySet())
 		{
-			String displayName = (String) key;
+			String displayName = e.getKey();
+			String value = e.getValue();
 			int style = SWT.NORMAL;
 			RGBa foreground = null;
 			RGBa background = null;
-			String value = props.getProperty(displayName);
 			String scopeSelector = displayName;
 			int selectorIndex = value.indexOf(SELECTOR_DELIMITER);
 			if (selectorIndex != -1)
@@ -418,13 +400,13 @@ public class Theme
 	 */
 	public Properties toProps()
 	{
-		Properties props = new OrderedProperties();
-		props.put(THEME_NAME_PROP_KEY, getName());
-		props.put(SELECTION_PROP_KEY, toHex(getSelection()));
-		props.put(LINE_HIGHLIGHT_PROP_KEY, toHex(getLineHighlight()));
-		props.put(FOREGROUND_PROP_KEY, toHex(getForeground()));
-		props.put(BACKGROUND_PROP_KEY, toHex(getBackground()));
-		props.put(CARET_PROP_KEY, toHex(caret));
+		OrderedProperties props = new OrderedProperties();
+		props.setProperty(THEME_NAME_PROP_KEY, getName());
+		props.setProperty(SELECTION_PROP_KEY, toHex(getSelection()));
+		props.setProperty(LINE_HIGHLIGHT_PROP_KEY, toHex(getLineHighlight()));
+		props.setProperty(FOREGROUND_PROP_KEY, toHex(getForeground()));
+		props.setProperty(BACKGROUND_PROP_KEY, toHex(getBackground()));
+		props.setProperty(CARET_PROP_KEY, toHex(caret));
 		for (ThemeRule rule : coloringRules)
 		{
 			if (rule == null)
@@ -463,7 +445,7 @@ public class Theme
 			// Append the scope selector
 			value.append(SELECTOR_DELIMITER);
 			value.append(rule.getScopeSelector().toString());
-			props.put(rule.getName(), value.toString());
+			props.setProperty(rule.getName(), value.toString());
 		}
 		return props;
 	}
@@ -637,7 +619,7 @@ public class Theme
 		}
 		coloringRules.clear();
 		wipeCache();
-		parseProps(props);
+		parseProps(ThemeManager.convertPropertiesToMap(props));
 		deleteCustomVersion();
 	}
 
@@ -775,7 +757,7 @@ public class Theme
 		{
 			Properties props = toProps();
 			props.setProperty(THEME_NAME_PROP_KEY, value);
-			Theme newTheme = new Theme(colorManager, props);
+			Theme newTheme = new Theme(colorManager, ThemeManager.convertPropertiesToMap(props));
 			addTheme(newTheme);
 			return newTheme;
 		}
