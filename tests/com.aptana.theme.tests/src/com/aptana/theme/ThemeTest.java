@@ -12,8 +12,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.swt.SWT;
@@ -22,7 +23,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.aptana.scope.ScopeSelector;
-import com.aptana.theme.internal.OrderedProperties;
 
 @SuppressWarnings("nls")
 public class ThemeTest
@@ -34,7 +34,7 @@ public class ThemeTest
 	@Before
 	public void setUp() throws Exception
 	{
-		Properties props = new OrderedProperties();
+		Map<String, String> props = new LinkedHashMap<String, String>();
 		props.put("background", "#ffffff");
 		props.put("foreground", "#ff0000");
 		props.put("caret", "#00ff00");
