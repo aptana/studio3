@@ -17,7 +17,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ICoreRunnable;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -117,7 +121,6 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.logging.IdeLog;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.ConsoleThemer;
@@ -971,10 +974,18 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	}
 
-	protected void setTheme(Theme newTheme)
+	protected void setTheme(final Theme newTheme)
 	{
+		// Run this in a job/thread since we don't want this to happen in UI thread!
+		Job.createSystem("save theme", new ICoreRunnable()
+		{
+			public void run(IProgressMonitor monitor) throws CoreException
+			{
+				newTheme.save();
+			}
+		}).schedule();
+
 		fSelectedTheme = newTheme;
-		newTheme.save();
 		Theme theme = getTheme();
 		fgSelector.setColorValue(theme.getForeground());
 		bgSelector.setColorValue(theme.getBackground());
@@ -982,8 +993,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		caretSelector.setColorValue(theme.getCaret());
 		selectionSelector.setColorValue(theme.getSelection().toRGB());
 		fThemeCombo.setText(theme.getName());
-		tableViewer.setInput(theme);
+		tableViewer.setInput(theme); // For whatever reason, the element column (listing all the scopes stylized) isn't refreshing properly!
 		addCustomTableEditorControls();
+		tableViewer.getTable().redraw(); // this is blunt, but seems to work to fix redraw of the listing of scopes
 		if (getThemeManager().isBuiltinTheme(theme.getName()))
 		{
 			renameThemeButton.setEnabled(false);
