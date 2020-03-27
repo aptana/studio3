@@ -110,7 +110,7 @@
 		<delete dir="${scripting.plugin.dir}/bundles/studio3-sdk" failonerror="true" />
 
 		<!-- Now grab the max value of lastmods in bundle_timestamps.txt file and use that as qualifier! -->
-		<script language="javascript">
+		<script manager="javax" language="javascript" classpath="${java.home}/lib/ext/nashorn.jar">
 			<![CDATA[
 				var File = java.io.File;
 				var BufferedReader = java.io.BufferedReader;
