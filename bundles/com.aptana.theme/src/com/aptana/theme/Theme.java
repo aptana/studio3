@@ -117,7 +117,8 @@ public class Theme
 		{
 			// Log the properties
 			throw new IllegalStateException(
-					"Invalid theme properties. No theme 'name' provided. Properties may be corrupted: " +  props.toString()); //$NON-NLS-1$
+					"Invalid theme properties. No theme 'name' provided. Properties may be corrupted: " //$NON-NLS-1$
+							+ props.toString());
 		}
 		// The general editor colors
 		// FIXME Add fallback rgb colors to use! black on white, etc.
@@ -187,8 +188,8 @@ public class Theme
 				num++;
 			}
 			DelayedTextAttribute attribute = new DelayedTextAttribute(foreground, background, style);
-			coloringRules.add(new ThemeRule(displayName, scopeSelector == null ? null
-					: new ScopeSelector(scopeSelector), attribute));
+			coloringRules.add(new ThemeRule(displayName,
+					scopeSelector == null ? null : new ScopeSelector(scopeSelector), attribute));
 		}
 	}
 
@@ -984,5 +985,22 @@ public class Theme
 		{
 			System.out.println(entry.getKey() + ": " + entry.getValue()); //$NON-NLS-1$
 		}
+	}
+
+	public boolean appearsBroken()
+	{
+		if (coloringRules.isEmpty())
+		{
+			return true;
+		}
+		if (coloringRules.size() == 4)
+		{
+			return hasEntry("override.searchResultIndication") 
+					&& hasEntry("override.xmlTagPairOccurrenceIndication")
+					&& hasEntry("override.htmlTagPairOccurrenceIndication")
+					&& hasEntry("override.rubyBlockPairOccurrenceIndication");
+			// what about "override.pydevOccurrenceIndication"?
+		}
+		return false;
 	}
 }

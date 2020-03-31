@@ -577,10 +577,11 @@ public class ThemeManager implements IThemeManager
 			// do a sanity check. For some reason user themes for the builtins are getting loaded with NO rules.
 			// Let's assume one with no rules is invalid and fall back. We need name, the major 6 colors used for selection/caret/etc
 			// so if we have 7+ entries, it means it should have at least one rule
-			if (getBuiltinThemeNames().contains(themeName) && propMap.size() < 7) {
+			Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), propMap);
+			if (isBuiltinTheme(themeName) && theme.appearsBroken()) {
 				return null;
 			}
-			return new Theme(ThemePlugin.getDefault().getColorManager(), propMap);
+			return theme;
 		}
 		catch (IllegalArgumentException iae)
 		{
@@ -597,6 +598,9 @@ public class ThemeManager implements IThemeManager
 					props.loadFromXML(stream);
 					// Now store it as byte array explicitly so we don't run into this!
 					Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), convertPropertiesToMap(props));
+					if (isBuiltinTheme(themeName) && theme.appearsBroken()) {
+						return null;
+					}
 					theme.save();
 					return theme;
 				}
