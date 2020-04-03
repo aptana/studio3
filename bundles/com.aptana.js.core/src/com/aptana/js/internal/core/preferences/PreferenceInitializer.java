@@ -38,6 +38,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		// Set up JS Parser validator to be on for build and reconcile
 		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(JSParserValidator.ID, BuildType.BUILD), true);
-		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(JSParserValidator.ID, BuildType.RECONCILE), true);
+		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(JSParserValidator.ID, BuildType.RECONCILE), true);		
 	}
 }

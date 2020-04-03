@@ -71,11 +71,6 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		return "js";
 	}
 
-	protected List<IProblem> getParseErrors(String source) throws CoreException
-	{
-		return getParseErrors(source, new JSParseState(source), IJSConstants.JSSTYLE_PROBLEM_MARKER_TYPE);
-	}
-	
 	@Test
 	public void testAlreadyDefined() throws CoreException
 	{
@@ -89,8 +84,6 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "'foo' is already defined.", 3, IMarker.SEVERITY_WARNING, 42);
 	}
-	
-	
 
 	@Test
 	public void testAlreadyDefinedOK1() throws CoreException
@@ -161,7 +154,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		List<IProblem> items = getParseErrors(text);
 		assertProblemExists(items, "Do not assign to the exception parameter.", 5, IMarker.SEVERITY_WARNING, 78);
 	}
-	
+
 	@Test
 	public void testAvoidA1() throws CoreException
 	{
@@ -196,7 +189,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "ReferenceError:1:1 Invalid left hand side for assignment\n'string' = 2;\n ^", 1, IMarker.SEVERITY_ERROR, 0);
+		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 9);
 	}
 
 	@Test
@@ -240,7 +233,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "ReferenceError:1:0 Invalid left hand side for assignment\n/sdf/ = 1;\n^", 1, IMarker.SEVERITY_ERROR, 0);
+		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 6);
 	}
 
 	@Test
@@ -537,19 +530,6 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
 				IMarker.SEVERITY_WARNING, 20);
 	}
-
-	
-
-	// FIXME I can't seem to find a way to insert the required special characters into the string
-	// public void testUnsafe() throws CoreException
-	// {
-//		// @formatter:off
-//		String text = "var string = '^A';";
-//		// @formatter:on
-	//
-	// List<IProblem> items = getParseErrors(text);
-	// assertProblemExists(items, "Unsafe character.", 1, IMarker.SEVERITY_WARNING, 14);
-	// }
 
 	@Test
 	public void testConstructorNameA1() throws CoreException
@@ -1016,7 +996,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		String text = "new Array";
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 9);
+		assertProblemExists(items, "Missing '()'.", 1, IMarker.SEVERITY_WARNING, 4);
 	}
 
 	@Test
@@ -1052,7 +1032,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// This isn't a "bad_wrap", it's a "move_invocation"
 		assertDoesntContain(items, "Do not wrap function literals in parens unless they are to be immediately invoked.");
 		assertProblemExists(items, "Move the invocation into the parens that contain the function.", 4,
-				IMarker.SEVERITY_WARNING, 79);
+				IMarker.SEVERITY_WARNING, 80);
 	}
 
 	@Test
@@ -1288,9 +1268,9 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2, IMarker.SEVERITY_WARNING,
-				24);
-		assertCountOfProblems(items, 1, "Expected a conditional expression and instead saw an assignment.");
+		assertProblemExists(items, "Expected to see a statement and instead saw a block.", 3, IMarker.SEVERITY_WARNING,
+				46);
+		assertCountOfProblems(items, 1, "Expected to see a statement and instead saw a block.");
 	}
 
 	@Test
@@ -1384,7 +1364,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "eval is evil.", 2, IMarker.SEVERITY_WARNING, 16); //TODO: AST is building wrong for this source. eval node is getting ignored in the tree.
+		assertProblemExists(items, "eval is evil.", 2, IMarker.SEVERITY_WARNING, 16);
 	}
 
 	@Test
@@ -1448,7 +1428,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "SyntaxError:1:0 Illegal break statement\nbreak;\n^", 1, IMarker.SEVERITY_ERROR, 0);
+		assertProblemExists(items, "Unreachable 'var' after 'break'.", 2, IMarker.SEVERITY_WARNING, 7);
 	}
 
 	@Test
@@ -1460,7 +1440,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "SyntaxError:1:0 Illegal continue statement\ncontinue;\n^", 1, IMarker.SEVERITY_ERROR, 0);
+		assertProblemExists(items, "Unreachable 'var' after 'continue'.", 2, IMarker.SEVERITY_WARNING, 10);
 	}
 
 	@Test
@@ -1472,7 +1452,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "SyntaxError:1:0 Invalid return statement\nreturn 1;\n^", 1, IMarker.SEVERITY_ERROR, 0);
+		assertProblemExists(items, "Unreachable 'var' after 'return'.", 2, IMarker.SEVERITY_WARNING, 10);
 	}
 
 	@Test
@@ -1505,7 +1485,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 21);
+		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 16);
 	}
 
 	@Test
@@ -1590,32 +1570,6 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		assertProblemExists(items, "Use the object literal notation {}.", 1, IMarker.SEVERITY_WARNING, 16);
 	}
 
-	// public void testNotAScope1() throws CoreException
-	// {
-//		// @formatter:off
-//		String text = "var i;\n" +
-//				"for (i = 0; i < 10; i += 1) {\n" +
-//				"    continue foo;\n" +
-//				"}";
-//		// @formatter:on
-	//
-	// List<IProblem> items = getParseErrors(text);
-	// assertProblemExists(items, "'foo' is not a label.", 3, IMarker.SEVERITY_WARNING, 11);
-	// }
-
-	
-
-	// FIXME This is a bug in JSlint that this doesn't work.
-	// public void testNotAFunction2() throws CoreException
-	// {
-//		// @formatter:off
-//		String text = "JSON(10);";
-//		// @formatter:on
-	//
-	// List<IProblem> items = getParseErrors(text);
-	// assertProblemExists(items, "'JSON' is not a function.", 1, IMarker.SEVERITY_WARNING, 0);
-	// }
-
 	@Test
 	public void testUseParam() throws CoreException
 	{
@@ -1685,7 +1639,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "SyntaxError:1:0 Illegal break statement\nbreak;\n^", 1, IMarker.SEVERITY_ERROR, 0);
+		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 0);
 	}
 
 	@Test
@@ -1696,7 +1650,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "SyntaxError:1:0 Illegal continue statement\ncontinue;\n^", 1, IMarker.SEVERITY_ERROR, 0);
+		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 0);
 	}
 
 	@Test
@@ -1707,7 +1661,7 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 		// @formatter:on
 
 		List<IProblem> items = getParseErrors(text);
-		assertProblemExists(items, "SyntaxError:1:0 Invalid return statement\nreturn;\n^", 1, IMarker.SEVERITY_ERROR, 0);
+		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 0);
 	}
 
 	@Test
@@ -1815,6 +1769,11 @@ public class JSStyleValidatorTest extends AbstractValidatorTestCase
 	protected void setOption(String optionName, boolean value)
 	{
 		((JSStyleValidator) fValidator).setOption(optionName, value);
+	}
+
+	protected List<IProblem> getParseErrors(String source) throws CoreException
+	{
+		return getParseErrors(source, new JSParseState(source), IJSConstants.JSSTYLE_PROBLEM_MARKER_TYPE);
 	}
 
 	// Tests we are intentionally skipping -----------------------
