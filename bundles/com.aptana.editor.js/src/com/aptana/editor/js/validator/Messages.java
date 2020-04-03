@@ -14,10 +14,6 @@ public class Messages extends NLS
 
 	private static final String BUNDLE_NAME = "com.aptana.editor.js.validator.messages"; //$NON-NLS-1$
 
-	public static String JSLintValidatorPreferenceCompositeFactory_OptionsMsg;
-	public static String JSLintValidatorPreferenceCompositeFactory_OptionsParseError;
-	public static String JSLintValidatorPreferenceCompositeFactory_OptionsTitle;
-
 	public static String JSParserValidatorPreferenceCompositeFactory_MissingSemicolons;
 
 	public static String JSParserValidatorPreferenceCompositeFactory_OptionsGroup;

@@ -131,15 +131,6 @@
          </contentTypeBinding>
       </participant>
       <participant
-            class="com.aptana.js.internal.core.build.JSLintValidator"
-            id="com.aptana.js.core.JSLintValidator"
-            name="%validator.jslint.name"
-            priority="50">
-         <contentTypeBinding
-               contentTypeId="com.aptana.contenttype.js">
-         </contentTypeBinding>
-      </participant>
-      <participant
             class="com.aptana.js.internal.core.build.JSParserValidator"
             id="com.aptana.js.core.JSParserValidator"
             name="%validator.parser.name"
@@ -165,14 +156,6 @@
                contentTypeId="com.aptana.contenttype.js">
          </contentTypeBinding>
       </participant>
-   </extension>
-   <extension
-         id="jslint_problem"
-         name="%marker.jslint.name"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="com.aptana.js.core.problem">
-      </super>
    </extension>
    <extension
          id="jsstyle_problem"

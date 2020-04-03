@@ -9,18 +9,21 @@ package com.aptana.js.internal.core.build;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
 
+import com.aptana.buildpath.core.tests.AbstractValidatorTestCase;
 import com.aptana.core.build.IBuildParticipant;
 import com.aptana.core.build.IProblem;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.js.core.IJSConstants;
 import com.aptana.js.core.JSCorePlugin;
 import com.aptana.js.core.parsing.JSParseState;
 
-public class JSStyleValidatorTest extends JSLintValidatorTest
+public class JSStyleValidatorTest extends AbstractValidatorTestCase
 {
 
 	@Override
@@ -56,511 +59,1711 @@ public class JSStyleValidatorTest extends JSLintValidatorTest
 		};
 	}
 
-	// Warnings that we don't detect/implement yet!
+	@Override
+	protected String getContentType()
+	{
+		return IJSConstants.CONTENT_TYPE_JS;
+	}
+
+	@Override
+	protected String getFileExtension()
+	{
+		return "js";
+	}
+
+	@Test
+	public void testAlreadyDefined() throws CoreException
+	{
+		// @formatter:off
+		String text = "function bar() {\n" +
+				"    var foo = 1;\n" +
+				"    var foo = 2;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "'foo' is already defined.", 3, IMarker.SEVERITY_WARNING, 42);
+	}
+
+	@Test
+	public void testAlreadyDefinedOK1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var Class = ( function() {\n" +
+				"    var IS_DONTENUM_BUGGY = ( function() {\n" +
+				"        return true;\n" +
+				"    }());\n" +
+				"}());";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "'' is already defined.");
+	}
+
+	@Test
+	public void testAnd() throws CoreException
+	{
+		// @formatter:off
+		String text = "var one = 1;\n" +
+				"var that = 'that';\n" +
+				"var another = true;\n" +
+				"\n" +
+				"var result = one || that && another;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "The '&&' subexpression should be wrapped in parens.", 5, IMarker.SEVERITY_WARNING,
+				78);
+	}
+
+	@Test
+	public void testAScopeOK1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var Prototype = {\n" +
+				"	Browser : (function() {\n" +
+				"		var isOpera = Object.prototype.toString.call(window.opera) == '[object Opera]';\n" +
+				"	})(),\n" +
+				"	\n" +
+				"	BrowserFeatures : {\n" +
+				"		ElementExtensions : (function() {\n" +
+				"			var constructor = window.Element || window.HTMLElement;\n" +
+				"			return !!(constructor && constructor.prototype);\n" +
+				"		})()\n" +
+				"	}\n" +
+				"}; ";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "'window' used out of scope.");
+	}
+
+	@Test
+	public void testAssignException() throws CoreException
+	{
+		// @formatter:off
+		String text = "function message() {\n" +
+				"    try {\n" +
+				"        // comment\n" +
+				"    } catch (err) {\n" +
+				"        err = 'something';\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Do not assign to the exception parameter.", 5, IMarker.SEVERITY_WARNING, 78);
+	}
+
+	@Test
+	public void testAvoidA1() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    var yeah = arguments.caller;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Avoid 'arguments.caller'.", 2, IMarker.SEVERITY_WARNING, 32);
+	}
+
+	@Test
+	public void testAvoidA2() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    var yeah = arguments.callee;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Avoid 'arguments.callee'.", 2, IMarker.SEVERITY_WARNING, 32);
+	}
+
+	@Test
+	public void testBadAssignmentA1() throws CoreException
+	{
+		// @formatter:off
+		String text = "'string' = 2;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 9);
+	}
+
+	@Test
+	public void testBadAssignmentA2() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() { arguments['bar'] = 1; }";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 34);
+	}
+
+	@Test
+	public void testBadAssignmentA3() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() { arguments[1] = 1; }";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 30);
+	}
+
+	@Test
+	public void testBadAssignmentA4() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() { arguments.bar = 1; }";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 31);
+	}
+
+	@Test
+	public void testBadAssignmentA5() throws CoreException
+	{
+		// @formatter:off
+		String text = "/sdf/ = 1;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Bad assignment.", 1, IMarker.SEVERITY_WARNING, 6);
+	}
+
+	@Test
+	public void testBadAssignmentAOK1() throws CoreException
+	{
+		// @formatter:off
+		String text = "Prototype.BrowserFeatures.SpecificElementExtensions = false;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Bad assignment.");
+	}
+
+	@Test
+	public void testBadNew() throws CoreException
+	{
+		// @formatter:off
+		String text = "function Blah() {}\n" +
+				"new Blah();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Do not use 'new' for side effects.", 2, IMarker.SEVERITY_WARNING, 29);
+	}
+
+	@Test
+	public void testBadNewOK1() throws CoreException
+	{
+		// @formatter:off
+		String text = "function Blah() {}\n" +
+				"var b = new Blah();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Do not use 'new' for side effects.");
+	}
+
+	@Test
+	public void testBadNewOK2() throws CoreException
+	{
+		// @formatter:off
+		String text = "function Blah() {}\n" +
+				"var b;\n" +
+				"b = new Blah();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Do not use 'new' for side effects.");
+	}
+
+	@Test
+	public void testBadNewOK3() throws CoreException
+	{
+		// @formatter:off
+		String text = "throw new TypeError();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Do not use 'new' for side effects.");
+	}
+
+	@Test
+	public void testBadNewOK4() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() { return new TypeError(); }";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Do not use 'new' for side effects.");
+	}
+
+	@Test
+	public void testBadNumber1() throws CoreException
+	{
+		// @formatter:off
+		String text = "var number = 1.7976931348623157e+309;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Bad number '1.7976931348623157e+309'.", 1, IMarker.SEVERITY_WARNING, 36);
+	}
+
+	@Test
+	public void testBadNumber2() throws CoreException
+	{
+		// @formatter:off
+		String text = "var number = -1.7976931348623157e+309;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Bad number '1.7976931348623157e+309'.", 1, IMarker.SEVERITY_WARNING, 37);
+	}
+
+	@Test
+	public void testBadWrap() throws CoreException
+	{
+		// @formatter:off
+		String text = "/*jslint sloppy: true, es5: true */\n" +
+				"var obj = (function () {\n" +
+				"        var a;\n" +
+				"        return {\n" +
+				"            get a() {\n" +
+				"                return a;\n" +
+				"            },\n" +
+				"            set a(value) {\n" +
+				"                a = 'prepender: ';\n" +
+				"            }\n" +
+				"        };\n" +
+				"    });";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items,
+				"Do not wrap function literals in parens unless they are to be immediately invoked.", 2,
+				IMarker.SEVERITY_WARNING, 46);
+	}
+
+	@Test
+	public void testCombineVar() throws CoreException
+	{
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    var bar = 1;\n" +
+				"    var x = 10;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Combine this with the previous 'var' statement.", 3, IMarker.SEVERITY_WARNING, 42);
+	}
+
+	@Test
+	public void testCombineVarOK1() throws CoreException
+	{
+		// @formatter:off
+		String text = "function eachSlice(number, iterator, context) {\n" +
+				"	var index = -number, slices = [], array = this.toArray();\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Combine this with the previous 'var' statement.");
+	}
+
+	@Test
+	public void testConditionalAssignmentAndLeftSide() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a = 1;\n" +
+				"if ((a = 3) && a) {\n" +
+				"    var b = 3;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 18);
+	}
+
+	@Test
+	public void testConditionalAssignmentAndRightSide() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a = 1;\n" +
+				"if (a && (a = 3)) {\n" +
+				"    var b = 3;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 23);
+	}
+
+	@Test
+	public void testConditionalAssignmentDoWhile() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a = 3;\n" +
+				"do {\n" +
+				"    a = 7;\n" +
+				"} while (a = 1);";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 4,
+				IMarker.SEVERITY_WARNING, 38);
+	}
+
+	@Test
+	public void testConditionalAssignmentFor() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a;\n" +
+				"for (a = 3; a = 7; a += 3) {\n" +
+				"    var b = 1;\n" +
+				"}";
+		// @formatter:on
 
-	public void testALabel1() throws CoreException
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 21);
+	}
+
+	@Test
+	public void testConditionalAssignmentIf() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a = 3;\n" +
+				"if (a = 1) {\n" +
+				"    a = 7;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 17);
+	}
+
+	@Test
+	public void testConditionalAssignmentOrLeftSide() throws CoreException
+	{
+		// @formatter:off
+		String text = "var a = 1;\n" +
+				"if ((a = 3) || a) {\n" +
+				"    var b = 3;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 18);
+	}
+
+	@Test
+	public void testConditionalAssignmentOrRightSide() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var a = 1;\n" +
+				"if (a || (a = 3)) {\n" +
+				"    var b = 3;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 23);
 	}
 
-	public void testAssignmentFunctionExpression() throws CoreException
+	@Test
+	public void testConditionalAssignmentSwitch() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var a;\n" +
+				"switch (a = 3) {\n" +
+				"case 3:\n" +
+				"    var b = 1;\n" +
+				"    break;\n" +
+				"default:\n" +
+				"    break;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 17);
 	}
 
-	public void testBadConstructor() throws CoreException
+	@Test
+	public void testConditionalAssignmentTernary() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var a = 3;\n" +
+				"var b = (a = 3) ? true : false;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 22);
 	}
 
-	public void testBadInA() throws CoreException
+	@Test
+	public void testConditionalAssignmentWhile() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var a = 3;\n" +
+				"while (a = 1) {\n" +
+				"    a = 7;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a conditional expression and instead saw an assignment.", 2,
+				IMarker.SEVERITY_WARNING, 20);
 	}
 
-	public void testBadInvocation1() throws CoreException
+	@Test
+	public void testConstructorNameA1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "function bar() {}\n" +
+				"var foo = new bar();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "A constructor name 'bar' should start with an uppercase letter.", 2,
+				IMarker.SEVERITY_WARNING, 32);
 	}
 
-	public void testBadInvocation2() throws CoreException
+	@Test
+	public void testDangerousComment1() throws CoreException
 	{
-		// TODO Implement!
+		setOption("safe", true);
+		// @formatter:off
+		String text = "/* </ */";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Dangerous comment.", 1, IMarker.SEVERITY_WARNING, 2);
 	}
 
-	public void testBadOperand1() throws CoreException
+	@Test
+	public void testDangerousComment2() throws CoreException
 	{
-		// TODO Implement!
+		setOption("safe", true);
+		// @formatter:off
+		String text = "// <";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Dangerous comment.", 1, IMarker.SEVERITY_WARNING, 2);
 	}
 
-	public void testBadOperand2() throws CoreException
+	@Test
+	public void testDangerousComment3() throws CoreException
 	{
-		// TODO Implement!
+		setOption("safe", true);
+		// @formatter:off
+		String text = "// scRipT";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Dangerous comment.", 1, IMarker.SEVERITY_WARNING, 2);
 	}
 
-	public void testConfusingABang1() throws CoreException
+	@Test
+	public void testDangerousComment4() throws CoreException
 	{
-		// TODO Implement!
+		setOption("safe", true);
+		// @formatter:off
+		String text = "// &Lt";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Dangerous comment.", 1, IMarker.SEVERITY_WARNING, 2);
 	}
 
-	public void testConfusingABang2() throws CoreException
+	@Test
+	public void testDangerousComment5() throws CoreException
 	{
-		// TODO Implement!
+		setOption("safe", true);
+		// @formatter:off
+		String text = "/* ]    ] */";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Dangerous comment.", 1, IMarker.SEVERITY_WARNING, 2);
 	}
 
-	public void testConfusingAInfixMinusMinusMinus() throws CoreException
+	@Test
+	public void testDangerousComment6() throws CoreException
 	{
-		// TODO Implement!
+		setOption("safe", true);
+		// @formatter:off
+		String text = "/* <   ! */";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Dangerous comment.", 1, IMarker.SEVERITY_WARNING, 2);
 	}
 
-	public void testConfusingAInfixPlusPlusPlus() throws CoreException
+	@Test
+	public void testDangerousComment7() throws CoreException
 	{
-		// TODO Implement!
+		setOption("safe", true);
+		// @formatter:off
+		String text = "/*@cc */";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Dangerous comment.", 1, IMarker.SEVERITY_WARNING, 2);
 	}
 
-	public void testConfusingAPrefixMinusMinusMinus() throws CoreException
+	@Test
+	public void testDangerousCommentOKIfSafeOptionNotExplicitlyTurnedOn() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "/*  Prototype Javascript framework, version 1.7 */";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Dangerous comment.");
 	}
 
-	public void testConfusingAPrefixPlusPlusPlus() throws CoreException
+	@Test
+	public void testDanglingA1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var _foo = '';";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unexpected dangling '_' in '_foo'.", 1, IMarker.SEVERITY_WARNING, 4);
 	}
 
-	public void testConfusingRegexp1() throws CoreException
+	@Test
+	public void testDanglingA2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var foo_ = '';";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unexpected dangling '_' in 'foo_'.", 1, IMarker.SEVERITY_WARNING, 4);
 	}
 
-	public void testConfusingRegexp2() throws CoreException
+	@Test
+	public void testDeleteOK() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var o = { x: 1 };\n" +
+				"delete o.x;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Only properties should be deleted.");
 	}
 
-	public void testDelete1() throws CoreException
+	@Test
+	public void testEmptyBlock1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "if (true) {\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Empty block.", 2, IMarker.SEVERITY_WARNING, 12);
 	}
 
-	public void testDelete2() throws CoreException
+	@Test
+	public void testEmptyBlock2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "if (true) {\n" +
+				"    var i = 0;\n" +
+				"} else {\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Empty block.", 4, IMarker.SEVERITY_WARNING, 36);
 	}
 
-	public void testDuplicateACase1() throws CoreException
+	@Test
+	public void testEmptyBlock3() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "for (i = 0; i < 10; i += 1) {\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Empty block.", 2, IMarker.SEVERITY_WARNING, 30);
 	}
 
-	public void testDuplicateACase2() throws CoreException
+	@Test
+	public void testEmptyBlock4() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "while (true) {\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Empty block.", 2, IMarker.SEVERITY_WARNING, 15);
 	}
 
-	public void testDuplicateAGetterSetter() throws CoreException
+	@Test
+	public void testEmptyBlock5() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "do {\n" +
+				"} while (i > 0);";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Empty block.", 2, IMarker.SEVERITY_WARNING, 7);
 	}
 
-	public void testDuplicateAJSONPropertyName() throws CoreException
+	@Test
+	public void testEmptyClass() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var regexp = /[]/;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Empty class.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
-	public void testEmptyCase() throws CoreException
+	@Test
+	public void testEvil1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "eval('blah');";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "eval is evil.", 1, IMarker.SEVERITY_WARNING, 0);
 	}
 
-	public void testES5() throws CoreException
+	@Test
+	public void testEvil2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var foo = '';\n" +
+					"foo['eval'] = '';";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "eval is evil.", 2, IMarker.SEVERITY_WARNING, 18);
 	}
 
-	public void testES5_2() throws CoreException
+	@Test
+	public void testEvil3() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var foo = '';\n" +
+					"foo.execScript = '';";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "eval is evil.", 2, IMarker.SEVERITY_WARNING, 29);
 	}
 
-	public void testExpectedAAtBC() throws CoreException
+	@Test
+	public void testExpectedNumberA1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var r = /x{a}/;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected a number and instead saw 'a'.", 1, IMarker.SEVERITY_WARNING, 10);
 	}
 
-	public void testExpectedIdentifer() throws CoreException
+	@Test
+	public void testExpectedNumberAOK1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "Template.Pattern = /(^|.|\\r|\\n)(#\\{(.*?)\\})/;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Expected a number and instead saw '(.*?)\\'.");
 	}
 
-	public void testForIf1() throws CoreException
+	@Test
+	public void testFixedWrapImmediate() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var someVar = (function () {\n" +
+					"}());";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(
+				items,
+				"Wrap an immediate function invocation in parentheses to assist the reader in understanding that the expression is the result of a function, and not the function itself.");
 	}
 
-	public void testForIf2() throws CoreException
+	@Test
+	public void testForIfOk1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (array[i] === Object) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.");
 	}
 
-	public void testForIf3() throws CoreException
+	@Test
+	public void testForIfOk2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (typeof array[i] === Object) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.");
 	}
 
-	public void testForIf4() throws CoreException
+	@Test
+	public void testForIfOk3() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (array.hasOwnProperty(i)) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.");
 	}
 
-	public void testForIf5() throws CoreException
+	@Test
+	public void testForIfOk4() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (ADSAFE.has(array, i)) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.");
 	}
 
-	public void testForIf6() throws CoreException
+	@Test
+	public void testForIfOk5() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var array = [1, 2, 3];\n" +
+				"var i;\n" +
+				"for (i in array) {\n" +
+				"    if (Object.prototype.hasOwnProperty.call(array, i)) {\n" +
+				"        var x = i % 2;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items,
+				"The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.");
 	}
 
-	public void testForIf7() throws CoreException
+	@Test
+	public void testFunctionEval() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var number = new Function('');";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "The Function constructor is eval.", 1, IMarker.SEVERITY_WARNING, 25);
 	}
 
-	public void testForIf8() throws CoreException
+	@Test
+	public void testImpliedEvil1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "setTimeout('blah', 2000);";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Implied eval is evil. Pass a function instead of a string.", 1,
+				IMarker.SEVERITY_WARNING, 0);
 	}
 
-	public void testFunctionBlock1() throws CoreException
+	@Test
+	public void testImpliedEvil2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "setInterval('blah', 2000);";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Implied eval is evil. Pass a function instead of a string.", 1,
+				IMarker.SEVERITY_WARNING, 0);
 	}
 
-	public void testFunctionLoop1() throws CoreException
+	@Test
+	public void testInsecureA1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var r = /.regexp/;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Insecure '.'.", 1, IMarker.SEVERITY_WARNING, 9);
 	}
 
-	public void testFunctionLoop2() throws CoreException
+	@Test
+	public void testInsecureA2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var r = /[^t]regexp/;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Insecure '^'.", 1, IMarker.SEVERITY_WARNING, 10);
 	}
 
-	public void testFunctionStatement() throws CoreException
+	@Test
+	public void testJSLintValidator() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "/*jslint undef: false */\n" +
+				"var foo = function() {\n" +
+				"  hello();\n" +
+				"};";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "'hello' was used before it was defined.", 3, IMarker.SEVERITY_WARNING, 50);
 	}
 
-	public void testFunctionStrict1() throws CoreException
+	@Test
+	public void testLeadingDecimalA() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var number = .8;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "A leading decimal point can be confused with a dot: '.8'.", 1,
+				IMarker.SEVERITY_WARNING, 13);
 	}
 
-	public void testFunctionStrict2() throws CoreException
+	@Test
+	public void testMissingA1() throws CoreException
 	{
-		// TODO Implement!
+		String text = "new Array";
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Missing '()'.", 1, IMarker.SEVERITY_WARNING, 4);
 	}
 
-	public void testHTMLConfusionA1() throws CoreException
+	@Test
+	public void testMissingA1OK() throws CoreException
 	{
-		// TODO Implement!
+		String text = "new Array();";
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Missing '()'.");
 	}
 
-	public void testHTMLConfusionA2() throws CoreException
+	@Test
+	public void testMissingA2() throws CoreException
 	{
-		// TODO Implement!
+		String text = "switch (1) {\n}";
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Missing 'case'.", 2, IMarker.SEVERITY_WARNING, 13);
 	}
 
-	public void testHTMLConfusionA3() throws CoreException
+	@Test
+	public void testMoveInvocation2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var Prototype = {\n" +
+				"  Browser: (function(){\n" +
+				"    var ua = navigator.userAgent;\n" +
+				"  })()\n" +
+				"};";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		// This isn't a "bad_wrap", it's a "move_invocation"
+		assertDoesntContain(items, "Do not wrap function literals in parens unless they are to be immediately invoked.");
+		assertProblemExists(items, "Move the invocation into the parens that contain the function.", 4,
+				IMarker.SEVERITY_WARNING, 80);
 	}
 
-	public void testInfixIn() throws CoreException
+	@Test
+	public void testNotAConstructor1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var x = new Math();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Do not use Math as a constructor.", 1, IMarker.SEVERITY_WARNING, 12);
 	}
 
-	public void testIsNaN1() throws CoreException
+	@Test
+	public void testNotAConstructor2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var x = new Number();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Do not use Number as a constructor.", 1, IMarker.SEVERITY_WARNING, 12);
 	}
 
-	public void testIsNaN2() throws CoreException
+	@Test
+	public void testNotAConstructor3() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var x = new String();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Do not use String as a constructor.", 1, IMarker.SEVERITY_WARNING, 12);
 	}
 
-	public void testIsNaN3() throws CoreException
+	@Test
+	public void testNotAConstructor4() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var x = new JSON();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Do not use JSON as a constructor.", 1, IMarker.SEVERITY_WARNING, 12);
 	}
 
-	public void testIsNaN4() throws CoreException
+	@Test
+	public void testNotAConstructor5() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var x = new Boolean();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Do not use Boolean as a constructor.", 1, IMarker.SEVERITY_WARNING, 12);
 	}
 
-	public void testIsNaN5() throws CoreException
+	// public void testANotDefined() throws CoreException
+	// {
+//		// @formatter:off
+//		String text = "function bar() {\n" +
+//				"    var foo = 1;\n" +
+//				"    var foo = 2;\n" +
+//				"}";
+//		// @formatter:on
+	//
+	// List<IProblem> items = getParseErrors(text);
+	// assertProblemExists(items, "'foo' is already defined.", 3, IMarker.SEVERITY_WARNING, 42);
+	// }
+
+	@Test
+	public void testNotALabelOK1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    var i;\n" +
+				"something:\n" +
+				"    for (i = 0; i < 10; i += 1) {\n" +
+				"        if (i === 2) {\n" +
+				"            break something;\n" +
+				"        }\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "'something' is not a label.");
 	}
 
-	public void testIsNaN6() throws CoreException
+	@Test
+	public void testNotALabelOK2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    var i;\n" +
+				"something:\n" +
+				"    for (i = 0; i < 10; i += 1) {\n" +
+				"        if (i === 2) {\n" +
+				"            continue something;\n" +
+				"        }\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "'something' is not a label.");
 	}
 
-	public void testIsNaN7() throws CoreException
+	@Test
+	public void testNotGreater() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var r = /x{3,1}/;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "'3' should not be greater than '1'.", 1, IMarker.SEVERITY_WARNING, 14);
 	}
 
-	public void testIsNaN8() throws CoreException
+	@Test
+	public void testParameterArgumentsA() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "function foo(param) {\n" +
+				"    param = 3;\n" +
+				"    arguments[0] = true;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Do not mutate parameter 'param' when using 'arguments'.", 1,
+				IMarker.SEVERITY_WARNING, 13);
 	}
 
-	public void testMissingA3() throws CoreException
+	@Test
+	public void testRadix() throws CoreException
 	{
-		// TODO Implement! Our parser doesn't support getter/setter syntax yet!
+		// @formatter:off
+		String text = "var number = parseInt('');";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Missing radix parameter.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
-	public void testMissingProperty() throws CoreException
+	@Test
+	public void testReadOnlyEval() throws CoreException
 	{
-		// TODO Implement! Our parser doesn't support getter/setter syntax yet!
+		Set<String> predefineds = CollectionsUtil.newSet("eval");
+		for (String predefined : predefineds)
+		{
+			// @formatter:off
+			String text = predefined + " = true;";
+			// @formatter:on
+
+			List<IProblem> items = getParseErrors(text);
+			assertProblemExists(items, "Read only.", 1, IMarker.SEVERITY_ERROR, 7);
+		}
 	}
 
-	public void testMoveInvocation() throws CoreException
+	@Test
+	public void testReservedA1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var __iterator__ = '';";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Reserved name '__iterator__'.", 1, IMarker.SEVERITY_ERROR, 4);
 	}
 
-	public void testMoveVar() throws CoreException
+	@Test
+	public void testReservedA2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var __proto__ = '';";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Reserved name '__proto__'.", 1, IMarker.SEVERITY_ERROR, 4);
 	}
 
-	public void testNestedComment() throws CoreException
+	@Test
+	public void testStatementBlock1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var foo = 1;\n" +
+				"{}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected to see a statement and instead saw a block.", 2, IMarker.SEVERITY_WARNING,
+				14);
 	}
 
-	public void testNotAFunction1() throws CoreException
+	@Test
+	public void testStatementBlock2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"{}\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected to see a statement and instead saw a block.", 2, IMarker.SEVERITY_WARNING,
+				18);
+		assertCountOfProblems(items, 1, "Expected to see a statement and instead saw a block.");
 	}
 
-	public void testNotALabel1() throws CoreException
+	@Test
+	public void testStatementBlockOK1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var event;\n" +
+					  "while (event = events.shift()) {\n" +
+					  "	\n" +
+					  "}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Expected to see a statement and instead saw a block.");
 	}
 
-	public void testNotALabel2() throws CoreException
+	@Test
+	public void testStatementBlockOK2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var event;\n" +
+					  "while (event = events.shift()) {\n" +
+					  "	{}\n" +
+					  "}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Expected to see a statement and instead saw a block.", 3, IMarker.SEVERITY_WARNING,
+				46);
+		assertCountOfProblems(items, 1, "Expected to see a statement and instead saw a block.");
 	}
 
-	public void testOctalA() throws CoreException
+	@Test
+	public void testStrangeLoop1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var i;\n" +
+				"for (i = 0; i < 10; i++) {\n" +
+				"    var x = i * i;\n" +
+				"    break;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Strange loop.", 4, IMarker.SEVERITY_WARNING, 62);
 	}
 
-	public void testParameterAGetB() throws CoreException
+	@Test
+	public void testStrangeLoop2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var i;\n" +
+				"do {\n" +
+				"    var x = i * i;\n" +
+				"    continue;\n" +
+				"} while (i < 20);";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Strange loop.", 4, IMarker.SEVERITY_WARNING, 43);
 	}
 
-	public void testParameterSetA() throws CoreException
+	@Test
+	public void testStrangeLoop3() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var i = 0;\n" +
+				"while (true) {\n" +
+				"    var x = i * i;\n" +
+				"    throw 'error!';\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Strange loop.", 4, IMarker.SEVERITY_WARNING, 63);
 	}
 
-	public void testParameterSetA2() throws CoreException
+	@Test
+	public void testSubscript() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var result = true;\n" +
+				"result['something'] = 'yeah';";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "['something'] is better written in dot notation.", 2, IMarker.SEVERITY_WARNING, 26);
 	}
 
-	public void testReadOnly() throws CoreException
+	@Test
+	public void testSubscriptOK() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var result = true;\n" +
+				"result['case'] = 'yeah';";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "['case'] is better written in dot notation.");
 	}
 
-	public void testSlashEqual() throws CoreException
+	@Test
+	public void testSyncA() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var result = true;\n" +
+				"result.methodSync('yeah');";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unexpected sync method: 'methodSync'.", 2, IMarker.SEVERITY_WARNING, 26);
 	}
 
-	public void testStrict1() throws CoreException
+	@Test
+	public void testTabsDontMessUpOffset() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "function x() {\n" +
+				"	eval('blah!');\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "eval is evil.", 2, IMarker.SEVERITY_WARNING, 16);
 	}
 
-	public void testStrict2() throws CoreException
+	@Test
+	public void testTrailingDecimalA() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var number = 1.;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "A trailing decimal point can be confused with a dot: '1.'.", 1,
+				IMarker.SEVERITY_WARNING, 15);
 	}
 
-	public void testUnexpectedAMinusMinus() throws CoreException
+	@Test
+	public void testUnexpectedAOK1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var Prototype = {\n" +
+				"  Browser: (function(){\n" +
+				"    var ua = navigator.userAgent;\n" +
+				"  })()\n" +
+				"};";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Unexpected 'ua'.");
 	}
 
-	public void testUnexpectedAPlusPlus() throws CoreException
+	@Test
+	public void testUnexpectedAOK2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "function create() {\n" +
+				"    var parent = null, properties = $A(arguments);\n" +
+				"};";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Unexpected 'parent'.");
 	}
 
-	public void testUnexpectedAPlusPlus2() throws CoreException
+	@Test
+	public void testUnnecessaryInitialize() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var foo = undefined;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "It is not necessary to initialize 'foo' to 'undefined'.", 1,
+				IMarker.SEVERITY_WARNING, 8);
 	}
 
-	public void testUnexpectedPropertyA1() throws CoreException
+	@Test
+	public void testUnreachableAB1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "break;\n" +
+				"var a = 1;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unreachable 'var' after 'break'.", 2, IMarker.SEVERITY_WARNING, 7);
 	}
 
-	public void testUnexpectedPropertyA2() throws CoreException
+	@Test
+	public void testUnreachableAB2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "continue;\n" +
+				"var a = 1;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unreachable 'var' after 'continue'.", 2, IMarker.SEVERITY_WARNING, 10);
 	}
 
-	public void testUnnecessaryUseStrict1() throws CoreException
+	@Test
+	public void testUnreachableAB3() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "return 1;\n" +
+				"var a = 1;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Unreachable 'var' after 'return'.", 2, IMarker.SEVERITY_WARNING, 10);
 	}
 
-	public void testURL() throws CoreException
+	@Test
+	public void testUseArray() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var array = new Array(1, 2, 3);";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 21);
 	}
 
-	public void testURL2() throws CoreException
+	@Test
+	public void testUseArray2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var array = new Array();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 21);
 	}
 
-	public void testURL3() throws CoreException
+	@Test
+	public void testUseArray3() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var array = new Array;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 16);
 	}
 
-	public void testURL4() throws CoreException
+	@Test
+	public void testUseArray4() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "'string'.split(1);";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Use the array literal notation [].", 1, IMarker.SEVERITY_WARNING, 9);
 	}
 
-	public void testURL5() throws CoreException
+	@Test
+	public void testUseBraces() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var regexp = /  /;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Spaces are hard to count. Use {2}.", 1, IMarker.SEVERITY_WARNING, 15);
 	}
 
-	public void testURL6() throws CoreException
+	@Test
+	public void testUsedBeforeA() throws CoreException
 	{
-		// TODO Implement!
+		setOption("undef", false);
+		// @formatter:off
+		String text = "/*jslint undef: false */\n" +
+				"function chris() {\n" +
+				"    var bar = foo + 1;\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "'foo' was used before it was defined.", 3, IMarker.SEVERITY_WARNING, 58);
 	}
 
-	public void testURL7() throws CoreException
+	@Test
+	public void testUsedBeforeA2() throws CoreException
 	{
-		// TODO Implement!
+		setOption("undef", false);
+		// @formatter:off
+		String text = "var Events = Backbone.Events = {};";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "'Backbone' was used before it was defined.", 1, IMarker.SEVERITY_WARNING, 13);
 	}
 
-	public void testURL8() throws CoreException
+	@Test
+	public void testUsedBeforeAOK1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var Prototype = { Version: '1.7' }";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "'Version' was used before it was defined.");
 	}
 
-	public void testUseOr() throws CoreException
+	@Test
+	public void testUseObject() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var foo = new Object();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Use the object literal notation {}.", 1, IMarker.SEVERITY_WARNING, 14);
 	}
 
-	public void testuseStrict1() throws CoreException
+	@Test
+	public void testUseObject2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var foo = Object();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Use the object literal notation {}.", 1, IMarker.SEVERITY_WARNING, 16);
 	}
 
-	public void testuseStrict2() throws CoreException
+	@Test
+	public void testUseParam() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "function chris(a, b) {\n" +
+				"   return arguments[1];\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Use a named parameter.", 2, IMarker.SEVERITY_WARNING, 33);
 	}
 
-	public void testWeirdAssignment() throws CoreException
+	@Test
+	public void testUseStrictOK() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "function foo() {\n" +
+				"    \"use strict\";\n" +
+				"    var x;\n" +
+				"    try {\n" +
+				"        x = 1;\n" +
+				"    } catch (e) {\n" +
+				"        x = 10;\n" +
+				"    }\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Missing 'use strict' statement.");
 	}
 
-	public void testWeirdCondition1() throws CoreException
+	@Test
+	public void testVarANot() throws CoreException
 	{
-		// TODO Implement!
+		String text = "var chris = blah = 'something';";
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Variable blah was not declared correctly.", 1, IMarker.SEVERITY_ERROR, 12);
 	}
 
-	public void testWeirdCondition2() throws CoreException
+	@Test
+	public void testVarANot_OK() throws CoreException
 	{
-		// TODO Implement!
+		String text = "var Events = Backbone.Events = {};";
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Variable  was not declared correctly.");
 	}
 
-	public void testWeirdCondition3() throws CoreException
+	@Test
+	public void testWeirdNew() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var someObj = new function () {};";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Weird construction. Delete 'new'.", 1, IMarker.SEVERITY_WARNING, 14);
 	}
 
-	public void testWeirdCondition4() throws CoreException
+	@Test
+	public void testWeirdProgram1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "break;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 0);
 	}
 
-	public void testWeirdRelation1() throws CoreException
+	@Test
+	public void testWeirdProgram2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "continue;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 0);
 	}
 
-	public void testWeirdRelation2() throws CoreException
+	@Test
+	public void testWeirdProgram3() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "return;";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 0);
 	}
 
-	public void testWeirdRelation3() throws CoreException
+	@Test
+	public void testWeirdProgram4() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "throw 'e';";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Weird program.", 1, IMarker.SEVERITY_WARNING, 6);
 	}
 
-	public void testWeirdRelation4() throws CoreException
+	@Test
+	public void testWrapImmediate() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var someVar = function () {\n" +
+					"}();";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(
+				items,
+				"Wrap an immediate function invocation in parentheses to assist the reader in understanding that the expression is the result of a function, and not the function itself.",
+				2, IMarker.SEVERITY_WARNING, 30);
 	}
 
-	public void testWeirdRelation5() throws CoreException
+	@Test
+	public void testWrapImmediateOK() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var someVar = (function () {\n" +
+					"}());";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(
+				items,
+				"Wrap an immediate function invocation in parentheses to assist the reader in understanding that the expression is the result of a function, and not the function itself.");
 	}
 
-	public void testWeirdRelation6() throws CoreException
+	@Test
+	public void testWrapRegexp1() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "function chris() { return /regexp/i; }";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Wrap the /regexp/ literal in parens to disambiguate the slash operator.", 1,
+				IMarker.SEVERITY_WARNING, 26);
 	}
 
-	public void testWeirdRelation7() throws CoreException
+	@Test
+	public void testWrapRegexp2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "function blank() {\n" +
+				"	return /^\\s*$/.test(this);\n" +
+				"}";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "Wrap the /regexp/ literal in parens to disambiguate the slash operator.", 2,
+				IMarker.SEVERITY_WARNING, 27);
 	}
 
-	public void testWeirdRelation8() throws CoreException
+	@Test
+	public void testWriteIsWrong() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "/*jslint evil: false */\n" +
+				"document.write('something');";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "document.write can be a form of eval.", 2, IMarker.SEVERITY_WARNING, 24);
 	}
 
-	public void testWeirdTernary1() throws CoreException
+	@Test
+	public void testWriteIsWrong2() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "/*jslint evil: false */\n" +
+				"document.writeln('something');";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertProblemExists(items, "document.write can be a form of eval.", 2, IMarker.SEVERITY_WARNING, 24);
 	}
 
-	public void testWeirdTernary2() throws CoreException
+	@Test
+	public void testTISTUD2925() throws CoreException
 	{
-		// TODO Implement!
+		// @formatter:off
+		String text = "var child = spawn(cmd.shift(), cmd);\n" +
+					  "re = new RegExp('(\\u001b\\\\[\\\\d+m)?\\\\[?(' + logger.getLevels().join('|') + ')\\\\]?\\s*(\\u001b\\\\[\\\\d+m)?(.*)', 'i');";
+		// @formatter:on
+
+		List<IProblem> items = getParseErrors(text);
+		assertDoesntContain(items, "Read only.");
 	}
 
 	protected void setOption(String optionName, boolean value)
@@ -574,46 +1777,6 @@ public class JSStyleValidatorTest extends JSLintValidatorTest
 	}
 
 	// Tests we are intentionally skipping -----------------------
-
-	public void testExpectedIdentiferAReserved1() throws CoreException
-	{
-		// we don't so this, because we generate a parse error in parser
-	}
-
-	public void testExpectedIdentiferAReserved2() throws CoreException
-	{
-		// we don't so this, because we generate a parse error in parser
-	}
-
-	public void testNameFunction() throws CoreException
-	{
-		// we don't so this, because we generate a parse error in parser
-	}
-
-	public void testBadNameA1() throws CoreException
-	{
-		// we don't do this because it's an HTML check
-	}
-
-	public void testBadNameA2() throws CoreException
-	{
-		// we don't do this because it's an HTML check
-	}
-
-	public void testUnrecognizedStyleAttributeA() throws CoreException
-	{
-		// skip CSS in HTML check
-	}
-
-	public void testUnrecognizedTagA() throws CoreException
-	{
-		// skip HTML check
-	}
-
-	public void testNestedNot() throws CoreException
-	{
-		// skip CSS check
-	}
 
 	@SuppressWarnings("nls")
 	@Test

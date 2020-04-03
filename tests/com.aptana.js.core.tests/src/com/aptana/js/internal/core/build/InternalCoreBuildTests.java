@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ JSLintValidatorTest.class, JSParserValidatorTest.class, JSStyleValidatorTest.class, })
+@SuiteClasses({ JSParserValidatorTest.class, JSStyleValidatorTest.class, })
 public class InternalCoreBuildTests
 {
 
