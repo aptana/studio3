@@ -5,8 +5,7 @@ Bundle-SymbolicName: com.aptana.editor.js;singleton:=true
 Bundle-Version: 3.0.3.qualifier
 Bundle-Activator: com.aptana.editor.js.JSPlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.mozilla.javascript,
- json.simple;bundle-version="1.0.0",
+Require-Bundle: json.simple;bundle-version="1.0.0",
  com.aptana.jetty.util.epl,
  org.eclipse.help,
  com.aptana.core;bundle-version="3.0.4",

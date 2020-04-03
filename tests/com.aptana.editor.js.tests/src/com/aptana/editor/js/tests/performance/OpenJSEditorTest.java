@@ -35,7 +35,7 @@ import com.aptana.editor.epl.tests.OpenEditorTest;
 import com.aptana.editor.epl.tests.ResourceTestHelper;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.js.core.JSCorePlugin;
-import com.aptana.js.internal.core.build.JSLintValidator;
+import com.aptana.js.internal.core.build.JSStyleValidator;
 import com.aptana.testing.categories.PerformanceTests;
 
 @Category({ PerformanceTests.class })
@@ -73,8 +73,7 @@ public class OpenJSEditorTest extends OpenEditorTest
 		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(JSPlugin.PLUGIN_ID);
 
 		// Turn off all JS validators!!!!
-		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(JSLintValidator.ID, BuildType.BUILD), false);
-		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(JSLintValidator.ID, BuildType.BUILD), false);
+		prefs.putBoolean(PreferenceUtil.getEnablementPreferenceKey(JSStyleValidator.ID, BuildType.BUILD), false);
 
 		EditorTestHelper.runEventQueue();
 		setWarmUpRuns(WARM_UP_RUNS);

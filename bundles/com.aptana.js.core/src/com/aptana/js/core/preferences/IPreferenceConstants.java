@@ -19,11 +19,6 @@ public interface IPreferenceConstants
 	public static final String JS_INDEX_VERSION = "JS_INDEX_VERSION"; //$NON-NLS-1$
 
 	/**
-	 * Preference key used to store the JSLint options as JSON.
-	 */
-	public static final String JS_LINT_OPTIONS = "jsLintOptions"; //$NON-NLS-1$
-
-	/**
 	 * Path to NodeJS' binary. Stored as OS string. Convert to {@link IPath} using {@link Path#fromOSString(String)}
 	 */
 	public static final String NODEJS_EXECUTABLE_PATH = "nodejs_path"; //$NON-NLS-1$

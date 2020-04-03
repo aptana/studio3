@@ -6,7 +6,6 @@
 			<unit id="com.fasterxml.jackson.core.jackson-core" version="2.9.2.v20180207-1730"/>
 			<unit id="com.fasterxml.jackson.core.jackson-databind" version="2.9.2.v20180207-1730"/>
 			<unit id="org.apache.commons.lang3" version="3.1.0.v201403281430"/>
-			<unit id="org.mozilla.javascript" version="1.7.5.v201504281450"/>
 			<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20180905201904/repository"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
