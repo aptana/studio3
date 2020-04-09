@@ -615,10 +615,10 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			if (traceParticipantsEnabled)
 			{
 				double endTime = ((double) System.nanoTime() - startTime) / 1000000;
-				IdeLog.logTrace(
-						BuildPathCorePlugin.getDefault(),
-						MessageFormat
-								.format("Executed build participant ''{0}'' on ''{1}'' in {2} ms.", participant.getName(), context.getURI(), endTime), IDebugScopes.BUILDER_PARTICIPANTS); //$NON-NLS-1$
+				IdeLog.logTrace(BuildPathCorePlugin.getDefault(),
+						MessageFormat.format("Executed build participant ''{0}'' on ''{1}'' in {2} ms.", //$NON-NLS-1$
+								participant.getName(), context.getURI(), endTime),
+						IDebugScopes.BUILDER_PARTICIPANTS);
 			}
 
 			// stop building if it has been canceled
@@ -742,6 +742,10 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 				files.add((IFile) resource);
 				return false;
 			}
+			else if (resource.isDerived())
+			{
+				return false;
+			}
 			return true;
 		}
 	}
@@ -760,10 +764,16 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		public boolean visit(IResourceDelta delta) throws CoreException
 		{
 			IResource resource = delta.getResource();
+			// ignore derived files/dirs (like "build" dir)
+			if (resource.isDerived(IResource.CHECK_ANCESTORS))
+			{
+				return false;
+			}
+
 			if (resource instanceof IFile)
 			{
-				if (delta.getKind() == IResourceDelta.ADDED
-						|| (delta.getKind() == IResourceDelta.CHANGED && ((delta.getFlags() & (IResourceDelta.CONTENT | IResourceDelta.ENCODING)) != 0)))
+				if (delta.getKind() == IResourceDelta.ADDED || (delta.getKind() == IResourceDelta.CHANGED
+						&& ((delta.getFlags() & (IResourceDelta.CONTENT | IResourceDelta.ENCODING)) != 0)))
 				{
 					updatedFiles.add((IFile) resource);
 				}

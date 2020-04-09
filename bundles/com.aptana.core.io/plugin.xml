@@ -89,6 +89,19 @@
                type="org.eclipse.core.filesystem.IFileStore">
          </adapter>
       </factory>
+      <factory
+            adaptableType="org.eclipse.core.filesystem.IFileStore"
+            class="com.aptana.ide.core.io.internal.FileStoreAdapterFactory">
+         <adapter
+               type="org.eclipse.core.resources.IResource">
+         </adapter>
+         <adapter
+               type="org.eclipse.core.resources.IFile">
+         </adapter>
+         <adapter
+               type="org.eclipse.core.resources.IContainer">
+         </adapter>
+      </factory>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
