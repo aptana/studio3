@@ -66,6 +66,7 @@ public class IndexContainerJob extends IndexRequestJob
 
 		try
 		{
+			// FIXME: Ignore node_modules inside hyperloop module?
 			// Collect the full set of files in the project...
 			Set<IFileStore> files = IndexUtil.getAllFiles(getContainerFileStore(), sub.newChild(100));
 			if (sub.isCanceled())
