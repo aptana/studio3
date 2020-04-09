@@ -18,6 +18,7 @@ import java.util.Set;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -184,9 +185,16 @@ public class IndexUtil
 			{
 				return files;
 			}
+
 			// We know it exists...
 			if (info.isDirectory())
 			{
+				// If it's a derived resource, skip it!
+				IContainer curr = file.getAdapter(IContainer.class);
+				if (curr != null && curr.isDerived())
+				{
+					return files;
+				}
 				try
 				{
 					// Now try to dive into directory and add all children recursively

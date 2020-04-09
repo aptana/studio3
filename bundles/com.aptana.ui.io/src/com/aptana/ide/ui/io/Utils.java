@@ -24,6 +24,9 @@ public class Utils
 
 	public static IFileStore getFileStore(Object adaptable)
 	{
+		if (adaptable instanceof IFileStore) {
+			return (IFileStore) adaptable;
+		}
 		if (adaptable instanceof IAdaptable)
 		{
 			IResource resource = (IResource) ((IAdaptable) adaptable).getAdapter(IResource.class);
