@@ -1,6 +1,10 @@
 #! groovy
 // Keep logs/reports/etc of last 15 builds, only keep build artifacts of last build
-properties([buildDiscarder(logRotator(numToKeepStr: '15', artifactNumToKeepStr: '1'))])
+properties([
+	buildDiscarder(logRotator(numToKeepStr: '15', artifactNumToKeepStr: '1')),
+	// specify projects to allow to copy artifacts with a comma-separated list.
+	copyArtifactPermission("appcelerator-studio/titanium_studio/${env.BRANCH_NAME}"),
+])
 // Set after copying upstream artifacts
 // Tells maven where to assume a p2 repo holding the sftp libraries would be
 def sftpURL = ''
