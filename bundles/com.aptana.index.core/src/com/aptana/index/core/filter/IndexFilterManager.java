@@ -147,7 +147,7 @@ public class IndexFilterManager
 		{
 			IResource resource = (IResource) f.getAdapter(IResource.class);
 
-			if (resource != null)
+			if (resource != null && resource.exists()) // only affected if the file/dir actually existed
 			{
 				projects.add(resource.getProject());
 			}
@@ -268,13 +268,7 @@ public class IndexFilterManager
 			{
 				URI uri = new URI(uriString);
 				IFileStore item = EFS.getStore(uri);
-
-				// TODO: Is it possible to have non-local files in projects
-				// and will this still work for those?
-				if (item.fetchInfo().exists())
-				{
-					filteredItems.add(item);
-				}
+				filteredItems.add(item);
 			}
 			catch (URISyntaxException e)
 			{
