@@ -1,7 +1,10 @@
 package com.aptana.editor.common.text.rules;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,6 +26,7 @@ public class CommentScanner extends QueuedTokenScanner
 	private IToken fDefaultToken;
 	private Pattern fPattern;
 	private static IToken taskToken = new Token(TASK_TAG_SCOPE);
+	private Map<String, String> others;
 
 	public CommentScanner(IToken defaultToken)
 	{
@@ -35,7 +39,24 @@ public class CommentScanner extends QueuedTokenScanner
 		}), TaskTag.isCaseSensitive());
 	}
 
+	public CommentScanner(IToken defaultToken, Map<String, String> others)
+	{
+		this(defaultToken, CollectionsUtil.map(TaskTag.getTaskTags(), new IMap<TaskTag, String>()
+		{
+			public String map(TaskTag item)
+			{
+				return item.getName();
+			}
+		}), TaskTag.isCaseSensitive(), others);
+	}
+
 	public CommentScanner(IToken defaultToken, Collection<String> tags, boolean caseSensitive)
+	{
+		this(defaultToken, tags, caseSensitive, null);
+	}
+
+	public CommentScanner(IToken defaultToken, Collection<String> tags, boolean caseSensitive,
+			Map<String, String> others)
 	{
 		super();
 		this.fDefaultToken = defaultToken;
@@ -51,6 +72,21 @@ public class CommentScanner extends QueuedTokenScanner
 		{
 			flags = flags | Pattern.CASE_INSENSITIVE;
 		}
+		// Other special keywords to pick up!
+		this.others = others;
+		if (this.others != null)
+		{
+			// add the keys to the list of tag names
+			tagNames.addAll(others.keySet());
+		}
+		// Sort by descending length so that we try to match longest words/tokens first
+		Collections.sort(tagNames, new Comparator<String>()
+		{
+			public int compare(String o1, String o2)
+			{
+				return o2.length() - o1.length();
+			}
+		});
 		this.fPattern = Pattern.compile(StringUtil.join("|", tagNames), flags);
 	}
 
@@ -74,7 +110,16 @@ public class CommentScanner extends QueuedTokenScanner
 				}
 				int endOffset = matcher.end();
 				int tokenLength = endOffset - startOffset;
-				queueToken(taskToken, startOffset + offset, tokenLength);
+				// Is this a task tag or an "other"?
+				String text = matcher.group();
+				if (this.others != null && this.others.containsKey(text))
+				{
+					queueToken(new Token(this.others.get(text)), startOffset + offset, tokenLength);
+				}
+				else
+				{
+					queueToken(taskToken, startOffset + offset, tokenLength);
+				}
 				currentOffset = endOffset;
 			}
 			// If we have space between end of last task tag and end of region, queue up default token!
