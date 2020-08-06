@@ -3,7 +3,7 @@
 properties([
 	buildDiscarder(logRotator(numToKeepStr: '15', artifactNumToKeepStr: '1')),
 	// specify projects to allow to copy artifacts with a comma-separated list.
-	copyArtifactPermission("/appcelerator-studio/titanium_studio/${env.BRANCH_NAME},../Pydev/${env.BRANCH_NAME},../studio3-ruby/${env.BRANCH_NAME},../studio3-php/${env.BRANCH_NAME},../studio3-rcp/${env.BRANCH_NAME}"),
+	copyArtifactPermission("/appcelerator-studio/titanium_studio/*,../Pydev/*,../studio3-ruby/*,../studio3-php/*,../studio3-rcp/*"),
 ])
 // Set after copying upstream artifacts
 // Tells maven where to assume a p2 repo holding the sftp libraries would be
