@@ -114,8 +114,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.themes.ThemeElementHelper;
-import org.eclipse.ui.internal.tweaklets.PreferencePageEnhancer;
-import org.eclipse.ui.internal.tweaklets.Tweaklets;
 import org.eclipse.ui.themes.ITheme;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -355,7 +353,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			{
 				org.eclipse.e4.ui.css.swt.theme.ITheme selection = getSelection();
 				e4ThemeEngine.setTheme(selection, false);
-				((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY)).setSelection(selection);
 			}
 		});
 	}
