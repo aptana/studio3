@@ -49,6 +49,10 @@ timestamps {
 							timeout(30) {
 								sh "mvn -Dsftp.p2.repo.url=${sftpURL} -Dmaven.test.failure.ignore=true -Djarsigner.keypass=${env.STOREPASS} -Djarsigner.storepass=${env.STOREPASS} -Djarsigner.keystore=${env.KEYSTORE} clean verify"
 							}
+						} catch (err) {
+							sleep(10) // try and wait for log to finish writing?
+							archiveArtifacts artifacts: 'tests/*/target/work/data/.metadata/.log,tests/*/target/work/configuration/*.log'
+							throw err
 						} finally {
 							// record tests even if we failed
 							junit 'tests/*/target/surefire-reports/TEST-*.xml'
