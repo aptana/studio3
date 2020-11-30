@@ -378,19 +378,6 @@ public class HTMLParserTest
 		assertEquals(new Range(19, 19), endTag.getNameRange());
 	}
 
-	/**
-	 * This method is not being used for formal testing, but it's useful to determine how effective
-	 * {@link ParseNode#trimToSize()} is.
-	 * 
-	 * @throws Exception
-	 */
-	// public void trimToSize() throws Exception
-	// {
-	// fParseState = new HTMLParseState(getSource("performance/amazon.html"));
-	//
-	// ASTUtil.showBeforeAndAfterTrim(parse());
-	// }
-
 	protected void parseTest(String source) throws Exception
 	{
 		parseTest(source, source);
