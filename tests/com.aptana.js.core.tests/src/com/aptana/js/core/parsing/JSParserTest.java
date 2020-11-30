@@ -1807,18 +1807,6 @@ public abstract class JSParserTest
 		fail(builder.toString());
 	}
 
-	/**
-	 * This method is not being used for formal testing, but it's useful to determine how effective
-	 * {@link ParseNode#trimToSize()} is.
-	 * 
-	 * @throws Exception
-	 */
-//	public void trimToSize() throws Exception
-//	{
-//		ParseState parseState = new ParseState(getSource("performance/ext/ext-all-debug-w-comments.js"));
-//		ASTUtil.showBeforeAndAfterTrim(parse(parseState));
-//	}
-
 	protected IParseRootNode parse(String source) throws Exception
 	{
 		return parse(new ParseState(source));
