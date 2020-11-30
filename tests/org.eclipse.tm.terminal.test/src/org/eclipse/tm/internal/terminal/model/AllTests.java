@@ -24,7 +24,6 @@ import org.junit.runners.Suite.SuiteClasses;
 	SynchronizedTerminalTextDataTest.class,
 	TerminalTextDataFastScrollTest.class,
 	TerminalTextDataFastScrollTestMaxHeigth.class,
-	TerminalTextDataPerformanceTest.class,
 	TerminalTextDataSnapshotTest.class,
 	TerminalTextDataSnapshotWindowTest.class,
 	TerminalTextDataStoreTest.class,
