@@ -22,9 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
-
-import com.aptana.testing.categories.PerformanceTests;
 
 public class StringUtilTest
 {
@@ -537,32 +534,6 @@ public class StringUtilTest
 		assertEquals(-1, StringUtil.findNextWhitespaceOffset("a b c", 4));
 	}
 
-	@Test
-	@Category({PerformanceTests.class})
-	public void testJoinSpeed()
-	{
-		// @formatter:off
-		timeBothJoins(
-			"(with delim)",
-			"~~|~~",
-			new String[] { "abc", "def", "ghi", "jkl", "mno", "pqr", "stu", "vwx", "yz" }
-		);
-		// @formatter:on
-	}
-
-	@Test
-	@Category({PerformanceTests.class})
-	public void testEmptyDelimiterJoinSpeed()
-	{
-		// @formatter:off
-		timeBothJoins(
-			"(no delim)",
-			null,
-			new String[] { "abc", "def", "ghi", "jkl", "mno", "pqr", "stu", "vwx", "yz" }
-		);
-		// @formatter:on
-	}
-
 	protected void timeBothJoins(String title, String delimiter, String... items)
 	{
 		timeOldJoin(title, delimiter, items);
@@ -593,15 +564,6 @@ public class StringUtilTest
 
 		long diff = System.currentTimeMillis() - start;
 		System.out.println("old join " + title + ": " + diff + "ms");
-	}
-
-	@Test
-	@Category({PerformanceTests.class})
-	public void testConcatVersusStringBuilder()
-	{
-		timeConcatArray();
-		timeConcatList();
-		timeStringBuilder();
 	}
 
 	protected void timeConcatList()
