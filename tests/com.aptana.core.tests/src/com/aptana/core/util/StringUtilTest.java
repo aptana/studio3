@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+<<<<<<< HEAD
+=======
+import org.junit.experimental.categories.Category;
+>>>>>>> a3695a42df... test: remove performance tests
 
 public class StringUtilTest
 {
@@ -532,99 +536,6 @@ public class StringUtilTest
 		assertEquals(3, StringUtil.findNextWhitespaceOffset("a b c", 2));
 		assertEquals(3, StringUtil.findNextWhitespaceOffset("a b c", 3));
 		assertEquals(-1, StringUtil.findNextWhitespaceOffset("a b c", 4));
-	}
-
-	protected void timeBothJoins(String title, String delimiter, String... items)
-	{
-		timeOldJoin(title, delimiter, items);
-		timeNewJoin(title, delimiter, items);
-	}
-
-	protected void timeNewJoin(String title, String delimiter, String... items)
-	{
-		long start = System.currentTimeMillis();
-
-		for (int i = 0; i < 1000000; i++)
-		{
-			StringUtil.join(delimiter, items);
-		}
-
-		long diff = System.currentTimeMillis() - start;
-		System.out.println("new join " + title + ": " + diff + "ms");
-	}
-
-	protected void timeOldJoin(String title, String delimiter, String... items)
-	{
-		long start = System.currentTimeMillis();
-
-		for (int i = 0; i < 1000000; i++)
-		{
-			oldJoin(delimiter, items);
-		}
-
-		long diff = System.currentTimeMillis() - start;
-		System.out.println("old join " + title + ": " + diff + "ms");
-	}
-
-	protected void timeConcatList()
-	{
-		List<String> items = CollectionsUtil.newList("abc", "def", "ghi", "jkl", "mno", "pqr", "stu", "vwx", "yz");
-
-		long start = System.currentTimeMillis();
-
-		for (int i = 0; i < 1000000; i++)
-		{
-			String result = StringUtil.concat(items);
-			assertNotNull(result);
-			assertTrue(result.length() != 0);
-		}
-
-		long diff = System.currentTimeMillis() - start;
-
-		System.out.println("concat list: " + diff + "ms");
-	}
-
-	protected void timeConcatArray()
-	{
-		String[] items = new String[] { "abc", "def", "ghi", "jkl", "mno", "pqr", "stu", "vwx", "yz" };
-
-		long start = System.currentTimeMillis();
-
-		for (int i = 0; i < 1000000; i++)
-		{
-			String result = StringUtil.concat(items);
-			assertNotNull(result);
-			assertTrue(result.length() != 0);
-		}
-
-		long diff = System.currentTimeMillis() - start;
-
-		System.out.println("concat array: " + diff + "ms");
-	}
-
-	protected void timeStringBuilder()
-	{
-		List<String> items = CollectionsUtil.newList("abc", "def", "ghi", "jkl", "mno", "pqr", "stu", "vwx", "yz");
-
-		long start = System.currentTimeMillis();
-
-		for (int i = 0; i < 1000000; i++)
-		{
-			StringBuilder builder = new StringBuilder();
-
-			for (String item : items)
-			{
-				builder.append(item);
-
-			}
-
-			String result = builder.toString();
-			assertTrue(result.length() != 0);
-		}
-
-		long diff = System.currentTimeMillis() - start;
-
-		System.out.println("string builder: " + diff + "ms");
 	}
 
 	@Test
