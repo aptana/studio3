@@ -1,36 +1,51 @@
 /*
- * Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
- * This code is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * The Universal Permissive License (UPL), Version 1.0
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * version 2 for more details (a copy is included in the LICENSE file that
- * accompanied this code).
+ * Subject to the condition set forth below, permission is hereby granted to any
+ * person obtaining a copy of this software, associated documentation and/or
+ * data (collectively the "Software"), free of charge and under any and all
+ * copyright rights in the Software, and any and all patent rights owned or
+ * freely licensable by each licensor hereunder covering either (i) the
+ * unmodified Software as contributed to or provided by such licensor, or (ii)
+ * the Larger Works (as defined below), to deal in both
  *
- * You should have received a copy of the GNU General Public License version
- * 2 along with this work; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * (a) the Software, and
  *
- * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
- * or visit www.oracle.com if you need additional information or have any
- * questions.
+ * (b) any piece of software and/or hardware listed in the lrgrwrks.txt file if
+ * one is included with the Software each a "Larger Work" to which the Software
+ * is contributed by such licensors),
+ *
+ * without restriction, including without limitation the rights to copy, create
+ * derivative works of, display, perform, and distribute the Software and make,
+ * use, sell, offer for sale, import, export, have made, and have sold the
+ * Software and the Larger Work(s), and to sublicense the foregoing rights on
+ * either these or other terms.
+ *
+ * This license is subject to the following condition:
+ *
+ * The above copyright notice and either this complete permission notice or at a
+ * minimum a reference to the UPL must be included in all copies or substantial
+ * portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package com.oracle.js.parser.ir;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+
+import org.graalvm.collections.EconomicMap;
 
 import com.oracle.js.parser.ir.visitor.NodeVisitor;
 import com.oracle.js.parser.ir.visitor.TranslatorNodeVisitor;
@@ -44,16 +59,10 @@ public class Block extends Node implements BreakableNode, Terminal, Flags<Block>
     protected final List<Statement> statements;
 
     /** Symbol table - keys must be returned in the order they were put in. */
-    protected final Map<String, Symbol> symbols;
+    protected final EconomicMap<String, Symbol> symbols;
 
     private int blockScopedOrRedeclaredSymbols;
     private int declaredNames;
-
-    /** Entry label. */
-    private final Label entryLabel;
-
-    /** Break label. */
-    private final Label breakLabel;
 
     /** Does the block/function need a new scope? Is this synthetic? */
     protected final int flags;
@@ -94,6 +103,16 @@ public class Block extends Node implements BreakableNode, Terminal, Flags<Block>
     public static final int IS_SWITCH_BLOCK = 1 << 7;
 
     /**
+     * Marks the variable declaration block for a for-of loop.
+     */
+    public static final int IS_FOR_OF_BLOCK = 1 << 8;
+
+    /**
+     * Is this an expression block (class or do expression) that should return its completion value.
+     */
+    public static final int IS_EXPRESSION_BLOCK = 1 << 9;
+
+    /**
      * Constructor
      *
      * @param token      The first token of the block
@@ -105,24 +124,11 @@ public class Block extends Node implements BreakableNode, Terminal, Flags<Block>
         super(token, finish);
         assert start <= finish;
 
-        this.statements = Arrays.asList(statements);
-        this.symbols    = new LinkedHashMap<>();
-        this.entryLabel = new Label("block_entry");
-        this.breakLabel = new Label("block_break");
+        this.statements = statements.length == 0 ? Collections.emptyList() : Arrays.asList(statements);
+        this.symbols    = EconomicMap.create();
         final int len = statements.length;
         final int terminalFlags = len > 0 && statements[len - 1].hasTerminalFlags() ? IS_TERMINAL : 0;
         this.flags = terminalFlags | flags;
-    }
-
-    /**
-     * Constructs a new block
-     *
-     * @param token The first token of the block
-     * @param finish The index of the last character
-     * @param statements All statements in the block
-     */
-    public Block(final long token, final int finish, final List<Statement> statements) {
-        this(token, finish, IS_SYNTHETIC, statements);
     }
 
     /**
@@ -137,13 +143,11 @@ public class Block extends Node implements BreakableNode, Terminal, Flags<Block>
         this(token, finish, flags, statements.toArray(new Statement[statements.size()]));
     }
 
-    private Block(final Block block, final int finish, final List<Statement> statements, final int flags, final Map<String, Symbol> symbols) {
+    private Block(final Block block, final int finish, final List<Statement> statements, final int flags, final EconomicMap<String, Symbol> symbols) {
         super(block, finish);
         this.statements = statements;
         this.flags      = flags;
-        this.symbols    = new LinkedHashMap<>(symbols);
-        this.entryLabel = new Label(block.entryLabel);
-        this.breakLabel = new Label(block.breakLabel);
+        this.symbols    = EconomicMap.create(symbols);
 
         this.declaredNames = block.declaredNames;
         this.blockScopedOrRedeclaredSymbols = block.blockScopedOrRedeclaredSymbols;
@@ -179,11 +183,11 @@ public class Block extends Node implements BreakableNode, Terminal, Flags<Block>
     }
 
     /**
-     * Get a copy of the list for all the symbols defined in this block
+     * Get all the symbols defined in this block, in definition order.
      * @return symbol iterator
      */
-    public List<Symbol> getSymbols() {
-        return Collections.unmodifiableList(new ArrayList<>(symbols.values()));
+    public Iterable<Symbol> getSymbols() {
+        return symbols.getValues();
     }
 
     /**
@@ -197,13 +201,28 @@ public class Block extends Node implements BreakableNode, Terminal, Flags<Block>
     }
 
     /**
+     * Test if a symbol with this name is defined in the current block.
+     * @param name the name of the symbol
+     */
+    public boolean hasSymbol(final String name) {
+        return symbols.containsKey(name);
+    }
+
+    /**
+     * Get the number of symbols defined in this block.
+     */
+    public int getSymbolCount() {
+        return symbols.size();
+    }
+
+    /**
      * Test if this block represents a <tt>catch</tt> block in a <tt>try</tt> statement.
      * This is used by the Splitter as catch blocks are not be subject to splitting.
      *
      * @return true if this block represents a catch block in a try statement.
      */
     public boolean isCatchBlock() {
-        return statements.size() == 1 && statements.get(0) instanceof CatchNode;
+        return getLastStatement() instanceof CatchNode;
     }
 
     @Override
@@ -227,19 +246,6 @@ public class Block extends Node implements BreakableNode, Terminal, Flags<Block>
     @Override
     public boolean isTerminal() {
         return getFlag(IS_TERMINAL);
-    }
-
-    /**
-     * Get the entry label for this block
-     * @return the entry label
-     */
-    public Label getEntryLabel() {
-        return entryLabel;
-    }
-
-    @Override
-    public Label getBreakLabel() {
-        return breakLabel;
     }
 
     /**
@@ -313,10 +319,10 @@ public class Block extends Node implements BreakableNode, Terminal, Flags<Block>
      */
     public void putSymbol(final LexicalContext lc, final Symbol symbol) {
         symbols.put(symbol.getName(), symbol);
-        if (symbol.isBlockScoped() || symbol.isVarRedeclaredHere()) {
+        if ((symbol.isBlockScoped() || symbol.isVarRedeclaredHere()) && !symbol.isImportBinding()) {
             blockScopedOrRedeclaredSymbols++;
         }
-        if (symbol.isBlockScoped() || symbol.isVarDeclaredHere()) {
+        if ((symbol.isBlockScoped() || (symbol.isVar() && symbol.isVarDeclaredHere())) && !symbol.isImportBinding()) {
             declaredNames++;
         }
     }
@@ -363,22 +369,13 @@ public class Block extends Node implements BreakableNode, Terminal, Flags<Block>
     }
 
     @Override
-    public List<Label> getLabels() {
-        return Collections.unmodifiableList(Arrays.asList(entryLabel, breakLabel));
-    }
-
-    @Override
     public Node accept(final NodeVisitor<? extends LexicalContext> visitor) {
-        return Acceptor.accept(this, visitor);
+        return BreakableNode.super.accept(visitor);
     }
 
     @Override
     public <R> R accept(TranslatorNodeVisitor<? extends LexicalContext, R> visitor) {
-        return Acceptor.accept(this, visitor);
-    }
-
-    public Map<String, Symbol> getSymbolMap() {
-        return symbols;
+        return BreakableNode.super.accept(visitor);
     }
 
     public boolean hasBlockScopedOrRedeclaredSymbols() {
@@ -399,5 +396,13 @@ public class Block extends Node implements BreakableNode, Terminal, Flags<Block>
 
     public boolean isSwitchBlock() {
         return getFlag(IS_SWITCH_BLOCK);
+    }
+
+    public boolean isForOfBlock() {
+        return getFlag(IS_FOR_OF_BLOCK);
+    }
+
+    public boolean isExpressionBlock() {
+        return getFlag(IS_EXPRESSION_BLOCK);
     }
 }

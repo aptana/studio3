@@ -1,26 +1,42 @@
 /*
- * Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
- * This code is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * The Universal Permissive License (UPL), Version 1.0
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * version 2 for more details (a copy is included in the LICENSE file that
- * accompanied this code).
+ * Subject to the condition set forth below, permission is hereby granted to any
+ * person obtaining a copy of this software, associated documentation and/or
+ * data (collectively the "Software"), free of charge and under any and all
+ * copyright rights in the Software, and any and all patent rights owned or
+ * freely licensable by each licensor hereunder covering either (i) the
+ * unmodified Software as contributed to or provided by such licensor, or (ii)
+ * the Larger Works (as defined below), to deal in both
  *
- * You should have received a copy of the GNU General Public License version
- * 2 along with this work; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * (a) the Software, and
  *
- * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
- * or visit www.oracle.com if you need additional information or have any
- * questions.
+ * (b) any piece of software and/or hardware listed in the lrgrwrks.txt file if
+ * one is included with the Software each a "Larger Work" to which the Software
+ * is contributed by such licensors),
+ *
+ * without restriction, including without limitation the rights to copy, create
+ * derivative works of, display, perform, and distribute the Software and make,
+ * use, sell, offer for sale, import, export, have made, and have sold the
+ * Software and the Larger Work(s), and to sublicense the foregoing rights on
+ * either these or other terms.
+ *
+ * This license is subject to the following condition:
+ *
+ * The above copyright notice and either this complete permission notice or at a
+ * minimum a reference to the UPL must be included in all copies or substantial
+ * portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package com.oracle.js.parser.ir;
@@ -81,6 +97,10 @@ public final class Symbol implements Comparable<Symbol> {
     public static final int IS_VAR_REDECLARED_HERE = 1 << 12;
     /** Is this symbol declared in an unprotected switch case context? */
     public static final int IS_DECLARED_IN_SWITCH_BLOCK = 1 << 13;
+    /** Is this symbol an indirect import binding of a module environment? */
+    public static final int IS_IMPORT_BINDING = 1 << 14;
+    /** Is this symbol a catch parameter binding? */
+    public static final int IS_CATCH_PARAMETER = 1 << 15;
 
     /** Null or name identifying symbol. */
     private final String name;
@@ -108,12 +128,10 @@ public final class Symbol implements Comparable<Symbol> {
 
         sb.append(name);
 
-        if (isScope()) {
-            if (isGlobal()) {
-                sb.append(" G");
-            } else {
-                sb.append(" S");
-            }
+        if (isGlobal()) {
+            sb.append(" G");
+        } else if (isScope()) {
+            sb.append(" S");
         }
 
         return sb.toString();
@@ -277,81 +295,12 @@ public final class Symbol implements Comparable<Symbol> {
     }
 
     /**
-     * Increase the symbol's use count by one.
-     */
-    public void increaseUseCount() {
-        if (isScope()) { // Avoid dirtying a cache line; we only need the use count for scoped symbols
-            useCount++;
-        }
-    }
-
-    /**
      * Get the symbol's use count
      *
      * @return the number of times the symbol is used in code.
      */
     public int getUseCount() {
         return useCount;
-    }
-
-    /**
-     * Flag this symbol as scope as described in {@link Symbol#isScope()}
-     *
-     * @return the symbol
-     */
-    public Symbol setIsScope() {
-        if (!isScope()) {
-            flags |= IS_SCOPE;
-        }
-        return this;
-    }
-
-    /**
-     * Mark this symbol as a function declaration.
-     */
-    public void setIsFunctionDeclaration() {
-        if (!isFunctionDeclaration()) {
-            flags |= IS_FUNCTION_DECLARATION;
-        }
-    }
-
-    /**
-     * Set the symbol flags
-     *
-     * @param flags flags
-     * @return the symbol
-     */
-    public Symbol setFlags(final int flags) {
-        if (this.flags != flags) {
-            this.flags = flags;
-        }
-        return this;
-    }
-
-    /**
-     * Set a single symbol flag
-     *
-     * @param flag flag to set
-     * @return the symbol
-     */
-    public Symbol setFlag(final int flag) {
-        if ((this.flags & flag) == 0) {
-            this.flags |= flag;
-        }
-        return this;
-    }
-
-    /**
-     * Clears a single symbol flag
-     *
-     * @param flag flag to set
-     * @return the symbol
-     */
-    public Symbol clearFlag(final int flag) {
-        if ((this.flags & flag) != 0) {
-            this.flags &= ~flag;
-        }
-        return this;
     }
 
     /**
@@ -369,5 +318,21 @@ public final class Symbol implements Comparable<Symbol> {
         if (!isDeclaredInSwitchBlock()) {
             flags |= IS_DECLARED_IN_SWITCH_BLOCK;
         }
+    }
+
+    /**
+     * @return true if this symbol is an indirect import binding
+     * @see #IS_IMPORT_BINDING
+     */
+    public boolean isImportBinding() {
+        return (flags & IS_IMPORT_BINDING) != 0;
+    }
+
+    /**
+     * @return true if this symbol is a catch parameter binding
+     * @see #IS_CATCH_PARAMETER
+     */
+    public boolean isCatchParameter() {
+        return (flags & IS_CATCH_PARAMETER) != 0;
     }
 }

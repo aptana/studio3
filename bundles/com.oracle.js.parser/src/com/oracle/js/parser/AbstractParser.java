@@ -1,26 +1,42 @@
 /*
- * Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
- * This code is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * The Universal Permissive License (UPL), Version 1.0
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * version 2 for more details (a copy is included in the LICENSE file that
- * accompanied this code).
+ * Subject to the condition set forth below, permission is hereby granted to any
+ * person obtaining a copy of this software, associated documentation and/or
+ * data (collectively the "Software"), free of charge and under any and all
+ * copyright rights in the Software, and any and all patent rights owned or
+ * freely licensable by each licensor hereunder covering either (i) the
+ * unmodified Software as contributed to or provided by such licensor, or (ii)
+ * the Larger Works (as defined below), to deal in both
  *
- * You should have received a copy of the GNU General Public License version
- * 2 along with this work; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * (a) the Software, and
  *
- * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
- * or visit www.oracle.com if you need additional information or have any
- * questions.
+ * (b) any piece of software and/or hardware listed in the lrgrwrks.txt file if
+ * one is included with the Software each a "Larger Work" to which the Software
+ * is contributed by such licensors),
+ *
+ * without restriction, including without limitation the rights to copy, create
+ * derivative works of, display, perform, and distribute the Software and make,
+ * use, sell, offer for sale, import, export, have made, and have sold the
+ * Software and the Larger Work(s), and to sublicense the foregoing rights on
+ * either these or other terms.
+ *
+ * This license is subject to the following condition:
+ *
+ * The above copyright notice and either this complete permission notice or at a
+ * minimum a reference to the UPL must be included in all copies or substantial
+ * portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package com.oracle.js.parser;
@@ -31,8 +47,8 @@ import static com.oracle.js.parser.TokenType.EOF;
 import static com.oracle.js.parser.TokenType.EOL;
 import static com.oracle.js.parser.TokenType.IDENT;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.math.BigInteger;
+
 import java.util.function.Function;
 
 import com.oracle.js.parser.Lexer.LexerToken;
@@ -85,13 +101,8 @@ public abstract class AbstractParser {
     /** Is this parser running under strict mode? */
     protected boolean isStrictMode;
 
-    /** Is this parser running under strong mode? */
-    protected boolean isStrongMode;
-
     /** What should line numbers be counted from? */
     protected final int lineOffset;
-
-    private final Map<String, String> canonicalNames = new HashMap<>();
 
     /**
      * Construct a parser.
@@ -204,17 +215,16 @@ public abstract class AbstractParser {
      * @return tokenType of next token.
      */
     protected TokenType nextToken() {
-        // Capture last token type, but ignore comments (which are irrelevant for the purpose of
-        // newline detection).
-        if (type != COMMENT) {
-            last = type;
-        }
         if (type != EOF) {
-
             // Set up next token.
             k++;
             final long lastToken = token;
-            previousToken = token;
+            // Capture last token type, but ignore comments (which are irrelevant for the purpose of
+            // newline detection).
+            if (type != COMMENT) {
+                last = type;
+                previousToken = token;
+            }
             token = getToken(k);
             type = Token.descType(token);
 
@@ -292,9 +302,8 @@ public abstract class AbstractParser {
      * @return ParserException upon failure. Caller should throw and not ignore
      */
     protected final ParserException error(final JSErrorType errorType, final String message) {
-        // TODO - column needs to account for tabs.
         final int position = Token.descPosition(token);
-        final int column = position - linePosition;
+        final int column = source.getColumn(position);
         final String formatted = ErrorManager.format(message, source, line, column, token);
         return new ParserException(errorType, formatted, source, line, column, token);
     }
@@ -331,6 +340,12 @@ public abstract class AbstractParser {
         return msg;
     }
 
+    protected final String expectMessage(final TokenType expected, final long errorToken) {
+        final String expectedName = expected.getNameOrType();
+        final String tokenString = Token.toString(source, errorToken);
+        return AbstractParser.message("expected", expectedName, tokenString);
+    }
+
     /**
      * Check current token and advance to the next token.
      *
@@ -357,22 +372,18 @@ public abstract class AbstractParser {
     }
 
     /**
-     * Check next token, get its value and advance.
+     * Get the value of the current token. If the current token contains an escape sequence, the
+     * method does not attempt to convert it.
      *
-     * @param expected Expected tokenType.
-     * @return The JavaScript value of the token
-     * @throws ParserException on unexpected token type
+     * @return JavaScript value of the token.
      */
-    protected final Object expectValue(final TokenType expected) throws ParserException {
-        if (type != expected) {
-            throw error(expectMessage(expected));
+    protected final Object getValueNoEscape() {
+        try {
+            return lexer.getValueOf(token, isStrictMode, false);
+        } catch (final ParserException e) {
+            errors.error(e);
         }
-
-        final Object value = getValue();
-
-        next();
-
-        return value;
+        return null;
     }
 
     /**
@@ -420,25 +431,22 @@ public abstract class AbstractParser {
         // Capture IDENT token.
         long identToken = token;
 
-        if (isNonStrictModeIdent()) {
-            // Fake out identifier.
-            identToken = Token.recast(token, IDENT);
-            // Get IDENT.
+        if (type == IDENT) {
             final String ident = (String) getValue(identToken);
 
             next();
 
-            // Create IDENT node.
-            return createIdentNode(identToken, finish, ident).setIsFutureStrictName();
-        }
+            return createIdentNode(identToken, finish, ident);
+        } else if (type.isContextualKeyword() || isNonStrictModeIdent()) {
+            final String ident = type.getName();
 
-        // Get IDENT.
-        final String ident = (String) expectValue(IDENT);
-        if (ident == null) {
-            return null;
+            next();
+
+            return new IdentNode(identToken, finish, ident);
+        } else {
+            // Not an IDENT.
+            throw error(expectMessage(IDENT));
         }
-        // Create IDENT node.
-        return createIdentNode(identToken, finish, ident);
     }
 
     /**
@@ -453,9 +461,16 @@ public abstract class AbstractParser {
      *         name will be deduplicated.
      */
     protected IdentNode createIdentNode(final long identToken, final int identFinish, final String name) {
-        final String existingName = canonicalNames.putIfAbsent(name, name);
-        final String canonicalName = existingName != null ? existingName : name;
-        return new IdentNode(identToken, identFinish, canonicalName);
+        assert isInterned(name) : name;
+        return new IdentNode(identToken, identFinish, name);
+    }
+
+    private boolean isInterned(final String name) {
+        return isSame(lexer.stringIntern(name), name) || isSame(name.intern(), name);
+    }
+
+    private static boolean isSame(Object a, Object b) {
+        return a == b;
     }
 
     /**
@@ -464,14 +479,25 @@ public abstract class AbstractParser {
      * @return true if current token is an identifier name
      */
     protected final boolean isIdentifierName() {
-        final TokenKind kind = type.getKind();
-        if (kind == TokenKind.KEYWORD || kind == TokenKind.FUTURE || kind == TokenKind.FUTURESTRICT) {
+        return isIdentifierName(token);
+    }
+
+    /**
+     * Check if token is an identifier name
+     *
+     * @return true if token is an identifier name
+     */
+    protected final boolean isIdentifierName(long currentToken) {
+        final TokenType currentType = Token.descType(currentToken);
+        assert currentType != IDENT; // handled before
+        final TokenKind kind = currentType.getKind();
+        if (kind == TokenKind.KEYWORD || kind == TokenKind.FUTURE || kind == TokenKind.FUTURESTRICT || kind == TokenKind.CONTEXTUAL) {
             return true;
         }
 
         // only literals allowed are null, false and true
         if (kind == TokenKind.LITERAL) {
-            switch (type) {
+            switch (currentType) {
                 case FALSE:
                 case NULL:
                 case TRUE:
@@ -482,7 +508,7 @@ public abstract class AbstractParser {
         }
 
         // Fake out identifier.
-        final long identToken = Token.recast(token, IDENT);
+        final long identToken = Token.recast(currentToken, IDENT);
         // Get IDENT.
         final String ident = (String) getValue(identToken);
         return !ident.isEmpty() && Character.isJavaIdentifierStart(ident.charAt(0));
@@ -505,11 +531,8 @@ public abstract class AbstractParser {
             // Create IDENT node.
             return createIdentNode(identToken, finish, ident);
         } else {
-        		expectDontAdvance(IDENT);
-        		
-        		// Fake out identifier.
-            final long identToken = Token.recast(token, IDENT);
-            return createIdentNode(identToken, finish, "");
+            expect(IDENT);
+            return null;
         }
     }
 
@@ -532,6 +555,8 @@ public abstract class AbstractParser {
 
         if (value == null) {
             node = LiteralNode.newInstance(literalToken, finish);
+        } else if (value instanceof BigInteger) {
+            node = LiteralNode.newInstance(literalToken, finish, (BigInteger) value);
         } else if (value instanceof Number) {
             node = LiteralNode.newInstance(literalToken, finish, (Number) value, getNumberToStringConverter());
         } else if (value instanceof String) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2017, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,35 +22,33 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package com.oracle.js.parser.ir;
+package org.graalvm.collections;
 
 /**
- * Abstraction for labels.
+ * Cursor to iterate over a map without changing its contents.
+ *
+ * @since 1.0
  */
-public final class Label {
-    /** Name of this label. */
-    private final String name;
+public interface UnmodifiableMapCursor<K, V> {
+    /**
+     * Advances to the next entry.
+     *
+     * @return {@code true} if a next entry exists, {@code false} if there is no next entry.
+     * @since 1.0
+     */
+    boolean advance();
 
     /**
-     * Constructor.
+     * The key of the current entry.
      *
-     * @param name name of this label
+     * @since 1.0
      */
-    public Label(final String name) {
-        this.name = name;
-    }
+    K getKey();
 
     /**
-     * Copy constructor.
+     * The value of the current entry.
      *
-     * @param label a label to clone
+     * @since 1.0
      */
-    public Label(final Label label) {
-        this.name = label.name;
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
+    V getValue();
 }

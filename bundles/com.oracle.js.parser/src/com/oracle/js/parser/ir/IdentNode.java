@@ -1,29 +1,47 @@
 /*
- * Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
- * This code is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * The Universal Permissive License (UPL), Version 1.0
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * version 2 for more details (a copy is included in the LICENSE file that
- * accompanied this code).
+ * Subject to the condition set forth below, permission is hereby granted to any
+ * person obtaining a copy of this software, associated documentation and/or
+ * data (collectively the "Software"), free of charge and under any and all
+ * copyright rights in the Software, and any and all patent rights owned or
+ * freely licensable by each licensor hereunder covering either (i) the
+ * unmodified Software as contributed to or provided by such licensor, or (ii)
+ * the Larger Works (as defined below), to deal in both
  *
- * You should have received a copy of the GNU General Public License version
- * 2 along with this work; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * (a) the Software, and
  *
- * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
- * or visit www.oracle.com if you need additional information or have any
- * questions.
+ * (b) any piece of software and/or hardware listed in the lrgrwrks.txt file if
+ * one is included with the Software each a "Larger Work" to which the Software
+ * is contributed by such licensors),
+ *
+ * without restriction, including without limitation the rights to copy, create
+ * derivative works of, display, perform, and distribute the Software and make,
+ * use, sell, offer for sale, import, export, have made, and have sold the
+ * Software and the Larger Work(s), and to sublicense the foregoing rights on
+ * either these or other terms.
+ *
+ * This license is subject to the following condition:
+ *
+ * The above copyright notice and either this complete permission notice or at a
+ * minimum a reference to the UPL must be included in all copies or substantial
+ * portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package com.oracle.js.parser.ir;
+
+import java.util.Objects;
 
 import com.oracle.js.parser.ir.visitor.NodeVisitor;
 import com.oracle.js.parser.ir.visitor.TranslatorNodeVisitor;
@@ -36,14 +54,13 @@ public final class IdentNode extends Expression implements PropertyKey, Function
     private static final int PROPERTY_NAME     = 1 << 0;
     private static final int INITIALIZED_HERE  = 1 << 1;
     private static final int FUNCTION          = 1 << 2;
-    private static final int FUTURESTRICT_NAME = 1 << 3;
+    private static final int NEW_TARGET        = 1 << 3;
     private static final int IS_DECLARED_HERE  = 1 << 4;
-    private static final int IS_DEAD           = 1 << 5;
-    private static final int DIRECT_SUPER      = 1 << 6;
-    private static final int REST_PARAMETER    = 1 << 7;
-    private static final int PROTO_PROPERTY    = 1 << 8;
-    private static final int DEFAULT_PARAMETER = 1 << 9;
-    private static final int DESTRUCTURED_PARAMETER = 1 << 10;
+    private static final int THIS              = 1 << 5;
+    private static final int SUPER             = 1 << 6;
+    private static final int DIRECT_SUPER      = 1 << 7;
+    private static final int REST_PARAMETER    = 1 << 8;
+    private static final int CATCH_PARAMETER   = 1 << 9;
 
     /** Identifier. */
     private final String name;
@@ -61,7 +78,7 @@ public final class IdentNode extends Expression implements PropertyKey, Function
      */
     public IdentNode(final long token, final int finish, final String name) {
         super(token, finish);
-        this.name = name;
+        this.name = Objects.requireNonNull(name);
         this.flags = 0;
     }
 
@@ -143,18 +160,7 @@ public final class IdentNode extends Expression implements PropertyKey, Function
      * @return true if this is a future strict name
      */
     public boolean isFutureStrictName() {
-        return (flags & FUTURESTRICT_NAME) == FUTURESTRICT_NAME;
-    }
-
-    /**
-     * Flag this IdentNode as a future strict name
-     * @return a node equivalent to this one except for the requested change.
-     */
-    public IdentNode setIsFutureStrictName() {
-        if (isFutureStrictName()) {
-            return this;
-        }
-        return new IdentNode(this, name, flags | FUTURESTRICT_NAME);
+        return tokenType().isFutureStrict();
     }
 
     /**
@@ -174,15 +180,6 @@ public final class IdentNode extends Expression implements PropertyKey, Function
             return this;
         }
         return new IdentNode(this, name, flags | INITIALIZED_HERE);
-    }
-
-    /**
-     * Is this a LET or CONST identifier used before its declaration?
-     *
-     * @return true if identifier is dead
-     */
-    public boolean isDead() {
-        return (flags & IS_DEAD) != 0;
     }
 
     /**
@@ -221,12 +218,28 @@ public final class IdentNode extends Expression implements PropertyKey, Function
         return name.charAt(0) == ':';
     }
 
+    public boolean isThis() {
+        return (flags & THIS) != 0;
+    }
+
+    public IdentNode setIsThis() {
+        return new IdentNode(this, name, flags | THIS);
+    }
+
+    public boolean isSuper() {
+        return (flags & SUPER) != 0;
+    }
+
+    public IdentNode setIsSuper() {
+        return new IdentNode(this, name, flags | SUPER);
+    }
+
     public boolean isDirectSuper() {
         return (flags & DIRECT_SUPER) != 0;
     }
 
     public IdentNode setIsDirectSuper() {
-        return new IdentNode(this, name, flags | DIRECT_SUPER);
+        return new IdentNode(this, name, flags | SUPER | DIRECT_SUPER);
     }
 
     public boolean isRestParameter() {
@@ -237,27 +250,19 @@ public final class IdentNode extends Expression implements PropertyKey, Function
         return new IdentNode(this, name, flags | REST_PARAMETER);
     }
 
-    public boolean isProtoPropertyName() {
-        return (flags & PROTO_PROPERTY) != 0;
+    public boolean isCatchParameter() {
+        return (flags & CATCH_PARAMETER) != 0;
     }
 
-    public IdentNode setIsProtoPropertyName() {
-        return new IdentNode(this, name, flags | PROTO_PROPERTY);
+    public IdentNode setIsCatchParameter() {
+        return new IdentNode(this, name, flags | CATCH_PARAMETER);
     }
 
-    public boolean isDefaultParameter() {
-        return (flags & DEFAULT_PARAMETER) != 0;
+    public boolean isNewTarget() {
+        return (flags & NEW_TARGET) != 0;
     }
 
-    public IdentNode setIsDefaultParameter() {
-        return new IdentNode(this, name, flags | DEFAULT_PARAMETER);
-    }
-
-    public boolean isDestructuredParameter() {
-        return (flags & DESTRUCTURED_PARAMETER) != 0;
-    }
-
-    public IdentNode setIsDestructuredParameter() {
-        return new IdentNode(this, name, flags | DESTRUCTURED_PARAMETER);
+    public IdentNode setIsNewTarget() {
+        return new IdentNode(this, name, flags | NEW_TARGET);
     }
 }

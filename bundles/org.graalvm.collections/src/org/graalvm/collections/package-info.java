@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,22 +22,17 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-
-package com.oracle.js.parser.ir;
-
-import java.util.List;
-
-// @formatter:off
-/**
- * Interface that can be used to get a list of all labels in a node
+/*
+ @ApiInfo(
+ group="Graal SDK"
+ )
  */
-public interface Labels {
-
-    /**
-     * Return the labels associated with this node. Breakable nodes that
-     * aren't LoopNodes only have a break label - the location immediately
-     * afterwards the node in code
-     * @return list of labels representing locations around this node
-     */
-    List<Label> getLabels();
-}
+/**
+ * The Graal-SDK collections package contains memory efficient data structures.
+ *
+ * @see org.graalvm.collections.EconomicMap
+ * @see org.graalvm.collections.EconomicSet
+ *
+ * @since 1.0
+ */
+package org.graalvm.collections;

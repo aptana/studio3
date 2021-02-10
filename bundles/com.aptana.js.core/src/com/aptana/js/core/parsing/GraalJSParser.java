@@ -142,7 +142,7 @@ public class GraalJSParser extends AbstractParser
 			// Reset state and fall back to non-strict script as our goal
 			working.getErrors().clear();
 			fParser = new CommentCollectingParser(env, src, errorManager);
-			result = fParser.parse(filename, startOffset, source.length() - startOffset, false);
+			result = fParser.parse(filename, startOffset, source.length() - startOffset, 0);
 		}
 
 		// If any errors found, will run in a simple recovery mode where will assume basic expected tokens({, },IDENT, (,)) are available and proceed with the parse without failing.
@@ -152,7 +152,7 @@ public class GraalJSParser extends AbstractParser
 			// considered in the recovery mode
 			inRecoveryMode[0] = true;
 			fParser = new CommentCollectingParser(env, src, errorManager, true);
-			result = fParser.parse(filename, startOffset, source.length() - startOffset, false);
+			result = fParser.parse(filename, startOffset, source.length() - startOffset, 0);
 
 		}
 		return result;
@@ -253,18 +253,6 @@ public class GraalJSParser extends AbstractParser
 						break;
 				}
 			}
-		}
-
-		private void insertToken(TokenType expectedTokenType)
-		{
-			long expectedNewToken = Token.toDesc(expectedTokenType, linePosition,
-					expectedTokenType.getName() != null ? expectedTokenType.getLength() : 0);
-
-			// insert the token that is expected before the unexpected token
-			stream.insert(k, expectedNewToken);
-			token = expectedNewToken;
-			k--;
-
 		}
 
 	}

@@ -1,45 +1,50 @@
 /*
- * Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
- * This code is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * The Universal Permissive License (UPL), Version 1.0
  *
- * This code is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * version 2 for more details (a copy is included in the LICENSE file that
- * accompanied this code).
+ * Subject to the condition set forth below, permission is hereby granted to any
+ * person obtaining a copy of this software, associated documentation and/or
+ * data (collectively the "Software"), free of charge and under any and all
+ * copyright rights in the Software, and any and all patent rights owned or
+ * freely licensable by each licensor hereunder covering either (i) the
+ * unmodified Software as contributed to or provided by such licensor, or (ii)
+ * the Larger Works (as defined below), to deal in both
  *
- * You should have received a copy of the GNU General Public License version
- * 2 along with this work; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * (a) the Software, and
  *
- * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
- * or visit www.oracle.com if you need additional information or have any
- * questions.
+ * (b) any piece of software and/or hardware listed in the lrgrwrks.txt file if
+ * one is included with the Software each a "Larger Work" to which the Software
+ * is contributed by such licensors),
+ *
+ * without restriction, including without limitation the rights to copy, create
+ * derivative works of, display, perform, and distribute the Software and make,
+ * use, sell, offer for sale, import, export, have made, and have sold the
+ * Software and the Larger Work(s), and to sublicense the foregoing rights on
+ * either these or other terms.
+ *
+ * This license is subject to the following condition:
+ *
+ * The above copyright notice and either this complete permission notice or at a
+ * minimum a reference to the UPL must be included in all copies or substantial
+ * portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package com.oracle.js.parser;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOError;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -60,8 +65,8 @@ public final class Source {
     private final String name;
 
     /**
-     * Base directory the File or base part of the URL. Used to implement __DIR__.
-     * Used to load scripts relative to the 'directory' or 'base' URL of current script.
+     * Base path or URL of this source. Used to implement __DIR__, which can be
+     * used to load scripts relative to the location of the current script.
      * This will be null when it can't be computed.
      */
     private final String base;
@@ -85,23 +90,6 @@ public final class Source {
         this.data = data;
     }
 
-    private static Source sourceFor(final String name, final String base, final URLData data) throws IOException {
-        try {
-            final Source newSource = new Source(name, base, data);
-
-            // All sources in cache must be fully loaded
-            data.load();
-
-            return newSource;
-        } catch (final RuntimeException e) {
-            final Throwable cause = e.getCause();
-            if (cause instanceof IOException) {
-                throw (IOException) cause;
-            }
-            throw e;
-        }
-    }
-
     // Wrapper to manage lazy loading
     private interface Data {
 
@@ -111,17 +99,17 @@ public final class Source {
 
         long lastModified();
 
-        String data();
+        CharSequence data();
 
         boolean isEvalCode();
     }
 
     private static final class RawData implements Data {
-        private final String source;
+        private final CharSequence source;
         private final boolean evalCode;
         private int hash;
 
-        private RawData(final String source, final boolean evalCode) {
+        private RawData(final CharSequence source, final boolean evalCode) {
             this.source = Objects.requireNonNull(source);
             this.evalCode = evalCode;
         }
@@ -153,7 +141,7 @@ public final class Source {
 
         @Override
         public String toString() {
-            return data();
+            return data().toString();
         }
 
         @Override
@@ -171,7 +159,8 @@ public final class Source {
             return 0;
         }
 
-        public String data() {
+        @Override
+        public CharSequence data() {
             return source;
         }
 
@@ -181,141 +170,7 @@ public final class Source {
         }
     }
 
-    private static class URLData implements Data {
-        private final URL url;
-        protected final Charset cs;
-        private int hash;
-        protected String source;
-        protected int length;
-        protected long lastModified;
-
-        private URLData(final URL url, final Charset cs) {
-            this.url = Objects.requireNonNull(url);
-            this.cs = cs;
-        }
-
-        @Override
-        public int hashCode() {
-            int h = hash;
-            if (h == 0) {
-                h = hash = url.hashCode();
-            }
-            return h;
-        }
-
-        @Override
-        public boolean equals(final Object other) {
-            if (this == other) {
-                return true;
-            }
-            if (!(other instanceof URLData)) {
-                return false;
-            }
-
-            final URLData otherData = (URLData) other;
-
-            if (url.equals(otherData.url)) {
-                // Make sure both have meta data loaded
-                try {
-                    if (isDeferred()) {
-                        // Data in cache is always loaded, and we only compare to cached data.
-                        assert !otherData.isDeferred();
-                        loadMeta();
-                    } else if (otherData.isDeferred()) {
-                        otherData.loadMeta();
-                    }
-                } catch (final IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-                // Compare meta data
-                return this.length == otherData.length && this.lastModified == otherData.lastModified;
-            }
-            return false;
-        }
-
-        @Override
-        public String toString() {
-            return data();
-        }
-
-        @Override
-        public URL url() {
-            return url;
-        }
-
-        @Override
-        public int length() {
-            return length;
-        }
-
-        @Override
-        public long lastModified() {
-            return lastModified;
-        }
-
-        public String data() {
-            assert !isDeferred();
-            return source;
-        }
-
-        @Override
-        public boolean isEvalCode() {
-            return false;
-        }
-
-        boolean isDeferred() {
-            return source == null;
-        }
-
-        protected void load() throws IOException {
-            if (source == null) {
-                final URLConnection c = url.openConnection();
-                try (InputStream in = c.getInputStream()) {
-                    source = cs == null ? readFully(in) : readFully(in, cs);
-                    length = source.length();
-                    lastModified = c.getLastModified();
-                }
-            }
-        }
-
-        protected void loadMeta() throws IOException {
-            if (length == 0 && lastModified == 0) {
-                final URLConnection c = url.openConnection();
-                length = c.getContentLength();
-                lastModified = c.getLastModified();
-            }
-        }
-    }
-
-    private static class FileData extends URLData {
-        private final File file;
-
-        private FileData(final File file, final Charset cs) {
-            super(getURLFromFile(file), cs);
-            this.file = file;
-
-        }
-
-        @Override
-        protected void loadMeta() {
-            if (length == 0 && lastModified == 0) {
-                length = (int) file.length();
-                lastModified = file.lastModified();
-            }
-        }
-
-        @Override
-        protected void load() throws IOException {
-            if (source == null) {
-                source = cs == null ? readFully(file) : readFully(file, cs);
-                length = source.length();
-                lastModified = file.lastModified();
-            }
-        }
-    }
-
-    private String data() {
+    private CharSequence data() {
         return data.data();
     }
 
@@ -323,11 +178,11 @@ public final class Source {
      * Returns a Source instance
      *
      * @param name    source name
-     * @param content contents as string
+     * @param content contents as {@link CharSequence}
      * @param isEval does this represent code from 'eval' call?
      * @return source instance
      */
-    public static Source sourceFor(final String name, final String content, final boolean isEval) {
+    public static Source sourceFor(final String name, final CharSequence content, final boolean isEval) {
         return new Source(name, baseName(name), new RawData(content, isEval));
     }
 
@@ -340,103 +195,6 @@ public final class Source {
      */
     public static Source sourceFor(final String name, final String content) {
         return sourceFor(name, content, false);
-    }
-
-    /**
-     * Returns a Source instance
-     *
-     * @param name  source name
-     * @param url   url from which source can be loaded
-     *
-     * @return source instance
-     *
-     * @throws IOException if source cannot be loaded
-     */
-    public static Source sourceFor(final String name, final URL url) throws IOException {
-        return sourceFor(name, url, null);
-    }
-
-    /**
-     * Returns a Source instance
-     *
-     * @param name  source name
-     * @param url   url from which source can be loaded
-     * @param cs    Charset used to convert bytes to chars
-     *
-     * @return source instance
-     *
-     * @throws IOException if source cannot be loaded
-     */
-    public static Source sourceFor(final String name, final URL url, final Charset cs) throws IOException {
-        return sourceFor(name, baseURL(url), new URLData(url, cs));
-    }
-
-    /**
-     * Returns a Source instance
-     *
-     * @param name  source name
-     * @param file  file from which source can be loaded
-     *
-     * @return source instance
-     *
-     * @throws IOException if source cannot be loaded
-     */
-    public static Source sourceFor(final String name, final File file) throws IOException {
-        return sourceFor(name, file, null);
-    }
-
-    /**
-     * Returns a Source instance
-     *
-     * @param name  source name
-     * @param path  path from which source can be loaded
-     *
-     * @return source instance
-     *
-     * @throws IOException if source cannot be loaded
-     */
-    public static Source sourceFor(final String name, final Path path) throws IOException {
-        File file = null;
-        try {
-            file = path.toFile();
-        } catch (final UnsupportedOperationException uoe) {
-        }
-
-        if (file != null) {
-            return sourceFor(name, file);
-        } else {
-            return sourceFor(name, Files.newBufferedReader(path));
-        }
-    }
-
-    /**
-     * Returns a Source instance
-     *
-     * @param name  source name
-     * @param file  file from which source can be loaded
-     * @param cs    Charset used to convert bytes to chars
-     *
-     * @return source instance
-     *
-     * @throws IOException if source cannot be loaded
-     */
-    public static Source sourceFor(final String name, final File file, final Charset cs) throws IOException {
-        final File absFile = file.getAbsoluteFile();
-        return sourceFor(name, dirName(absFile, null), new FileData(file, cs));
-    }
-
-    /**
-     * Returns a Source instance.
-     *
-     * @param name source name
-     * @param reader reader from which source can be loaded
-     *
-     * @return source instance
-     *
-     * @throws IOException if source cannot be loaded
-     */
-    public static Source sourceFor(final String name, final Reader reader) throws IOException {
-        return new Source(name, baseName(name), new RawData(reader));
     }
 
     @Override
@@ -499,7 +257,7 @@ public final class Source {
      * @return Source content portion.
      */
     public String getString(final int start, final int len) {
-        return data().substring(start, start + len);
+        return data().subSequence(start, start + len).toString();
     }
 
     /**
@@ -554,7 +312,7 @@ public final class Source {
      * @return Index of first character of line.
      */
     private int findBOLN(final int position) {
-        final String d = data();
+        final CharSequence d = data();
         for (int i = position - 1; i > 0; i--) {
             final char ch = d.charAt(i);
 
@@ -572,7 +330,7 @@ public final class Source {
      * @return Index of last character of line.
      */
     private int findEOLN(final int position) {
-        final String d = data();
+        final CharSequence d = data();
         final int length = d.length();
         for (int i = position; i < length; i++) {
             final char ch = d.charAt(i);
@@ -595,7 +353,7 @@ public final class Source {
      * @return Line number.
      */
     public int getLine(final int position) {
-        final String d = data();
+        final CharSequence d = data();
         // Line count starts at 1.
         int line = 1;
 
@@ -625,19 +383,19 @@ public final class Source {
      * @param position Position of character in source content.
      * @return Line text.
      */
-    public String getSourceLine(final int position) {
+    public CharSequence getSourceLine(final int position) {
         // Find end of previous line.
         final int first = findBOLN(position);
         // Find end of this line.
         final int last = findEOLN(position);
 
-        return data().substring(first, last + 1);
+        return data().subSequence(first, last + 1);
     }
 
     /**
-     * Get the content of this source as a {@link String}.
+     * Get the content of this source as a {@link CharSequence}.
      */
-    public String getContent() {
+    public CharSequence getContent() {
         return data();
     }
 
@@ -673,60 +431,6 @@ public final class Source {
     }
 
     /**
-     * Read all of the source until end of file.
-     *
-     * @param file source file
-     * @return source as content
-     * @throws IOException if source could not be read
-     */
-    public static String readFully(final File file) throws IOException {
-        if (!file.isFile()) {
-            throw new IOException(file + " is not a file");
-        }
-        return byteArrayToString(Files.readAllBytes(file.toPath()));
-    }
-
-    /**
-     * Read all of the source until end of file.
-     *
-     * @param file source file
-     * @param cs Charset used to convert bytes to chars
-     * @return source as content
-     * @throws IOException if source could not be read
-     */
-    public static String readFully(final File file, final Charset cs) throws IOException {
-        if (!file.isFile()) {
-            throw new IOException(file + " is not a file");
-        }
-
-        final byte[] buf = Files.readAllBytes(file.toPath());
-        return (cs != null) ? new String(buf, cs) : byteArrayToString(buf);
-    }
-
-    /**
-     * Read all of the source until end of stream from the given URL.
-     *
-     * @param url URL to read content from
-     * @return source as content
-     * @throws IOException if source could not be read
-     */
-    public static String readFully(final URL url) throws IOException {
-        return readFully(url.openStream());
-    }
-
-    /**
-     * Read all of the source until end of file.
-     *
-     * @param url URL to read content from
-     * @param cs Charset used to convert bytes to chars
-     * @return source as content
-     * @throws IOException if source could not be read
-     */
-    public static String readFully(final URL url, final Charset cs) throws IOException {
-        return readFully(url.openStream(), cs);
-    }
-
-    /**
      * Get a Base64-encoded SHA1 digest for this source.
      *
      * @return a Base64-encoded SHA1 digest for this source
@@ -738,7 +442,7 @@ public final class Source {
     private byte[] getDigestBytes() {
         byte[] ldigest = digest;
         if (ldigest == null) {
-            final String content = data();
+            final CharSequence content = data();
             final byte[] bytes = new byte[content.length() * 2];
 
             for (int i = 0; i < content.length(); i++) {
@@ -767,41 +471,6 @@ public final class Source {
         return ldigest;
     }
 
-    /**
-     * Get the base url. This is currently used for testing only
-     * @param url a URL
-     * @return base URL for url
-     */
-    public static String baseURL(final URL url) {
-        if (url.getProtocol().equals("file")) {
-            try {
-                final Path path = Paths.get(url.toURI());
-                final Path parent = path.getParent();
-                return (parent != null) ? (parent + File.separator) : null;
-            } catch (final SecurityException | URISyntaxException | IOError e) {
-                return null;
-            }
-        }
-
-        // FIXME: is there a better way to find 'base' URL of a given URL?
-        String path = url.getPath();
-        if (path.isEmpty()) {
-            return null;
-        }
-        path = path.substring(0, path.lastIndexOf('/') + 1);
-        final int port = url.getPort();
-        try {
-            return new URL(url.getProtocol(), url.getHost(), port, path).toString();
-        } catch (final MalformedURLException e) {
-            return null;
-        }
-    }
-
-    private static String dirName(final File file, final String defaultBaseName) {
-        final String res = file.getParent();
-        return (res != null) ? (res + File.separator) : defaultBaseName;
-    }
-
     // fake directory like name
     private static String baseName(final String name) {
         int idx = name.lastIndexOf('/');
@@ -811,65 +480,8 @@ public final class Source {
         return (idx != -1) ? name.substring(0, idx + 1) : null;
     }
 
-    public static String readFully(final InputStream is, final Charset cs) throws IOException {
-        return (cs != null) ? new String(readBytes(is), cs) : readFully(is);
-    }
-
-    public static String readFully(final InputStream is) throws IOException {
-        return byteArrayToString(readBytes(is));
-    }
-
-    private static String byteArrayToString(final byte[] bytes) {
-        Charset cs = StandardCharsets.UTF_8;
-        int start = 0;
-        // BOM detection.
-        if (bytes.length > 1 && bytes[0] == (byte) 0xFE && bytes[1] == (byte) 0xFF) {
-            start = 2;
-            cs = StandardCharsets.UTF_16BE;
-        } else if (bytes.length > 1 && bytes[0] == (byte) 0xFF && bytes[1] == (byte) 0xFE) {
-            if (bytes.length > 3 && bytes[2] == 0 && bytes[3] == 0) {
-                start = 4;
-                cs = Charset.forName("UTF-32LE");
-            } else {
-                start = 2;
-                cs = StandardCharsets.UTF_16LE;
-            }
-        } else if (bytes.length > 2 && bytes[0] == (byte) 0xEF && bytes[1] == (byte) 0xBB && bytes[2] == (byte) 0xBF) {
-            start = 3;
-            cs = StandardCharsets.UTF_8;
-        } else if (bytes.length > 3 && bytes[0] == 0 && bytes[1] == 0 && bytes[2] == (byte) 0xFE && bytes[3] == (byte) 0xFF) {
-            start = 4;
-            cs = Charset.forName("UTF-32BE");
-        }
-
-        return new String(bytes, start, bytes.length - start, cs);
-    }
-
-    static byte[] readBytes(final InputStream is) throws IOException {
-        final byte[] arr = new byte[BUF_SIZE];
-        try {
-            try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
-                int numBytes;
-                while ((numBytes = is.read(arr, 0, arr.length)) > 0) {
-                    buf.write(arr, 0, numBytes);
-                }
-                return buf.toByteArray();
-            }
-        } finally {
-            is.close();
-        }
-    }
-
     @Override
     public String toString() {
         return getName();
-    }
-
-    private static URL getURLFromFile(final File file) {
-        try {
-            return file.toURI().toURL();
-        } catch (final SecurityException | MalformedURLException ignored) {
-            return null;
-        }
     }
 }
